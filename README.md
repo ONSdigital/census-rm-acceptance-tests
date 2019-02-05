@@ -4,7 +4,12 @@ Python Behave BDD tests for RM.
 
 ### Deploy the Behave tests to Kubernetes
 
-> kubectl run acceptance-tests --image ezol31/census-rm-acceptance-tests --namespace=response-management-dev -it --rm /bin/bash
+> kubectl run acceptance-tests --image rjweeks/census-rm-acceptance-tests --namespace=response-management-dev -it --rm /bin/bash
+
+### Run the tests
+
+> cd acceptance_tests
+> behave
 
 ### Build the Docker image
 
