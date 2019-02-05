@@ -1,5 +1,6 @@
 from behave import *
 import requests
+from config import Config
 
 
 @given('we have rm services running')
@@ -14,7 +15,8 @@ def setup_get_request_info(context):
 
 @then('we get 200 response')
 def get_request_info(context):
-    r = requests.get('http://localhost:8151/info')
+    action_service_info_endpoint = f'{Config.ACTION_SERVICE}/info'
+    r = requests.get(action_service_info_endpoint)
     assert r.status_code == 200
 
 
