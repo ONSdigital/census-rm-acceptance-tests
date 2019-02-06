@@ -1,6 +1,7 @@
 from behave import *
 import requests
-from config import Config
+
+from acceptance_tests.config import Config
 
 
 @given('we have rm services running')
