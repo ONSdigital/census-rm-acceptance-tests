@@ -1,6 +1,6 @@
 from behave import *
 import requests
-from acceptance_tests.config import Config
+from config import Config
 
 
 @given('we need a survey')
@@ -17,9 +17,9 @@ def create_survey(context):
 def validate_create_survey_response(context):
     create_survey_endpoint = f'{Config.SURVEY_SERVICE}/surveys'
     survey = {
-        'surveyRef': 'Census2',
-        'shortName': 'Census2',
-        'longName': 'Census2',
+        'surveyRef': 'Census3',
+        'shortName': 'Census3',
+        'longName': 'Census3',
         'legalBasisRef': 'GovERD',
         'surveyType': 'Social'}
     response = requests.post(create_survey_endpoint, auth=Config.BASIC_AUTH, json=survey)
@@ -28,7 +28,7 @@ def validate_create_survey_response(context):
 
 @given("we have a survey")
 def step_impl(context):
-    get_survey_byref_endpoint = f'{Config.SURVEY_SERVICE}/surveys/ref/Census2'
+    get_survey_byref_endpoint = f'{Config.SURVEY_SERVICE}/surveys/ref/Census3'
     response = requests.get(get_survey_byref_endpoint, auth=Config.BASIC_AUTH)
     assert response.status_code == 200
     context.survey_id = response.json()['id']
