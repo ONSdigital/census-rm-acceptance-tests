@@ -2,8 +2,8 @@ import requests
 from behave import given, when, then
 
 from config import Config
-from acceptance_tests.reset_database import reset_database
 from utilities.collection_exercise_utilities import create_collection_exercise
+from utilities.database import reset_database
 from utilities.survey_utilities import create_survey
 
 
