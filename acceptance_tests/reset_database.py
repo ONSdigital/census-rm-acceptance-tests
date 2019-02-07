@@ -1,9 +1,9 @@
-from acceptance_tests import database_controller
+from utilities import database
 
 
 def reset_database():
     print('Resetting databases')
-    database_controller.execute_sql('resources/database/database_reset_rm.sql')
+    database.execute_sql('resources/database/database_reset_rm.sql')
     print('Reset DB')
 
 

@@ -13,7 +13,7 @@ def there_is_a_live_collex(context, unique_id):
     context.survey_id = create_survey(context.survey_ref, context.survey_ref, context.survey_ref,
                                       'GovERD', 'Social')['id']
     create_survery_classifier(context)
-    create_collection_exercise(context.survey_ref)
+    context.collection_exercise_id = create_collection_exercise(context.survey_ref)
 
 
 @when('a sample file "{sample_file_name}" is loaded')

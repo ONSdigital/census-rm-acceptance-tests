@@ -8,6 +8,12 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+def reset_database():
+    print('Resetting databases')
+    execute_sql('resources/database/database_reset_rm.sql')
+    print('Reset DB')
+
+
 def execute_sql(sql_script_file_path=None, sql_string=None, database_uri=Config.DATABASE_URI):
     logger.debug('Executing SQL script', sql_script_file_path=sql_script_file_path)
     engine = create_engine(database_uri, connect_args={"options": "-c statement_timeout=120000"})
