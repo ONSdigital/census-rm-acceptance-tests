@@ -1,6 +1,6 @@
-import os
+ import os
 
-
+ 
 class Config(object):
 
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
