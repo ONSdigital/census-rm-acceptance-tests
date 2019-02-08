@@ -21,6 +21,8 @@ def create_collection_exercise(survey_ref):
 
     assert response.status_code == 201
 
+    logger.debug("Successfully created collection exercise", exercise_ref=survey_ref)
+
     return get_collection_exercise_id_from_response(response)
 
 
