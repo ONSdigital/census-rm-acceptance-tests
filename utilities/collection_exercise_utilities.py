@@ -19,11 +19,9 @@ def create_collection_exercise(survey_ref):
     response = requests.post(f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises",
                              auth=Config.BASIC_AUTH, json=collex)
 
-    assert response.status_code == 201
+    response.raise_for_status()
 
-    logger.debug("Successfully created collection exercise", exercise_ref=survey_ref)
-
-    return get_collection_exercise_id_from_response(response)
+    return response
 
 
 def get_collection_exercise_id_from_response(response):
