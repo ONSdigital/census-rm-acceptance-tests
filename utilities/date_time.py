@@ -1,9 +1,10 @@
 import maya
-import datetime
+from dateutil.parser import parse
 
 
 def create_utc_timestamp():
-    dt = datetime.utcnow().strftime('%Y-%m-%d-%H-%M-%S-%f')
-    mt = maya.now().iso8601()
-    prit(dt)
-    print(mt)
+    return maya.now().iso8601()
+
+
+def create_timestamp(month, day, year, time):
+    date = parse(month )
