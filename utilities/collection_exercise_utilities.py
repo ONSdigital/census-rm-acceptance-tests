@@ -8,18 +8,28 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_collection_exercise(survey_id, exercise_ref, user_description):
-    create_collection_exercise_url = f'{Config.COLLECTION_EXERCISE}/collectionexercises'
+def create_collection_exercise(survey_ref):
     collex = {
-        "surveyId": survey_id,
-        "exerciseRef": exercise_ref,
-        "userDescription": user_description
+        "surveyRef": survey_ref,
+        "name": survey_ref[:20],
+        "exerciseRef": '1',
+        "userDescription": '1',
     }
-    response = requests.post(create_collection_exercise_url, auth=Config.BASIC_AUTH, json=collex)
+
+    response = requests.post(f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises",
+                             auth=Config.BASIC_AUTH, json=collex)
+
     response.raise_for_status()
-    response_json = response.json()
-    logger.debug("Successfully created collection exercise", exercise_ref=exercise_ref)
-    return response_json
+
+    return response
+
+
+def get_collection_exercise_id_from_response(response):
+    headers = response.headers
+    store = headers.__getattribute__('_store')
+    collection_exercise_uri = store['location'][1]
+
+    return collection_exercise_uri.rsplit('/', 1)[-1]
 
 
 def delete_collection_exercise(id):
