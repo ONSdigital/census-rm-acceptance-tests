@@ -4,7 +4,7 @@ from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
 
-def get_timestamp:
+def get_timestamp():
     return maya.now().iso8601()
 
 
