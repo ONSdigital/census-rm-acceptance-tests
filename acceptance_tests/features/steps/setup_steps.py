@@ -44,7 +44,8 @@ def there_is_a_live_collex(context, unique_id):
     event_status = create_mandatory_events(context.collection_exercise_id, mandatory_events)
 
     for status in event_status:
-        assert status == 201
+        assert status == requests.codes.created
+
 
 
 @when('a sample file "{sample_file_name}" is loaded')
