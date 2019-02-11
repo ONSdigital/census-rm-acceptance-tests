@@ -36,7 +36,8 @@ def there_is_a_live_collex(context, unique_id):
 
 @when('a sample file "{sample_file_name}" is loaded')
 def step_impl(context, sample_file_name):
-    load_sample_file(sample_file_name)
+    context.sample_file_name = sample_file_name
+    load_sample_file(context)
 
 
 @then('"{10}" Rows appear on the case database')
@@ -45,8 +46,24 @@ def step_impl(context, expected_row_count):
     pass
 
 
-def load_sample_file(sample_file_name):
-    pass
+def load_sample_file(context):
+    result = subprocess.run('pwd', stdout=subprocess.PIPE)
+
+    p = subprocess.Popen(['python', 'load_sample.py', context.sample_file_name, context.collection_exercise_id,
+                             'NoActionPlanIDForThisTest', context.classifier_id],
+                         cwd='../census-rm-sample-loader')
+    p.wait()
+
+    #result = subprocess.run(['python', 'census-rm-sample-loader/load_sample.py'], stdout=subprocess.PIPE)
+
+    #x = subprocess.call(["python", "census-rm-sample-loader/load_sample.py"], stdout=subprocess.PIPE)
+
+
+    # result = subprocess.run(['cd census-rm-sample-loader']
+    #
+    # result = subprocess.run(['cd census-rm-sample-loader; python load_sample.py', context.sample_file_name, context.collection_exercise_id,
+    #                          'NoActionPlanIDForThisTest', context.classifier_id], stdout=subprocess.PIPE)
+    a = 1
 
 
 def set_ids(context, scenario_id):

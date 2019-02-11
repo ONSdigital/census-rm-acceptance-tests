@@ -22,8 +22,12 @@ paramiko = "*"
 pytz = "*"
 tzlocal = "*"
 psutil = "*"
+v = {editable = true,version = "*"}
 
 [requires]
 python_version = "3.6"
 
 [packages]
+"jinja2" = "*"
+pika = "*"
+redis = "*"

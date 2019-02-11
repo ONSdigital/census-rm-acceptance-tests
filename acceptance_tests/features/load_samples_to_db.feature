@@ -5,6 +5,6 @@ Feature: Load Samples from file to database
 
   Scenario: Good sample file load GSFL
     Given there is a live collection exercise with unique id "GSFL"
-    When a sample file "10RowSampleFile.csv" is loaded
+    When a sample file "Sample_10.csv" is loaded
     Then "10" Rows appear on the case database
 
