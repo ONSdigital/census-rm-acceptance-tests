@@ -3,14 +3,16 @@ import logging
 import requests
 from behave import given, when, then
 from structlog import wrap_logger
-
 from utilities.action_service import create_action_plan
 from utilities.case import get_cases
+
 from utilities.collection_exercise_utilities import create_collection_exercise, \
     get_collection_exercise_id_from_response, create_mandatory_events
 from utilities.database import reset_database
 from utilities.sample_loader.sample_file_loader import load_sample_file
 from utilities.survey_utilities import create_survey, create_survey_classifier
+from utilities.collection_instrument_utilities import create_eq_collection_instrument, \
+    get_collection_instruments_by_classifier, link_ci_to_exercise
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -48,9 +50,20 @@ def there_is_a_live_collex(context, unique_id):
     for status in event_status:
         assert status == requests.codes.created
 
+    create_ci = create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
+    assert create_ci.status_code == requests.codes.ok
+
+    ci_response = get_collection_instruments_by_classifier(survey_id=context.survey_id, form_type="household")
+    assert len(ci_response[0]['id']) == 36
+    context.collection_instrument_id = ci_response[0]['id']
+
+    link_response = link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
+    assert link_response.status_code == requests.codes.ok
+
     action_response, context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id)
     assert action_response.status_code == requests.codes.created
     logger.debug("Successfully created action plan")
+
 
 
 @when('a sample file "{sample_file_name}" is loaded')
