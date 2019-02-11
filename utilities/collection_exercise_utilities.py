@@ -66,7 +66,7 @@ def create_mandatory_events(collection_exercise_id, collex_events: dict):
             'timestamp': timestamp
         }
         response = requests.post(collex_event_url, auth=Config.BASIC_AUTH, json=event_tag)
-        response.raise_for_status()
+        #response.raise_for_status()
         if response.status_code == requests.codes.created:
             logger.debug('Event created', collection_exercise_id=collection_exercise_id, event_tag=event_tag)
         else:
