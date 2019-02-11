@@ -6,7 +6,7 @@ import logging
 
 from structlog import wrap_logger
 
-from utilities.collection_exercise_utilities import create_collection_exercise, get_collection_exercise_id_from_response
+from utilities.collection_exercise_utilities import create_collection_exercise, get_collection_exercise_id_from_response, create_mandatory_events
 from utilities.database import reset_database
 from utilities.survey_utilities import create_survey, create_survey_classifier
 
@@ -32,6 +32,20 @@ def there_is_a_live_collex(context, unique_id):
     assert collex_response.status_code == requests.codes.created
     logger.debug("Successfully created collection exercise", exercise_ref=context.survey_ref)
     context.collection_exercise_id = get_collection_exercise_id_from_response(collex_response)
+
+    # Temp dates
+    mandatory_events = {
+        "mps": "2019-02-08T15:00:00.000Z",
+        "go_live": "2019-02-08T16:00:00.000Z",
+        "return_by": "2019-02-08T17:00:00.000Z",
+        "exercise_end": "2019-02-08T18:00:00.000Z"
+    }
+
+    event_status = create_mandatory_events(context.collection_exercise_id, mandatory_events)
+
+    for status in event_status:
+        assert status == requests.codes.created
+
 
 
 @when('a sample file "{sample_file_name}" is loaded')
