@@ -6,9 +6,12 @@ import logging
 
 from structlog import wrap_logger
 
-from utilities.collection_exercise_utilities import create_collection_exercise, get_collection_exercise_id_from_response, create_mandatory_events
+from utilities.collection_exercise_utilities import create_collection_exercise, \
+    get_collection_exercise_id_from_response, create_mandatory_events
 from utilities.database import reset_database
 from utilities.survey_utilities import create_survey, create_survey_classifier
+from utilities.collection_instrument_utilities import create_eq_collection_instrument, \
+    get_collection_instruments_by_classifier, link_ci_to_exercise
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -26,7 +29,7 @@ def there_is_a_live_collex(context, unique_id):
     survey_classifier_response = create_survey_classifier(context.survey_id)
     assert survey_classifier_response.status_code == requests.codes.created
     context.classifier_id = survey_classifier_response.json()['id']
-    logger.debug("Successfully added survey classifier", classifier_id=context.classifier_id )
+    logger.debug("Successfully added survey classifier", classifier_id=context.classifier_id)
 
     collex_response = create_collection_exercise(context.survey_ref)
     assert collex_response.status_code == requests.codes.created
@@ -46,6 +49,15 @@ def there_is_a_live_collex(context, unique_id):
     for status in event_status:
         assert status == requests.codes.created
 
+    create_ci = create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
+    assert create_ci.status_code == requests.codes.ok
+
+    ci_response = get_collection_instruments_by_classifier(survey_id=context.survey_id, form_type="household")
+    assert len(ci_response[0]['id']) == 36
+    context.collection_instrument_id = ci_response[0]['id']
+
+    link_response = link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
+    assert link_response.status_code == requests.codes.ok
 
 
 @when('a sample file "{sample_file_name}" is loaded')

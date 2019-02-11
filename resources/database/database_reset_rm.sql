@@ -65,3 +65,13 @@ ALTER SEQUENCE survey.classifiertypeselector_classifiertypeselectorpk_seq1 RESTA
 ALTER SEQUENCE survey.survey_surveypk_seq RESTART WITH 1;
 ALTER SEQUENCE survey.survey_surveypk_seq1 RESTART WITH 1;
 */
+
+
+/* Clean ras CI DB */
+TRUNCATE ras_ci.survey CASCADE;
+TRUNCATE ras_ci.exercise CASCADE;
+TRUNCATE ras_ci.instrument_exercise CASCADE;
+TRUNCATE ras_ci.seft_instrument CASCADE;
+TRUNCATE ras_ci.instrument CASCADE;
+TRUNCATE ras_ci.business CASCADE;
+TRUNCATE ras_ci.instrument_business CASCADE;
