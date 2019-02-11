@@ -65,7 +65,6 @@ def there_is_a_live_collex(context, unique_id):
     logger.debug("Successfully created action plan")
 
 
-
 @when('a sample file "{sample_file_name}" is loaded')
 def load_sample_file_step(context, sample_file_name):
     sample_file_path = f'./resources/sample_files/{sample_file_name}'
