@@ -1,11 +1,16 @@
+
 import requests
 
 from config import Config
+from utilities.date_utilities import convert_to_iso_timestamp
+
 
 
 def create_action_plan(survey_ref, collection_exercise_id):
-    # hard coded until dateutils available and we know more about data randomization
-    trigger_date_time = '2019-02-11T11:11:00.000+00:00'
+    try:
+        dt = convert_to_iso_timestamp('2019-02-11T11:11')
+    except ValueError:
+        return -1
 
     action_plan_name = survey_ref + ' H 1'
     action_plans = get_action_plans()
@@ -20,7 +25,7 @@ def create_action_plan(survey_ref, collection_exercise_id):
         'actionTypeName': 'SOCIALNOT',
         'name': action_plan_name,
         'description': 'myActionPlanDesc',
-        'triggerDateTime': trigger_date_time,
+        'triggerDateTime': dt,
         'priority': 3
     }
 
@@ -39,6 +44,9 @@ def plan_for_collection_exercise(plan, collection_exercise_id):
     if not plan['selectors']:
         return False
     return plan['selectors']['collectionExerciseId'] == collection_exercise_id
+
+
+
 
 
 def build_combined_action_data(action_plans):
