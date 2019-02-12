@@ -1,14 +1,15 @@
-import subprocess
+import logging
 
 import requests
 from behave import given, when, then
-import logging
-
 from structlog import wrap_logger
+from utilities.actions import create_action_plan
+from utilities.case import get_cases
 
 from utilities.collection_exercise_utilities import create_collection_exercise, \
     get_collection_exercise_id_from_response, create_mandatory_events
 from utilities.database import reset_database
+from utilities.sample_loader.sample_file_loader import load_sample_file
 from utilities.survey_utilities import create_survey, create_survey_classifier
 from utilities.collection_instrument_utilities import create_eq_collection_instrument, \
     get_collection_instruments_by_classifier, link_ci_to_exercise
@@ -60,20 +61,25 @@ def there_is_a_live_collex(context, unique_id):
     link_response = link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
     assert link_response.status_code == requests.codes.ok
 
+    action_response, context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id)
+    assert action_response.status_code == requests.codes.created
+    logger.debug("Successfully created action plan")
+
 
 @when('a sample file "{sample_file_name}" is loaded')
-def step_impl(context, sample_file_name):
-    load_sample_file(sample_file_name)
+def load_sample_file_step(context, sample_file_name):
+    sample_file_path = f'./resources/sample_files/{sample_file_name}'
+
+    context.sample_file_name = sample_file_path
+    load_sample_file(context)
 
 
-@then('"{10}" Rows appear on the case database')
-def step_impl(context, expected_row_count):
-    # Test database table case has expected_row_count
-    pass
+@then("a call to the casesvc api returns {expected_row_count:d} cases")
+def check_count_of_cases(context, expected_row_count):
+    cases_response = get_cases(expected_row_count)
+    assert cases_response.status_code == requests.codes.ok
 
-
-def load_sample_file(sample_file_name):
-    pass
+    assert len(cases_response.json()) == expected_row_count
 
 
 def set_ids(context, scenario_id):

@@ -12,7 +12,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def create_eq_collection_instrument(survey_id, form_type, eq_id):
     logger.debug('Uploading eQ collection instrument', survey_id=survey_id, form_type=form_type)
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-        f'collection-instrument-api/1.0.2/upload'
+          f'collection-instrument-api/1.0.2/upload'
 
     classifiers = {
         "form_type": form_type,

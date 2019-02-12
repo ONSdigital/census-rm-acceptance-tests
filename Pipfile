@@ -26,3 +26,6 @@ maya="*"
 python_version = "3.6"
 
 [packages]
+"jinja2" = "*"
+pika = "*"
+redis = "*"
