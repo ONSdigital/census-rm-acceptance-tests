@@ -1,16 +1,11 @@
-from _datetime import datetime, timedelta
-
 import requests
-import tzlocal
 
 from config import Config
 
 
 def create_action_plan(survey_ref, collection_exercise_id):
-    try:
-        dt = convert_to_iso_timestamp('2019-02-11T11:11')
-    except ValueError:
-        return -1
+    # hard coded until dateutils available and we know more about data randomization
+    trigger_date_time = '2019-02-11T11:11:00.000+00:00'
 
     action_plan_name = survey_ref + ' H 1'
     action_plans = get_action_plans()
@@ -25,7 +20,7 @@ def create_action_plan(survey_ref, collection_exercise_id):
         'actionTypeName': 'SOCIALNOT',
         'name': action_plan_name,
         'description': 'myActionPlanDesc',
-        'triggerDateTime': dt,
+        'triggerDateTime': trigger_date_time,
         'priority': 3
     }
 
@@ -44,12 +39,6 @@ def plan_for_collection_exercise(plan, collection_exercise_id):
     if not plan['selectors']:
         return False
     return plan['selectors']['collectionExerciseId'] == collection_exercise_id
-
-
-def convert_to_iso_timestamp(timestamp_string):
-    timestamp = datetime.strptime(timestamp_string, "%Y-%m-%dT%H:%M")
-    timestamp_iso = timestamp.astimezone(tzlocal.get_localzone()).isoformat(timespec='milliseconds')
-    return timestamp_iso
 
 
 def build_combined_action_data(action_plans):

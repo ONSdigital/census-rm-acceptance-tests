@@ -20,7 +20,6 @@ paramiko = "*"
 pytz = "*"
 tzlocal = "*"
 psutil = "*"
-v = {editable = true,version = "*"}
 maya="*"
 
 [requires]

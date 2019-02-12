@@ -13,7 +13,6 @@ def get_timestamp_with_offset(months, weeks):
     return maya.MayaDT.from_datetime(future).iso8601()
 
 
-# Example date string to parse is 'April 29 2018 05:15'
 def parse_timestamp(date):
     future = parse(date)
     return maya.MayaDT.from_datetime(future).iso8601()
