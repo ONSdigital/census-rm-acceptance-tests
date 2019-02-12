@@ -1,9 +1,7 @@
-
 import requests
 
 from config import Config
 from utilities.date_utilities import convert_to_iso_timestamp
-
 
 
 def create_action_plan(survey_ref, collection_exercise_id):
@@ -44,9 +42,6 @@ def plan_for_collection_exercise(plan, collection_exercise_id):
     if not plan['selectors']:
         return False
     return plan['selectors']['collectionExerciseId'] == collection_exercise_id
-
-
-
 
 
 def build_combined_action_data(action_plans):

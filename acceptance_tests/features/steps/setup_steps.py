@@ -3,7 +3,7 @@ import logging
 import requests
 from behave import given, when, then
 from structlog import wrap_logger
-from utilities.action_service import create_action_plan
+from utilities.actions import create_action_plan
 from utilities.case import get_cases
 
 from utilities.collection_exercise_utilities import create_collection_exercise, \
