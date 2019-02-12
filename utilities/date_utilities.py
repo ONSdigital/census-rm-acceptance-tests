@@ -14,8 +14,21 @@ def get_timestamp_with_offset(months=0, weeks=0, days=0, hours=0, minutes=0, sec
     date_str = future.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
     return date_str + 'Z'
 
-# Example date string to parse is 'April 29 2018 05:15'
+
 def parse_timestamp(date):
+    """ This class can accept various string formats for the date
+        Examples:
+        '2018-06-29 08:15:27.243860',
+        'Jun 28 2018  7:40AM',
+        'Jun 28 2018 at 7:40AM',
+        'September 18, 2017, 22:19:55',
+        'Sun, 05/12/1999, 12:30PM',
+        'Mon, 21 March, 2015',
+        '2018-03-12T10:12:45Z',
+        '2018-06-29 17:08:00.586525+00:00',
+        '2018-06-29 17:08:00.586525+05:00',
+        'Tuesday , 6th September, 2017 at 4:30pm'
+    """
     future = parse(date)
     return maya.MayaDT.from_datetime(future).iso8601()
 
