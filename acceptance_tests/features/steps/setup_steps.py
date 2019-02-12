@@ -13,6 +13,7 @@ from utilities.sample_loader.sample_file_loader import load_sample_file
 from utilities.survey_utilities import create_survey, create_survey_classifier
 from utilities.collection_instrument_utilities import create_eq_collection_instrument, \
     get_collection_instruments_by_classifier, link_ci_to_exercise
+from utilities.date_utilities import get_timestamp_with_offset
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -39,10 +40,10 @@ def there_is_a_live_collex(context, unique_id):
 
     # Temp dates
     mandatory_events = {
-        "mps": "2019-02-08T15:00:00.000Z",
-        "go_live": "2019-02-08T16:00:00.000Z",
-        "return_by": "2019-02-18T17:00:00.000Z",
-        "exercise_end": "2019-02-18T18:00:00.000Z"
+        "mps": get_timestamp_with_offset(months=0, weeks=1),
+        "go_live": get_timestamp_with_offset(months=0, weeks=1, hours=1),
+        "return_by": get_timestamp_with_offset(months=0, weeks=1, hours=2),
+        "exercise_end":get_timestamp_with_offset(months=0, weeks=1, hours=3)
     }
 
     event_status = create_mandatory_events(context.collection_exercise_id, mandatory_events)
