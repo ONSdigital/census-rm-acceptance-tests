@@ -19,6 +19,6 @@ def get_cases(required_count):
 
 
 def get_all_cases_from_casesvc():
-    casesvc_url = 'http://localhost:8171/cases'
+    casesvc_url = f'{Config.CASE_SERVICE}/cases'
     response = requests.get(casesvc_url, auth=Config.BASIC_AUTH)
     return response
