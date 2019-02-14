@@ -7,8 +7,7 @@ from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
-def create_survey(survey_ref, short_name, long_name, legal_basis='GovERD', survey_type='Social'):
+def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
     logger.debug('Creating new survey',
                  survey_ref=survey_ref, short_name=short_name,
                  long_name=long_name, legal_basis=legal_basis,
@@ -31,10 +30,12 @@ def create_survey(survey_ref, short_name, long_name, legal_basis='GovERD', surve
 
 
 def create_survey_classifier(survey_id):
-    post_survey_classifiers = f'{Config.SURVEY_SERVICE}/surveys/{survey_id}/classifiers'
+    url = f'{Config.SURVEY_SERVICE}/surveys/{survey_id}/classifiers'
     classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}
-    response = requests.post(post_survey_classifiers, auth=Config.BASIC_AUTH, json=classifiers)
 
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=classifiers)
     response.raise_for_status()
 
     return response
+
+

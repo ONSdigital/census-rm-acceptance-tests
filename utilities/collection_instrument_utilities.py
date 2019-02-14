@@ -11,8 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def create_eq_collection_instrument(survey_id, form_type, eq_id):
     logger.debug('Uploading eQ collection instrument', survey_id=survey_id, form_type=form_type)
-    url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-          f'collection-instrument-api/1.0.2/upload'
+    url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/collection-instrument-api/1.0.2/upload'
 
     classifiers = {
         "form_type": form_type,
@@ -31,8 +30,7 @@ def create_eq_collection_instrument(survey_id, form_type, eq_id):
 
 def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
     logger.debug('Retrieving collection instruments', survey_id=survey_id, form_type=form_type)
-    url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-          f'collection-instrument-api/1.0.2/collectioninstrument'
+    url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/collection-instrument-api/1.0.2/collectioninstrument'
 
     classifiers = dict()
 
@@ -42,7 +40,6 @@ def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
         classifiers['form_type'] = form_type
 
     response = requests.get(url=url, auth=Config.BASIC_AUTH, params={'searchString': dumps(classifiers)})
-
     response.raise_for_status()
 
     logger.debug('Successfully retrieved collection instruments', survey_id=survey_id, form_type=form_type)

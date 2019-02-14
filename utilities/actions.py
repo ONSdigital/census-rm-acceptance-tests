@@ -27,9 +27,12 @@ def create_action_plan(survey_ref, collection_exercise_id):
         'priority': 3
     }
 
-    action_rules_response = requests.post(f'{Config.ACTION_SERVICE}/actionrules', auth=Config.BASIC_AUTH, json=rule)
+    url = f'{Config.ACTION_SERVICE}/actionrules'
 
-    return action_rules_response, action_plan_id
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=rule)
+    response.raise_for_status()
+
+    return response, action_plan_id
 
 
 def get_action_plans():

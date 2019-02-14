@@ -11,13 +11,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 def create_collection_exercise(survey_ref):
     collex = {
         "surveyRef": survey_ref,
-        "name": survey_ref[:20],
         "exerciseRef": '1',
         "userDescription": '1',
     }
 
-    response = requests.post(f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises",
-                             auth=Config.BASIC_AUTH, json=collex)
+    url = f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises"
+
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=collex)
 
     response.raise_for_status()
 
@@ -56,7 +56,7 @@ def create_collex_event(collection_exercise_id, event_tag, timestamp):
 
 def create_mandatory_events(collection_exercise_id, collex_events: dict):
     logger.debug('Creating mandatory events', collection_exercise_id=collection_exercise_id)
-    collex_event_url = f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises/{collection_exercise_id}/events"
+    url = f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises/{collection_exercise_id}/events"
 
     return_statuses = []
 
@@ -66,7 +66,7 @@ def create_mandatory_events(collection_exercise_id, collex_events: dict):
             'timestamp': timestamp
         }
 
-        response = requests.post(collex_event_url, auth=Config.BASIC_AUTH, json=event_tag)
+        response = requests.post(url, auth=Config.BASIC_AUTH, json=event_tag)
         response.raise_for_status()
         
         if response.status_code == requests.codes.created:

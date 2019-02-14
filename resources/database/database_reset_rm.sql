@@ -48,13 +48,13 @@ ALTER SEQUENCE action.messageseq RESTART WITH 1;
 
 /* Clean Action Exporter DB */
 
-TRUNCATE actionexporter.actionrequest CASCADE;
-TRUNCATE actionexporter.address CASCADE;
-TRUNCATE actionexporter.contact CASCADE;
-TRUNCATE actionexporter.filerowcount CASCADE;
-
-ALTER SEQUENCE actionexporter.actionrequestpkseq RESTART WITH 1;
-ALTER SEQUENCE actionexporter.contactpkseq RESTART WITH 1;
+-- TRUNCATE actionexporter.actionrequest CASCADE;
+-- TRUNCATE actionexporter.address CASCADE;
+-- TRUNCATE actionexporter.contact CASCADE;
+-- TRUNCATE actionexporter.filerowcount CASCADE;
+--
+-- ALTER SEQUENCE actionexporter.actionrequestpkseq RESTART WITH 1;
+-- ALTER SEQUENCE actionexporter.contactpkseq RESTART WITH 1;
 
 
 /* Reset Survey Sequences, these break the tests, not in existing acceptance tests; probably for that reason.

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import maya
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
@@ -9,8 +9,8 @@ def get_timestamp():
     return maya.now().iso8601()
 
 
-def get_timestamp_with_offset(months=0, weeks=0, days=0, hours=0, minutes=0, seconds=0, microseconds=0):
-    future = datetime.now() + relativedelta(months=months, weeks=weeks, days=days, hours=hours,
+def get_timestamp_with_offset(base_date, months=0, weeks=0, days=0, hours=0, minutes=0, seconds=0, microseconds=0):
+    future = base_date + relativedelta(months=months, weeks=weeks, days=days, hours=hours,
                                             minutes=minutes, seconds=seconds, microseconds=microseconds)
     date_str = future.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
     return date_str + 'Z'
@@ -42,3 +42,16 @@ def convert_to_iso_timestamp(timestamp_string):
     timestamp = datetime.strptime(timestamp_string, "%Y-%m-%dT%H:%M")
     timestamp_iso = timestamp.astimezone(tzlocal.get_localzone()).isoformat(timespec='milliseconds')
     return timestamp_iso
+
+
+def generate_collection_exercise_dates(base_date):
+    """Generates and returns collection exercise event dates based on the base date supplied."""
+
+    dates = {
+        'mps': get_timestamp_with_offset(base_date + timedelta(seconds=5)),
+        'go_live': get_timestamp_with_offset(base_date + timedelta(minutes=1)),
+        'return_by': get_timestamp_with_offset(base_date + timedelta(days=10)),
+        'exercise_end': get_timestamp_with_offset(base_date + timedelta(days=11))
+    }
+
+    return dates
