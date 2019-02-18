@@ -16,7 +16,7 @@ def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
     url = f'{Config.SURVEY_SERVICE}/surveys'
 
     survey_details = {
-        "surveyRef": survey_ref,
+        "surveyRef": str(survey_ref),
         "longName": long_name,
         "shortName": short_name,
         "legalBasisRef": legal_basis,
@@ -29,9 +29,8 @@ def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
     return response
 
 
-def create_survey_classifier(survey_id):
+def create_survey_classifier(survey_id, classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}):
     url = f'{Config.SURVEY_SERVICE}/surveys/{survey_id}/classifiers'
-    classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}
 
     response = requests.post(url, auth=Config.BASIC_AUTH, json=classifiers)
     response.raise_for_status()

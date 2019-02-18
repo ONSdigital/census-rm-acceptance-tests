@@ -33,17 +33,17 @@ def a_collection_exercise_exists(context):
     context.survey_id = survey_response.json()['id']
     logger.debug("Successfully created survey", short_name=context.survey_ref)
 
-    survey_classifier_response = create_survey_classifier(context.survey_id)
-    context.classifier_id = survey_classifier_response.json()['id']
-    logger.debug("Successfully added survey classifier", classifier_id=context.classifier_id)
-
-    collex_response = create_collection_exercise(context.survey_ref)
-    logger.debug("Successfully created collection exercise", exercise_ref=context.survey_ref)
-    context.collection_exercise_id = get_collection_exercise_id_from_response(collex_response)
-
-    mandatory_events = generate_collection_exercise_dates(datetime.now() + timedelta(weeks=1))
-
-    create_mandatory_events(context.collection_exercise_id, mandatory_events)
+    # survey_classifier_response = create_survey_classifier(context.survey_id)
+    # context.classifier_id = survey_classifier_response.json()['id']
+    # logger.debug("Successfully added survey classifier", classifier_id=context.classifier_id)
+    #
+    # collex_response = create_collection_exercise(context.survey_ref)
+    # logger.debug("Successfully created collection exercise", exercise_ref=context.survey_ref)
+    # context.collection_exercise_id = get_collection_exercise_id_from_response(collex_response)
+    #
+    # mandatory_events = generate_collection_exercise_dates(datetime.now() + timedelta(weeks=1))
+    #
+    # create_mandatory_events(context.collection_exercise_id, mandatory_events)
 
     create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
 

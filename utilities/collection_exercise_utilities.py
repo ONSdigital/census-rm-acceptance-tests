@@ -8,11 +8,11 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_collection_exercise(survey_ref):
+def create_collection_exercise(survey_ref, period):
     collex = {
         "surveyRef": survey_ref,
-        "exerciseRef": '1',
-        "userDescription": '1',
+        "exerciseRef": period,
+        "userDescription": survey_ref,
     }
 
     url = f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises"
