@@ -8,20 +8,22 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_collection_exercise(survey_ref, period):
-    collex = {
-        "surveyRef": survey_ref,
+def create_collection_exercise(survey_id, period, user_description):
+    logger.debug('Creating collection exercise', survey_id=survey_id, period=period)
+
+    url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises'
+    json = {
+        "surveyId": survey_id,
         "exerciseRef": period,
-        "userDescription": survey_ref,
+        "userDescription": user_description
     }
 
-    url = f"{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises"
-
-    response = requests.post(url, auth=Config.BASIC_AUTH, json=collex)
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=json)
 
     response.raise_for_status()
 
-    return response
+    logger.debug('Successfully created collection exercise', survey_id=survey_id, period=period)
+
 
 
 def get_collection_exercise_id_from_response(response):

@@ -36,7 +36,7 @@ jinja_template = env.get_template("./utilities/sample_loader/message_template.xm
 def load_sample_file(context):
     init_rabbit()
     with open(context.sample_file_name) as f_obj:
-        sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
+        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
 
 
 def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
@@ -56,6 +56,8 @@ def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
     print('\nAll Sample Units have been added to the queue ' + rabbitmq_queue)
     rabbitmq_connection.close()
     write_sampleunits_to_redis(sampleunits)
+
+    return sampleunits
 
 
 def create_json(sample_id, sampleunit):
