@@ -8,24 +8,6 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_collection_exercise(survey_id, period, user_description):
-    logger.debug('Creating collection exercise', survey_id=survey_id, period=period)
-
-    url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises'
-    json = {
-        "surveyId": survey_id,
-        "exerciseRef": period,
-        "userDescription": user_description
-    }
-
-    response = requests.post(url, auth=Config.BASIC_AUTH, json=json)
-
-    response.raise_for_status()
-
-    logger.debug('Successfully created collection exercise', survey_id=survey_id, period=period)
-
-
-
 def get_collection_exercise_id_from_response(response):
     headers = response.headers
     store = headers.__getattribute__('_store')
