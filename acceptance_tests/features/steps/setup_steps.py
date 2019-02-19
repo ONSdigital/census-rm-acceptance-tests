@@ -7,7 +7,7 @@ from structlog import wrap_logger
 
 from acceptance_tests.features.data_setup import create_census_survey, create_census_collection_exercise
 from utilities.actions import create_action_plan
-from utilities.case import get_cases
+from utilities.case import get_all_cases_from_casesvc
 from utilities.database import reset_database
 from utilities.sample_loader.sample_file_loader import load_sample_file
 
@@ -40,12 +40,10 @@ def check_count_of_cases(context, expected_row_count):
         json.loads(sample_unit).get('id')
         for sample_unit in context.sample_units.values()
     ]
-    cases_response = get_cases(sample_units)
 
+    cases_response = get_all_cases_from_casesvc(sample_units)
 
-    assert cases_response.status_code == requests.codes.ok
-
-    assert len(cases_response.json()) == expected_row_count
+    assert len(cases_response) == expected_row_count
 
 
 def set_ids(context, scenario_id):
