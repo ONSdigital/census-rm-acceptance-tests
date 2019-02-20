@@ -15,7 +15,8 @@ class Config(object):
 
     PROTOCOL = os.getenv('PROTOCOL', 'http')
 
-    ACTION_SERVICE_HOST = os.getenv('ACTION_SERVICE_HOST', 'localhost')
+    ACTION_SERVICE_HOST = os.getenv('ACTION_SERVICE_HOST', ''
+                                                           'localhost')
     ACTION_SERVICE_PORT = os.getenv('ACTION_SERVICE_PORT', 8151)
     ACTION_SERVICE = f'{PROTOCOL}://{ACTION_SERVICE_HOST}:{ACTION_SERVICE_PORT}'
 
