@@ -1,4 +1,3 @@
-import subprocess
 import csv
 import json
 import os
@@ -102,18 +101,3 @@ def write_sampleunits_to_redis(sampleunits):
 
     redis_pipeline.execute()
     print("Sample Units written to Redis")
-
-#
-# # ------------------------------------------------------------------------------------------------------------------
-# # Usage python loadSample.py <SAMPLE.csv> <COLLECTION_EXERCISE_UUID> <ACTIONPLAN_UUID> <COLLECTION_INSTRUMENT_UUID>
-# # ------------------------------------------------------------------------------------------------------------------
-#
-# if __name__ == "__main__":
-#     if len(sys.argv) < 4:
-#         print(
-#             'Usage python loadSample.py sample.csv <COLLECTION_EXERCISE_UUID> <ACTIONPLAN_UUID> <COLLECTION_INSTRUMENT_UUID>')
-#     else:
-#         init_rabbit()
-#         with open(sys.argv[1]) as f_obj:
-#             sample_reader(f_obj, sys.argv[2], sys.argv[3], sys.argv[4])
-

@@ -3,7 +3,7 @@ import logging
 from structlog import wrap_logger
 
 from controllers.survey_controller import create_survey, create_survey_classifiers
-from utilities.id_generation import create_survey_ref
+from utilities.string_utilities import create_random_string
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -19,7 +19,9 @@ def setup_census_survey(context):
 
     context.survey_id = create_survey(context.survey_ref, context.short_name, context.long_name,
                                       context.legal_basis, context.survey_type)['id']
-    context.classifier_id = create_survey_classifiers(context.survey_id)['id']
+
+    survey_classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}
+    context.classifier_id = create_survey_classifiers(context.survey_id, survey_classifiers)['id']
 
 
 def _create_data_for_survey():
@@ -32,3 +34,9 @@ def _create_data_for_survey():
         'long_name': survey_ref,
         'survey_type': 'Social'
     }
+
+
+def create_survey_ref():
+    survey_ref = create_random_string(min_len=13, max_len=13)
+
+    return f'Census-{survey_ref}'

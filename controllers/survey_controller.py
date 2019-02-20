@@ -32,9 +32,7 @@ def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
     return response.json()
 
 
-def create_survey_classifiers(survey_id,
-                              classifiers={"name": "COLLECTION_INSTRUMENT",
-                                           "classifierTypes": ["COLLECTION_EXERCISE"]}):
+def create_survey_classifiers(survey_id, classifiers):
     logger.info('Creating classifiers', survey_id=survey_id)
 
     url = f'{Config.SURVEY_SERVICE}/surveys/{survey_id}/classifiers'
