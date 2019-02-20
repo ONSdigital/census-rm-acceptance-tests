@@ -1,6 +1,6 @@
 Feature: Load Samples from file to database
 
-  Scenario: Good sample file load GSFL
+  Scenario: Successful sample file upload
     Given a survey exists
     And a collection exercise exists in a scheduled state
     And a social action plan exists for the collection exercise
