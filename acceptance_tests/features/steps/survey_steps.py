@@ -5,7 +5,7 @@ from data_setup.collection_exercise_setup import setup_census_collection_exercis
 from data_setup.survey_setup import setup_census_survey
 
 
-@given('a survey exists with collection exercise')
+@given('a survey exists with a collection exercise')
 def a_survey_exists(context):
     setup_census_survey(context)
     setup_census_collection_exercise_to_scheduled_state(context)
