@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 import sys
 import uuid
 
@@ -8,14 +7,16 @@ import jinja2
 import pika
 import redis
 
+from config import Config
+
 # get rabbitmq env vars
-rabbitmq_host = os.environ.get('RABBITMQ_SERVICE_HOST', 'localhost')
-rabbitmq_port = os.environ.get('RABBITMQ_SERVICE_PORT', '6672')
-rabbitmq_vhost = os.environ.get('RABBITMQ_VHOST', '/')
-rabbitmq_queue = os.environ.get('RABBITMQ_QUEUE', 'Case.CaseDelivery')
-rabbitmq_exchange = os.environ.get('RABBITMQ_EXCHANGE', '')
-rabbitmq_user = os.environ.get('RABBITMQ_USER', 'guest')
-rabbitmq_password = os.environ.get('RABBITMQ_PASSWORD', 'guest')
+rabbitmq_host = Config.RABBITMQ_HOST
+rabbitmq_port = Config.RABBITMQ_PORT
+rabbitmq_vhost = Config.RABBITMQ_VHOST
+rabbitmq_queue = Config.RABBITMQ_QUEUE
+rabbitmq_exchange = Config.RABBITMQ_EXCHANGE
+rabbitmq_user = Config.RABBITMQ_USER
+rabbitmq_password = Config.RABBITMQ_PASSWORD
 
 # rabbit global vars
 rabbitmq_credentials = None
@@ -23,9 +24,9 @@ rabbitmq_connection = None
 rabbitmq_channel = None
 
 # get redis env vars
-redis_host = os.environ.get('REDIS_SERVICE_HOST', 'localhost')
-redis_port = os.environ.get('REDIS_SERVICE_PORT', '7379')
-redis_db = os.environ.get('REDIS_DB', '0')
+redis_host = Config.REDIS_HOST
+redis_port = Config.REDIS_PORT
+redis_db = Config.REDIS_DB
 
 # globally load sampleunit message template
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(["./"]))

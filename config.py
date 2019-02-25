@@ -1,7 +1,7 @@
 import os
 
 
-class Config(object):
+class Config:
 
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
@@ -15,8 +15,7 @@ class Config(object):
 
     PROTOCOL = os.getenv('PROTOCOL', 'http')
 
-    ACTION_SERVICE_HOST = os.getenv('ACTION_SERVICE_HOST', ''
-                                                           'localhost')
+    ACTION_SERVICE_HOST = os.getenv('ACTION_SERVICE_HOST', 'localhost')
     ACTION_SERVICE_PORT = os.getenv('ACTION_SERVICE_PORT', 8151)
     ACTION_SERVICE = f'{PROTOCOL}://{ACTION_SERVICE_HOST}:{ACTION_SERVICE_PORT}'
 
@@ -36,3 +35,15 @@ class Config(object):
     CASE_SERVICE_HOST = os.getenv('CASE_SERVICE_HOST', 'localhost')
     CASE_SERVICE_PORT = os.getenv('CASE_SERVICE_PORT', 8171)
     CASE_SERVICE = f'{PROTOCOL}://{CASE_SERVICE_HOST}:{CASE_SERVICE_PORT}'
+
+    RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
+    RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
+    RABBITMQ_VHOST = os.getenv('RABBITMQ_VHOST', '/')
+    RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'Case.CaseDelivery')
+    RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
+    RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
+    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
+
+    REDIS_HOST = os.getenv('REDIS_SERVICE_HOST', 'localhost')
+    REDIS_PORT = os.getenv('REDIS_SERVICE_PORT', '7379')
+    REDIS_DB = os.getenv('REDIS_DB', '0')
