@@ -4,7 +4,7 @@ import logging
 from behave import __main__ as behave_executable
 
 DEFAULT_LOG_LEVEL = 'INFO'
-DEFAULT_BEHAVE_FORMAT = 'progress2'
+DEFAULT_BEHAVE_FORMAT = 'pretty'
 DEFAULT_FEATURE_DIRECTORY = 'acceptance_tests/features'
 
 
