@@ -1,3 +1,4 @@
+@census
 Feature: Load Samples from file to database
 
   Scenario: Successful sample file upload

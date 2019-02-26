@@ -9,13 +9,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_action_plans():
-    logger.info('Retrieving action plans')
+    logger.debug('Retrieving action plans')
 
     url = f'{Config.ACTION_SERVICE}/actionplans'
 
     response = requests.get(url, auth=Config.BASIC_AUTH)
     response.raise_for_status()
 
-    logger.info('Successfully retrieved action plans')
+    logger.debug('Successfully retrieved action plans')
 
     return response.json()

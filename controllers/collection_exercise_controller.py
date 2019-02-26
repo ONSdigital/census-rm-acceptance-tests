@@ -9,7 +9,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def create_collection_exercise(survey_id, period, user_description):
-    logger.info('Creating collection exercise', survey_id=survey_id, period=period, user_description=user_description)
+    logger.debug('Creating collection exercise', survey_id=survey_id, period=period, user_description=user_description)
 
     url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises'
     json = {
@@ -21,13 +21,13 @@ def create_collection_exercise(survey_id, period, user_description):
     response = requests.post(url, auth=Config.BASIC_AUTH, json=json)
     response.raise_for_status()
 
-    logger.info('Successfully created collection exercise', survey_id=survey_id, period=period,
-                user_description=user_description)
+    logger.debug('Successfully created collection exercise', survey_id=survey_id, period=period,
+                 user_description=user_description)
 
 
 def post_event_to_collection_exercise(collection_exercise_id, event_tag, date_str):
-    logger.info('Adding a collection exercise event',
-                collection_exercise_id=collection_exercise_id, event_tag=event_tag, date_str=date_str)
+    logger.debug('Adding a collection exercise event',
+                 collection_exercise_id=collection_exercise_id, event_tag=event_tag, date_str=date_str)
 
     url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises/{collection_exercise_id}/events'
     post_data = {'tag': event_tag, 'timestamp': date_str}
@@ -39,12 +39,12 @@ def post_event_to_collection_exercise(collection_exercise_id, event_tag, date_st
         logger.error('Failed to post event', status=response.status_code)
         raise Exception(f'Failed to post event {collection_exercise_id}')
 
-    logger.info('Successfully added event', collection_exercise_id=collection_exercise_id, event_tag=event_tag,
-                date_str=date_str)
+    logger.debug('Successfully added event', collection_exercise_id=collection_exercise_id, event_tag=event_tag,
+                 date_str=date_str)
 
 
 def get_collection_exercise(survey_id, period):
-    logger.info('Retrieving collection exercise', survey_id=survey_id, exercise_ref=period)
+    logger.debug('Retrieving collection exercise', survey_id=survey_id, exercise_ref=period)
 
     url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises/survey/{survey_id}'
 
@@ -59,6 +59,6 @@ def get_collection_exercise(survey_id, period):
     else:
         return None
 
-    logger.info('Successfully retrieved collection exercise', survey_id=survey_id, exercise_ref=period)
+    logger.debug('Successfully retrieved collection exercise', survey_id=survey_id, exercise_ref=period)
 
     return collection_exercise

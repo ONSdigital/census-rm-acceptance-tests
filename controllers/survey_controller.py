@@ -9,10 +9,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
-    logger.info('Creating new survey',
-                survey_ref=survey_ref, short_name=short_name,
-                long_name=long_name, legal_basis=legal_basis,
-                survey_type=survey_type)
+    logger.debug('Creating new survey',
+                 survey_ref=survey_ref, short_name=short_name,
+                 long_name=long_name, legal_basis=legal_basis,
+                 survey_type=survey_type)
 
     url = f'{Config.SURVEY_SERVICE}/surveys'
 
@@ -33,7 +33,7 @@ def create_survey(survey_ref, short_name, long_name, legal_basis, survey_type):
 
 
 def create_survey_classifiers(survey_id, classifiers):
-    logger.info('Creating classifiers', survey_id=survey_id)
+    logger.debug('Creating classifiers', survey_id=survey_id)
 
     url = f'{Config.SURVEY_SERVICE}/surveys/{survey_id}/classifiers'
 
