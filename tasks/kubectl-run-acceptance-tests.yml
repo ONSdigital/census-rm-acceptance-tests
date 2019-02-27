@@ -1,0 +1,42 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+      repository: google/cloud-sdk
+      tag: slim
+
+params:
+  SERVICE_ACCOUNT_JSON:
+  GCP_PROJECT_NAME:
+  KUBERNETES_NAMESPACE:
+  KUBERNETES_CLUSTER:
+
+inputs:
+- name: acceptance-tests-repo
+
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+      apt install kubectl
+
+      cat >~/gcloud-service-key.json <<EOL
+      $SERVICE_ACCOUNT_JSON
+      EOL
+
+      # Use gcloud service account to configure kubectl
+      gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
+      gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
+
+      # Create an acceptance tests pod and run the acceptance tests in it
+      # Env vars have to passed one by one as a --env flag each
+      # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
+      kubectl run acceptance-tests -it --command --rm --quiet \
+      --namespace=${KUBERNETES_NAMESPACE} \
+      --generator=run-pod/v1 \
+      --image=eu.gcr.io/census-rm-adamhawtin/census-rm-acceptance-tests \
+      --restart=Never \
+      $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
+      -- /bin/bash -c "sleep 2; behave acceptance_tests/features"  
