@@ -1,10 +1,6 @@
 Feature: Load Samples from file to database
 
-  Background: Clear DB
-    Given the database is cleared down
-
-  Scenario: Good sample file load GSFL
-    Given there is a live collection exercise with unique id "GSFL"
-    When a sample file "Sample_10.csv" is loaded
-    Then a call to the casesvc api returns 10 cases
-
+  Scenario: Successful sample file upload
+    Given a survey exists with a collection exercise
+    When sample file "Sample_10.csv" is loaded
+    Then the sample units are created and stored in the case service

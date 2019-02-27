@@ -1,7 +1,5 @@
-import subprocess
 import csv
 import json
-import os
 import sys
 import uuid
 
@@ -9,14 +7,16 @@ import jinja2
 import pika
 import redis
 
+from config import Config
+
 # get rabbitmq env vars
-rabbitmq_host = os.environ.get('RABBITMQ_SERVICE_HOST', 'localhost')
-rabbitmq_port = os.environ.get('RABBITMQ_SERVICE_PORT', '6672')
-rabbitmq_vhost = os.environ.get('RABBITMQ_VHOST', '/')
-rabbitmq_queue = os.environ.get('RABBITMQ_QUEUE', 'Case.CaseDelivery')
-rabbitmq_exchange = os.environ.get('RABBITMQ_EXCHANGE', '')
-rabbitmq_user = os.environ.get('RABBITMQ_USER', 'guest')
-rabbitmq_password = os.environ.get('RABBITMQ_PASSWORD', 'guest')
+rabbitmq_host = Config.RABBITMQ_HOST
+rabbitmq_port = Config.RABBITMQ_PORT
+rabbitmq_vhost = Config.RABBITMQ_VHOST
+rabbitmq_queue = Config.RABBITMQ_QUEUE
+rabbitmq_exchange = Config.RABBITMQ_EXCHANGE
+rabbitmq_user = Config.RABBITMQ_USER
+rabbitmq_password = Config.RABBITMQ_PASSWORD
 
 # rabbit global vars
 rabbitmq_credentials = None
@@ -24,9 +24,9 @@ rabbitmq_connection = None
 rabbitmq_channel = None
 
 # get redis env vars
-redis_host = os.environ.get('REDIS_SERVICE_HOST', 'localhost')
-redis_port = os.environ.get('REDIS_SERVICE_PORT', '7379')
-redis_db = os.environ.get('REDIS_DB', '0')
+redis_host = Config.REDIS_HOST
+redis_port = Config.REDIS_PORT
+redis_db = Config.REDIS_DB
 
 # globally load sampleunit message template
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(["./"]))
@@ -36,7 +36,7 @@ jinja_template = env.get_template("./utilities/sample_loader/message_template.xm
 def load_sample_file(context):
     init_rabbit()
     with open(context.sample_file_name) as f_obj:
-        sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
+        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
 
 
 def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
@@ -56,6 +56,8 @@ def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
     print('\nAll Sample Units have been added to the queue ' + rabbitmq_queue)
     rabbitmq_connection.close()
     write_sampleunits_to_redis(sampleunits)
+
+    return sampleunits
 
 
 def create_json(sample_id, sampleunit):
@@ -100,18 +102,3 @@ def write_sampleunits_to_redis(sampleunits):
 
     redis_pipeline.execute()
     print("Sample Units written to Redis")
-
-#
-# # ------------------------------------------------------------------------------------------------------------------
-# # Usage python loadSample.py <SAMPLE.csv> <COLLECTION_EXERCISE_UUID> <ACTIONPLAN_UUID> <COLLECTION_INSTRUMENT_UUID>
-# # ------------------------------------------------------------------------------------------------------------------
-#
-# if __name__ == "__main__":
-#     if len(sys.argv) < 4:
-#         print(
-#             'Usage python loadSample.py sample.csv <COLLECTION_EXERCISE_UUID> <ACTIONPLAN_UUID> <COLLECTION_INSTRUMENT_UUID>')
-#     else:
-#         init_rabbit()
-#         with open(sys.argv[1]) as f_obj:
-#             sample_reader(f_obj, sys.argv[2], sys.argv[3], sys.argv[4])
-

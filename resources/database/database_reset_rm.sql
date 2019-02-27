@@ -45,7 +45,6 @@ ALTER SEQUENCE action.actionplanjobseq RESTART WITH 1;
 ALTER SEQUENCE action.casepkseq RESTART WITH 1;
 ALTER SEQUENCE action.messageseq RESTART WITH 1;
 
-
 /* Clean Action Exporter DB */
 
 TRUNCATE actionexporter.actionrequest CASCADE;
@@ -55,7 +54,6 @@ TRUNCATE actionexporter.filerowcount CASCADE;
 
 ALTER SEQUENCE actionexporter.actionrequestpkseq RESTART WITH 1;
 ALTER SEQUENCE actionexporter.contactpkseq RESTART WITH 1;
-
 
 /* Reset Survey Sequences, these break the tests, not in existing acceptance tests; probably for that reason.
 ALTER SEQUENCE survey.classifiertype_classifiertypepk_seq RESTART WITH 1;

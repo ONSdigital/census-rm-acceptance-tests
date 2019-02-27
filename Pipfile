@@ -5,27 +5,12 @@ name = "pypi"
 
 [dev-packages]
 behave = "*"
-nose = "*"
 requests = "*"
 structlog = "*"
-splinter = "*"
-itsdangerous = "*"
-testfixtures = "*"
-sqlalchemy = "*"
 retrying = "*"
-pyjwt = "*"
-paramiko = "*"
-"psycopg2-binary" = "*"
-"psycopg2" = "*"
-pytz = "*"
-tzlocal = "*"
-psutil = "*"
-maya="*"
-
-[requires]
-python_version = "3.6"
-
-[packages]
 "jinja2" = "*"
 pika = "*"
 redis = "*"
+
+[requires]
+python_version = "3.6"
