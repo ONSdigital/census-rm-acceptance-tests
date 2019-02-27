@@ -16,7 +16,7 @@ script:
   - pipenv check --style . --max-line-length 120
 
 after_success:
-- if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] || [ "$TRAVIS_BRANCH" = "run-acceptance-tests-in-ci" ]; then
+- if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
   docker build -t "$DESTINATION_IMAGE_NAME" .;
   docker login -u "${DOCKER_GCP_USERNAME}" -p "${DOCKER_GCP_PASSWORD}" "${DOCKER_GCP_REGISTRY}";
   docker push "$DESTINATION_IMAGE_NAME";
@@ -30,4 +30,3 @@ env:
 branches:
   only:
     - master
-    - run-acceptance-tests-in-ci
