@@ -36,7 +36,7 @@ jinja_template = env.get_template("./utilities/sample_loader/message_template.xm
 def load_sample_file(context):
     init_rabbit()
     with open(context.sample_file_name) as f_obj:
-        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
+        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.collection_instrument_id)
 
 
 def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
