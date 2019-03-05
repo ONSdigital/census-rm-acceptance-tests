@@ -15,11 +15,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def setup_census_collection_exercise_to_scheduled_state(context):
     survey_collection_exercise_data = _create_data_for_collection_exercise()
-    period = survey_collection_exercise_data['period']
+    context.period = survey_collection_exercise_data['period']
 
-    dates = _generate_collection_exercise_dates_from_period(period)
+    dates = _generate_collection_exercise_dates_from_period(context.period)
 
-    context.collection_exercise_id = setup_collection_exercise_to_scheduled_state(context.survey_id, period,
+    context.collection_exercise_id = setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
                                                                                   context.survey_ref, dates)['id']
     create_ci = create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
     assert create_ci.status_code == requests.codes.ok
@@ -34,7 +34,6 @@ def setup_census_collection_exercise_to_scheduled_state(context):
 
 def setup_collection_exercise_to_created_state(survey_id, period, user_description):
     create_collection_exercise(survey_id, period, user_description)
-
     return get_collection_exercise(survey_id, period)
 
 
@@ -121,7 +120,6 @@ def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
     response.raise_for_status()
 
     logger.debug('Successfully retrieved collection instruments', survey_id=survey_id, form_type=form_type)
-    t = loads(response.text)
     return loads(response.text)
 
 

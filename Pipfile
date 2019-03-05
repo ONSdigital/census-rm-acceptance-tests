@@ -11,6 +11,6 @@ retrying = "*"
 "jinja2" = "*"
 pika = "*"
 redis = "*"
-
+paramiko = "*"
 [requires]
 python_version = "3.6"
