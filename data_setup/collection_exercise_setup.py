@@ -18,6 +18,7 @@ def setup_census_collection_exercise_to_scheduled_state(context):
     context.period = survey_collection_exercise_data['period']
 
     dates = _generate_collection_exercise_dates_from_period(context.period)
+    context.collex_return_by_date = get_formatted_expected_return_by_date_for_print_file(dates)
 
     context.collection_exercise_id = setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
                                                                                   context.survey_ref, dates)['id']
@@ -30,6 +31,11 @@ def setup_census_collection_exercise_to_scheduled_state(context):
 
     link_response = link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
     assert link_response.status_code == requests.codes.ok
+
+
+def get_formatted_expected_return_by_date_for_print_file(dates):
+    return_by_date = dates["return_by"]
+    return '{:02d}'.format(return_by_date.day) + "/" + '{:02d}'.format(return_by_date.month)
 
 
 def setup_collection_exercise_to_created_state(survey_id, period, user_description):

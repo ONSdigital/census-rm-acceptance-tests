@@ -34,20 +34,7 @@ def check_files_have_correct_data(sftp_client, context):
     ]
 
     expected_data_unrefined = add_full_info_to_sample_units(sample_units, context.cases)
-
-    expected_data = "hello world"
-
     expected_data = []
-
-    # Office for National Statistics:  ADDRESS_LINE1
-    # Segensworth Road:  ADDRESS_LINE2
-    # PO15 5RR: POSTCODE
-    # Titchfield: TOWN_NAME
-    # Hampshire: LOCALITY
-    # E: COUNTRY
-    # 3hj7gj5vxtch: (not in attributes)  "iac"
-    # OHS000001: TLA + REFERENCE
-    # 15 / 03  return by date?, hard code for now, it'll break if left
 
     for exp in expected_data_unrefined:
         atts = exp["attributes"]
@@ -59,9 +46,8 @@ def check_files_have_correct_data(sftp_client, context):
         csv_line += atts["COUNTRY"] + ":"
         csv_line += exp["iac"] + ":"
         csv_line += atts["TLA"] + atts["REFERENCE"] + ":"
-        csv_line += "15/03"
+        csv_line += context.collex_return_by_date
         expected_data.append(csv_line)
-
 
     _check_notification_files_have_all_the_expected_data(sftp_client,
                                                          context.test_start_datetime,
