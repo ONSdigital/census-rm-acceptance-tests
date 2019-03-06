@@ -15,25 +15,23 @@ use_step_matcher("re")
 
 @step("the a correctly formatted file is created on the sftp server")
 def check_correct_files_on_sftp_server(context):
+    # This test stores quite a bit of data incore.
+    # For large file size performance will deteriorate and then kaboom!
+    # So performance style tests should work differently
     sftp_client = _get_sftp_client()
-    expected_iacs = get_iacs_for_collection_exercise(context)
+    context.cases = get_cases_with_iacs_for_sample_units(context)
+    expected_data = _get_expected_data(context)
 
-    _check_notification_files_have_iacs(sftp_client,
-                                        context.test_start_datetime,
-                                        context.survey_ref,
-                                        context.period,
-                                        expected_iacs)
-
-    check_files_have_correct_data(sftp_client, context)
+    _check_notification_files_have_all_the_expected_data(sftp_client,
+                                                         context.test_start_datetime,
+                                                         context.survey_ref,
+                                                         context.period,
+                                                         expected_data)
 
 
-def check_files_have_correct_data(sftp_client, context):
-    sample_units = [
-        json.loads(sample_unit)
-        for sample_unit in context.sample_units.values()
-    ]
-
-    expected_data_unrefined = add_full_info_to_sample_units(sample_units, context.cases)
+def _get_expected_data(context):
+    # sample_units = _get_sample_units(context)
+    expected_data_unrefined = add_full_info_to_sample_units(context.sample_units, context.cases)
     expected_data = []
 
     for exp in expected_data_unrefined:
@@ -49,11 +47,7 @@ def check_files_have_correct_data(sftp_client, context):
         csv_line += context.collex_return_by_date
         expected_data.append(csv_line)
 
-    _check_notification_files_have_all_the_expected_data(sftp_client,
-                                                         context.test_start_datetime,
-                                                         context.survey_ref,
-                                                         context.period,
-                                                         expected_data)
+    return expected_data
 
 
 def get_iac_for_sample_unit(sample_unit_id, cases):
@@ -75,25 +69,21 @@ def add_full_info_to_sample_units(sample_units, cases):
     return enriched_sample_units
 
 
-def get_iacs_for_collection_exercise(context):
+def get_cases_with_iacs_for_sample_units(context):
     sample_units = [
-        json.loads(sample_unit).get('id')
-        for sample_unit in context.sample_units.values()
+        sample_unit['id']
+        for sample_unit in context.sample_units
     ]
 
     cases = get_cases_by_sample_unit_ids(sample_units)
-    expected_iacs = []
-    enriched_cases = []
+    cases_with_iac = []
 
     for case in cases:
         iac = get_iac_for_case_id(case["id"])
         case.update({'iac': iac})
-        expected_iacs.append(iac)
-        enriched_cases.append(case)
+        cases_with_iac.append(case)
 
-    context.cases = enriched_cases
-
-    return expected_iacs
+    return cases_with_iac
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError),
