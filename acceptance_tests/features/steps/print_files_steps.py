@@ -6,7 +6,7 @@ from retrying import retry
 from structlog import wrap_logger
 
 from config import Config
-from controllers.case_controller import get_cases_by_sample_unit_ids, get_1st_iac_for_case_id
+from controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id
 from utilities.sftp_utility import create_open_sftp_client
 
 use_step_matcher("re")
@@ -25,11 +25,6 @@ def check_correct_files_on_sftp_server(context):
                                                          context.survey_ref,
                                                          context.period,
                                                          expected_csv_lines)
-
-
-def _get_iacs_and_apply_to_sample_units(context):
-    cases = _get_cases_with_iacs_for_sample_units(context)
-    _add_iac_to_sample_units(context.sample_units, cases)
 
 
 def _create_expected_csv_lines(context):
@@ -76,42 +71,10 @@ def _create_expected_csv_line(expected_data, return_by_date):
     )
 
 
-def _add_iac_to_sample_units(sample_units, cases):
-    for sample_unit in sample_units:
-        iac = _get_iac_for_sample_unit(sample_unit["id"], cases)
-        sample_unit.update({'iac': iac})
-
-
-def _get_iac_for_sample_unit(sample_unit_id, cases):
-    for case in cases:
-        if case["sampleUnitId"] == sample_unit_id:
-            return case["iac"]
-
-    # or raise an exception here?
-    return f"iac not found for sample unit id {sample_unit_id}"
-
-
-def _get_cases_with_iacs_for_sample_units(context):
-    sample_units = _extract_sample_unit_ids(context.sample_units)
-    cases = get_cases_by_sample_unit_ids(sample_units)
-
-    cases = [
-        _get_iac_and_apply_to_case(case)
-        for case in cases
-    ]
-
-    return cases
-
-
-def _get_iac_and_apply_to_case(case):
-    iac = get_1st_iac_for_case_id(case["id"])
-    case.update({'iac': iac})
-    return case
-
-
 def _get_files_content_as_list(sftp_client, files):
     actual_content = []
 
+    # Can this be done in a nicer way?
     for file in files:
         content_list = _get_file_lines_as_list(sftp_client, file)
         actual_content.extend(content_list)
@@ -140,8 +103,16 @@ def _round_to_minute(start_of_test):
                     start_of_test.minute, second=0, microsecond=0)
 
 
-def _extract_sample_unit_ids(sample_units):
-    return [
-        sample_unit['id']
-        for sample_unit in sample_units
-    ]
+def _get_iacs_and_apply_to_sample_units(context):
+    cases = get_cases_by_survey_id(context.survey_id)
+
+    for case in cases:
+        _get_iac_and_apply_to_sample_unit(case, context.sample_units)
+
+
+def _get_iac_and_apply_to_sample_unit(case, sample_units):
+    iac = get_1st_iac_for_case_id(case["id"])
+
+    for sample_unit in sample_units:
+        if case["sampleUnitId"] == sample_unit["id"]:
+            sample_unit.update({'iac': iac})

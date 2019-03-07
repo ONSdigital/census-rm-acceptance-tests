@@ -42,3 +42,22 @@ def get_1st_iac_for_case_id(case_id):
         raise DataNotYetThereError
 
     return iac_list[0]["iac"]
+
+
+@retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError), wait_fixed=5000, stop_max_attempt_number=30)
+def get_cases_by_survey_id(survey_id):
+    logger.info('Retrieving cases by survey id')
+
+    url = f'{Config.CASE_SERVICE}/cases/surveyid/{survey_id}'
+    # payload = {'sampleUnitId': sample_unit_ids}
+
+    response = requests.get(url, auth=Config.BASIC_AUTH)
+    response.raise_for_status()
+
+    cases = response.json()
+    # if len(cases) < len(sample_unit_ids):
+    #     raise DataNotYetThereError
+
+    logger.info('Successfully retrieved cases by sample_unit_ids')
+
+    return cases
