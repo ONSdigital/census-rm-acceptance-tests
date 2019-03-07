@@ -41,14 +41,20 @@ def plan_for_collection_exercise(plan, collection_exercise_id):
 
 
 def build_combined_action_data(action_plans):
-    action_data = []
-    for action_plan in action_plans:
-        action_rule_id = action_plan.get('id')
-        action_rules = get_action_rules(action_rule_id)
-        action_rules = sorted(action_rules, key=lambda k: k['triggerDateTime'])
-        action_plan['action_rules'] = action_rules
-        action_data.append(action_plan)
+    return [
+        build_action_plan(action_plan)
+        for action_plan in action_plans
+    ]
+
     return action_data
+
+
+def build_action_plan(action_plan):
+    action_rule_id = action_plan.get('id')
+    action_rules = get_action_rules(action_rule_id)
+    action_rules = sorted(action_rules, key=lambda k: k['triggerDateTime'])
+    action_plan['action_rules'] = action_rules
+    return action_plan
 
 
 def get_actionplan_datetime():
