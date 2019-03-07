@@ -14,7 +14,7 @@ use_step_matcher("re")
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@step("the a correctly formatted file is created on the sftp server")
+@step("the the correctly formatted files are created on the sftp server")
 def check_correct_files_on_sftp_server(context):
     sftp_client = create_open_sftp_client()
     _get_iacs_and_apply_to_sample_units(context)
@@ -93,16 +93,20 @@ def _get_iac_for_sample_unit(sample_unit_id, cases):
 
 def _get_cases_with_iacs_for_sample_units(context):
     sample_units = _extract_sample_unit_ids(context.sample_units)
-
     cases = get_cases_by_sample_unit_ids(sample_units)
-    cases_with_iac = []
 
-    for case in cases:
-        iac = get_1st_iac_for_case_id(case["id"])
-        case.update({'iac': iac})
-        cases_with_iac.append(case)
+    cases = [
+        _get_iac_and_apply_to_case(case)
+        for case in cases
+    ]
 
-    return cases_with_iac
+    return cases
+
+
+def _get_iac_and_apply_to_case(case):
+    iac = get_1st_iac_for_case_id(case["id"])
+    case.update({'iac': iac})
+    return case
 
 
 def _get_files_content_as_list(sftp_client, files):
