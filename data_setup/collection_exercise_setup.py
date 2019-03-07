@@ -13,29 +13,22 @@ from utilities.date_utilities import convert_datetime_for_event, format_period
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def setup_census_collection_exercise_to_scheduled_state(context):
+def setup_census_collection_exercise(context):
     survey_collection_exercise_data = _create_data_for_collection_exercise()
     context.period = survey_collection_exercise_data['period']
 
-    dates = _generate_collection_exercise_dates_from_period(context.period)
-    context.collex_return_by_date = get_formatted_expected_return_by_date_for_print_file(dates)
+    context.dates = _generate_collection_exercise_dates_from_period(context.period)
 
     context.collection_exercise_id = setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
-                                                                                  context.survey_ref, dates)['id']
-    create_ci = create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
-    assert create_ci.status_code == requests.codes.ok
+                                                                                  context.survey_ref,
+                                                                                  context.dates)['id']
+
+    create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
 
     ci_response = get_collection_instruments_by_classifier(survey_id=context.survey_id, form_type="household")
-    assert len(ci_response[0]['id']) == 36
     context.collection_instrument_id = ci_response[0]['id']
 
-    link_response = link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
-    assert link_response.status_code == requests.codes.ok
-
-
-def get_formatted_expected_return_by_date_for_print_file(dates):
-    return_by_date = dates["return_by"]
-    return '{:02d}'.format(return_by_date.day) + "/" + '{:02d}'.format(return_by_date.month)
+    link_ci_to_exercise(context.collection_instrument_id, context.collection_exercise_id)
 
 
 def setup_collection_exercise_to_created_state(survey_id, period, user_description):
@@ -92,7 +85,7 @@ def _create_data_for_collection_exercise():
 def create_eq_collection_instrument(survey_id, form_type, eq_id):
     logger.debug('Uploading eQ collection instrument', survey_id=survey_id, form_type=form_type)
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-          f'collection-instrument-api/1.0.2/upload'
+        f'collection-instrument-api/1.0.2/upload'
 
     classifiers = {
         "form_type": form_type,
@@ -112,7 +105,7 @@ def create_eq_collection_instrument(survey_id, form_type, eq_id):
 def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
     logger.debug('Retrieving collection instruments', survey_id=survey_id, form_type=form_type)
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-          f'collection-instrument-api/1.0.2/collectioninstrument'
+        f'collection-instrument-api/1.0.2/collectioninstrument'
 
     classifiers = dict()
 
@@ -133,7 +126,7 @@ def link_ci_to_exercise(collection_instrument_id, collection_exercise_id):
     logger.debug('Linking collection instrument to exercise',
                  collection_instrument_id=collection_instrument_id, collection_exercise_id=collection_exercise_id)
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-          f'collection-instrument-api/1.0.2/link-exercise/{collection_instrument_id}/{collection_exercise_id}'
+        f'collection-instrument-api/1.0.2/link-exercise/{collection_instrument_id}/{collection_exercise_id}'
 
     response = requests.post(url=url, auth=Config.BASIC_AUTH)
     response.raise_for_status()

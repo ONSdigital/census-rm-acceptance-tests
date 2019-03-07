@@ -1,14 +1,11 @@
 from datetime import datetime
 
-import requests
-
-from config import Config
-from controllers.action_controller import get_action_plans, get_action_rules
+from controllers.action_controller import get_action_plans, get_action_rules, create_action_rule
 
 
 def create_action_plan(survey_ref, collection_exercise_id):
     try:
-        dt = get_actionplan_datetime()
+        trigger_date_time = get_actionplan_datetime()
     except ValueError:
         return -1
 
@@ -25,11 +22,11 @@ def create_action_plan(survey_ref, collection_exercise_id):
         'actionTypeName': 'SOCIALNOT',
         'name': action_plan_name,
         'description': 'myActionPlanDesc',
-        'triggerDateTime': dt,
+        'triggerDateTime': trigger_date_time,
         'priority': 3
     }
 
-    action_rules_response = requests.post(f'{Config.ACTION_SERVICE}/actionrules', auth=Config.BASIC_AUTH, json=rule)
+    action_rules_response = create_action_rule(rule)
 
     return action_rules_response, action_plan_id
 
