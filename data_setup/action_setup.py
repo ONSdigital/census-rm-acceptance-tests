@@ -26,9 +26,9 @@ def create_action_plan(survey_ref, collection_exercise_id):
         'priority': 3
     }
 
-    action_rules_response = create_action_rule(rule)
+    create_action_rule(rule)
 
-    return action_rules_response, action_plan_id
+    return action_plan_id
 
 
 def plan_for_collection_exercise(plan, collection_exercise_id):

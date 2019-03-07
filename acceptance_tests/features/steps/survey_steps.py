@@ -9,13 +9,8 @@ from data_setup.survey_setup import setup_census_survey
 
 @given('a survey exists with a collection exercise')
 def a_survey_exists_with_collex(context):
-    now = datetime.utcnow()
-
-    context.test_start_datetime = datetime(now.year, now.month, now.day, now.hour, now.minute, now.second,
-                                           now.microsecond)
+    context.test_start_datetime = datetime.utcnow()
     setup_census_survey(context)
     setup_census_collection_exercise(context)
-
-    action_response, context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id)
-
+    context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id)
 
