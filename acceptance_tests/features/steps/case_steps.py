@@ -1,5 +1,3 @@
-import json
-
 from behave import then
 
 from controllers.case_controller import get_cases_by_sample_unit_ids

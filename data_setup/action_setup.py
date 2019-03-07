@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 
 from config import Config
+from controllers.action_controller import get_action_plans, get_action_rules
 
 
 def create_action_plan(survey_ref, collection_exercise_id):
@@ -33,12 +34,6 @@ def create_action_plan(survey_ref, collection_exercise_id):
     return action_rules_response, action_plan_id
 
 
-def get_action_plans():
-    action_plans_response = requests.get(f'{Config.ACTION_SERVICE}/actionplans', auth=Config.BASIC_AUTH)
-    action_plans_response.raise_for_status()
-    return action_plans_response.json()
-
-
 def plan_for_collection_exercise(plan, collection_exercise_id):
     if not plan['selectors']:
         return False
@@ -54,12 +49,6 @@ def build_combined_action_data(action_plans):
         action_plan['action_rules'] = action_rules
         action_data.append(action_plan)
     return action_data
-
-
-def get_action_rules(action_plan_id):
-    response = requests.get(f'{Config.ACTION_SERVICE}/actionrules/actionplan/{action_plan_id}', auth=Config.BASIC_AUTH)
-    response.raise_for_status()
-    return response.json()
 
 
 def get_actionplan_datetime():
