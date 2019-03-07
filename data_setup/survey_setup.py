@@ -1,11 +1,5 @@
-import logging
-
-from structlog import wrap_logger
-
 from controllers.survey_controller import create_survey, create_survey_classifiers
 from utilities.string_utilities import create_random_string
-
-logger = wrap_logger(logging.getLogger(__name__))
 
 
 def setup_census_survey(context):

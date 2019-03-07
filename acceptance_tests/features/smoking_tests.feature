@@ -1,6 +1,7 @@
+@census
+@smoke_test
 Feature: Smoke tests to check the system is tied together correctly
 
-  @smoke_test
   Scenario: Successful sample file upload
       Given a survey exists with a collection exercise
       When sample file "Sample_10.csv" is loaded
