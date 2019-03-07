@@ -6,7 +6,7 @@ from config import Config
 from utilities.date_utilities import round_to_minute
 
 
-class SFTPUtility():
+class SftpUtility():
     def __init__(self):
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
