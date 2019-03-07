@@ -8,6 +8,20 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+def create_action_rule(rule):
+    logger.info('Creating action rule')
+
+    url = f'{Config.ACTION_SERVICE}/actionrules'
+
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=rule)
+
+    response.raise_for_status()
+
+    logger.info('Successfully created action rule')
+
+    return response.json()
+
+
 def get_action_plans():
     logger.info('Retrieving action plans')
 

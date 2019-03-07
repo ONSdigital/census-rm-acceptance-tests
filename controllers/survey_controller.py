@@ -43,4 +43,3 @@ def create_survey_classifiers(survey_id, classifiers):
     logger.debug("Classifier created", classifiers=classifiers, survey_id=survey_id)
 
     return response.json()
-

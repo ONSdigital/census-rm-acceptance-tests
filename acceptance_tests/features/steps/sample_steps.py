@@ -14,9 +14,3 @@ def load_sample_file_step(context, sample_file_name):
         json.loads(sample_unit)
         for sample_unit in sample_units_raw.values()
     ]
-
-#     _get_sample_units(sample_units_raw)
-#
-#
-# def _get_sample_units(sample_units_raw):
-

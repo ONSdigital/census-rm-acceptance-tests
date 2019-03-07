@@ -1,4 +1,4 @@
-from controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id, get_cases_by_sample_unit_ids
+from controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id
 from utilities.date_utilities import format_date_as_ddmm
 
 
@@ -44,4 +44,3 @@ def _get_iac_and_apply_to_sample_unit(case, sample_units):
     for sample_unit in sample_units:
         if case["sampleUnitId"] == sample_unit["id"]:
             sample_unit.update({'iac': iac})
-
