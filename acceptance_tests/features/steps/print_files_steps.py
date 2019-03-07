@@ -1,190 +1,141 @@
-import json
+import logging
 from datetime import datetime
 
-import paramiko
-import requests
 from behave import *
 from retrying import retry
+from structlog import wrap_logger
 
 from config import Config
-from controllers.case_controller import get_cases_by_sample_unit_ids
-from exceptions import DataNotYetThereError
+from controllers.case_controller import get_cases_by_sample_unit_ids, get_1st_iac_for_case_id
+from utilities.sftp_utility import create_open_sftp_client
 
 use_step_matcher("re")
 
+logger = wrap_logger(logging.getLogger(__name__))
 
+
+# This test stores quite a bit of data incore.
+# For large file size performance will deteriorate and then kaboom!
+# So performance style tests should work differently, not sure how...
 @step("the a correctly formatted file is created on the sftp server")
 def check_correct_files_on_sftp_server(context):
-    # This test stores quite a bit of data incore.
-    # For large file size performance will deteriorate and then kaboom!
-    # So performance style tests should work differently
-    sftp_client = _get_sftp_client()
-    context.cases = get_cases_with_iacs_for_sample_units(context)
-    expected_data = _get_expected_data(context)
+    sftp_client = create_open_sftp_client()
+    context.cases = _get_cases_with_iacs_for_sample_units(context)
+    expected_csv_lines = _create_expected_csv_lines(context)
 
     _check_notification_files_have_all_the_expected_data(sftp_client,
                                                          context.test_start_datetime,
                                                          context.survey_ref,
                                                          context.period,
-                                                         expected_data)
+                                                         expected_csv_lines)
 
 
-def _get_expected_data(context):
-    # sample_units = _get_sample_units(context)
-    expected_data_unrefined = add_full_info_to_sample_units(context.sample_units, context.cases)
-    expected_data = []
+def _create_expected_csv_lines(context):
+    _add_iac_to_sample_units(context.sample_units, context.cases)
 
-    for exp in expected_data_unrefined:
-        atts = exp["attributes"]
-        csv_line = atts["ADDRESS_LINE1"] + ":"
-        csv_line += atts["ADDRESS_LINE2"] + ":"
-        csv_line += atts["POSTCODE"] + ":"
-        csv_line += atts["TOWN_NAME"] + ":"
-        csv_line += atts["LOCALITY"] + ":"
-        csv_line += atts["COUNTRY"] + ":"
-        csv_line += exp["iac"] + ":"
-        csv_line += atts["TLA"] + atts["REFERENCE"] + ":"
-        csv_line += context.collex_return_by_date
-        expected_data.append(csv_line)
-
-    return expected_data
+    return [
+        _create_expected_csv_line(expected_data, context.collex_return_by_date)
+        for expected_data in context.sample_units
+    ]
 
 
-def get_iac_for_sample_unit(sample_unit_id, cases):
+def _create_expected_csv_line(expected_data, return_by_date):
+    attributes = expected_data["attributes"]
+
+    return (
+        f'{attributes["ADDRESS_LINE1"]}:'
+        f'{attributes["ADDRESS_LINE2"]}:'
+        f'{attributes["POSTCODE"] }:'
+        f'{attributes["TOWN_NAME"]}:'
+        f'{attributes["LOCALITY"]}:'
+        f'{attributes["COUNTRY"]}:'
+        f'{expected_data["iac"]}:'
+        f'{attributes["TLA"]}{ attributes["REFERENCE"]}:'
+        f'{return_by_date}'
+    )
+
+
+def _add_iac_to_sample_units(sample_units, cases):
+    for sample_unit in sample_units:
+        iac = _get_iac_for_sample_unit(sample_unit["id"], cases)
+        sample_unit.update({'iac': iac})
+
+
+def _get_iac_for_sample_unit(sample_unit_id, cases):
     for case in cases:
         if case["sampleUnitId"] == sample_unit_id:
             return case["iac"]
 
+    # or raise an exception here?
     return f"iac not found in for sample unit id {sample_unit_id}"
 
 
-def add_full_info_to_sample_units(sample_units, cases):
-    enriched_sample_units = []
-
-    for sample_unit in sample_units:
-        iac = get_iac_for_sample_unit(sample_unit["id"], cases)
-        sample_unit.update({'iac': iac})
-        enriched_sample_units.append(sample_unit)
-
-    return enriched_sample_units
-
-
-def get_cases_with_iacs_for_sample_units(context):
-    sample_units = [
-        sample_unit['id']
-        for sample_unit in context.sample_units
-    ]
+def _get_cases_with_iacs_for_sample_units(context):
+    sample_units = _extract_sample_unit_ids(context.sample_units)
 
     cases = get_cases_by_sample_unit_ids(sample_units)
     cases_with_iac = []
 
     for case in cases:
-        iac = get_iac_for_case_id(case["id"])
+        iac = get_1st_iac_for_case_id(case["id"])
         case.update({'iac': iac})
         cases_with_iac.append(case)
 
     return cases_with_iac
 
 
-@retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError),
-       wait_fixed=5000, stop_max_attempt_number=24)
-def get_iac_for_case_id(case_id):
-    url = f'{Config.CASE_SERVICE}/cases/{case_id}/iac'
-    response = requests.get(url, auth=Config.BASIC_AUTH)
-    response.raise_for_status()
-
-    iac_list = json.loads(response.text)
-    if len(iac_list) == 0:
-        raise DataNotYetThereError
-
-    iac = iac_list[0]["iac"]
-    return iac
-
-
-def _get_sftp_client():
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=Config.SFTP_HOST,
-                port=int(Config.SFTP_PORT),
-                username=Config.SFTP_USERNAME,
-                password=Config.SFTP_PASSWORD,
-                look_for_keys=False,
-                timeout=120)
-    return ssh.open_sftp()
-
-
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError),
        wait_fixed=5000, stop_max_attempt_number=24)
-def _check_notification_files_have_iacs(client, start_of_test, survey_ref, period, expected_iacs):
-    # logger.debug('Checking for files on SFTP server')
-    files = _get_files_filtered_by_name_and_modified_time(client, survey_ref, period, start_of_test)
+def _check_notification_files_have_all_the_expected_data(sftp_client, start_of_test, survey_ref, period, expected_csv_lines):
+    logger.debug('Checking for files on SFTP server')
+
+    files = _get_files_filtered_by_survey_ref_period_and_modified_date(sftp_client, survey_ref, period, start_of_test)
     if len(files) == 0:
         raise FileNotFoundError
 
-    seen_iacs = []
+    actual_content_list = _get_files_content_as_list(sftp_client, files)
 
-    for file in files:
-        file_path = f'{Config.SFTP_DIR}/{file.filename}'
-
-        with client.open(file_path) as sftp_file:
-            content = str(sftp_file.read())
-
-            for iac in expected_iacs:
-                if iac in content:
-                    seen_iacs.append(iac)
-
-    if set(seen_iacs) != set(expected_iacs):
+    if set(actual_content_list) != set(expected_csv_lines):
         file_names = [f.filename for f in files]
-        # logger.info('Unable to find all iacs', files_found=file_names, seen_iacs=seen_iacs, expected_iacs=expected_iacs)
-        raise FileNotFoundError
-
-    return files
-
-
-@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError),
-       wait_fixed=5000, stop_max_attempt_number=24)
-def _check_notification_files_have_all_the_expected_data(client, start_of_test, survey_ref, period, expected_data):
-    # logger.debug('Checking for files on SFTP server')
-    files = _get_files_filtered_by_name_and_modified_time(client, survey_ref, period, start_of_test)
-    if len(files) == 0:
-        raise FileNotFoundError
-
-    seen_iacs = []
-
-    total_content_lines = 0
-
-    for file in files:
-        file_path = f'{Config.SFTP_DIR}/{file.filename}'
-
-        with client.open(file_path) as sftp_file:
-            content = str(sftp_file.read())
-
-            for iac in expected_data:
-                if iac in content:
-                    seen_iacs.append(iac)
-
-            total_content_lines += content.count('\\n')
-
-    if set(seen_iacs) != set(expected_data):
-        file_names = [f.filename for f in files]
-        # logger.info('Unable to find all iacs', files_found=file_names, seen_iacs=seen_iacs, expected_iacs=expected_iacs)
-        raise FileNotFoundError
-
-    if total_content_lines != len(expected_data):
+        logger.info('Unable to find all iacs', files_found=file_names, expected_csv_lines=expected_csv_lines,
+                    actual_content_list=actual_content_list)
         raise FileNotFoundError
 
     return True
 
 
-def _get_files_filtered_by_name_and_modified_time(client, survey_ref, period, start_of_test):
+def _get_files_content_as_list(sftp_client, files):
+    actual_content = []
+
+    for file in files:
+        content_list = _get_file_lines_as_list(sftp_client, file)
+        actual_content.extend(content_list)
+
+    return actual_content
+
+
+def _get_file_lines_as_list(sftp_client, file):
+    file_path = f'{Config.SFTP_DIR}/{file.filename}'
+    with sftp_client.open(file_path) as sftp_file:
+        content = sftp_file.read().decode('utf-8')
+        return content.rstrip().split('\n')
+
+
+def _get_files_filtered_by_survey_ref_period_and_modified_date(client, survey_ref, period, start_of_test):
     files = client.listdir_attr(Config.SFTP_DIR)
     start_of_test = _round_to_minute(start_of_test)
-    files = list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
-                                  and start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
-    return files
+    return list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
+                                 and start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
 
 
 def _round_to_minute(start_of_test):
     return datetime(start_of_test.year, start_of_test.month,
                     start_of_test.day, start_of_test.hour,
                     start_of_test.minute, second=0, microsecond=0)
+
+
+def _extract_sample_unit_ids(sample_units):
+    return [
+        sample_unit['id']
+        for sample_unit in sample_units
+    ]

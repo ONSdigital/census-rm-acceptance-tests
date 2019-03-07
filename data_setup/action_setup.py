@@ -65,8 +65,6 @@ def get_action_rules(action_plan_id):
 def get_actionplan_datetime():
     now = datetime.utcnow()
     base_date = datetime(now.year, now.month, now.day, now.hour, now.minute, now.second, now.microsecond)
-    #Add on some seconds
-    #base_date = base_date.time
     return datetime.strftime(base_date, '%Y-%m-%dT%H:%M:%S.000Z')
 
 

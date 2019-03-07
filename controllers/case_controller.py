@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -27,3 +28,17 @@ def get_cases_by_sample_unit_ids(sample_unit_ids):
     logger.info('Successfully retrieved cases by sample_unit_ids')
 
     return cases
+
+
+@retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError),
+       wait_fixed=5000, stop_max_attempt_number=24)
+def get_1st_iac_for_case_id(case_id):
+    url = f'{Config.CASE_SERVICE}/cases/{case_id}/iac'
+    response = requests.get(url, auth=Config.BASIC_AUTH)
+    response.raise_for_status()
+
+    iac_list = json.loads(response.text)
+    if len(iac_list) == 0:
+        raise DataNotYetThereError
+
+    return iac_list[0]["iac"]
