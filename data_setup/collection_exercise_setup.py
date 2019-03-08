@@ -10,7 +10,7 @@ def setup_census_collection_exercise(context):
     context.period = create_period()
 
     context.dates = _generate_collection_exercise_dates_from_period(context.period)
-    create_eq_collection_instrument  context.collection_exercise_id = _setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
+    context.collection_exercise_id = _setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
                                                                                    context.survey_ref,
                                                                                    context.dates)
     context.collection_instrument_id = _add_a_collection_instrument(context)
