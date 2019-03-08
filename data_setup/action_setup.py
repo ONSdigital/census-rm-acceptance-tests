@@ -4,7 +4,6 @@ from utilities.date_utilities import get_datetime_now_as_str
 
 def create_action_plan(survey_ref, collection_exercise_id, action_rule_name, action_type_name):
     trigger_date_time = get_datetime_now_as_str()
-
     action_plan_id = _get_id_of_1st_action_plan_for_collection_excercise(collection_exercise_id)
 
     rule = {
