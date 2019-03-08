@@ -58,8 +58,6 @@ def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
     rabbitmq_connection.close()
     write_sampleunits_to_redis(sampleunits)
 
-
-
     return sampleunits
 
 
