@@ -5,13 +5,12 @@ from utilities.date_utilities import get_datetime_now_as_str
 def create_action_plan(survey_ref, collection_exercise_id):
     trigger_date_time = get_datetime_now_as_str()
 
-    action_plan_name = survey_ref + ' H 1'
     action_plan_id = _get_id_of_1st_action_plan_for_collection_excercise(collection_exercise_id)
 
     rule = {
         'actionPlanId': action_plan_id,
         'actionTypeName': 'SOCIALNOT',
-        'name': action_plan_name,
+        'name': survey_ref + ' H 1',
         'description': 'myActionPlanDesc',
         'triggerDateTime': trigger_date_time,
         'priority': 3
