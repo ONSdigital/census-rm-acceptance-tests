@@ -1,7 +1,11 @@
 from datetime import datetime
 
 
-def convert_datetime_for_event(date_time):
+def get_datetime_now_as_str():
+    return convert_datetime_to_str(datetime.utcnow())
+
+
+def convert_datetime_to_str(date_time):
     return datetime.strftime(date_time, '%Y-%m-%dT%H:%M:%S.000Z')
 
 

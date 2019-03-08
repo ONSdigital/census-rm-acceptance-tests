@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from controllers.collection_exercise_controller import post_event_to_collection_exercise, create_collection_exercise, \
     get_collection_exercise, create_eq_collection_instrument, get_collection_instruments_by_classifier, \
     link_ci_to_exercise
-from utilities.date_utilities import convert_datetime_for_event, format_period
+from utilities.date_utilities import convert_datetime_to_str, format_period
 
 
 def setup_census_collection_exercise(context):
@@ -34,13 +34,13 @@ def setup_collection_exercise_to_scheduled_state(survey_id, period, user_descrip
     collection_exercise_id = collection_exercise['id']
 
     post_event_to_collection_exercise(collection_exercise_id, 'mps',
-                                      convert_datetime_for_event(dates['mps']))
+                                      convert_datetime_to_str(dates['mps']))
     post_event_to_collection_exercise(collection_exercise_id, 'go_live',
-                                      convert_datetime_for_event(dates['go_live']))
+                                      convert_datetime_to_str(dates['go_live']))
     post_event_to_collection_exercise(collection_exercise_id, 'return_by',
-                                      convert_datetime_for_event(dates['return_by']))
+                                      convert_datetime_to_str(dates['return_by']))
     post_event_to_collection_exercise(collection_exercise_id, 'exercise_end',
-                                      convert_datetime_for_event(dates['exercise_end']))
+                                      convert_datetime_to_str(dates['exercise_end']))
     return collection_exercise
 
 
