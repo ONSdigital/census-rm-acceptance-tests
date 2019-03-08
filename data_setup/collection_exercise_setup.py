@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from controllers.collection_exercise_controller import post_event_to_collection_exercise, create_collection_exercise, \
-    get_collection_exercise, create_eq_collection_instrument, get_collection_instruments_by_classifier, \
+    create_eq_collection_instrument, get_collection_instruments_by_classifier, \
     link_ci_to_exercise
 from utilities.date_utilities import convert_datetime_to_str, create_period
 
@@ -12,13 +12,12 @@ def setup_census_collection_exercise(context):
     context.dates = _generate_collection_exercise_dates_from_period(context.period)
     context.collection_exercise_id = _setup_collection_exercise_to_scheduled_state(context.survey_id, context.period,
                                                                                    context.survey_ref,
-                                                                                   context.dates)['id']
+                                                                                   context.dates)
     context.collection_instrument_id = _add_a_collection_instrument(context)
 
 
 def _setup_collection_exercise_to_scheduled_state(survey_id, period, user_description, dates):
-    collection_exercise = _setup_collection_exercise_to_created_state(survey_id, period, user_description)
-    collection_exercise_id = collection_exercise['id']
+    collection_exercise_id = create_collection_exercise(survey_id, period, user_description)
 
     post_event_to_collection_exercise(collection_exercise_id, 'mps',
                                       convert_datetime_to_str(dates['mps']))
@@ -28,12 +27,7 @@ def _setup_collection_exercise_to_scheduled_state(survey_id, period, user_descri
                                       convert_datetime_to_str(dates['return_by']))
     post_event_to_collection_exercise(collection_exercise_id, 'exercise_end',
                                       convert_datetime_to_str(dates['exercise_end']))
-    return collection_exercise
-
-
-def _setup_collection_exercise_to_created_state(survey_id, period, user_description):
-    create_collection_exercise(survey_id, period, user_description)
-    return get_collection_exercise(survey_id, period)
+    return collection_exercise_id
 
 
 def _generate_collection_exercise_dates_from_period(period):

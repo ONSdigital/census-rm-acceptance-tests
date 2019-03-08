@@ -26,12 +26,19 @@ def create_collection_exercise(survey_id, period, user_description):
     logger.info('Successfully created collection exercise', survey_id=survey_id, period=period,
                 user_description=user_description)
 
+    return _get_collection_exercise_id_from_response(response)
+
+
+def _get_collection_exercise_id_from_response(response):
+    collection_exercise_uri = response.headers.__getattribute__('_store')['location'][1]
+    return collection_exercise_uri.rsplit('/', 1)[-1]
+
 
 def create_eq_collection_instrument(survey_id, form_type, eq_id):
     logger.info('Uploading eQ collection instrument', survey_id=survey_id, form_type=form_type)
 
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-        f'collection-instrument-api/1.0.2/upload'
+          f'collection-instrument-api/1.0.2/upload'
 
     classifiers = {
         "form_type": form_type,
@@ -55,7 +62,7 @@ def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
     logger.info('Retrieving collection instruments', survey_id=survey_id, form_type=form_type)
 
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-        f'collection-instrument-api/1.0.2/collectioninstrument'
+          f'collection-instrument-api/1.0.2/collectioninstrument'
 
     classifiers = dict()
 
@@ -78,7 +85,7 @@ def link_ci_to_exercise(collection_instrument_id, collection_exercise_id):
                 collection_instrument_id=collection_instrument_id, collection_exercise_id=collection_exercise_id)
 
     url = f'{Config.COLLECTION_INSTRUMENT_SERVICE}/' \
-        f'collection-instrument-api/1.0.2/link-exercise/{collection_instrument_id}/{collection_exercise_id}'
+          f'collection-instrument-api/1.0.2/link-exercise/{collection_instrument_id}/{collection_exercise_id}'
 
     response = requests.post(url=url, auth=Config.BASIC_AUTH)
     response.raise_for_status()
@@ -105,24 +112,3 @@ def post_event_to_collection_exercise(collection_exercise_id, event_tag, date_st
 
     logger.info('Successfully added event', collection_exercise_id=collection_exercise_id, event_tag=event_tag,
                 date_str=date_str)
-
-
-def get_collection_exercise(survey_id, period):
-    logger.info('Retrieving collection exercise', survey_id=survey_id, exercise_ref=period)
-
-    url = f'{Config.COLLECTION_EXERCISE_SERVICE}/collectionexercises/survey/{survey_id}'
-
-    response = requests.get(url=url, auth=Config.BASIC_AUTH)
-    response.raise_for_status()
-
-    collection_exercises = response.json()
-    for ce in collection_exercises:
-        if ce['exerciseRef'] == period:
-            collection_exercise = ce
-            break
-    else:
-        return None
-
-    logger.info('Successfully retrieved collection exercise', survey_id=survey_id, exercise_ref=period)
-
-    return collection_exercise
