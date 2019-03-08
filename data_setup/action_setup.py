@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from controllers.action_controller import get_action_plans, get_action_rules, create_action_rule
 from utilities.date_utilities import get_datetime_now_as_str
 
