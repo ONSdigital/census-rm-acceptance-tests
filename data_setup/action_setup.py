@@ -1,17 +1,17 @@
-from controllers.action_controller import get_action_plans, get_action_rules, create_action_rule
+from controllers.action_controller import get_action_plans, create_action_rule
 from utilities.date_utilities import get_datetime_now_as_str
 
 
-def create_action_plan(survey_ref, collection_exercise_id):
+def create_action_plan(survey_ref, collection_exercise_id, action_rule_name, action_type_name):
     trigger_date_time = get_datetime_now_as_str()
 
     action_plan_id = _get_id_of_1st_action_plan_for_collection_excercise(collection_exercise_id)
 
     rule = {
         'actionPlanId': action_plan_id,
-        'actionTypeName': 'SOCIALNOT',
-        'name': survey_ref + ' H 1',
-        'description': 'myActionPlanDesc',
+        'actionTypeName': action_type_name,
+        'name': action_rule_name,
+        'description': survey_ref,
         'triggerDateTime': trigger_date_time,
         'priority': 3
     }
