@@ -49,7 +49,7 @@ def _generate_collection_exercise_dates_from_period(period):
 def _add_a_collection_instrument(context):
     create_eq_collection_instrument(context.survey_id, form_type="household", eq_id="census")
     collection_instrument_id = get_collection_instruments_by_classifier(survey_id=context.survey_id,
-                                                                                form_type="household")[0]['id']
+                                                                        form_type="household")[0]['id']
     link_ci_to_exercise(collection_instrument_id, context.collection_exercise_id)
 
     return collection_instrument_id
