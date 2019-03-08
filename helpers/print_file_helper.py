@@ -30,7 +30,7 @@ def _create_expected_csv_line(expected_data, return_by_date):
 
 
 def _get_iacs_and_apply_to_sample_units(context):
-    cases = get_cases_by_survey_id(context.survey_id)
+    cases = get_cases_by_survey_id(context.survey_id, len(context.sample_units))
 
     for case in cases:
         _get_iac_and_apply_to_sample_unit(case, context.sample_units)

@@ -11,25 +11,6 @@ from exceptions import DataNotYetThereError
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError), wait_fixed=5000, stop_max_attempt_number=30)
-def get_cases_by_sample_unit_ids(sample_unit_ids):
-    logger.info('Retrieving cases by sample_unit_ids')
-
-    url = f'{Config.CASE_SERVICE}/cases/sampleunitids'
-    payload = {'sampleUnitId': sample_unit_ids}
-
-    response = requests.get(url, params=payload, auth=Config.BASIC_AUTH)
-    response.raise_for_status()
-
-    cases = response.json()
-    if len(cases) < len(sample_unit_ids):
-        raise DataNotYetThereError
-
-    logger.info('Successfully retrieved cases by sample_unit_ids')
-
-    return cases
-
-
 @retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError),
        wait_fixed=5000, stop_max_attempt_number=24)
 def get_1st_iac_for_case_id(case_id):
@@ -45,7 +26,7 @@ def get_1st_iac_for_case_id(case_id):
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, DataNotYetThereError), wait_fixed=5000, stop_max_attempt_number=30)
-def get_cases_by_survey_id(survey_id):
+def get_cases_by_survey_id(survey_id, expected_count):
     logger.info('Retrieving cases by survey id')
 
     url = f'{Config.CASE_SERVICE}/cases/surveyid/{survey_id}'
@@ -53,4 +34,11 @@ def get_cases_by_survey_id(survey_id):
     response = requests.get(url, auth=Config.BASIC_AUTH)
     response.raise_for_status()
 
-    return response.json()
+    cases = response.json()
+
+    if len(cases) < expected_count:
+        raise DataNotYetThereError
+
+    logger.info('Successfully retrieved cases by survey id')
+
+    return cases
