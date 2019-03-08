@@ -34,7 +34,6 @@ class SftpUtility:
     def get_files_content_as_list(self, files):
         actual_content = []
 
-        # Can this be done in a nicer way?
         for file in files:
             file_path = f'{Config.SFTP_DIR}/{file.filename}'
             content_list = self._get_file_lines_as_list(file_path)
