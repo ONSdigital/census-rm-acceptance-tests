@@ -55,8 +55,6 @@ def create_eq_collection_instrument(survey_id, form_type, eq_id):
 
     logger.info('Successfully uploaded eQ collection instrument', survey_id=survey_id, form_type=form_type)
 
-    return response
-
 
 def get_collection_instruments_by_classifier(survey_id=None, form_type=None):
     logger.info('Retrieving collection instruments', survey_id=survey_id, form_type=form_type)
