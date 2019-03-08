@@ -105,8 +105,7 @@ def post_event_to_collection_exercise(collection_exercise_id, event_tag, date_st
 
     response = requests.post(url, auth=Config.BASIC_AUTH, json=post_data)
 
-    # 409: event already exists, which we count as permissable for testing
-    if response.status_code not in (201, 409):
+    if response.status_code != 201:
         logger.error('Failed to post event', status=response.status_code)
         raise Exception(f'Failed to post event {collection_exercise_id}')
 
