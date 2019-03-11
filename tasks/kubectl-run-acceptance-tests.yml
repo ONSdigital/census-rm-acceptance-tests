@@ -27,10 +27,6 @@ run:
       gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
 
-      #Get the sftp username
-      --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
-      --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
-
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
@@ -41,4 +37,6 @@ run:
       --restart=Never \
       $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
+      --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+      --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
 
