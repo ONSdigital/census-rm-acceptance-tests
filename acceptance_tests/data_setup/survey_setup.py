@@ -15,7 +15,7 @@ def setup_census_survey(context):
                                       context.legal_basis, context.survey_type)['id']
 
     survey_classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}
-    context.classifier_id = create_survey_classifiers(context.survey_id, survey_classifiers)['id']
+    create_survey_classifiers(context.survey_id, survey_classifiers)['id']
 
 
 def _create_data_for_survey():

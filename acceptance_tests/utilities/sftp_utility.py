@@ -21,7 +21,7 @@ class SftpUtility:
         self._sftp_client = self.ssh_client.open_sftp()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, *_):
         self.ssh_client.close()
 
     def get_files_filtered_by_survey_ref_period_and_modified_date(self, survey_ref, period, start_of_test):

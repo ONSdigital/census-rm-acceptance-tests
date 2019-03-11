@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from acceptance_tests.controllers.collection_exercise_controller import post_event_to_collection_exercise, create_collection_exercise, \
-    create_eq_collection_instrument, get_collection_instruments_by_classifier, \
+from acceptance_tests.controllers.collection_exercise_controller import post_event_to_collection_exercise, \
+    create_collection_exercise, create_eq_collection_instrument, get_collection_instruments_by_classifier, \
     link_ci_to_exercise
 from acceptance_tests.utilities.date_utilities import convert_datetime_to_str, create_period
 

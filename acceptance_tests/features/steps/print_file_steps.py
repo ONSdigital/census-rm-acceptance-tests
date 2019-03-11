@@ -1,6 +1,6 @@
 import logging
 
-from behave import Then
+from behave import then
 from retrying import retry
 from structlog import wrap_logger
 
@@ -10,7 +10,7 @@ from acceptance_tests.utilities.sftp_utility import SftpUtility
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@Then("correctly formatted notification files are created")
+@then("correctly formatted notification files are created")
 def check_correct_files_on_sftp_server(context):
     expected_csv_lines = create_expected_csv_lines(context)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines)

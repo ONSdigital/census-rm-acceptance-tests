@@ -36,7 +36,7 @@ run:
       --image=eu.gcr.io/census-ci/rm/census-rm-acceptance-tests \
       --restart=Never \
       $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
-      -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
       --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
       --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+      -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
 
