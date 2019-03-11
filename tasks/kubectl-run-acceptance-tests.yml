@@ -27,8 +27,9 @@ run:
       gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
 
-      #Get the sftp username and password here? and send them over after the loop of kubernetes.env
-      kubectl get secret sftp-credentials -o=jsonpath='{.data.password}'
+      #Get the sftp username
+      --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+      --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
 
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each

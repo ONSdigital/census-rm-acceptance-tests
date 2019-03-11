@@ -1,0 +1,2 @@
+class DataNotYetThereError(OSError):
+    pass

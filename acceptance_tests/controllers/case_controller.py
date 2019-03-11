@@ -4,7 +4,7 @@ import requests
 from retrying import retry
 from structlog import wrap_logger
 from config import Config
-from exceptions.exceptions import DataNotYetThereError
+from acceptance_tests.exceptions.exceptions import DataNotYetThereError
 
 logger = wrap_logger(logging.getLogger(__name__))
 

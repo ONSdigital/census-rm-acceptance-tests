@@ -2,7 +2,7 @@ import json
 
 from behave import when
 
-from utilities.sample_loader.sample_file_loader import load_sample_file
+from acceptance_tests.utilities.sample_loader.sample_file_loader import load_sample_file
 
 
 @when('sample file "{sample_file_name}" is loaded')

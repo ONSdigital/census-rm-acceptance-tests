@@ -30,7 +30,7 @@ redis_db = Config.REDIS_DB
 
 # globally load sampleunit message template
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(["./"]))
-jinja_template = env.get_template("./utilities/sample_loader/message_template.xml")
+jinja_template = env.get_template("./acceptance_tests/utilities/sample_loader/message_template.xml")
 
 
 def load_sample_file(context):

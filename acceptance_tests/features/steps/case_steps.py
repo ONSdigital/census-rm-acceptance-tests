@@ -1,6 +1,6 @@
 from behave import then
 
-from controllers.case_controller import get_cases_by_survey_id
+from acceptance_tests.controllers.case_controller import get_cases_by_survey_id
 
 
 @then("the sample units are created and stored in the case service")

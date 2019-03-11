@@ -4,8 +4,8 @@ from behave import Then
 from retrying import retry
 from structlog import wrap_logger
 
-from helpers.print_file_helper import create_expected_csv_lines
-from utilities.sftp_utility import SftpUtility
+from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines
+from acceptance_tests.utilities.sftp_utility import SftpUtility
 
 logger = wrap_logger(logging.getLogger(__name__))
 

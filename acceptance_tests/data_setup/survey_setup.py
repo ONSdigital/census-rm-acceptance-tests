@@ -1,5 +1,5 @@
-from controllers.survey_controller import create_survey, create_survey_classifiers
-from utilities.string_utilities import create_random_string
+from acceptance_tests.controllers.survey_controller import create_survey, create_survey_classifiers
+from acceptance_tests.utilities.string_utilities import create_random_string
 
 
 def setup_census_survey(context):

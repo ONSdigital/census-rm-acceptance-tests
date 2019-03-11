@@ -1,4 +1,3 @@
-@census
 @smoke_test
 Feature: Smoke tests to check the system is tied together correctly
 

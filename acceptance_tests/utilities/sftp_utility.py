@@ -3,7 +3,7 @@ from datetime import datetime
 import paramiko
 
 from config import Config
-from utilities.date_utilities import round_to_minute
+from acceptance_tests.utilities.date_utilities import round_to_minute
 
 
 class SftpUtility:
@@ -18,14 +18,14 @@ class SftpUtility:
                                 timeout=120)
 
     def __enter__(self):
-        self.__sftp_client = self.ssh_client.open_sftp()
+        self._sftp_client = self.ssh_client.open_sftp()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.ssh_client.close()
 
     def get_files_filtered_by_survey_ref_period_and_modified_date(self, survey_ref, period, start_of_test):
-        files = self.__sftp_client.listdir_attr(Config.SFTP_DIR)
+        files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         start_of_test = round_to_minute(start_of_test)
 
         return list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
@@ -42,6 +42,6 @@ class SftpUtility:
         return actual_content
 
     def _get_file_lines_as_list(self, file_path):
-        with self.__sftp_client.open(file_path) as sftp_file:
+        with self._sftp_client.open(file_path) as sftp_file:
             content = sftp_file.read().decode('utf-8')
             return content.rstrip().split('\n')

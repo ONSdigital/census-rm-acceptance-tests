@@ -1,5 +1,5 @@
-from controllers.action_controller import get_action_plans, create_action_rule
-from utilities.date_utilities import get_datetime_now_as_str
+from acceptance_tests.controllers.action_controller import get_action_plans, create_action_rule
+from acceptance_tests.utilities.date_utilities import get_datetime_now_as_str
 
 
 def create_action_plan(survey_ref, collection_exercise_id, action_rule_name, action_type_name):

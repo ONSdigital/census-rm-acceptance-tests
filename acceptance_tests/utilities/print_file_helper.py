@@ -1,5 +1,5 @@
-from controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id
-from utilities.date_utilities import format_date_as_ddmm
+from acceptance_tests.controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id
+from acceptance_tests.utilities.date_utilities import format_date_as_ddmm
 
 
 def create_expected_csv_lines(context):
