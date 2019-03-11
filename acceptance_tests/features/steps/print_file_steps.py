@@ -1,6 +1,6 @@
 import logging
 
-from behave import *
+from behave import Then
 from retrying import retry
 from structlog import wrap_logger
 
