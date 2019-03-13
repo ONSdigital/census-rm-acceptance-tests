@@ -27,15 +27,12 @@ def _validate_print_file_content(sftp_utility, survey_ref, period, start_of_test
     logger.debug('Checking for files on SFTP server')
 
     files = sftp_utility.get_files_filtered_by_survey_ref_period_and_modified_date(survey_ref, period, start_of_test)
-    if len(files) == 0:
-        raise FileNotFoundError
-
     actual_content_list = sftp_utility.get_files_content_as_list(files)
 
     if set(actual_content_list) != set(expected_csv_lines):
         file_names = [f.filename for f in files]
-        logger.info('Unable to find all iacs', files_found=file_names, expected_csv_lines=expected_csv_lines,
-                    actual_content_list=actual_content_list)
+        logger.info('Unable to find all expected data in existing files', files_found=file_names,
+                    expected_csv_lines=expected_csv_lines, actual_content_list=actual_content_list)
         raise FileNotFoundError
 
     return True
