@@ -39,6 +39,3 @@ run:
       --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
       --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
-      --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}" --namespace=${KUBERNETES_NAMESPACE}) \
-      --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}" --namespace=${KUBERNETES_NAMESPACE}) \
-      -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
