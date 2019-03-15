@@ -116,3 +116,6 @@ tmp_ras_rm_docker_dev
 setenvs.sh
 
 *_failed.png
+
+# VSCode
+.vscode/
