@@ -1,11 +1,5 @@
-import logging
-
-from structlog import wrap_logger
-
-from controllers.survey_controller import create_survey, create_survey_classifiers
-from utilities.string_utilities import create_random_string
-
-logger = wrap_logger(logging.getLogger(__name__))
+from acceptance_tests.controllers.survey_controller import create_survey, create_survey_classifiers
+from acceptance_tests.utilities.string_utilities import create_random_string
 
 
 def setup_census_survey(context):
@@ -21,7 +15,7 @@ def setup_census_survey(context):
                                       context.legal_basis, context.survey_type)['id']
 
     survey_classifiers = {"name": "COLLECTION_INSTRUMENT", "classifierTypes": ["COLLECTION_EXERCISE"]}
-    context.classifier_id = create_survey_classifiers(context.survey_id, survey_classifiers)['id']
+    create_survey_classifiers(context.survey_id, survey_classifiers)['id']
 
 
 def _create_data_for_survey():

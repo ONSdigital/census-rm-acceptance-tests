@@ -33,9 +33,11 @@ run:
       kubectl run acceptance-tests -it --command --rm --quiet \
       --namespace=${KUBERNETES_NAMESPACE} \
       --generator=run-pod/v1 \
-      --image=eu.gcr.io/census-ci/rm/census-rm-acceptance-tests \
+      --image=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests \
       --restart=Never \
       $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
+      --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+      --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
       --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}" --namespace=${KUBERNETES_NAMESPACE}) \
       --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}" --namespace=${KUBERNETES_NAMESPACE}) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
