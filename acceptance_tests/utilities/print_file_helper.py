@@ -44,3 +44,4 @@ def _get_iac_and_apply_to_sample_unit(case, sample_units):
     for sample_unit in sample_units:
         if case["sampleUnitId"] == sample_unit["id"]:
             sample_unit.update({'iac': iac})
+            return
