@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$ENV" ]; then
-	ENV=ci
+    ENV=ci
 fi
 
 GCP_PROJECT=census-rm-$ENV
