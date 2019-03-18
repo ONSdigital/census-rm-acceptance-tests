@@ -17,15 +17,15 @@ def _create_expected_csv_line(expected_data, return_by_date):
     attributes = expected_data["attributes"]
 
     return (
+        f'{expected_data["iac"]}:'
+        f'{attributes["ARID"]}:'
         f'{attributes["ADDRESS_LINE1"]}:'
         f'{attributes["ADDRESS_LINE2"]}:'
-        f'{attributes["POSTCODE"]}:'
+        f'{attributes["ADDRESS_LINE3"]}:'
         f'{attributes["TOWN_NAME"]}:'
-        f'{attributes["LOCALITY"]}:'
-        f'{attributes["COUNTRY"]}:'
-        f'{expected_data["iac"]}:'
-        f'{attributes["TLA"]}{attributes["REFERENCE"]}:'
-        f'{return_by_date}'
+        f'{attributes["POSTCODE"]}:'
+        f'PROD_CODE???'
+        #Is PROD CODE HTC_WILLINGNES prefixed with ICL?
     )
 
 
