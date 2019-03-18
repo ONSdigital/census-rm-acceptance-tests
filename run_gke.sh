@@ -12,7 +12,7 @@ if [ -z "$IMAGE" ]; then
     IMAGE=eu.gcr.io/$GCP_PROJECT/rm/census-rm-acceptance-tests:latest
 fi
 
-if [ "$PUSH" = "true" ]; then
+if [ "$BUILD" = "true" ]; then
     echo "Building and pushing docker image [$IMAGE]..."
     docker build -t $IMAGE .
     docker push $IMAGE
