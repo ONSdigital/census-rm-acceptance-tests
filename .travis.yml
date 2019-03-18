@@ -13,7 +13,8 @@ install:
   - pipenv install --dev --deploy
 
 script:
-  - pipenv check --style . --max-line-length 120
+  - make package_vulnerability
+  - make flake
 
 after_success:
 - if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then

@@ -29,7 +29,8 @@ def main():
 
     logging.basicConfig(level=args.log_level)
 
-    return behave_executable.main(args=f'--logging-level {args.log_level} --format {args.format} {args.feature_directory}')
+    args = f'--logging-level {args.log_level} --format {args.format} {args.feature_directory}'
+    return behave_executable.main(args)
 
 
 if __name__ == '__main__':

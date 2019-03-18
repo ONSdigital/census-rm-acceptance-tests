@@ -47,3 +47,9 @@ class Config:
     REDIS_HOST = os.getenv('REDIS_SERVICE_HOST', 'localhost')
     REDIS_PORT = os.getenv('REDIS_SERVICE_PORT', '7379')
     REDIS_DB = os.getenv('REDIS_DB', '0')
+
+    SFTP_HOST = os.getenv('SFTP_HOST', 'localhost')
+    SFTP_PORT = os.getenv('SFTP_PORT', '122')
+    SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'centos')
+    SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', 'JLibV2&XD,')
+    SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp')

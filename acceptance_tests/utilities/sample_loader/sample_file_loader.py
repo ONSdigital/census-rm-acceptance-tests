@@ -30,13 +30,14 @@ redis_db = Config.REDIS_DB
 
 # globally load sampleunit message template
 env = jinja2.Environment(loader=jinja2.FileSystemLoader(["./"]))
-jinja_template = env.get_template("./utilities/sample_loader/message_template.xml")
+jinja_template = env.get_template("./acceptance_tests/utilities/sample_loader/message_template.xml")
 
 
 def load_sample_file(context):
     init_rabbit()
     with open(context.sample_file_name) as f_obj:
-        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id, context.classifier_id)
+        return sample_reader(f_obj, context.collection_exercise_id, context.action_plan_id,
+                             context.collection_instrument_id)
 
 
 def sample_reader(file_obj, ce_uuid, ap_uuid, ci_uuid):
