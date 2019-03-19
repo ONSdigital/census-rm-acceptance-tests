@@ -71,11 +71,15 @@ To run the acceptance tests (`latest` image in GCR) in a pod in census-rm-ci:
 ```
 To run a locally-modified version of the acceptance tests in a pod in a dev GCP project (builds and pushes the docker image to the project's GCR):
 ```bash
-BUILD=true ENV=jc ./run_gke.sh
+BUILD=true ENV=test-env ./run_gke.sh
 ```
-To run the acceptance tests using the `latest` image in the census-rm-ci GCR in a pod in a dev GCP project (otherwise defaults to the image in the project's GCR):
+To run the acceptance tests using the `latest` image from the census-rm-ci GCR in a pod in a dev GCP project (otherwise defaults to the image in the project's GCR):
 ```bash
-IMAGE=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest ENV=jc ./run_gke.sh
+IMAGE=ci ENV=test-env ./run_gke.sh
+```
+Build and push a locally-modified version of the acceptance tests and then run in a pod in another dev GCP project:
+```bash
+BUILD=true IMAGE="eu.gcr.io/census-rm-at/rm/census-rm-acceptance-tests:latest" ENV=test-env ./run_gke.sh
 ```
 
 ## Script Environment variables
@@ -83,5 +87,5 @@ IMAGE=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest ENV=jc ./run_g
 | Name                  | Description                                                                                                                                                                                                  | Example                                  | Default              | Required |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|----------------------|----------|
 | `ENV`                 | The environment to run the tests in and against, it will try to use an existing project of the form `census-rm-<ENV>`                                                                                                  | `ENV=test-env`                           | `ci`                 | no      |
-| `IMAGE`              | The path to the acceptance tests Docker image to use in the k8s pod                                                                                                                | `IMAGE="eu.gcr.io/census-rm-test-env/rm/census-rm-acceptance-tests:latest"`                    | `eu.gcr.io/census-rm-$ENV/rm/census-rm-acceptance-tests:latest`                 | no       |
+| `IMAGE`              | The path to the acceptance tests Docker image to use in the k8s pod (lazy option `ci` to use the default master image)                                                                                                                | `IMAGE="eu.gcr.io/census-rm-test-env/rm/census-rm-acceptance-tests:latest"`                    | `eu.gcr.io/census-rm-$ENV/rm/census-rm-acceptance-tests:latest`                 | no       |
 | `BUILD`          | A boolean (`true` or not set string) to toggle the build and push of the acceptance tests as a Docker image                                                                                                                  | `IMAGE=true`                        | None              | no       |

@@ -10,15 +10,22 @@ GCP_REGION=europe-west2
 
 if [ -z "$IMAGE" ]; then
     IMAGE=eu.gcr.io/$GCP_PROJECT/rm/census-rm-acceptance-tests:latest
+elif [ "$IMAGE" = "ci" ]; then
+    IMAGE=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest
 fi
 
 if [ "$BUILD" = "true" ]; then
-    echo "Building and pushing docker image [$IMAGE]..."
-    docker build -t $IMAGE .
-    docker push $IMAGE
+    echo "Building and pushing Docker image [$IMAGE]..."
+    read -p "Are you sure (y/N)? " -n 1 -r
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        docker build -t $IMAGE .
+        docker push $IMAGE
+    else
+        exit 1
+    fi
 fi
 
-echo "Using Acceptance Tests image [$IMAGE]"
+echo "Using RM Acceptance Tests image [$IMAGE]"
 
 KUBERNETES_NAMESPACE=response-management-$ENV
 
