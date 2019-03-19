@@ -27,7 +27,11 @@ fi
 
 echo "Using RM Acceptance Tests image [$IMAGE]"
 
-KUBERNETES_NAMESPACE=response-management-$ENV
+if [ -z "$NAMESPACE" ]; then
+    KUBERNETES_NAMESPACE=response-management-$ENV
+else
+    KUBERNETES_NAMESPACE=$NAMESPACE
+fi
 
 gcloud config set project $GCP_PROJECT
 gcloud container clusters get-credentials rm-k8s-cluster \
