@@ -24,8 +24,7 @@ def _create_expected_csv_line(expected_data, return_by_date):
         f'{attributes["ADDRESS_LINE3"]}:'
         f'{attributes["TOWN_NAME"]}:'
         f'{attributes["POSTCODE"]}:'
-        f'PROD_CODE???'
-        #Is PROD CODE HTC_WILLINGNES prefixed with ICL?
+        'HOLDER'
     )
 
 
