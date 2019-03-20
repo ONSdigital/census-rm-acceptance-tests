@@ -44,11 +44,4 @@ class SftpUtility:
     def _get_file_lines_as_list(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
             content = sftp_file.read().decode('utf-8')
-            return self._clean_file_contents(content)
-
-    def _clean_file_contents(self, file_content):
-        rows = file_content.rstrip().split('\n')
-        if rows[0] == "UAC,CASEREF,ADDRESS_LINE1,ADDRESS_LINE2,ADDRESS_LINE3,TOWN_NAME,POSTCODE,PRODUCT_CODE":
-            rows.pop(0)
-
-        return rows
+            return content.rstrip().split('\n')
