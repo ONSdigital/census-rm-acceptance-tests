@@ -7,9 +7,6 @@ if [ -z "$ENV" ]; then
         IMAGE=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest
     fi
 else
-    if [ -z "$NAMESPACE" ]; then
-        NAMESPACE=response-management-$ENV
-    fi
     GCP_PROJECT=census-rm-$ENV
     if [ -z "$IMAGE" ]; then
         IMAGE=eu.gcr.io/$GCP_PROJECT/rm/census-rm-acceptance-tests:latest

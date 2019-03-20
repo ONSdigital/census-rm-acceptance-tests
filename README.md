@@ -41,7 +41,7 @@ BUILD=true IMAGE="eu.gcr.io/census-rm-at/rm/census-rm-acceptance-tests:latest" E
 | `ENV`                 | The environment to run the tests in and against, it will try to use an existing project of the form `census-rm-<ENV>`. If not present, the script will use the current k8s context.                                                                                                  | `ENV=test-env`                           | None                 | no      |
 | `IMAGE`              | The path to the acceptance tests Docker image to use in the k8s pod (lazy option `ci` to use the default master image).                                                                                                                | `IMAGE="eu.gcr.io/census-rm-test-env/rm/census-rm-acceptance-tests:latest"`                    | `eu.gcr.io/census-rm-$ENV/rm/census-rm-acceptance-tests:latest`                 | no       |
 | `BUILD`          | A boolean (`true` or not set string) to toggle the build and push of the acceptance tests as a Docker image.                                                                                                                  | `IMAGE=true`                        | None              | no       |
-| `NAMESPACE`          | The k8s namespace to run the acceptance tests as a pod in.                                                                                                                  | `NAMESPACE=default`                        | `response-management-$ENV`              | no       |
+| `NAMESPACE`          | The k8s namespace to run the acceptance tests as a pod in.                                                                                                                  | `NAMESPACE=default`                        | None              | no       |
 
 
 ### Alternatively
@@ -60,8 +60,8 @@ in order to have permission to pull the image.
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 --image=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest --restart=Never \
 $(while read env; do echo --env=${env}; done < kubernetes.env) \
---env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
---env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+--env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
+--env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" | base64 --decode) \
 -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
 ```
 
@@ -87,7 +87,7 @@ Then you should be able to run the tests with a similar command to above:
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 --image=eu.gcr.io/<project-name>/rm/census-rm-acceptance-tests:latest --restart=Never \
 $(while read env; do echo --env=${env}; done < kubernetes.env) \
---env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
---env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" --namespace=${KUBERNETES_NAMESPACE} | base64 --decode) \
+--env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
+--env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" | base64 --decode) \
 -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
 ```
