@@ -49,6 +49,6 @@ class SftpUtility:
     def _clean_file_contents(self, file_content):
         rows = file_content.rstrip().split('\n')
         if rows[0] == "UAC,CASEREF,ADDRESS_LINE1,ADDRESS_LINE2,ADDRESS_LINE3,TOWN_NAME,POSTCODE,PRODUCT_CODE":
-            rows.pop(1)
+            rows.pop(0)
 
         return rows
