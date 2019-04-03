@@ -62,6 +62,8 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 $(while read env; do echo --env=${env}; done < kubernetes.env) \
 --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
 --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" | base64 --decode) \
+--env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
+--env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
 -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
 ```
 
@@ -73,7 +75,7 @@ You should see the output of the tests in your terminal as if you were running t
 
 If you are testing a new branch of the acceptance-tests themselves you will need to build an image yourself 
 and push it to your gcr and then reference that.  
-Go to the gcr container api enabler https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com
+Go to the gcr container api enabler (https://console.cloud.google.com/flows/enableapi?apiid=containerregistry.googleapis.com)
 Choose your project and enable it
 
 Build the image locally and push it to gcr:
@@ -89,5 +91,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 $(while read env; do echo --env=${env}; done < kubernetes.env) \
 --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
 --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" | base64 --decode) \
+--env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
+--env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
 -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
 ```

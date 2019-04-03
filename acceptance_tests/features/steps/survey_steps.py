@@ -12,5 +12,6 @@ def a_survey_exists_with_collex(context):
     context.test_start_datetime = datetime.utcnow()
     setup_census_survey(context)
     setup_census_collection_exercise(context)
-    context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id, 'Notification',
-                                                'SOCIALNOT')
+    context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id,
+                                                'Initial Contact Letter',
+                                                'ICL1E')
