@@ -2,7 +2,7 @@ from datetime import datetime
 
 from behave import given
 
-from acceptance_tests.data_setup.action_setup import create_action_plan
+from acceptance_tests.data_setup.action_setup import get_id_of_1st_action_plan_for_collection_excercise
 from acceptance_tests.data_setup.collection_exercise_setup import setup_census_collection_exercise
 from acceptance_tests.data_setup.survey_setup import setup_census_survey
 
@@ -12,6 +12,4 @@ def a_survey_exists_with_collex(context):
     context.test_start_datetime = datetime.utcnow()
     setup_census_survey(context)
     setup_census_collection_exercise(context)
-    context.action_plan_id = create_action_plan(context.survey_ref, context.collection_exercise_id,
-                                                'Initial Contact Letter',
-                                                'ICL1E')
+    context.action_plan_id = get_id_of_1st_action_plan_for_collection_excercise(context.collection_exercise_id)

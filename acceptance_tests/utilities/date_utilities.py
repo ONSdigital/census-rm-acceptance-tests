@@ -1,16 +1,8 @@
 from datetime import datetime, timedelta
 
 
-def get_datetime_now_as_str():
-    return convert_datetime_to_str(datetime.utcnow())
-
-
 def convert_datetime_to_str(date_time):
     return datetime.strftime(date_time, '%Y-%m-%dT%H:%M:%S.000Z')
-
-
-def format_date_as_ddmm(date_to_format):
-    return '{:02d}'.format(date_to_format.day) + "/" + '{:02d}'.format(date_to_format.month)
 
 
 def create_period(period_offset_days=0):
