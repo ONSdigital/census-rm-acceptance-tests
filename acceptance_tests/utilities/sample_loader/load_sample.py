@@ -79,9 +79,9 @@ def _create_case_json(sample, collection_exercise_id, action_plan_id) -> str:
                    'addressLine1': sample['ADDRESS_LINE1'], 'addressLine2': sample['ADDRESS_LINE2'],
                    'addressLine3': sample['ADDRESS_LINE3'], 'townName': sample['TOWN_NAME'],
                    'postcode': sample['POSTCODE'], 'latitude': sample['LATITUDE'],
-                   'longitude': sample['LONGITUDE'], 'oa11cd': sample['OA11CD'],
-                   'lsoa11cd': sample['LSOA11CD'], 'msoa11cd': sample['MSOA11CD'],
-                   'lad18cd': sample['LAD18CD'], 'rgn10cd': sample['RGN10CD'],
+                   'longitude': sample['LONGITUDE'], 'oa': sample['OA'],
+                   'lsoa': sample['LSOA'], 'msoa': sample['MSOA'],
+                   'lad': sample['LAD'], 'rgn': sample['RGN'],
                    'htcWillingness': sample['HTC_WILLINGNESS'], 'htcDigital': sample['HTC_DIGITAL'],
                    'treatmentCode': sample['TREATMENT_CODE'], 'collectionExerciseId': collection_exercise_id,
                    'actionPlanId': action_plan_id}
