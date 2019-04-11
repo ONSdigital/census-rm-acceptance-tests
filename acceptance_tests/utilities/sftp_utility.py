@@ -24,11 +24,11 @@ class SftpUtility:
     def __exit__(self, *_):
         self.ssh_client.close()
 
-    def get_files_filtered_by_survey_ref_period_and_modified_date(self, survey_ref, period, start_of_test):
+    def get_files_filtered_by_survey_ref_period_and_modified_date(self, start_of_test):
         files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         start_of_test = round_to_minute(start_of_test)
-
-        return list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
+        period = start_of_test.strftime('%Y-%m-%d')
+        return list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
                                      and start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
 
     def get_files_content_as_list(self, files):
