@@ -31,6 +31,12 @@ class SftpUtility:
         return list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
                                      and start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
 
+    def get_files_after_datetime(self, start_of_test):
+        files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
+        start_of_test = round_to_minute(start_of_test)
+
+        return list(filter(lambda f: start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
+
     def get_files_content_as_list(self, files):
         actual_content = []
 
@@ -45,3 +51,8 @@ class SftpUtility:
         with self._sftp_client.open(file_path) as sftp_file:
             content = sftp_file.read().decode('utf-8')
             return content.rstrip().split('\n')
+
+    def _get_file_contents_as_string(self, file_path):
+        with self._sftp_client.open(file_path) as sftp_file:
+            content = sftp_file.read().decode('utf-8')
+            return content

@@ -7,3 +7,4 @@ Feature: Smoke tests to check the system is tied together correctly
       When sample file "sample_input_census_spec.csv" is loaded
       Then the sample units are created and stored in the case service
       And correctly formatted print files are created
+      And there is a correct manifest file for each csv file written
