@@ -1,7 +1,6 @@
 import functools
 import json
 import logging
-import time
 
 import pika
 from behave import then
@@ -21,7 +20,8 @@ def check_count_of_cases(context):
 
 @then("the new cases are emitted to Respondent Home")
 def check_messages_are_received(context):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=Config.RABBITMQ_HOST, port=Config.RABBITMQ_PORT))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=Config.RABBITMQ_HOST, port=Config.RABBITMQ_PORT))
 
     channel = connection.channel()
 
@@ -44,8 +44,8 @@ def _timeout_callback(ch):
 
 def _is_valid_message(parsed_body):
     return _assert_equals(parsed_body['payload']['collectionCase']['survey'], 'Census') \
-    and _assert_equals(parsed_body['payload']['collectionCase']['state'], 'ACTIONABLE') \
-    and len(parsed_body['payload']['collectionCase']['caseRef']) == 8
+           and _assert_equals(parsed_body['payload']['collectionCase']['state'], 'ACTIONABLE') \
+           and len(parsed_body['payload']['collectionCase']['caseRef']) == 8
 
 
 def _callback(ch, method, properties, body, expected_sample_units):
@@ -71,9 +71,11 @@ def _callback(ch, method, properties, body, expected_sample_units):
 
 
 def _sample_matches_rh_message(sample_unit, rh_message):
-    return sample_unit['attributes']['ADDRESS_LINE1'] == rh_message['payload']['collectionCase']['address']['addressLine1'] \
-        and sample_unit['attributes']['ADDRESS_LINE2'] == rh_message['payload']['collectionCase']['address']['addressLine2'] \
-        and sample_unit['attributes']['RGN'][:1] == rh_message['payload']['collectionCase']['address']['region']
+    return sample_unit['attributes']['ADDRESS_LINE1'] == \
+           rh_message['payload']['collectionCase']['address']['addressLine1'] \
+           and sample_unit['attributes']['ADDRESS_LINE2'] == \
+           rh_message['payload']['collectionCase']['address']['addressLine2'] \
+           and sample_unit['attributes']['RGN'][:1] == rh_message['payload']['collectionCase']['address']['region']
 
 
 def _assert_equals(expected, actual):
