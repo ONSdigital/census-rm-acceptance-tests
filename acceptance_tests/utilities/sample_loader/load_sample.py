@@ -10,6 +10,7 @@ import jinja2
 
 from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
 from acceptance_tests.utilities.sample_loader.redis_pipeline_context import RedisPipelineContext
+from config import Config
 
 
 def parse_arguments():
@@ -38,7 +39,7 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, collect
     case_message_template = jinja2.Environment(
         loader=jinja2.FileSystemLoader([os.path.dirname(__file__)])).get_template('message_template.xml')
     with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline, RabbitContext(
-            queue_name='exampleInboundQueue') as new_rabbit:
+            queue_name=Config.RABBITMQ_NEW_QUEUE) as new_rabbit:
         print(f'Loading sample units to queue {rabbit.queue_name}')
         for count, sample_row in enumerate(sample_file_reader):
             sample_unit_id = uuid.uuid4()
