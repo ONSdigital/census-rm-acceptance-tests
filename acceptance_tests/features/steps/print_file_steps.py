@@ -41,9 +41,10 @@ def _validate_print_file_content(sftp_utility, survey_ref, period, start_of_test
     return True
 
 
-@step("there is a correct manifest file for each csv file written")
+@then("there is a correct manifest file for each csv file written")
 def step_impl(context):
     logger.debug("checking manifest files exist for csv files")
+    _check_manifest_files_created(context)
 
 
 def _create_expected_manifest(_file):
