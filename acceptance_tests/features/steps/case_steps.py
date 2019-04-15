@@ -9,7 +9,11 @@ from structlog import wrap_logger
 from acceptance_tests.controllers.case_controller import get_cases_by_survey_id
 from config import Config
 
+from unittest import TestCase
+
 logger = wrap_logger(logging.getLogger(__name__))
+
+tc = TestCase('__init__')
 
 
 @then("the sample units are created and stored in the case service")
@@ -33,19 +37,18 @@ def check_messages_are_received(context):
 
     channel.start_consuming()
 
-    if len(expected_sample_units) > 0:
-        assert False, 'Some messages are missing'
+    assert not expected_sample_units, 'Some messages are missing'
 
 
 def _timeout_callback(ch):
-    logger.info('Timed out!!!')
+    logger.error('Timed out waiting for messages')
     ch.stop_consuming()
 
 
-def _is_valid_message(parsed_body):
-    return _assert_equals(parsed_body['payload']['collectionCase']['survey'], 'Census') \
-           and _assert_equals(parsed_body['payload']['collectionCase']['state'], 'ACTIONABLE') \
-           and len(parsed_body['payload']['collectionCase']['caseRef']) == 8
+def _validate_message(parsed_body):
+    tc.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
+    tc.assertEqual('ACTIONABLE', parsed_body['payload']['collectionCase']['state'])
+    tc.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
 
 
 def _callback(ch, method, properties, body, expected_sample_units):
@@ -53,20 +56,16 @@ def _callback(ch, method, properties, body, expected_sample_units):
 
     parsed_body = json.loads(body)
 
-    if not _is_valid_message(parsed_body):
-        assert False, 'Message body is invalid'
-
-    matched_sample_unit_index = None
+    _validate_message(parsed_body)
 
     for index, sample_unit in enumerate(expected_sample_units):
         if _sample_matches_rh_message(sample_unit, parsed_body):
-            matched_sample_unit_index = index
+            del expected_sample_units[index]
             break
-    if matched_sample_unit_index is None:
+    else:
         assert False, 'Could not find sample unit'
-    del expected_sample_units[matched_sample_unit_index]
 
-    if len(expected_sample_units) == 0:
+    if not expected_sample_units:
         ch.stop_consuming()
 
 
@@ -75,7 +74,7 @@ def _sample_matches_rh_message(sample_unit, rh_message):
            rh_message['payload']['collectionCase']['address']['addressLine1'] \
            and sample_unit['attributes']['ADDRESS_LINE2'] == \
            rh_message['payload']['collectionCase']['address']['addressLine2'] \
-           and sample_unit['attributes']['RGN'][:1] == rh_message['payload']['collectionCase']['address']['region']
+           and sample_unit['attributes']['RGN'][0] == rh_message['payload']['collectionCase']['address']['region']
 
 
 def _assert_equals(expected, actual):

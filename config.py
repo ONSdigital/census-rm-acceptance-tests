@@ -41,7 +41,7 @@ class Config:
     RABBITMQ_VHOST = os.getenv('RABBITMQ_VHOST', '/')
     RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'Case.CaseDelivery')
     RABBITMQ_RH_OUTBOUND_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_QUEUE', 'myfanout.rhqueue')
-    RABBITMQ_NEW_QUEUE = os.getenv('RABBITMQ_NEW_QUEUE', 'exampleInboundQueue')
+    RABBITMQ_CASE_INBOUND_JSON_QUEUE = os.getenv('RABBITMQ_CASE_INBOUND_JSON_QUEUE', 'exampleInboundQueue')
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
