@@ -19,7 +19,7 @@ def check_correct_files_on_sftp_server(context):
 def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines):
     with SftpUtility() as sftp_utility:
         _validate_print_file_content(sftp_utility, context.survey_ref, context.period,
-                                     context.test_start_datetime, expected_csv_lines)
+                                     context.test_start_local_datetime, expected_csv_lines)
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=5000, stop_max_attempt_number=24)

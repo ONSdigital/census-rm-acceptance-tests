@@ -9,7 +9,7 @@ from acceptance_tests.data_setup.survey_setup import setup_census_survey
 
 @given('a survey exists with a collection exercise')
 def a_survey_exists_with_collex(context):
-    context.test_start_datetime = datetime.utcnow()
+    context.test_start_local_datetime = datetime.now()
     setup_census_survey(context)
     setup_census_collection_exercise(context)
     context.action_plan_id = get_id_of_1st_action_plan_for_collection_excercise(context.collection_exercise_id)
