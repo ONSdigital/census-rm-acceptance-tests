@@ -1,4 +1,9 @@
+
+
 # census-rm-acceptance-tests
+
+[![Build Status](https://travis-ci.com/ONSdigital/census-rm-acceptance-tests.svg?branch=master)](https://travis-ci.com/ONSdigital/census-rm-acceptance-tests)
+
 
 Python Behave BDD tests for RM Census.
 
