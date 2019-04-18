@@ -8,7 +8,7 @@
 Python Behave BDD tests for RM Census.
 
 ## Run the tests locally against census-rm-docker-dev
-1. Clone [census-rm-docker-dev](https://github.com/ONSdigital/census-rm-kubernetes) and run `make up` to start the required services  
+1. Clone [census-rm-docker-dev](https://github.com/ONSdigital/census-rm-docker-dev) and run `make up` to start the required services  
 1. Run:
 ```bash 
 make test
