@@ -10,6 +10,7 @@ import jinja2
 
 from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
 from acceptance_tests.utilities.sample_loader.redis_pipeline_context import RedisPipelineContext
+from config import Config
 
 
 def parse_arguments():
@@ -37,7 +38,8 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, collect
     sample_units = {}
     case_message_template = jinja2.Environment(
         loader=jinja2.FileSystemLoader([os.path.dirname(__file__)])).get_template('message_template.xml')
-    with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline:
+    with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline, RabbitContext(
+            queue_name=Config.RABBITMQ_CASE_INBOUND_JSON_QUEUE) as new_rabbit:
         print(f'Loading sample units to queue {rabbit.queue_name}')
         for count, sample_row in enumerate(sample_file_reader):
             sample_unit_id = uuid.uuid4()
@@ -48,6 +50,11 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, collect
                                                      action_plan_id=action_plan_id,
                                                      collection_instrument_id=collection_instrument_id),
                 content_type='text/xml')
+            new_rabbit.publish_message(
+                message=_create_case_json(sample=sample_row,
+                                          collection_exercise_id=collection_exercise_id,
+                                          action_plan_id=action_plan_id),
+                content_type='application/json')
             sample_unit = {
                 f'sampleunit:{sample_unit_id}': _create_sample_unit_json(sample_unit_id, sample_row)}
             redis_pipeline.set_names_to_values(sample_unit)
@@ -63,6 +70,23 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, collect
 def _create_sample_unit_json(sample_unit_id, sample_unit) -> str:
     sample_unit = {'id': str(sample_unit_id), 'attributes': sample_unit}
     return json.dumps(sample_unit)
+
+
+def _create_case_json(sample, collection_exercise_id, action_plan_id) -> str:
+    create_case = {'arid': sample['ARID'], 'estabArid': sample['ESTAB_ARID'], 'uprn':  sample['UPRN'],
+                   'addressType': sample['ADDRESS_TYPE'], 'estabType': sample['ESTAB_TYPE'],
+                   'addressLevel': sample['ADDRESS_LEVEL'], 'abpCode': sample['ABP_CODE'],
+                   'organisationName': sample['ORGANISATION_NAME'],
+                   'addressLine1': sample['ADDRESS_LINE1'], 'addressLine2': sample['ADDRESS_LINE2'],
+                   'addressLine3': sample['ADDRESS_LINE3'], 'townName': sample['TOWN_NAME'],
+                   'postcode': sample['POSTCODE'], 'latitude': sample['LATITUDE'],
+                   'longitude': sample['LONGITUDE'], 'oa': sample['OA'],
+                   'lsoa': sample['LSOA'], 'msoa': sample['MSOA'],
+                   'lad': sample['LAD'], 'rgn': sample['RGN'],
+                   'htcWillingness': sample['HTC_WILLINGNESS'], 'htcDigital': sample['HTC_DIGITAL'],
+                   'treatmentCode': sample['TREATMENT_CODE'], 'collectionExerciseId': collection_exercise_id,
+                   'actionPlanId': action_plan_id}
+    return json.dumps(create_case)
 
 
 def main():
