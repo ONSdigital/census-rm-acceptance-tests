@@ -53,4 +53,3 @@ class Config:
     SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'centos')
     SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', 'JLibV2&XD,')
     SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp/fulfillment')
-
