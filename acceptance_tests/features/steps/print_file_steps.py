@@ -29,9 +29,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
 def _validate_print_file_content(sftp_utility, survey_ref, period, start_of_test, expected_csv_lines):
     logger.debug('Checking for files on SFTP server')
 
-    TODO, this needs to be filtered for csv files
-
-    files = sftp_utility.get_files_after_datetime(start_of_test)
+    files = sftp_utility.get_all_print_files_after_time(start_of_test)
     # sftp_utility.get_files_filtered_by_survey_ref_period_and_modified_date(survey_ref, period, start_of_test)
     actual_content_list = sftp_utility.get_files_content_as_list(files)
 

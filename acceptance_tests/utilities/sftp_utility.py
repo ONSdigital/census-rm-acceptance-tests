@@ -31,6 +31,14 @@ class SftpUtility:
         return list(filter(lambda f: f'{survey_ref}_{period}' in f.filename
                                      and start_of_test <= datetime.fromtimestamp(f.st_mtime), files))
 
+    def get_all_print_files_after_time(self, period_start_time):
+        files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
+
+        f = list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
+                                     and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
+
+        return f
+
     def get_files_after_datetime(self, start_of_test):
         files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         start_of_test = round_to_minute(start_of_test)
