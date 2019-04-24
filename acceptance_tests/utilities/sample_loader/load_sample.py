@@ -1,16 +1,12 @@
 import argparse
 import csv
 import json
-import os
 import sys
 import uuid
 from typing import Iterable
 
-import jinja2
-
 from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
 from acceptance_tests.utilities.sample_loader.redis_pipeline_context import RedisPipelineContext
-from config import Config
 
 
 def parse_arguments():
@@ -22,35 +18,23 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def load_sample_file(sample_file_path, collection_exercise_id, action_plan_id, collection_instrument_id):
+def load_sample_file(sample_file_path, collection_exercise_id, action_plan_id):
     with open(sample_file_path) as sample_file:
-        return load_sample(sample_file, collection_exercise_id, action_plan_id, collection_instrument_id)
+        return load_sample(sample_file, collection_exercise_id, action_plan_id)
 
 
-def load_sample(sample_file: Iterable[str], collection_exercise_id: str, action_plan_id: str,
-                collection_instrument_id: str):
+def load_sample(sample_file: Iterable[str], collection_exercise_id: str, action_plan_id: str):
     sample_file_reader = csv.DictReader(sample_file, delimiter=',')
-    return _load_sample_units(action_plan_id, collection_exercise_id, collection_instrument_id, sample_file_reader)
+    return _load_sample_units(action_plan_id, collection_exercise_id, sample_file_reader)
 
 
-def _load_sample_units(action_plan_id: str, collection_exercise_id: str, collection_instrument_id: str,
-                       sample_file_reader: Iterable[str]):
+def _load_sample_units(action_plan_id: str, collection_exercise_id: str, sample_file_reader: Iterable[str]):
     sample_units = {}
-    case_message_template = jinja2.Environment(
-        loader=jinja2.FileSystemLoader([os.path.dirname(__file__)])).get_template('message_template.xml')
-    with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline, RabbitContext(
-            queue_name=Config.RABBITMQ_CASE_INBOUND_JSON_QUEUE) as new_rabbit:
+    with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline:
         print(f'Loading sample units to queue {rabbit.queue_name}')
         for count, sample_row in enumerate(sample_file_reader):
             sample_unit_id = uuid.uuid4()
             rabbit.publish_message(
-                message=case_message_template.render(sample=sample_row,
-                                                     sample_unit_id=sample_unit_id,
-                                                     collection_exercise_id=collection_exercise_id,
-                                                     action_plan_id=action_plan_id,
-                                                     collection_instrument_id=collection_instrument_id),
-                content_type='text/xml')
-            new_rabbit.publish_message(
                 message=_create_case_json(sample=sample_row,
                                           collection_exercise_id=collection_exercise_id,
                                           action_plan_id=action_plan_id),
@@ -91,8 +75,7 @@ def _create_case_json(sample, collection_exercise_id, action_plan_id) -> str:
 
 def main():
     args = parse_arguments()
-    load_sample_file(args.sample_file_path, args.collection_exercise_id, args.action_plan_id,
-                     args.collection_instrument_id)
+    load_sample_file(args.sample_file_path, args.collection_exercise_id, args.action_plan_id)
 
 
 if __name__ == "__main__":

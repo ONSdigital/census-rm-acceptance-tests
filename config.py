@@ -16,7 +16,7 @@ class Config:
     PROTOCOL = os.getenv('PROTOCOL', 'http')
 
     ACTION_SERVICE_HOST = os.getenv('ACTION_SERVICE_HOST', 'localhost')
-    ACTION_SERVICE_PORT = os.getenv('ACTION_SERVICE_PORT', 8151)
+    ACTION_SERVICE_PORT = os.getenv('ACTION_SERVICE_PORT', 8080)
     ACTION_SERVICE = f'{PROTOCOL}://{ACTION_SERVICE_HOST}:{ACTION_SERVICE_PORT}'
 
     SURVEY_SERVICE_HOST = os.getenv('SURVEY_SERVICE_HOST', 'localhost')
@@ -39,9 +39,8 @@ class Config:
     RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
     RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
     RABBITMQ_VHOST = os.getenv('RABBITMQ_VHOST', '/')
-    RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'Case.CaseDelivery')
+    RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'exampleInboundQueue')
     RABBITMQ_RH_OUTBOUND_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_QUEUE', 'myfanout.rhqueue')
-    RABBITMQ_CASE_INBOUND_JSON_QUEUE = os.getenv('RABBITMQ_CASE_INBOUND_JSON_QUEUE', 'exampleInboundQueue')
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
