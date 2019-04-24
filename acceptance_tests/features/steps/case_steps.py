@@ -29,11 +29,11 @@ def check_messages_are_received(context):
 
     channel = connection.channel()
 
-    connection.add_timeout(deadline=30, callback_method=functools.partial(_timeout_callback, channel))
+    connection.call_later(delay=30, callback=functools.partial(_timeout_callback, channel))
 
     expected_sample_units = context.sample_units.copy()
     channel.basic_consume(queue=Config.RABBITMQ_RH_OUTBOUND_QUEUE,
-                          consumer_callback=functools.partial(_callback, expected_sample_units=expected_sample_units))
+                          on_message_callback=functools.partial(_callback, expected_sample_units=expected_sample_units))
 
     channel.start_consuming()
 
@@ -51,7 +51,7 @@ def _validate_message(parsed_body):
     tc.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
 
 
-def _callback(ch, method, properties, body, expected_sample_units):
+def _callback(ch, method, _properties, body, expected_sample_units):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     parsed_body = json.loads(body)
