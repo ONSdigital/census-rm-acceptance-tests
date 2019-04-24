@@ -60,8 +60,4 @@ class SftpUtility:
             return content
 
     def get_file_size(self, file_path):
-        a = self._sftp_client.lstat(file_path)
-
-        size = a.st_size
-
-        return size
+        return self._sftp_client.lstat(file_path).st_size
