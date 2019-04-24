@@ -23,17 +23,19 @@ class SftpUtility:
     def __exit__(self, *_):
         self.ssh_client.close()
 
-    def get_all_print_files_after_time(self, period_start_time):
+    # def get_all_print_files_after_time(self, period_start_time):
+    #     files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
+    #
+    #     return list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
+    #                                  and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
+
+    def get_all_files_after_time(self, period_start_time, suffix):
         files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         period = period_start_time.strftime('%Y-%m-%d')
-        return list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
-                                     and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
-
-    def get_all_print_files_after_time(self, period_start_time):
-        files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
 
         f = list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
-                                     and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
+                                  and f.filename.endswith(suffix)
+                                  and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
 
         return f
 
@@ -52,7 +54,14 @@ class SftpUtility:
             content = sftp_file.read().decode('utf-8')
             return content.rstrip().split('\n')
 
-    def _get_file_contents_as_string(self, file_path):
+    def get_file_contents_as_string(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
             content = sftp_file.read().decode('utf-8')
             return content
+
+    def get_file_size(self, file_path):
+        a = self._sftp_client.lstat(file_path)
+
+        size = a.st_size
+
+        return size

@@ -1,6 +1,8 @@
-import datetime
+import hashlib
+from datetime import datetime, timedelta
 import json
 import logging
+from unittest import TestCase
 
 from behave import then
 from retrying import retry
@@ -9,9 +11,11 @@ from structlog import wrap_logger
 from acceptance_tests.utilities.date_utilities import convert_datetime_to_str
 from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
+from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+tc = TestCase('__init__')
 
 @then('correctly formatted print files are created')
 def check_correct_files_on_sftp_server(context):
@@ -28,7 +32,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines):
     logger.debug('Checking for files on SFTP server')
 
-    files = sftp_utility.get_all_print_files_after_time(start_of_test)
+    files = sftp_utility.get_all_files_after_time(start_of_test, ".csv")
 
     actual_content_list = sftp_utility.get_files_content_as_list(files)
 
@@ -47,12 +51,26 @@ def step_impl(context):
     _check_manifest_files_created(context)
 
 
-def _create_expected_manifest(_file):
+def _create_expected_manifest(sftp_utility, csv_file, created_datetime):
+    actual_file_contents = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{csv_file.filename}')
+
+    md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
+    expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
+
+    file = dict(
+        sizeBytes=expected_size,
+        md5sum=md5_hash,
+        relativePath='.\\',
+        name=csv_file.filename
+    )
+
     hardcoded_base = dict(
         schemaVersion=1,
+        files=[file],
         sourceName="ONS_RM",
-        manifestCreated=convert_datetime_to_str(datetime.utcnow()),
-        description="initial contact letters",
+        manifestCreated=created_datetime,
+        # convert_datetime_to_str(datetime.utcnow()),
+        description="Initial contact letter households - England",
         dataset="PPD1.1",
         version=1
     )
@@ -62,28 +80,31 @@ def _create_expected_manifest(_file):
 
 def _check_manifest_files_created(context):
     with SftpUtility() as sftp_utility:
-        # get list of csv files created after start of test, this works as long as tests not run in parrallel (could have partial csv files)
-        files = sftp_utility.get_files_after_datetime(context.test_start_datetime)
+        # get list of csv files created after start of test,
+        # this works as long as tests not run in parrallel (could have partial csv files)
+        files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, "")
 
         for _file in files:
             if _file.filename.endswith(".csv"):
-                manifest_file = _get_matching_manifest_file(_file.filename, files)
+                csv_file = _file
+                manifest_file = _get_matching_manifest_file(csv_file.filename, files)
 
-                # pythonic way? Also quite nested here...
                 if manifest_file is None:
-                    assert False, f'Failed to find manifest file for {_file.filename}'
+                    assert False, f'Failed to find manifest file for {csv_file.filename}'
 
-                actual_manifest_json = sftp_utility._get_file_contents_as_string(_file.filename)
+                actual_manifest = _get_actual_manifest(sftp_utility, manifest_file)
+                expected_manifest \
+                    = _create_expected_manifest(sftp_utility, csv_file, actual_manifest['manifestCreated'])
 
-                actual_manifest = json.loads(actual_manifest_json)
-                expected_manifest = _create_expected_manifest(_file)
+                tc.assertDictEqual(actual_manifest, expected_manifest)
 
-                a = expected_manifest
 
+def _get_actual_manifest(sftp_utility, manifest_file):
+    actual_manifest_json = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{manifest_file.filename}')
+    return json.loads(actual_manifest_json)
 
 
 def _get_matching_manifest_file(filename, files):
-
     manifest_filename = filename.replace(".csv", ".manifest")
 
     for _file in files:
