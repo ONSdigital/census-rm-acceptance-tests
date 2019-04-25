@@ -5,7 +5,6 @@ import logging
 from behave import then
 from structlog import wrap_logger
 
-from acceptance_tests.controllers.case_controller import get_cases_by_survey_id
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from config import Config
 
@@ -14,12 +13,6 @@ from unittest import TestCase
 logger = wrap_logger(logging.getLogger(__name__))
 
 tc = TestCase('__init__')
-
-
-@then("the sample units are created and stored in the case service")
-def check_count_of_cases(context):
-    cases = get_cases_by_survey_id(context.survey_id, len(context.sample_units))
-    assert len(cases) == len(context.sample_units)
 
 
 @then("the new cases are emitted to Respondent Home")
