@@ -6,7 +6,6 @@ import uuid
 from typing import Iterable
 
 from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
-from acceptance_tests.utilities.sample_loader.redis_pipeline_context import RedisPipelineContext
 
 
 def parse_arguments():
@@ -30,7 +29,7 @@ def load_sample(sample_file: Iterable[str], collection_exercise_id: str, action_
 
 def _load_sample_units(action_plan_id: str, collection_exercise_id: str, sample_file_reader: Iterable[str]):
     sample_units = {}
-    with RabbitContext() as rabbit, RedisPipelineContext() as redis_pipeline:
+    with RabbitContext() as rabbit:
         print(f'Loading sample units to queue {rabbit.queue_name}')
         for count, sample_row in enumerate(sample_file_reader):
             sample_unit_id = uuid.uuid4()
@@ -41,7 +40,6 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, sample_
                 content_type='application/json')
             sample_unit = {
                 f'sampleunit:{sample_unit_id}': _create_sample_unit_json(sample_unit_id, sample_row)}
-            redis_pipeline.set_names_to_values(sample_unit)
             sample_units.update(sample_unit)
 
             if count % 5000 == 0:
