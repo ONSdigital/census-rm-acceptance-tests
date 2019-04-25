@@ -21,6 +21,12 @@ def check_correct_files_on_sftp_server(context):
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines)
 
 
+@then("there is a correct manifest file for each csv file written")
+def check_manifest_files(context):
+    logger.debug("checking manifest files exist for csv files")
+    _check_manifest_files_created(context)
+
+
 def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines):
     with SftpUtility() as sftp_utility:
         _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines)
@@ -43,15 +49,9 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
     return True
 
 
-@then("there is a correct manifest file for each csv file written")
-def step_impl(context):
-    logger.debug("checking manifest files exist for csv files")
-    _check_manifest_files_created(context)
-
-
 def _check_manifest_files_created(context):
     with SftpUtility() as sftp_utility:
-        files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, "")
+        files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime)
 
         for _file in files:
             if _file.filename.endswith(".csv"):
@@ -62,9 +62,8 @@ def _check_manifest_files_created(context):
                     assert False, f'Failed to find manifest file for {csv_file.filename}'
 
                 actual_manifest = _get_actual_manifest(sftp_utility, manifest_file)
-                expected_manifest \
-                    = _create_expected_manifest(sftp_utility, csv_file, actual_manifest['manifestCreated'])
-
+                creation_datetime = actual_manifest['manifestCreated']
+                expected_manifest = _create_expected_manifest(sftp_utility, csv_file, creation_datetime)
                 tc.assertDictEqual(actual_manifest, expected_manifest)
 
 
