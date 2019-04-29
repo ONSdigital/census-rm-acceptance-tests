@@ -88,7 +88,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime):
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
 
-    file = dict(
+    _file = dict(
         sizeBytes=expected_size,
         md5sum=md5_hash,
         relativePath='.\\',
