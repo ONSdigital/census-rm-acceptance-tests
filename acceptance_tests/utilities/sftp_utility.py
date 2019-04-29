@@ -27,7 +27,9 @@ class SftpUtility:
         files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         period = period_start_time.strftime('%Y-%m-%d')
 
-        f = list(filter(lambda f: f'P_IC_ICL1_{period}' in f.filename
+        return [f for f in files if f'P_IC_ICL1_{period}' in f.filename
+                                 and f.filename.endswith(suffix)
+                                 and period_start_time <= datetime.fromtimestamp(f.st_mtime)]
                                   and f.filename.endswith(suffix)
                                   and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
 
