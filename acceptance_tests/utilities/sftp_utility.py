@@ -52,7 +52,7 @@ class SftpUtility:
 
     def get_file_contents_as_string(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
-            content = sftp_file.read().decode('utf-8')
+            return sftp_file.read().decode('utf-8')
             return content
 
     def get_file_size(self, file_path):
