@@ -27,13 +27,12 @@ class SftpUtility:
         files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
         period = period_start_time.strftime('%Y-%m-%d')
 
-        return [f for f in files if f'P_IC_ICL1_{period}' in f.filename
-                                 and f.filename.endswith(suffix)
-                                 and period_start_time <= datetime.fromtimestamp(f.st_mtime)]
-                                  and f.filename.endswith(suffix)
-                                  and period_start_time <= datetime.fromtimestamp(f.st_mtime), files))
-
-        return f
+        return [
+                _file for _file in files
+                if f'P_IC_ICL1_{period}' in _file.filename
+                and _file.filename.endswith(suffix)
+                and period_start_time <= datetime.fromtimestamp(_file.st_mtime)
+            ]
 
     def get_files_content_as_list(self, files):
         actual_content = []
@@ -53,7 +52,6 @@ class SftpUtility:
     def get_file_contents_as_string(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
             return sftp_file.read().decode('utf-8')
-            return content
 
     def get_file_size(self, file_path):
         return self._sftp_client.lstat(file_path).st_size

@@ -97,7 +97,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime):
 
     manifest = dict(
         schemaVersion=1,
-        files=[file],
+        files=[_file],
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
         description="Initial contact letter households - England",
