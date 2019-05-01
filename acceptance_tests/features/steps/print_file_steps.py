@@ -14,7 +14,7 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@then('messages are emitted to action scheduler')
+@then('messages are emitted to RH and Action Scheduler')
 def gather_messages_emitted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE, functools.partial(_callback, context=context))
