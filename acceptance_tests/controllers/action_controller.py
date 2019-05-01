@@ -8,28 +8,35 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_action_rule(rule):
-    logger.info('Creating action rule')
+def create_action_plan(action_plan_id):
+    logger.info('Creating action plan')
 
-    url = f'{Config.ACTION_SERVICE}/actionrules'
+    url = f'{Config.ACTION_SERVICE}/actionPlans'
 
-    response = requests.post(url, auth=Config.BASIC_AUTH, json=rule)
+    body = {'id': action_plan_id}
+
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=body)
 
     response.raise_for_status()
 
-    logger.info('Successfully created action rule')
+    logger.info('Successfully created action plan')
 
     return response.json()
 
 
-def get_action_plans():
-    logger.info('Retrieving action plans')
+def create_action_rule(action_rule_id, trigger_date_time, classifiers, action_plan_url, action_type,
+                       has_triggered=False):
+    logger.info('Creating action rule')
 
-    url = f'{Config.ACTION_SERVICE}/actionplans'
+    url = f'{Config.ACTION_SERVICE}/actionRules'
 
-    response = requests.get(url, auth=Config.BASIC_AUTH)
+    body = {'id': action_rule_id, 'triggerDateTime': trigger_date_time, 'classifiers': classifiers,
+            'actionPlan': action_plan_url, 'actionType': action_type, 'hasTriggered': has_triggered}
+
+    response = requests.post(url, auth=Config.BASIC_AUTH, json=body)
+
     response.raise_for_status()
 
-    logger.info('Successfully retrieved action plans')
+    logger.info('Successfully created action rule')
 
     return response.json()

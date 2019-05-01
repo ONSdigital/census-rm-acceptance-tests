@@ -10,7 +10,6 @@ structlog = "*"
 retrying = "*"
 "jinja2" = "*"
 pika = "*"
-redis = "*"
 paramiko = "*"
 "flake8" = "*"
 [requires]
