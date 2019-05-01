@@ -37,7 +37,7 @@ def _callback(ch, method, _properties, body, context):
     if len(context.messages_received) == (len(context.sample_units) * 2):
         ch.stop_consuming()
 
-        
+
 @then("there is a correct manifest file for each csv file written")
 def check_manifest_files(context):
     logger.debug("checking manifest files exist for csv files")
