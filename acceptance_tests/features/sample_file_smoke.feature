@@ -6,12 +6,12 @@ Feature: Smoke tests to check the system is tied together correctly
       And an action rule of type ICL1E is set 10 seconds in the future
       When sample file "sample_input_census_spec.csv" is loaded
       Then the sample units are created and stored in the case service
-      And correctly formatted print files are created
-      And there is a correct manifest file for each csv file written
+      And correctly formatted "P_IC_ICL1" print files are created
+      And there is a correct "P_IC_ICL1" manifest file for each csv file written
 
   Scenario: Successful wales sample file upload
     Given a survey exists with a collection exercise
     And an action rule of type ICL2E is set 10 seconds in the future
     When sample file "sample_input_census_spec.csv" is loaded
     Then the sample units are created and stored in the case service
-    And correctly formatted print files are created
+    And correctly formatted "P_IC_ICL2" print files are created

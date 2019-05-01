@@ -15,28 +15,28 @@ logger = wrap_logger(logging.getLogger(__name__))
 tc = TestCase('__init__')
 
 
-@then('correctly formatted print files are created')
-def check_correct_files_on_sftp_server(context):
-    expected_csv_lines = create_expected_csv_lines(context)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines)
+@then('correctly formatted "{prefix}" print files are created')
+def check_correct_files_on_sftp_server(context, prefix):
+    expected_csv_lines = create_expected_csv_lines(context, prefix)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-@then("there is a correct manifest file for each csv file written")
-def check_manifest_files(context):
+@then('there is a correct "{prefix}" manifest file for each csv file written')
+def check_manifest_files(context, prefix):
     logger.debug("checking manifest files exist for csv files")
-    _check_manifest_files_created(context)
+    _check_manifest_files_created(context, prefix)
 
 
-def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines):
+def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix):
     with SftpUtility() as sftp_utility:
-        _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines)
+        _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, prefix)
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=5000, stop_max_attempt_number=24)
-def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines):
+def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, prefix):
     logger.debug('Checking for files on SFTP server')
 
-    files = sftp_utility.get_all_files_after_time(start_of_test, ".csv")
+    files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv",)
 
     actual_content_list = sftp_utility.get_files_content_as_list(files)
 
@@ -49,9 +49,9 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
     return True
 
 
-def _check_manifest_files_created(context):
+def _check_manifest_files_created(context, prefix):
     with SftpUtility() as sftp_utility:
-        files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime)
+        files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, prefix)
 
         for _file in files:
             if _file.filename.endswith(".csv"):

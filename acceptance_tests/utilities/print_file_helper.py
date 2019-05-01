@@ -1,16 +1,16 @@
 from acceptance_tests.controllers.case_controller import get_cases_by_survey_id, get_1st_iac_for_case_id
 
 
-def create_expected_csv_lines(context):
+def create_expected_csv_lines(context, prefix):
     context.sample_units = _get_case_data_and_apply_to_sample_units(context)
 
     return [
-        _create_expected_csv_line(expected_data)
+        _create_expected_csv_line(expected_data, prefix)
         for expected_data in context.sample_units
     ]
 
 
-def _create_expected_csv_line(expected_data):
+def _create_expected_csv_line(expected_data, prefix):
     attributes = expected_data["attributes"]
 
     return (
@@ -21,7 +21,7 @@ def _create_expected_csv_line(expected_data):
         f'{attributes["ADDRESS_LINE3"]}|'
         f'{attributes["TOWN_NAME"]}|'
         f'{attributes["POSTCODE"]}|'
-        'P_IC_ICL1'
+        f'{prefix}'
     )
 
 
