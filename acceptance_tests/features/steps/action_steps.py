@@ -15,4 +15,4 @@ def setup_action_rule(context, action_type, action_rule_delay):
     trigger_date_time = (datetime.utcnow() + timedelta(seconds=int(action_rule_delay))).isoformat() + 'Z'
     classifiers = {'treatmentCode': ['HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE', 'HH_LFNR1E', 'HH_LF2R3BE']}
 
-    create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers, action_plan_url, 'ICL1E')
+    create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers, action_plan_url, action_type)

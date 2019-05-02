@@ -80,7 +80,7 @@ def _check_manifest_files_created(context, prefix):
 
                 actual_manifest = _get_actual_manifest(sftp_utility, manifest_file)
                 creation_datetime = actual_manifest['manifestCreated']
-                expected_manifest = _create_expected_manifest(sftp_utility, csv_file, creation_datetime)
+                expected_manifest = _create_expected_manifest(sftp_utility, csv_file, creation_datetime, prefix)
                 tc.assertDictEqual(actual_manifest, expected_manifest)
 
 
@@ -99,8 +99,13 @@ def _get_matching_manifest_file(filename, files):
     return None
 
 
-def _create_expected_manifest(sftp_utility, csv_file, created_datetime):
+def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     actual_file_contents = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{csv_file.filename}')
+
+    if "P_IC_ICL1" in prefix:
+        country = 'England'
+    if "P_IC_ICL2" in prefix:
+        country = 'Wales'
 
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
@@ -117,7 +122,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime):
         files=[_file],
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
-        description="Initial contact letter households - England",
+        description=f'Initial contact letter households - {country}',
         dataset="PPD1.1",
         version=1
     )
