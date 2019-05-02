@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 
-def create_expected_csv_lines(context):
+def create_expected_csv_lines(context, prefix):
     actual_data = defaultdict(dict)
 
     for message in context.messages_received:
@@ -22,12 +22,12 @@ def create_expected_csv_lines(context):
                 message['payload']['collectionCase']['address']['postcode']
 
     return [
-        _create_expected_csv_line(case)
+        _create_expected_csv_line(case, prefix)
         for case in actual_data.values()
     ]
 
 
-def _create_expected_csv_line(case):
+def _create_expected_csv_line(case, prefix):
     return (
         f'{case["uac"]}|'
         f'{case["case_ref"]}|'
@@ -36,5 +36,5 @@ def _create_expected_csv_line(case):
         f'{case["address_line_3"]}|'
         f'{case["town_name"]}|'
         f'{case["postcode"]}|'
-        'P_IC_ICL1'
+        f'{prefix}'
     )
