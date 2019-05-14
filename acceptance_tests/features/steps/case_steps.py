@@ -110,7 +110,7 @@ def _uac_wales_callback(ch, method, _properties, body, context):
     context.uac_events_seen = context.uac_events_seen + 1
     if parsed_body['payload']['uac']['questionnaireId'][:2] == "02":
         context.uac_england_seen = True
-    if parsed_body['payload']['uac']['questionnaireId'][:2] == "03":
+    elif parsed_body['payload']['uac']['questionnaireId'][:2] == "03":
         context.uac_wales_seen = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -56,6 +56,8 @@ def _callback_wales(ch, method, _properties, body, context):
     context.messages_received.append(parsed_body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
+    # for Welsh questionnaires there are 2 uac_created events plus a case created event
+    # so there are 3 events in total
     if len(context.messages_received) == (len(context.sample_units) * 3):
         ch.stop_consuming()
 
