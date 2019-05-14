@@ -7,7 +7,7 @@ from unittest import TestCase
 from behave import then
 from retrying import retry
 from structlog import wrap_logger
-from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines
+from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines, create_expected_wales_csv_lines
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from config import Config
@@ -23,6 +23,19 @@ def gather_messages_emitted(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE, functools.partial(_callback, context=context))
 
 
+@then('messages are emitted to RH and Action Scheduler for wales questionnaire')
+def gather_messages_emitted_wales(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(_callback_wales, context=context))
+
+
+@then('correctly formatted "{prefix}" print files are created for wales questionnaire')
+def check_correct_wales_files_on_sftp_server(context, prefix):
+    expected_csv_lines = create_expected_wales_csv_lines(context, prefix)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
+
+
 @then('correctly formatted "{prefix}" print files are created')
 def check_correct_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix)
@@ -35,6 +48,15 @@ def _callback(ch, method, _properties, body, context):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     if len(context.messages_received) == (len(context.sample_units) * 2):
+        ch.stop_consuming()
+
+
+def _callback_wales(ch, method, _properties, body, context):
+    parsed_body = json.loads(body)
+    context.messages_received.append(parsed_body)
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    if len(context.messages_received) == (len(context.sample_units) * 3):
         ch.stop_consuming()
 
 
@@ -104,8 +126,13 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
 
     if "P_IC_ICL1" in prefix:
         country = 'England'
+        purpose = 'Initial contact letter households'
     if "P_IC_ICL2" in prefix:
         country = 'Wales'
+        purpose = 'Initial contact letter households'
+    if "P_IC_H2" in prefix:
+        country = 'Wales'
+        purpose = 'Initial contact questionnaire households'
 
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
@@ -122,7 +149,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
         files=[_file],
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
-        description=f'Initial contact letter households - {country}',
+        description=f'{purpose} - {country}',
         dataset="PPD1.1",
         version=1
     )
