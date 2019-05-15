@@ -15,23 +15,22 @@ RECEIPT_TOPIC_NAME = "eq-submission-topic"
 
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
-    # get the case id from the case created events
-    context.createdCases = []
-    _get_emited_msgs(context, _case_created_msg_capture)
-    case = context.createdCases[0]
+    case = get_case_created_from_outbound_queue(context)
+    assert case['address']['arid'] == context.sample_units[0]['attributes']['ARID']
 
-    case_arid = case['address']['arid']
-    expected_arid = context.sample_units[0]['attributes']['ARID']
-
-    assert case_arid == expected_arid
-
-    _publish_to_pubsub(case_id=case['id'])
+    _publish_to_gcp_pubsub(case_id=case['id'])
 
 
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
                                     functools.partial(uac_updated_capture, context=context))
+
+
+def get_case_created_from_outbound_queue(context):
+    context.createdCases = []
+    _get_emited_msgs(context, _case_created_msg_capture)
+    return context.createdCases[0]
 
 
 def uac_updated_capture(ch, method, _properties, body, context):
@@ -62,7 +61,7 @@ def _case_created_msg_capture(ch, method, _properties, body, context):
         return
 
 
-def _publish_to_pubsub(case_id, tx_id="0", questionnaire_id="0"):
+def _publish_to_gcp_pubsub(case_id="0", tx_id="0", questionnaire_id="0"):
     os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8538"
     publisher = pubsub_v1.PublisherClient()
 
