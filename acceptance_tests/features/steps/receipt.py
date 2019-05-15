@@ -6,7 +6,6 @@ from behave import when, then
 from coverage.python import os
 from google.cloud import pubsub_v1
 
-from acceptance_tests.features.steps.case_steps import _callback
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from config import Config
 
@@ -14,13 +13,8 @@ RECEIPT_TOPIC_PROJECT_ID = "project"
 RECEIPT_TOPIC_NAME = "eq-submission-topic"
 
 
-def get_emitted_cases(args):
-
-    pass
-
-
 @when("the receipt msg for the created case is put on the GCP pubsub")
-def step_impl(context):
+def receipt_msg_published_to_gcp_pubsub(context):
     # get the case id from the case created events
     context.createdCases = []
     _get_emited_msgs(context, _case_created_msg_capture)
@@ -35,8 +29,9 @@ def step_impl(context):
 
 
 @then("a uac_updated msg is emitted with active set to false")
-def step_impl(context):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE, functools.partial(uac_updated_capture, context=context))
+def uac_updated_msg_emitted(context):
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(uac_updated_capture, context=context))
 
 
 def uac_updated_capture(ch, method, _properties, body, context):
