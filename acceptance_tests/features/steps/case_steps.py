@@ -2,7 +2,7 @@ import functools
 import json
 import logging
 
-from behave import then
+from behave import then, step
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
@@ -15,7 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 tc = TestCase('__init__')
 
 
-@then("the new cases are emitted to Respondent Home")
+@step("the new cases are emitted to Respondent Home")
 def check_messages_are_received(context):
     context.expected_sample_units = context.sample_units.copy()
     context.case_created_events = []
