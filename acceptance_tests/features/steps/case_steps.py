@@ -32,6 +32,19 @@ def check_uac_messages_are_received(context):
     assert not context.case_created_events, 'Some messages are missing'
 
 
+@then("two Wales QID UAC pairs are emitted to Respondent Home")
+def check_two_wales_uac_messages_are_received(context):
+    context.uac_events_seen = 0
+    context.uac_england_seen = False
+    context.uac_wales_seen = False
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(_uac_wales_callback, context=context))
+
+    tc.assertEqual(2, context.uac_events_seen)
+    assert context.uac_england_seen, 'England uac message missing'
+    assert context.uac_wales_seen, 'Wales uac messages missing'
+
+
 def _validate_message(parsed_body):
     tc.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
     tc.assertEqual('ACTIONABLE', parsed_body['payload']['collectionCase']['state'])
@@ -82,6 +95,26 @@ def _uac_callback(ch, method, _properties, body, context):
         assert False, 'Could not find UAC Updated event'
 
     if not context.case_created_events:
+        ch.stop_consuming()
+
+
+def _uac_wales_callback(ch, method, _properties, body, context):
+    parsed_body = json.loads(body)
+
+    if not parsed_body['event']['type'] == 'UAC_UPDATED':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        return
+
+    _validate_uac_message(parsed_body)
+
+    context.uac_events_seen = context.uac_events_seen + 1
+    if parsed_body['payload']['uac']['questionnaireId'][:2] == "02":
+        context.uac_england_seen = True
+    elif parsed_body['payload']['uac']['questionnaireId'][:2] == "03":
+        context.uac_wales_seen = True
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    if context.uac_events_seen == 2:
         ch.stop_consuming()
 
 
