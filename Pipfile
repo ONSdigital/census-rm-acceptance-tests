@@ -4,6 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+coverage = "*"
+google-cloud-pubsub = "*"
 behave = "*"
 requests = "*"
 structlog = "*"
@@ -12,5 +14,7 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
+v = {editable = true,version = "*"}
+
 [requires]
 python_version = "3.6"
