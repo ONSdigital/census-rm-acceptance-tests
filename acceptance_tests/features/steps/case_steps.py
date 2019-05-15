@@ -19,14 +19,15 @@ tc = TestCase('__init__')
 def check_messages_are_received(context):
     context.expected_sample_units = context.sample_units.copy()
     context.case_created_events = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE, functools.partial(_callback, context=context))
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(_callback, context=context))
 
     assert not context.expected_sample_units, 'Some messages are missing'
 
 
 @then("the QID UAC pairs are emitted to Respondent Home")
 def check_uac_messages_are_received(context):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(_uac_callback, context=context))
 
     assert not context.case_created_events, 'Some messages are missing'
@@ -37,7 +38,7 @@ def check_two_wales_uac_messages_are_received(context):
     context.uac_events_seen = 0
     context.uac_england_seen = False
     context.uac_wales_seen = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(_uac_wales_callback, context=context))
 
     tc.assertEqual(2, context.uac_events_seen)
@@ -60,6 +61,7 @@ def _callback(ch, method, _properties, body, context):
 
     if not parsed_body['event']['type'] == 'CASE_CREATED':
         ch.basic_nack(delivery_tag=method.delivery_tag)
+        assert False, 'Unexpected message on RH case queue'
         return
 
     _validate_message(parsed_body)
@@ -82,6 +84,7 @@ def _uac_callback(ch, method, _properties, body, context):
 
     if not parsed_body['event']['type'] == 'UAC_UPDATED':
         ch.basic_nack(delivery_tag=method.delivery_tag)
+        assert False, 'Unexpected message on RH UAC queue'
         return
 
     _validate_uac_message(parsed_body)
