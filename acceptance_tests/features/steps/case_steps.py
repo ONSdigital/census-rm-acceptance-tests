@@ -6,13 +6,10 @@ from behave import then
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
-from unittest import TestCase
-
 logger = wrap_logger(logging.getLogger(__name__))
-
-tc = TestCase('__init__')
 
 
 @then("the new cases are emitted to Respondent Home")
