@@ -54,3 +54,7 @@ class Config:
     SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'centos')
     SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', 'JLibV2&XD,')
     SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp/print_service')
+
+    CASEAPI_SERVICE_HOST = os.getenv('CASEAPI_SERVICE_HOST', 'localhost')
+    CASEAPI_SERVICE_PORT = os.getenv('CASEAPI_SERVICE_PORT', '8161')
+    CASEAPI_SERVICE = f'{PROTOCOL}://{CASEAPI_SERVICE_HOST}:{CASEAPI_SERVICE_PORT}'
