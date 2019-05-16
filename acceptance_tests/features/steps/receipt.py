@@ -3,14 +3,10 @@ import json
 import time
 
 from behave import when, then
-from coverage.python import os
 from google.cloud import pubsub_v1
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from config import Config
-
-RECEIPT_TOPIC_PROJECT_ID = "project"
-RECEIPT_TOPIC_NAME = "eq-submission-topic"
 
 
 @when("the receipt msg for the created case is put on the GCP pubsub")
@@ -18,7 +14,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
     case = get_case_created_from_outbound_queue(context)
     assert case['address']['arid'] == context.sample_units[0]['attributes']['ARID']
 
-    _publish_to_gcp_pubsub(case_id=case['id'])
+    _publish_object_finalize(case_id=case['id'])
 
 
 @then("a uac_updated msg is emitted with active set to false")
@@ -61,11 +57,10 @@ def _case_created_msg_capture(ch, method, _properties, body, context):
         return
 
 
-def _publish_to_gcp_pubsub(case_id="0", tx_id="0", questionnaire_id="0"):
-    os.environ["PUBSUB_EMULATOR_HOST"] = "localhost:8538"
+def _publish_object_finalize(case_id="0", tx_id="0", questionnaire_id="0"):
     publisher = pubsub_v1.PublisherClient()
 
-    topic_path = publisher.topic_path(RECEIPT_TOPIC_PROJECT_ID, RECEIPT_TOPIC_NAME)
+    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
 
     data = json.dumps({
         "timeCreated": "2008-08-24T00:00:00Z",
@@ -79,7 +74,7 @@ def _publish_to_gcp_pubsub(case_id="0", tx_id="0", questionnaire_id="0"):
     future = publisher.publish(topic_path,
                                data=data.encode('utf-8'),
                                eventType='OBJECT_FINALIZE',
-                               bucketId='123',
+                               bucketId='eq-bucket',
                                objectId=tx_id)
     while not future.done():
         time.sleep(1)

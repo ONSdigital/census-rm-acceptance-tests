@@ -54,3 +54,9 @@ class Config:
     SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'centos')
     SFTP_PASSWORD = os.getenv('SFTP_PASSWORD', 'JLibV2&XD,')
     SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp/print_service')
+
+    RECEIPT_TOPIC_PROJECT = os.getenv('RECEIPT_TOPIC_PROJECT', 'project')
+    RECEIPT_TOPIC_ID = os.getenv('RECEIPT_TOPIC_ID', 'eq-submission-topic')
+
+    GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
