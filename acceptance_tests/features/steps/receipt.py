@@ -2,65 +2,58 @@ import functools
 import json
 import time
 
-from behave import when, then
+from behave import when, then, step
 from google.cloud import pubsub_v1
 
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
+
+RECEIPT_TOPIC_PROJECT_ID = "project"
+RECEIPT_TOPIC_NAME = "eq-submission-topic"
+
+
+@step("the correct case and uac are emitted")
+def correct_case_and_uac_emitted(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=1, type_filter='UAC_UPDATED'))
+
+    assert len(context.messages_received) == 1
+
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=1, type_filter='CASE_CREATED'))
+    assert len(context.messages_received) == 1
+    context.emitted_case = context.messages_received[0]['payload']['collectionCase']
+    assert context.emitted_case['address']['arid'] == context.sample_units[0]['attributes']['ARID']
 
 
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
-    case = get_case_created_from_outbound_queue(context)
-    assert case['address']['arid'] == context.sample_units[0]['attributes']['ARID']
-
-    _publish_object_finalize(case_id=case['id'])
+    _publish_object_finalize(case_id=context.emitted_case['id'])
 
 
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
-                                    functools.partial(uac_updated_capture, context=context))
-
-
-def get_case_created_from_outbound_queue(context):
-    context.createdCases = []
-    _get_emited_msgs(context, _case_created_msg_capture)
-    return context.createdCases[0]
-
-
-def uac_updated_capture(ch, method, _properties, body, context):
-    parsed_body = json.loads(body)
-
-    if parsed_body['event']['type'] == 'UAC_UPDATED':
-        uac = parsed_body['payload']['uac']
-        assert context.createdCases[0]['id'] == uac['caseId']
-        assert uac['active'] is False
-        ch.basic_nack(delivery_tag=method.delivery_tag)
-        ch.stop_consuming()
-
-
-def _get_emited_msgs(context, callback):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE, functools.partial(callback, context=context))
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='UAC_UPDATED'))
 
-
-def _case_created_msg_capture(ch, method, _properties, body, context):
-    parsed_body = json.loads(body)
-
-    if parsed_body['event']['type'] == 'CASE_CREATED':
-        created_case = parsed_body['payload']['collectionCase']
-        context.createdCases.append(created_case)
-        ch.basic_nack(delivery_tag=method.delivery_tag)
-        ch.stop_consuming()
-
-        return
+    assert len(context.messages_received) == 1
+    uac = context.messages_received[0]['payload']['uac']
+    assert uac['caseId'] == context.emitted_case['id']
+    assert uac['active'] is False
 
 
 def _publish_object_finalize(case_id="0", tx_id="0", questionnaire_id="0"):
     publisher = pubsub_v1.PublisherClient()
 
-    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
+    topic_path = publisher.topic_path(RECEIPT_TOPIC_PROJECT_ID, RECEIPT_TOPIC_NAME)
 
     data = json.dumps({
         "timeCreated": "2008-08-24T00:00:00Z",
