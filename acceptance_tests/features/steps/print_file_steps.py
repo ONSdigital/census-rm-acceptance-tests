@@ -2,7 +2,6 @@ import functools
 import hashlib
 import json
 import logging
-from unittest import TestCase
 
 from behave import then
 from retrying import retry
@@ -10,11 +9,10 @@ from structlog import wrap_logger
 from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines, create_expected_wales_csv_lines
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.sftp_utility import SftpUtility
+from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
-
-tc = TestCase('__init__')
 
 
 @then('messages are emitted to RH and Action Scheduler')
