@@ -7,7 +7,7 @@ Feature: Case look up for the contact centre
 
   Scenario: Check non-existent caseId returns an empty list
     Given a random caseId is generated
-    Then caseapi should return an empty list when queried
+    Then caseapi should return a 404 when queried
 
   Scenario: Find multiple cases from a single UPRN
     Given sample file "sample_input_england_census_spec.csv" is loaded

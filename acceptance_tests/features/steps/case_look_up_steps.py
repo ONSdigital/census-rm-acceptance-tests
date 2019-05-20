@@ -28,7 +28,7 @@ def generate_random_uuid(context):
     logger.info(f'Dummy caseId = {context.dummy_case_id}')
 
 
-@then('caseapi should return an empty list when queried')
+@then('caseapi should return a 404 when queried')
 def get_non_existent_case_id(context):
     response = requests.get(f'{caseapi_url}{context.dummy_case_id}')
 
