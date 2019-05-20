@@ -9,6 +9,7 @@ params:
   SERVICE_ACCOUNT_JSON:
   GCP_PROJECT_NAME:
   KUBERNETES_CLUSTER:
+  IMAGE:
 
 inputs:
 - name: acceptance-tests-repo
@@ -31,7 +32,7 @@ run:
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
       kubectl run acceptance-tests -it --command --rm --quiet \
       --generator=run-pod/v1 \
-      --image=eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests \
+      --image=${IMAGE} \
       --restart=Never \
       $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
       --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
