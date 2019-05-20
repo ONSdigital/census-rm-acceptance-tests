@@ -32,9 +32,7 @@ def generate_random_uuid(context):
 def get_non_existent_case_id(context):
     response = requests.get(f'{caseapi_url}{context.dummy_case_id}')
 
-    response_data = json.loads(response.content)
-
-    assert not response_data, 'Response not empty'
+    assert response.status_code == 404, 'Case returned'
 
 
 @then('caseapi returns multiple cases for a UPRN')
