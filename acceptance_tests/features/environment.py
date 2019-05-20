@@ -25,7 +25,8 @@ def _purge_queues():
         pika.ConnectionParameters(host=Config.RABBITMQ_HOST, port=Config.RABBITMQ_PORT))
 
     channel = connection.channel()
-    channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_QUEUE)
+    channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE)
+    channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE)
     channel.queue_purge(queue=Config.RABBITMQ_QUEUE)
 
 
