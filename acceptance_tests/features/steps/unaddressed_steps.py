@@ -1,19 +1,12 @@
 import functools
 import json
-from unittest import TestCase
 
-from behave import given, when, then
+from behave import when, then
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
+from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
-
-tc = TestCase('__init__')
-
-
-@given('the unaddressed batch is run')
-def unaddressed_batch_run(context):
-    return
 
 
 @when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
@@ -28,7 +21,7 @@ def send_unaddressed_message(context, questionnaire_type):
 @then("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(_uac_callback, context=context))
 
     assert context.expected_message_received
