@@ -8,21 +8,18 @@ from google.cloud import pubsub_v1
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
 
-RECEIPT_TOPIC_PROJECT_ID = "project"
-RECEIPT_TOPIC_NAME = "eq-submission-topic"
-
 
 @step("the correct case and uac are emitted")
 def correct_case_and_uac_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=1, type_filter='UAC_UPDATED'))
 
     assert len(context.messages_received) == 1
 
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=1, type_filter='CASE_CREATED'))
     assert len(context.messages_received) == 1
@@ -38,7 +35,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,
@@ -53,7 +50,7 @@ def uac_updated_msg_emitted(context):
 def _publish_object_finalize(case_id="0", tx_id="0", questionnaire_id="0"):
     publisher = pubsub_v1.PublisherClient()
 
-    topic_path = publisher.topic_path(RECEIPT_TOPIC_PROJECT_ID, RECEIPT_TOPIC_NAME)
+    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
 
     data = json.dumps({
         "timeCreated": "2008-08-24T00:00:00Z",
