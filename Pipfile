@@ -14,7 +14,6 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
-v = {editable = true,version = "*"}
 
 [requires]
 python_version = "3.6"
