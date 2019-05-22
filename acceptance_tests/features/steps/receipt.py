@@ -30,6 +30,7 @@ def correct_case_and_uac_emitted(context):
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     _publish_object_finalize(case_id=context.emitted_case['id'])
+    assert context.sent_to_gcp is True
 
 
 @then("a uac_updated msg is emitted with active set to false")
@@ -47,7 +48,9 @@ def uac_updated_msg_emitted(context):
     assert uac['active'] is False
 
 
-def _publish_object_finalize(case_id="0", tx_id="0", questionnaire_id="0"):
+def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="0"):
+    context.sent_to_gcp = False
+
     publisher = pubsub_v1.PublisherClient()
 
     topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
@@ -70,3 +73,5 @@ def _publish_object_finalize(case_id="0", tx_id="0", questionnaire_id="0"):
         time.sleep(1)
 
     print(f'Message published to {topic_path}')
+
+    context.sent_to_gcp = True
