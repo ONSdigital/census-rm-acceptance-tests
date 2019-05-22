@@ -5,7 +5,7 @@ Feature: Case look up for the contact centre
     Then the new cases are emitted to Respondent Home
     And a case can be retrieved from the caseapi service
 
-  Scenario: Check non-existent caseId returns an empty list
+  Scenario: Check non-existent caseId returns a 404 status code
     Given a random caseId is generated
     Then caseapi should return a 404 when queried
 
