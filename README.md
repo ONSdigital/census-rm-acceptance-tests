@@ -9,12 +9,13 @@ Python Behave BDD tests for RM Census.
 
 ## Run the tests locally against census-rm-docker-dev
 1. Clone [census-rm-docker-dev](https://github.com/ONSdigital/census-rm-docker-dev) and run `make up` to start the required services
-1. Set Pub/Sub emulator-related environment variables (you should only need to do this once in your .bash_profile)
-   This will force your docker-dev version to use the Emulator
+1. Set Pub/Sub emulator-related environment variables, this will force your docker-dev version to use the GCP pubsub Emulator
    
     ```bash
        export PUBSUB_EMULATOR_HOST=localhost:8538
     ```
+    
+    You can put this in your .bash_profile or in a gitignored .env file 
 
 1. Run:
     ```bash
