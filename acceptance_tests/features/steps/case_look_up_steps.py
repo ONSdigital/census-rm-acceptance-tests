@@ -2,6 +2,7 @@ import json
 import logging
 import requests
 
+from random import randint
 from uuid import uuid4
 from behave import then, given
 from structlog import wrap_logger
@@ -25,12 +26,27 @@ def get_case_by_id(context):
 @given('a random caseId is generated')
 def generate_random_uuid(context):
     context.dummy_case_id = uuid4()
+    context.test_endpoint_with_non_existent_value = context.dummy_case_id
     logger.info(f'Dummy caseId = {context.dummy_case_id}')
+
+
+@given('a random uprn is generated')
+def generate_random_uprn(context):
+    context.random_uprn = randint(15000000000, 19999999999)
+    context.test_endpoint_with_non_existent_value = f'uprn/{context.random_uprn}'
+    logger.info(f'Dummy uprn = {context.random_uprn}')
+
+
+@given('a random caseRef is generated')
+def generate_random_caseref(context):
+    context.random_caseref = randint(15000000, 19999999)
+    context.test_endpoint_with_non_existent_value = f'ref/{context.random_caseref}'
+    logger.info(f'Dummy caseRef = {context.random_caseref}')
 
 
 @then('caseapi should return a 404 when queried')
 def get_non_existent_case_id(context):
-    response = requests.get(f'{caseapi_url}{context.dummy_case_id}')
+    response = requests.get(f'{caseapi_url}{context.test_endpoint_with_non_existent_value}')
 
     assert response.status_code == 404, 'Case returned'
 
