@@ -123,7 +123,7 @@ def _sample_matches_rh_message(sample_unit, rh_message):
            rh_message['payload']['collectionCase']['address']['addressLine1'] \
            and sample_unit['attributes']['ADDRESS_LINE2'] == \
            rh_message['payload']['collectionCase']['address']['addressLine2'] \
-           and sample_unit['attributes']['RGN'][0] == rh_message['payload']['collectionCase']['address']['region']
+           and sample_unit['attributes']['REGION'][0] == rh_message['payload']['collectionCase']['address']['region']
 
 
 def _assert_equals(expected, actual):
