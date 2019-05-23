@@ -1,8 +1,8 @@
 import functools
 import json
-import time
 
 from behave import when, then, step
+from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
@@ -64,13 +64,15 @@ def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="
         }
     })
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'),
-                               eventType='OBJECT_FINALIZE',
-                               bucketId='eq-bucket',
-                               objectId=tx_id)
-    while not future.done():
-        time.sleep(1)
+    try:
+        publisher.publish(topic_path,
+                          data=data.encode('utf-8'),
+                          eventType='OBJECT_FINALIZE',
+                          bucketId='eq-bucket',
+                          objectId=tx_id) \
+            .result(timeout=30)
+    except GoogleAPIError:
+        return
 
     print(f'Message published to {topic_path}')
 
