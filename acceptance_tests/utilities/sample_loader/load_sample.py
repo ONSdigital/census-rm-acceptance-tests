@@ -66,7 +66,11 @@ def _create_case_json(sample, collection_exercise_id, action_plan_id) -> str:
                    'lsoa': sample['LSOA'], 'msoa': sample['MSOA'],
                    'lad': sample['LAD'], 'rgn': sample['RGN'],
                    'htcWillingness': sample['HTC_WILLINGNESS'], 'htcDigital': sample['HTC_DIGITAL'],
-                   'treatmentCode': sample['TREATMENT_CODE'], 'collectionExerciseId': collection_exercise_id,
+                   'fieldCoordinatorId': sample['FIELDCOORDINATOR_ID'],
+                   'fieldOfficerId' : sample['FIELDOFFICER_ID'],
+                   'treatmentCode': sample['TREATMENT_CODE'],
+                   'ceExpectedCapacity': sample['CE_EXPECTED_CAPACITY'],
+                   'collectionExerciseId': collection_exercise_id,
                    'actionPlanId': action_plan_id}
     return json.dumps(create_case)
 
