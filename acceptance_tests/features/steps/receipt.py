@@ -29,7 +29,7 @@ def correct_case_and_uac_emitted(context):
 
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
-    _publish_object_finalize(case_id=context.emitted_case['id'])
+    _publish_object_finalize(context, case_id=context.emitted_case['id'])
     assert context.sent_to_gcp is True
 
 
