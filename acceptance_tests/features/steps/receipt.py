@@ -1,5 +1,6 @@
 import functools
 import json
+import time
 
 from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
@@ -64,13 +65,15 @@ def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="
         }
     })
 
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'),
+                               eventType='OBJECT_FINALIZE',
+                               bucketId='eq-bucket',
+                               objectId=tx_id)
+    if not future.done():
+        time.sleep(1)
     try:
-        publisher.publish(topic_path,
-                          data=data.encode('utf-8'),
-                          eventType='OBJECT_FINALIZE',
-                          bucketId='eq-bucket',
-                          objectId=tx_id) \
-            .result(timeout=30)
+        future.result(timeout=30)
     except GoogleAPIError:
         return
 
