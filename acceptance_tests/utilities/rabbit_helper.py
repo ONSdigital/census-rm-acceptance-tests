@@ -41,4 +41,3 @@ def store_all_msgs_in_context(ch, method, _properties, body, context, expected_m
 
     if len(context.messages_received) == expected_msg_count:
         ch.stop_consuming()
-
