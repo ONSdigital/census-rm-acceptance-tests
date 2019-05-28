@@ -1,4 +1,5 @@
 import functools
+import json
 import logging
 
 from structlog import wrap_logger
@@ -26,3 +27,18 @@ def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
 def _timeout_callback(rabbit):
     logger.error('Timed out waiting for messages')
     rabbit.close_connection()
+
+
+def store_all_msgs_in_context(ch, method, _properties, body, context, expected_msg_count, type_filter=None):
+    parsed_body = json.loads(body)
+
+    if parsed_body['event']['type'] == type_filter or type_filter is None:
+        context.messages_received.append(parsed_body)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+    else:
+        # take it, ignore it?
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+
+    if len(context.messages_received) == expected_msg_count:
+        ch.stop_consuming()
+
