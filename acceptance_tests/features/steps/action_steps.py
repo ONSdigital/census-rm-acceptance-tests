@@ -17,7 +17,7 @@ def setup_action_rule(context, action_type, action_rule_delay):
     if action_type == 'ICL1E':
         classifiers = _get_england_icl_treatment_codes()
 
-    if action_type == 'ICL2E':
+    if action_type == 'ICL2W':
         classifiers = _get_wales_icl_treatment_codes()
 
     if action_type == 'ICHHQW':
