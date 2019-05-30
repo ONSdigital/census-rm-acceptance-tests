@@ -65,6 +65,7 @@ def _create_expected_csv_line(case, prefix):
     return (
         f'{case["uac"]}|'
         f'{case["case_ref"]}|'
+        f'|||'
         f'{case["address_line_1"]}|'
         f'{case["address_line_2"]}|'
         f'{case["address_line_3"]}|'
@@ -81,6 +82,7 @@ def _create_expected_wales_csv_line(case, prefix):
         f'{case["uac_wales"]}|'
         f'{case["qid_wales"]}|'
         f'{case["case_ref"]}|'
+        f'|||'
         f'{case["address_line_1"]}|'
         f'{case["address_line_2"]}|'
         f'{case["address_line_3"]}|'
