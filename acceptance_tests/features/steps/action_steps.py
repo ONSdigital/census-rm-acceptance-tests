@@ -14,6 +14,8 @@ def setup_action_rule(context, action_type, action_rule_delay):
 
     trigger_date_time = (datetime.utcnow() + timedelta(seconds=int(action_rule_delay))).isoformat() + 'Z'
 
+    classifiers = None
+
     if action_type == 'ICL1E':
         classifiers = _get_england_icl_treatment_codes()
 
