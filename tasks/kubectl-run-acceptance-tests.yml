@@ -43,4 +43,6 @@ run:
       --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
       --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
       --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
+      --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
+      --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
