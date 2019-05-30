@@ -3,7 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: eu.gcr.io/census-ci/gcloud-kubectl
+    repository: eu.gcr.io/census-gcr/gcloud-kubectl
 
 params:
   SERVICE_ACCOUNT_JSON:
@@ -43,4 +43,6 @@ run:
       --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
       --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
       --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
+      --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
+      --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"

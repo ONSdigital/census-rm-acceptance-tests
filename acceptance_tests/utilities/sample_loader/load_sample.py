@@ -5,7 +5,7 @@ import sys
 import uuid
 from typing import Iterable
 
-from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 
 def parse_arguments():
