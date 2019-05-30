@@ -1,2 +1,0 @@
-class RabbitConnectionClosedError(Exception):
-    pass

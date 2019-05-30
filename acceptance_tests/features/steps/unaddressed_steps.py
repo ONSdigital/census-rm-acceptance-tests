@@ -4,7 +4,7 @@ import json
 from behave import when, then
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
-from acceptance_tests.utilities.sample_loader.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 

@@ -9,7 +9,7 @@ Feature: Smoke tests to check the system is tied together correctly
     And there is a correct "P_IC_ICL1" manifest file for each csv file written
 
   Scenario: Successful sample file upload and Wales ICL print file
-    Given an action rule of type ICL2E is set 10 seconds in the future
+    Given an action rule of type ICL2W is set 10 seconds in the future
     When sample file "sample_input_wales_census_spec.csv" is loaded
     Then messages are emitted to RH and Action Scheduler
     And correctly formatted "P_IC_ICL2" print files are created
