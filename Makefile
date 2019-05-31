@@ -7,7 +7,10 @@ package_vulnerability:
 flake:
 	pipenv run flake8 .
 
-test: package_vulnerability flake at_tests
+test: package_vulnerability flake set_pubsub_emulator at_tests
+
+set_pubsub_emulator:
+	./set_pubsub_emulator.sh
 
 at_tests:
 	pipenv run python run.py --log_level WARN
