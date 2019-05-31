@@ -14,18 +14,16 @@ def setup_action_rule(context, action_type, action_rule_delay):
 
     trigger_date_time = (datetime.utcnow() + timedelta(seconds=int(action_rule_delay))).isoformat() + 'Z'
 
-    classifiers = None
+    classifiers_for_action_type = {
+        'ICL1E': {'treatmentCode': ['HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE', 'HH_LFNR1E', 'HH_LF2R3BE']},
+        'ICL2W': {'treatmentCode': ['HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', 'HH_LF2R3AW',
+                                    'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW']},
+        'ICHHQW': {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']},
+        'FF2QE': None
+    }
 
-    if action_type == 'ICL1E':
-        classifiers = _get_england_icl_treatment_codes()
-
-    if action_type == 'ICL2W':
-        classifiers = _get_wales_icl_treatment_codes()
-
-    if action_type == 'ICHHQW':
-        classifiers = _get_wales_questionnaire_treatment_codes()
-
-    create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers, action_plan_url, action_type)
+    create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers_for_action_type.get(action_type),
+                       action_plan_url, action_type)
 
 
 def _get_england_icl_treatment_codes():
