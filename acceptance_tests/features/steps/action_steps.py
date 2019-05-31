@@ -19,7 +19,7 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'ICL2W': {'treatmentCode': ['HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', 'HH_LF2R3AW',
                                     'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW']},
         'ICHHQW': {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']},
-        'FF2QE': None
+        'FF2QE': {'treatmentCode': ['HH_QF2R1E']}
     }
 
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers_for_action_type.get(action_type),

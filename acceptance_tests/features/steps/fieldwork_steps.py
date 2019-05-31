@@ -8,9 +8,14 @@ from config import Config
 import xml.etree.ElementTree as ET
 
 
-@then('the action instruction messages are emitted to FWMT')
-def fwmt_messages_received(context):
-    context.expected_sample_units = context.sample_units.copy()
+@then('the action instruction messages are emitted to FWMT where the case has a treatment code of "{treatment_code}"')
+def fwmt_messages_received(context, treatment_code):
+    all_sample_units = context.sample_units.copy()
+    context.expected_sample_units = [
+        sample_unit
+        for sample_unit in all_sample_units if sample_unit['attributes']['TREATMENT_CODE'] == treatment_code
+    ]
+
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(_callback, context=context))
 
@@ -18,7 +23,6 @@ def fwmt_messages_received(context):
 
 
 def _callback(ch, method, _properties, body, context):
-
     root = ET.fromstring(body)
 
     if not root[0].tag == 'actionRequest':
