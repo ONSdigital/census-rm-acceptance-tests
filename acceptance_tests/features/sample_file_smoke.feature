@@ -21,3 +21,4 @@ Feature: Smoke tests to check the system is tied together correctly
     Then messages are emitted to RH and Action Scheduler for wales questionnaire
     And correctly formatted "P_IC_H2" print files are created for wales questionnaire
     And there is a correct "P_IC_H2" manifest file for each csv file written
+
