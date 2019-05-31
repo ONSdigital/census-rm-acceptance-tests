@@ -20,6 +20,9 @@ def setup_action_rule(context, action_type, action_rule_delay):
     if action_type == 'ICL2W':
         classifiers = _get_wales_icl_treatment_codes()
 
+    if action_type == 'ICL4E':
+        classifiers = _get_ni_icl_treatment_codes()
+
     if action_type == 'ICHHQW':
         classifiers = _get_wales_questionnaire_treatment_codes()
 
@@ -33,6 +36,10 @@ def _get_england_icl_treatment_codes():
 def _get_wales_icl_treatment_codes():
     return {'treatmentCode': ['HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', 'HH_LF2R3AW',
                               'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW']}
+
+
+def _get_ni_icl_treatment_codes():
+    return {'treatmentCode': ['HH_3QSFN']}
 
 
 def _get_wales_questionnaire_treatment_codes():

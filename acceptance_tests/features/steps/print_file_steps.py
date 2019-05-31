@@ -129,6 +129,9 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     if "P_IC_ICL2" in prefix:
         country = 'Wales'
         purpose = 'Initial contact letter households'
+    if "P_IC_ICL4" in prefix:
+        country = 'Northern Ireland'
+        purpose = 'Initial contact letter households'
     if "P_IC_H2" in prefix:
         country = 'Wales'
         purpose = 'Initial contact questionnaire households'
