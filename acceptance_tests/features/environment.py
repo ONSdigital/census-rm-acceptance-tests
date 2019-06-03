@@ -1,7 +1,9 @@
 import base64
 import json
+import shutil
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 from acceptance_tests.utilities.rabbit_context import (
     RabbitContext
@@ -9,16 +11,25 @@ from acceptance_tests.utilities.rabbit_context import (
 from config import Config
 
 
-def before_all(context):
+def before_all(_context):
     _setup_google_auth()
 
 
-def before_scenario(context, scenario):
+def before_scenario(context, _scenario):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     _purge_queues()
+    _create_and_clean_up_test_files(context)
+
+
+def after_scenario(context, _scenario):
+    _remove_test_files(context)
+
+
+def _remove_test_files(context):
+    shutil.rmtree(context.test_file_path)
 
 
 def _purge_queues():
@@ -34,3 +45,10 @@ def _setup_google_auth():
         with open(Config.GOOGLE_APPLICATION_CREDENTIALS, 'w') as credentials_file:
             json.dump(sa_json, credentials_file)
         print(f'Created GOOGLE_APPLICATION_CREDENTIALS: {Config.GOOGLE_APPLICATION_CREDENTIALS}')
+
+
+def _create_and_clean_up_test_files(context):
+    context.test_file_path = Path(__file__).parent.parent.resolve().joinpath('tmp_test_files')
+    if context.test_file_path.exists():
+        shutil.rmtree(context.test_file_path)
+    context.test_file_path.mkdir()
