@@ -23,14 +23,31 @@ def setup_action_rule(context, action_type, action_rule_delay):
     if action_type == 'ICL4E':
         classifiers = _get_ni_icl_treatment_codes()
 
+    if action_type == 'ICHHQE':
+        classifiers = _get_england_questionnaire_treatment_codes()
+
     if action_type == 'ICHHQW':
         classifiers = _get_wales_questionnaire_treatment_codes()
+
+    if action_type == 'ICHHQN':
+        classifiers = _get_ni_questionaire_treatment_codes()
 
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers, action_plan_url, action_type)
 
 
 def _get_england_icl_treatment_codes():
-    return {'treatmentCode': ['HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE', 'HH_LFNR1E', 'HH_LF2R3BE']}
+    return {'treatmentCode': [
+        'HH_LFNR1E',
+        'HH_LFNR2E',
+        'HH_LFNR3AE',
+        'HH_LF2R1E',
+        'HH_LF2R2E',
+        'HH_LF2R3AE',
+        'HH_LF2R3BE',
+        'HH_LF3R1E',
+        'HH_LF3R2E',
+        'HH_LF3R3AE',
+        'HH_LF3R3BE']}
 
 
 def _get_wales_icl_treatment_codes():
@@ -39,8 +56,16 @@ def _get_wales_icl_treatment_codes():
 
 
 def _get_ni_icl_treatment_codes():
-    return {'treatmentCode': ['HH_3QSFN']}
+    return {'treatmentCode': ['HH_1LSFN', 'HH_2LEFN']}
+
+
+def _get_england_questionnaire_treatment_codes():
+    return {'treatmentCode': ['HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', 'HH_QF3R3AE']}
 
 
 def _get_wales_questionnaire_treatment_codes():
     return {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']}
+
+
+def _get_ni_questionaire_treatment_codes():
+    return {'treatmentCode': ['HH_3QSFN']}
