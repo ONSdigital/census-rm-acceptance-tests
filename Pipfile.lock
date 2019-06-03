@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2a5a6269b2a91d4a2bcaff6af3a3ce3531dfafc2c2d40f9e76dbfd3345f0fef3"
+            "sha256": "c5bc9ce62c3e84ed92c39fb7a5ff71c96d9c4cbce56ddbfa9f85e6ae03a88c86"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,7 +18,7 @@
     "default": {
         "census-rm-qid-batch-runner": {
             "editable": true,
-            "git": "git@github.com/ONSdigital/census-rm-qid-batch-runner",
+            "git": "https://github.com/ONSdigital/census-rm-qid-batch-runner",
             "ref": "3d5fc747b879de578a5ef85503ba0565a2716920"
         }
     },
