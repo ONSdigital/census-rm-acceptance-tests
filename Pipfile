@@ -17,3 +17,6 @@ paramiko = "*"
 
 [requires]
 python_version = "3.6"
+
+[packages]
+census-rm-qid-batch-runner = {editable = true,git = "git@github.com/ONSdigital/census-rm-qid-batch-runner",ref = "setup-for-importing"}
