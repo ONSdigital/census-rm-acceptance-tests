@@ -1,2 +1,0 @@
-class DataNotYetThereError(OSError):
-    pass
