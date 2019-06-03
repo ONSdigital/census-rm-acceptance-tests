@@ -86,11 +86,11 @@ def validate_print_file_data(context):
 
     for index, print_file in enumerate(print_files):
         with open(print_file) as fh:
-            reader = csv.DictReader(fh, fieldnames=PRINT_FILE_TEMPLATE)
+            reader = csv.DictReader(fh, delimiter='|', fieldnames=PRINT_FILE_TEMPLATE)
             row_counter = 0
             for row in reader:
                 row_counter += 1
-                assert len(row['UAC']) == 16
-                assert row['PRODUCTPACK_CODE'] == config_file[index][0]
-                assert row['QUESTIONNAIRE_ID'][:2] == config_file[index][1]
-            assert row_counter == int(config_file[index][2])
+                assert len(row['UAC']) == 16, 'Incorrect UAC length'
+                assert row['PRODUCTPACK_CODE'] == config_file[index][0], 'PRODUCTPACK_CODE does not match config'
+                assert row['QUESTIONNAIRE_ID'][:2] == config_file[index][1], 'QUESTIONNAIRE_ID does not match config'
+            assert row_counter == int(config_file[index][2]), 'Print file row count does not match config'
