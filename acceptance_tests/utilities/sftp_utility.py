@@ -12,7 +12,8 @@ class SftpUtility:
         self.ssh_client.connect(hostname=Config.SFTP_HOST,
                                 port=int(Config.SFTP_PORT),
                                 username=Config.SFTP_USERNAME,
-                                password=Config.SFTP_PASSWORD,
+                                key_filename=Config.SFTP_KEY_FILENAME,
+                                passphrase=Config.SFTP_PASSPHRASE,
                                 look_for_keys=False,
                                 timeout=120)
 
