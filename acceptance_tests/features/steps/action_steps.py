@@ -26,58 +26,5 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'FF2QE': {'treatmentCode': ['HH_QF2R1E']}
     }
 
-    # if action_type == 'ICL1E':
-    #     classifiers = _get_england_icl_treatment_codes()
-    #
-    # if action_type == 'ICL2W':
-    #     classifiers = _get_wales_icl_treatment_codes()
-    #
-    # if action_type == 'ICL4E':
-    #     classifiers = _get_ni_icl_treatment_codes()
-
-    # if action_type == 'ICHHQE':
-    #     classifiers = _get_england_questionnaire_treatment_codes()
-    #
-    # if action_type == 'ICHHQW':
-    #     classifiers = _get_wales_questionnaire_treatment_codes()
-    #
-    # if action_type == 'ICHHQN':
-    #     classifiers = _get_ni_questionaire_treatment_codes()
-
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers_for_action_type[action_type],
                        action_plan_url, action_type)
-
-# def _get_england_icl_treatment_codes():
-#     return {'treatmentCode': [
-#         'HH_LFNR1E',
-#         'HH_LFNR2E',
-#         'HH_LFNR3AE',
-#         'HH_LF2R1E',
-#         'HH_LF2R2E',
-#         'HH_LF2R3AE',
-#         'HH_LF2R3BE',
-#         'HH_LF3R1E',
-#         'HH_LF3R2E',
-#         'HH_LF3R3AE',
-#         'HH_LF3R3BE']}
-
-
-# def _get_wales_icl_treatment_codes():
-#     return {'treatmentCode': ['HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', 'HH_LF2R3AW',
-#                               'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW']}
-
-
-# def _get_ni_icl_treatment_codes():
-#     return {'treatmentCode': ['HH_1LSFN', 'HH_2LEFN']}
-
-
-# def _get_england_questionnaire_treatment_codes():
-#     return {'treatmentCode': ['HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', 'HH_QF3R3AE']}
-#
-#
-# def _get_wales_questionnaire_treatment_codes():
-#     return {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']}
-#
-#
-# def _get_ni_questionaire_treatment_codes():
-#     return {'treatmentCode': ['HH_3QSFN']}
