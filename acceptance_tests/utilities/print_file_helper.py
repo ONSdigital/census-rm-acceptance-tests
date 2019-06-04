@@ -30,14 +30,10 @@ def create_expected_csv_lines(context, prefix):
 def create_expected_questionaire_csv_lines(context, prefix):
     actual_data = defaultdict(dict)
 
+    #
     for message in context.messages_received:
         if message['event']['type'] == 'UAC_UPDATED':
-            questionaire_prefix = message['payload']['uac']['questionnaireId'][:2]
-
-
-            if message['payload']['uac']['questionnaireId'][:2] == '02' \
-                    or message['payload']['uac']['questionnaireId'][:2] == '01'\
-                    or message['payload']['uac']['questionnaireId'][:2] == '04':
+            if message['payload']['uac']['questionnaireId'][:2] in ('01', '02', '04'):
                 actual_data[message['payload']['uac']['caseId']]['uac'] = message['payload']['uac']['uac']
                 actual_data[message['payload']['uac']['caseId']]['qid'] = message['payload']['uac']['questionnaireId']
             elif message['payload']['uac']['questionnaireId'][:2] == '03':
