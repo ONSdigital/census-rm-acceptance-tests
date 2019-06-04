@@ -136,8 +136,32 @@ def _get_matching_manifest_file(filename, files):
 def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     actual_file_contents = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{csv_file.filename}')
 
-    # TODO: put these in a mappy
+    purpose, country = _get_country_and_purpose(prefix)
 
+    md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
+    expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
+
+    _file = dict(
+        sizeBytes=expected_size,
+        md5sum=md5_hash,
+        relativePath='.\\',
+        name=csv_file.filename
+    )
+
+    manifest = dict(
+        schemaVersion=1,
+        files=[_file],
+        sourceName="ONS_RM",
+        manifestCreated=created_datetime,
+        description=f'{purpose} - {country}',
+        dataset="PPD1.1",
+        version=1
+    )
+
+    return manifest
+
+
+def _get_country_and_purpose(prefix):
     if "P_IC_ICL1" in prefix:
         country = 'England'
         purpose = 'Initial contact letter households'
@@ -162,24 +186,4 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
         country = "Northern Ireland"
         purpose = 'Initial contact questionnaire households'
 
-    md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
-    expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
-
-    _file = dict(
-        sizeBytes=expected_size,
-        md5sum=md5_hash,
-        relativePath='.\\',
-        name=csv_file.filename
-    )
-
-    manifest = dict(
-        schemaVersion=1,
-        files=[_file],
-        sourceName="ONS_RM",
-        manifestCreated=created_datetime,
-        description=f'{purpose} - {country}',
-        dataset="PPD1.1",
-        version=1
-    )
-
-    return manifest
+    return purpose, country

@@ -32,6 +32,9 @@ def create_expected_questionaire_csv_lines(context, prefix):
 
     for message in context.messages_received:
         if message['event']['type'] == 'UAC_UPDATED':
+            questionaire_prefix = message['payload']['uac']['questionnaireId'][:2]
+
+
             if message['payload']['uac']['questionnaireId'][:2] == '02' \
                     or message['payload']['uac']['questionnaireId'][:2] == '01'\
                     or message['payload']['uac']['questionnaireId'][:2] == '04':
