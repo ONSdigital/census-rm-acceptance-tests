@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dc7edbbbef1267f2de0a8e8d1054c098140c39ab9e75ffb039051086f226978a"
+            "sha256": "829dfeaefab4adf8e2044550d884ccd2737e3b2ed5dd4f23434485c705808384"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -200,13 +200,6 @@
             ],
             "version": "==1.6.3"
         },
-        "google-cloud-core": {
-            "hashes": [
-                "sha256:56a2c8c6420776ff5f4e590e3708e4b6e80cd417c7591e9a0f52b1961523aad9",
-                "sha256:9653ebd9724d2f2b2571b015731444056e00be5374863e17176925fd48a56378"
-            ],
-            "version": "==1.0.1"
-        },
         "google-cloud-pubsub": {
             "hashes": [
                 "sha256:91e2d1ccef131224fb570bc72127de3a723a865cb0d5bac10f6db41e895d14d4",
@@ -214,21 +207,6 @@
             ],
             "index": "pypi",
             "version": "==0.41.0"
-        },
-        "google-cloud-storage": {
-            "hashes": [
-                "sha256:aad501a7b47a92b20ce998208fc706959805982d639cc178f079382c43161283",
-                "sha256:fe98ecfba927f8de626b315cffe68d7c4a8da3658f95fee382269b92e3d71328"
-            ],
-            "index": "pypi",
-            "version": "==1.16.0"
-        },
-        "google-resumable-media": {
-            "hashes": [
-                "sha256:2dae98ee716efe799db3578a7b902fbf5592fc5c77d3c0906fc4ef9b1b930861",
-                "sha256:3e38923493ca0d7de0ad91c31acfefc393c78586db89364e91cb4f11990e51ba"
-            ],
-            "version": "==0.3.2"
         },
         "googleapis-common-protos": {
             "extras": [
@@ -446,8 +424,7 @@
         },
         "pycparser": {
             "hashes": [
-                "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3",
-                "sha256:cc2dbb4d14ced730e68ca3973ca62c6c92560fb5fd3a248d62a084d7ef241684"
+                "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
             ],
             "version": "==2.19"
         },
