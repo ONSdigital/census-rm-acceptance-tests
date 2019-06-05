@@ -15,7 +15,7 @@ Feature: Checks that input sample files and action rules results in correct prin
     And there is a correct "P_IC_ICL2" manifest file for each csv file written
 
   Scenario: Successful sample file upload and NI ICL print file
-    Given an action rule of type ICL4E is set 10 seconds in the future
+    Given an action rule of type ICL4N is set 10 seconds in the future
     When sample file "sample_input_ni_census_spec.csv" is loaded
     Then messages are emitted to RH and Action Scheduler
     And correctly formatted "P_IC_ICL4" print files are created
