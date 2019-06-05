@@ -40,7 +40,7 @@ def gather_messages_emitted_wales(context):
 
 
 @then('messages are emitted to RH and Action Scheduler for questionnaire')
-def gather_messages_emitted_questionair(context):
+def gather_messages_emitted_questionaire(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(_callback, context=context))
