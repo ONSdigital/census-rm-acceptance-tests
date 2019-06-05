@@ -16,7 +16,7 @@ inputs:
 - name: acceptance-tests-repo
 
 run:
-  path: sh
+  path: bash
   args:
     - -exc
     - |
@@ -29,7 +29,6 @@ run:
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
 
       # Run acceptance tests for unaddressed batch
-      bash
       kubectl apply -f ${UNADDRESSED_YAML}
       sleep 10
       OUTPUT=$(kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh)
