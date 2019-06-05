@@ -1,6 +1,7 @@
 import csv
 import functools
 import json
+import subprocess
 from pathlib import Path
 from uuid import uuid4
 
@@ -96,3 +97,21 @@ def _stop_consuming_after_n_messages(ch, method, _properties, _body, context, n)
     ch.basic_ack(delivery_tag=method.delivery_tag)
     if context.message_count >= n:
         ch.stop_consuming()
+
+
+@when("the unaddressed batch is loaded, the print files are generated")
+def validate_unaddressed_print_file(context):
+    if Config.USE_LOCAL_DOCKER:
+        docker_unaddressed_print_test()
+
+
+def docker_unaddressed_print_test():
+    result = str(subprocess.check_output(
+        ['docker', 'run',
+         '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
+         '--env', f'RABBITMQ_SERVICE_PORT=5672',
+         '--env', f'DB_PORT=5432',
+         '--env', f'DB_HOST=postgres',
+         '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
+         'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh']))
+    assert result.endswith('TESTS PASSED\\r\\n"')
