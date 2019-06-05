@@ -31,9 +31,4 @@ run:
       # Run acceptance tests for unaddressed batch
       kubectl apply -f ${UNADDRESSED_YAML}
       sleep 10
-      OUTPUT=$(kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh)
-      echo The output is $OUTPUT
-      kubectl delete -f ${UNADDRESSED_YAML}
-      TEST_RESULT=${OUTPUT: -16}
-      echo $TEST_RESULT > ~/test_result.txt
-      egrep "TESTS PASSED" ~/test_result.txt
+      kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh
