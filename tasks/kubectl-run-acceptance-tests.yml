@@ -10,6 +10,7 @@ params:
   GCP_PROJECT_NAME:
   KUBERNETES_CLUSTER:
   ACCEPTANCE_TESTS_IMAGE:
+  UNADDRESSED_YAML:
 
 inputs:
 - name: acceptance-tests-repo
@@ -49,10 +50,10 @@ run:
 
 
       # Run acceptance tests for unaddressed batch
-      kubectl apply -f tasks/qid-batch-runner.yml
+      kubectl apply -f ${UNADDRESSED_YAML}
       sleep 10
       OUTPUT=$(kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh)
-      kubectl delete -f tasks/qid-batch-runner.yml
+      kubectl delete -f ${UNADDRESSED_YAML}
       TEST_RESULT=${OUTPUT: -16}
       echo $TEST_RESULT > ~/test_result.txt
       egrep "TESTS PASSED" ~/test_result.txt
