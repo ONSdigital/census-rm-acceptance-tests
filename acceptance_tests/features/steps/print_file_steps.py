@@ -83,7 +83,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
         _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, prefix)
 
 
-@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=5000, stop_max_attempt_number=24)
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, prefix):
     logger.debug('Checking for files on SFTP server')
 
@@ -162,28 +162,22 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
 
 
 def _get_country_and_purpose(prefix):
-    if "P_IC_ICL1" in prefix:
-        country = 'England'
-        purpose = 'Initial contact letter households'
+    if "P_IC_ICL1" == prefix:
+        return 'Initial contact letter households', 'England'
 
-    if "P_IC_ICL2" in prefix:
-        country = 'Wales'
-        purpose = 'Initial contact letter households'
+    if "P_IC_ICL2" == prefix:
+        return 'Initial contact letter households', 'Wales'
 
-    if "P_IC_ICL4" in prefix:
-        country = 'Northern Ireland'
-        purpose = 'Initial contact letter households'
+    if "P_IC_ICL4" == prefix:
+        return 'Initial contact letter households', 'Northern Ireland'
 
-    if "P_IC_H1" in prefix:
-        country = "England"
-        purpose = 'Initial contact questionnaire households'
+    if "P_IC_H1" == prefix:
+        return 'Initial contact questionnaire households', 'England'
 
-    if "P_IC_H2" in prefix:
-        country = 'Wales'
-        purpose = 'Initial contact questionnaire households'
+    if "P_IC_H2" == prefix:
+        return 'Initial contact questionnaire households', 'Wales'
 
-    if "P_IC_H4" in prefix:
-        country = "Northern Ireland"
-        purpose = 'Initial contact questionnaire households'
+    if "P_IC_H4" == prefix:
+        return 'Initial contact questionnaire households', 'Northern Ireland'
 
-    return purpose, country
+    assert False, f'Unexpected Prefix: {prefix}'
