@@ -14,8 +14,6 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
-psycopg2-binary = "*"
-sqlalchemy = "*"
 
 [requires]
 python_version = "3.6"
