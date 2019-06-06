@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: qid-batch-runner-experiment
+  name: qid-batch-runner-acceptance-test
 spec:
   containers:
-    - name: qid-batch-runner
-      image: eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner-experiment:latest
+    - name: qid-batch-runner-acceptance-test
+      image: eu.gcr.io/census-rm-liamtoozer7/rm/census-rm-qid-batch-runner:latest
       imagePullPolicy: Always
       command: [ "python", "-c" ]
       args: [ "while 1:0" ]

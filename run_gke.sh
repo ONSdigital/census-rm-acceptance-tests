@@ -57,7 +57,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 # Run acceptance tests for unaddressed batch
 kubectl apply -f tasks/qid-batch-runner.yml
 sleep 10
-OUTPUT=$(kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh)
+OUTPUT=$(kubectl exec -it qid-batch-runner-acceptance-test -- /app/run_acceptance_tests.sh)
 echo The output is $OUTPUT
 kubectl delete -f tasks/qid-batch-runner.yml
 TEST_RESULT=${OUTPUT: -16}
