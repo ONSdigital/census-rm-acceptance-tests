@@ -11,7 +11,7 @@ from acceptance_tests.utilities.rabbit_context import (
 from config import Config
 
 
-def before_all(_context):
+def before_all(_):
     _setup_google_auth()
 
 
