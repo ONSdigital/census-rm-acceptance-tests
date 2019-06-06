@@ -52,3 +52,14 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
+
+
+# Run acceptance tests for unaddressed batch
+kubectl apply -f tasks/qid-batch-runner.yml
+sleep 10
+OUTPUT=$(kubectl exec -it qid-batch-runner-experiment -- /app/run_acceptance_tests.sh)
+echo The output is $OUTPUT
+kubectl delete -f tasks/qid-batch-runner.yml
+TEST_RESULT=${OUTPUT: -16}
+echo $TEST_RESULT > ~/test_result.txt
+egrep "TESTS PASSED" ~/test_result.txt
