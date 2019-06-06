@@ -13,7 +13,7 @@ def before_all(_):
     _setup_google_auth()
 
 
-def before_scenario(context, _scenario):
+def before_scenario(context, _):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
