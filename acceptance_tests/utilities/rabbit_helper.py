@@ -1,9 +1,11 @@
 import functools
 import json
 import logging
-import pika
 import os
+
+import pika
 from structlog import wrap_logger
+
 from acceptance_tests.utilities.rabbit_context import (
     RabbitContext
 )
@@ -25,6 +27,7 @@ def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
 
 
 def _timeout_callback(rabbit):
+    assert False, "No messages found"
     logger.error('Timed out waiting for messages')
     rabbit.close_connection()
 

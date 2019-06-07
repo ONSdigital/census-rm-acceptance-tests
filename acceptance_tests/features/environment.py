@@ -2,11 +2,7 @@ import base64
 import json
 import uuid
 from datetime import datetime
-
-from acceptance_tests.utilities.rabbit_context import (
-    RabbitContext
-)
-# from acceptance_tests.utilities.rabbit_helper import add_test_queue
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import add_test_queue
 from config import Config
 
@@ -35,8 +31,6 @@ def _purge_queues():
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_QUEUE)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
-
-        rabbit.channel
 
 
 def _setup_google_auth():
