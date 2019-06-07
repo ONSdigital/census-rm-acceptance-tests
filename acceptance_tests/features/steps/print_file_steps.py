@@ -16,26 +16,92 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-# @then('messages are emitted to RH and Action Scheduler')
-# def gather_messages_emitted(context):
-#     context.messages_received = []
-#     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-#                                     functools.partial(_callback, context=context))
-#
-#     # the case created events have been received and we are now expecting the same number of uacupdated events (2x)
-#     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-#                                     functools.partial(_callback, context=context, multiplier=2))
-
-
 @then("messages are emitted to RH and Action Scheduler for with {qid_count} qid per sample")
-def gather_messages_emitted_questionaire(context, qid_count):
-    qid_multiplier = int(qid_count) + 1
+def gather_messages_emitted(context, qid_count):
+    context.expected_sample_units = context.sample_units.copy()
     context.messages_received = []
+    context.case_created_events = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                                    functools.partial(_callback, context=context))
+                                    functools.partial(_cases_callback, context=context))
+
+    # by multipler add case_created_events to itself i.e. 2 for Wales
+    events_copy = context.case_created_events.copy()
+    for x in range(1, int(qid_count)):
+        context.case_created_events.extend(events_copy)
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-                                    functools.partial(_callback, context=context, multiplier=qid_multiplier))
+                                    functools.partial(_uac_callback, context=context))
+
+
+def _cases_callback(ch, method, _properties, body, context):
+    parsed_body = json.loads(body)
+
+    if not parsed_body['event']['type'] == 'CASE_CREATED':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        assert False, 'Unexpected message on RH case queue'
+        return
+
+    _validate_message(parsed_body)
+
+    for index, sample_unit in enumerate(context.expected_sample_units):
+        if _sample_matches_rh_message(sample_unit, parsed_body):
+            context.messages_received.append(parsed_body)
+            context.case_created_events.append(parsed_body
+                                               )
+            del context.expected_sample_units[index]
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            break
+    else:
+        assert False, 'Could not find sample unit'
+
+    if not context.expected_sample_units:
+        ch.stop_consuming()
+
+
+def _sample_matches_rh_message(sample_unit, rh_message):
+    return sample_unit['attributes']['ADDRESS_LINE1'] == \
+           rh_message['payload']['collectionCase']['address']['addressLine1'] \
+           and sample_unit['attributes']['ADDRESS_LINE2'] == \
+           rh_message['payload']['collectionCase']['address']['addressLine2'] \
+           and sample_unit['attributes']['REGION'][0] == rh_message['payload']['collectionCase']['address']['region']
+
+
+def _uac_callback(ch, method, _properties, body, context):
+    parsed_body = json.loads(body)
+
+    t = parsed_body['event']['type']
+    if not t == 'UAC_UPDATED':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        assert False, 'Unexpected message on RH UAC queue'
+        return
+
+    _validate_uac_message(parsed_body)
+
+    for index, case_created_event in enumerate(context.case_created_events):
+        if _uac_message_matches_rh_message(case_created_event, parsed_body):
+            context.messages_received.append(parsed_body)
+            del context.case_created_events[index]
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            break
+    else:
+        assert False, 'Could not find UAC Updated event'
+
+    if not context.case_created_events:
+        ch.stop_consuming()
+
+
+def _validate_uac_message(parsed_body):
+    tc.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
+
+
+def _uac_message_matches_rh_message(case_created_event, rh_message):
+    return case_created_event['payload']['collectionCase']['id'] == rh_message['payload']['uac']['caseId']
+
+
+def _validate_message(parsed_body):
+    tc.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
+    tc.assertEqual('ACTIONABLE', parsed_body['payload']['collectionCase']['state'])
+    tc.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
 
 
 @then('correctly formatted "{prefix}" print files are created for questionnaire')
@@ -50,16 +116,10 @@ def check_correct_files_on_sftp_server(context, prefix):
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-def _callback(ch, method, _properties, body, context, multiplier=1):
+def _msgs_received(ch, method, _properties, body, context, multiplier=1):
     parsed_body = json.loads(body)
     context.messages_received.append(parsed_body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    r = len(context.messages_received)
-    a = (len(context.sample_units) * multiplier)
-
-    if r == a:
-        ch.stop_consuming()
 
     if len(context.messages_received) == (len(context.sample_units) * multiplier):
         ch.stop_consuming()
