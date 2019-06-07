@@ -16,7 +16,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 def check_messages_are_received(context):
     context.expected_sample_units = context.sample_units.copy()
     context.case_created_events = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(_callback, context=context))
 
     assert not context.expected_sample_units, 'Some messages are missing'
@@ -24,7 +24,7 @@ def check_messages_are_received(context):
 
 @then("the QID UAC pairs are emitted to Respondent Home")
 def check_uac_messages_are_received(context):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(_uac_callback, context=context))
 
     assert not context.case_created_events, 'Some messages are missing'
@@ -35,7 +35,7 @@ def check_two_wales_uac_messages_are_received(context):
     context.uac_events_seen = 0
     context.uac_england_seen = False
     context.uac_wales_seen = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(_uac_wales_callback, context=context))
 
     tc.assertEqual(2, context.uac_events_seen)

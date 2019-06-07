@@ -13,14 +13,14 @@ from config import Config
 @step("the correct case and uac are emitted")
 def correct_case_and_uac_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=1, type_filter='UAC_UPDATED'))
 
     assert len(context.messages_received) == 1
 
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=1, type_filter='CASE_CREATED'))
     assert len(context.messages_received) == 1
@@ -37,7 +37,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,

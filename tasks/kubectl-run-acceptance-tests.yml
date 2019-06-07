@@ -31,7 +31,7 @@ run:
       # Env vars have to passed one by one as a --env flag each
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
       kubectl run acceptance-tests -it --command --rm --quiet \
-      --generator=run-pod/v1 \
+      --generator=run-cccccckbbdbdvfhlutcentpod/v1 \
       --image=${ACCEPTANCE_TESTS_IMAGE} \
       --restart=Never \
       $(while read env; do echo --env=${env}; done < acceptance-tests-repo/kubernetes.env) \
@@ -46,3 +46,4 @@ run:
       --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
       --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
+
