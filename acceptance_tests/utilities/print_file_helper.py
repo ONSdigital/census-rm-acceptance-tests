@@ -16,6 +16,23 @@ def create_expected_csv_lines(context, prefix):
     ]
 
 
+def create_expected_unreceipted_csv_lines(context, prefix, ignore_case_id):
+    actual_data = defaultdict(dict)
+
+    for message in context.messages_received:
+        if message['event']['type'] == 'UAC_UPDATED':
+            if message['payload']['uac']['caseId'] != ignore_case_id:
+                actual_data[message['payload']['uac']['caseId']]['uac'] = message['payload']['uac']['uac']
+        elif message['event']['type'] == 'CASE_CREATED':
+            if message['payload']['collectionCase']['id'] != ignore_case_id:
+                actual_data = _add_expected_case_data(message, actual_data)
+
+    return [
+        _create_expected_csv_line(case, prefix)
+        for case in actual_data.values()
+    ]
+
+
 def create_expected_questionaire_csv_lines(context, prefix):
     expected_data = defaultdict(dict)
 
