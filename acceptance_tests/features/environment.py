@@ -15,6 +15,12 @@ def before_all(context):
                    Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
 
 
+def after_all(context):
+    with RabbitContext() as rabbit:
+        rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
+        rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
+
+
 def before_scenario(context, scenario):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())

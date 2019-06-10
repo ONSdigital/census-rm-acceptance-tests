@@ -2,28 +2,28 @@ from collections import defaultdict
 
 
 def create_expected_csv_lines(context, prefix):
-    actual_data = defaultdict(dict)
+    expected_data = defaultdict(dict)
 
-    for message in context.messages_received:
-        if message['event']['type'] == 'UAC_UPDATED':
-            actual_data[message['payload']['uac']['caseId']]['uac'] = message['payload']['uac']['uac']
-        elif message['event']['type'] == 'CASE_CREATED':
-            actual_data = _add_expected_case_data(message, actual_data)
+    for uac in context.uac_created_events:
+        expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+
+    for case in context.case_created_events:
+        expected_data = _add_expected_case_data(case, expected_data)
 
     return [
         _create_expected_csv_line(case, prefix)
-        for case in actual_data.values()
+        for case in expected_data.values()
     ]
 
 
 def create_expected_questionaire_csv_lines(context, prefix):
     expected_data = defaultdict(dict)
 
-    for message in context.messages_received:
-        if message['event']['type'] == 'UAC_UPDATED':
-            expected_data = _add_expected_uac_data(message, expected_data)
-        elif message['event']['type'] == 'CASE_CREATED':
-            expected_data = _add_expected_case_data(message, expected_data)
+    for uac in context.uac_created_events:
+        expected_data = _add_expected_uac_data(uac, expected_data)
+
+    for case in context.case_created_events:
+        expected_data = _add_expected_case_data(case, expected_data)
 
     return [
         _create_expected_questionaire_csv_line(case, prefix)
