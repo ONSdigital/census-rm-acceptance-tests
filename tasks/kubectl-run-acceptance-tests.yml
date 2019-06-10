@@ -46,7 +46,7 @@ run:
       --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
       --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
       --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
-      -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=\"not @local-docker\""
+      -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
 
       # Run acceptance tests for unaddressed batch
@@ -54,5 +54,5 @@ run:
       kubectl delete deploy qid-batch-runner || true
       kubectl apply -f batch-runner-repo/qid-batch-runner.yml
       kubectl rollout status deploy qid-batch-runner --watch=true --timeout=30s
-      kubectl exec -it qid-batch-runner -- /app/run_acceptance_tests.sh
+      kubectl exec -it $(kubectl get pods -o name | grep -m1 qid-batch-runner | cut -d'/' -f 2) -- /bin/bash /app/run_acceptance_tests.sh
       kubectl delete deploy qid-batch-runner
