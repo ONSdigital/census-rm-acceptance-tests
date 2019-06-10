@@ -1,13 +1,17 @@
 import functools
 import json
+import logging
 import subprocess
 
-from behave import when, then
+from behave import then, when
+from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 @when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
@@ -45,17 +49,17 @@ def _uac_callback(ch, method, _properties, body, context):
 
 @when("the unaddressed batch is loaded, the print files are generated")
 def validate_unaddressed_print_file(context):
-    if Config.USE_LOCAL_DOCKER:
-        docker_unaddressed_print_test()
-
-
-def docker_unaddressed_print_test():
-    result = str(subprocess.check_output(
+    unaddressed_test_output = subprocess.run(
         ['docker', 'run',
          '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
          '--env', f'RABBITMQ_SERVICE_PORT=5672',
          '--env', f'DB_PORT=5432',
          '--env', f'DB_HOST=postgres',
          '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
-         'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh']))
-    assert result.endswith('TESTS PASSED\\r\\n"')
+         'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
+        stdout=subprocess.PIPE)
+    if unaddressed_test_output.returncode != 0:
+        logger.error('Unaddressed print file test failed',
+                     captured_stdout=unaddressed_test_output.stdout.decode('utf-8'),
+                     return_code=unaddressed_test_output.returncode)
+        raise AssertionError(f'Unaddressed print file test failed')
