@@ -14,9 +14,9 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
+census-rm-qid-batch-runner = {editable = true,git = "https://github.com/ONSdigital/census-rm-qid-batch-runner",ref = "setup-for-importing"}
 
 [requires]
 python_version = "3.6"
 
 [packages]
-census-rm-qid-batch-runner = {editable = true,git = "https://github.com/ONSdigital/census-rm-qid-batch-runner",ref = "setup-for-importing"}

@@ -1,7 +1,6 @@
-{
     "_meta": {
         "hash": {
-            "sha256": "c5bc9ce62c3e84ed92c39fb7a5ff71c96d9c4cbce56ddbfa9f85e6ae03a88c86"
+            "sha256": "298fbccf50bf86becbcbaf0fcb5efe748f6eb5166bc4c2f8939c908c02350c10"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -15,13 +14,7 @@
             }
         ]
     },
-    "default": {
-        "census-rm-qid-batch-runner": {
-            "editable": true,
-            "git": "https://github.com/ONSdigital/census-rm-qid-batch-runner",
-            "ref": "3d5fc747b879de578a5ef85503ba0565a2716920"
-        }
-    },
+    "default": {},
     "develop": {
         "asn1crypto": {
             "hashes": [
@@ -68,6 +61,11 @@
                 "sha256:8ea2d3ce97850f31e4a08b0e2b5e6c34997d7216a9d2c98e0f3978630d4da69a"
             ],
             "version": "==3.1.1"
+        },
+        "census-rm-qid-batch-runner": {
+            "editable": true,
+            "git": "https://github.com/ONSdigital/census-rm-qid-batch-runner",
+            "ref": "db870900478d84b0066c10da6d65912eb4407d52"
         },
         "certifi": {
             "hashes": [
@@ -323,11 +321,11 @@
         },
         "paramiko": {
             "hashes": [
-                "sha256:3c16b2bfb4c0d810b24c40155dbfd113c0521e7e6ee593d704e84b4c658a1f3b",
-                "sha256:a8975a7df3560c9f1e2b43dc54ebd40fd00a7017392ca5445ce7df409f900fcb"
+                "sha256:69c219df239775800a2589ee60159aa7cfd87175809b6557da7fb9dcb44ca430",
+                "sha256:9f081281064b5180dc0ef60e256224a280ff16f603a99f3dd4ba6334ebb65f7e"
             ],
             "index": "pypi",
-            "version": "==2.4.2"
+            "version": "==2.5.0"
         },
         "parse": {
             "hashes": [
