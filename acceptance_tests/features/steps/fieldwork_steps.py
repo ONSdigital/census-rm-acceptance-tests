@@ -15,7 +15,7 @@ def fwmt_messages_received(context, treatment_code):
         for sample_unit in context.sample_units.copy() if sample_unit['attributes']['TREATMENT_CODE'] == treatment_code
     ]
 
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                                     functools.partial(_callback, context=context))
 
     assert not context.expected_sample_units, 'Some messages are missing'

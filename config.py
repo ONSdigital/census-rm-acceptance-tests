@@ -2,7 +2,6 @@ import os
 
 
 class Config:
-
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
@@ -30,7 +29,7 @@ class Config:
     COLLECTION_INSTRUMENT_SERVICE_HOST = os.getenv('COLLECTION_INSTRUMENT_SERVICE_HOST', 'localhost')
     COLLECTION_INSTRUMENT_SERVICE_PORT = os.getenv('COLLECTION_INSTRUMENT_SERVICE_PORT', 8002)
     COLLECTION_INSTRUMENT_SERVICE = f'{PROTOCOL}://{COLLECTION_INSTRUMENT_SERVICE_HOST}:' \
-                                    f'{COLLECTION_INSTRUMENT_SERVICE_PORT}'
+        f'{COLLECTION_INSTRUMENT_SERVICE_PORT}'
 
     CASE_SERVICE_HOST = os.getenv('CASE_SERVICE_HOST', 'localhost')
     CASE_SERVICE_PORT = os.getenv('CASE_SERVICE_PORT', 8171)
@@ -39,7 +38,7 @@ class Config:
     RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
     RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
     RABBITMQ_VHOST = os.getenv('RABBITMQ_VHOST', '/')
-    RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'case.sample.inbound')
+    RABBITMQ_SAMPLE_INBOUND_QUEUE = os.getenv('RABBITMQ_QUEUE', 'case.sample.inbound')
     RABBITMQ_RH_OUTBOUND_CASE_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_CASE_QUEUE', 'case.rh.case')
     RABBITMQ_RH_OUTBOUND_UAC_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_UAC_QUEUE', 'case.rh.uac')
     RABBITMQ_OUTBOUND_FIELD_QUEUE = os.getenv('RABBITMQ_OUTBOUND_FIELD_QUEUE', 'Action.Field')
@@ -73,3 +72,6 @@ class Config:
 
     RABBITMQ_CASE_TEST_ROUTE = "event.case.*"
     RABBITMQ_UAC_TEST_ROUTE = "event.uac.*"
+
+    RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST = 'Action.Field.Test'
+    RABBITMQ_FIELD_TEST_ROUTE = "Action.Field.binding"

@@ -74,7 +74,7 @@ def add_queue(rabbitmq_amqp=RABBIT_AMQP,
     logger.info('Successfully initialised rabbitmq', exchange=exchange_name, binding=binding_key)
 
 
-def add_test_queue(rabbitmq_amqp, binding_key, exchange_name, queue_name):
+def add_test_queue(rabbitmq_amqp, binding_key, exchange_name, queue_name, exchange_type='topic'):
     """
     Initialise connection to rabbitmq
 
@@ -87,7 +87,7 @@ def add_test_queue(rabbitmq_amqp, binding_key, exchange_name, queue_name):
     logger.debug('Connecting to rabbitmq', url=rabbitmq_amqp)
     rabbitmq_connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_amqp))
     channel = rabbitmq_connection.channel()
-    channel.exchange_declare(exchange=exchange_name, exchange_type='topic', durable=True)
+    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
     channel.queue_declare(queue=queue_name, durable=True)
     channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)
     logger.info('Successfully initialised rabbitmq', exchange=exchange_name, binding=binding_key)
