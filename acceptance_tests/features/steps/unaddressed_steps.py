@@ -52,8 +52,8 @@ def validate_unaddressed_print_file(context):
     try:
         subprocess.run(
             ['docker', 'run',
-             '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
-             '--env', f'RABBITMQ_SERVICE_PORT=5672',
+             '--env', f'RABBITMQ_SERVICE_HOST={Config.RABBITMQ_HOST}',
+             '--env', f'RABBITMQ_SERVICE_PORT={Config.RABBITMQ_PORT}',
              '--env', f'DB_PORT=5432',
              '--env', f'DB_HOST=postgres',
              '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
