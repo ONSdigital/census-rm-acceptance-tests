@@ -49,17 +49,15 @@ def _uac_callback(ch, method, _properties, body, context):
 
 @when("the unaddressed batch is loaded, the print files are generated")
 def validate_unaddressed_print_file(context):
-    unaddressed_test_output = subprocess.run(
-        ['docker', 'run',
-         '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
-         '--env', f'RABBITMQ_SERVICE_PORT=5672',
-         '--env', f'DB_PORT=5432',
-         '--env', f'DB_HOST=postgres',
-         '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
-         'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
-        stdout=subprocess.PIPE)
-    if unaddressed_test_output.returncode != 0:
-        logger.error('Unaddressed print file test failed',
-                     captured_stdout=unaddressed_test_output.stdout.decode('utf-8'),
-                     return_code=unaddressed_test_output.returncode)
+    try:
+        subprocess.run(
+            ['docker', 'run',
+             '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
+             '--env', f'RABBITMQ_SERVICE_PORT=5672',
+             '--env', f'DB_PORT=5432',
+             '--env', f'DB_HOST=postgres',
+             '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
+             'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
+            check=True)
+    except subprocess.CalledProcessError:
         raise AssertionError(f'Unaddressed print file test failed')
