@@ -10,4 +10,4 @@ flake:
 test: package_vulnerability flake at_tests
 
 at_tests:
-	USE_LOCAL_DOCKER=True pipenv run python run.py --log_level WARN
+	pipenv run python run.py --log_level WARN
