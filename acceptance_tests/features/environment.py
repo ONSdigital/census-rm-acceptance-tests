@@ -9,11 +9,11 @@ from config import Config
 
 def before_all(context):
     _setup_google_auth()
-    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_CASE_TEST_ROUTE, "events",
+    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_CASE_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
                    Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
-    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_UAC_TEST_ROUTE, "events",
+    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_UAC_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
                    Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_FIELD_TEST_ROUTE, "action-outbound-exchange",
+    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_FIELD_TEST_ROUTE, Config.RABBITMQ_FIELD_TEST_ROUTE,
                    Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, 'direct')
 
 
