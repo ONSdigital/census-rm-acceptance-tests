@@ -8,7 +8,7 @@ from config import Config
 from acceptance_tests.utilities.test_case_helper import tc
 
 
-@then("messages are emitted to RH and Action Scheduler for with {qid_list_param} qids")
+@then("messages are emitted to RH and Action Scheduler with {qid_list_param} qids")
 def gather_messages_emitted(context, qid_list_param):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
