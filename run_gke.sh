@@ -51,16 +51,14 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
     --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
-    -- /bin/bash -c "sleep 2; behave acceptance_tests/features"
-
+    -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
 # Run acceptance tests for unaddressed batch
+# Pre-delete to avoid unintentionally running with an old image
 BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/master/qid-batch-runner.yml
+kubectl delete deploy qid-batch-runner --force --now || true
 kubectl apply -f ${BATCH_RUNNER_CONFIG}
-sleep 20
-OUTPUT=$(kubectl exec -it qid-batch-runner -- /app/run_acceptance_tests.sh)
-echo The output is $OUTPUT
-kubectl delete -f ${BATCH_RUNNER_CONFIG}
-TEST_RESULT=${OUTPUT: -16}
-echo $TEST_RESULT > ~/test_result.txt
-egrep "TESTS PASSED" ~/test_result.txt
+kubectl rollout status deploy qid-batch-runner --watch=true --timeout=30s
+kubectl exec -it $(kubectl get pods -o name | grep -m1 qid-batch-runner | cut -d'/' -f 2) \
+-- /bin/bash /app/run_acceptance_tests.sh
+kubectl delete deploy qid-batch-runner --force -now
