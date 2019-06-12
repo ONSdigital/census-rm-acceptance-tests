@@ -45,7 +45,8 @@ def _load_sample_units(action_plan_id: str, collection_exercise_id: str, sample_
             if count % 5000 == 0:
                 sys.stdout.write(f'\r{count} sample units loaded')
                 sys.stdout.flush()
-    print(f'\nAll sample units have been added to the queue {rabbit.queue_name}')
+
+    print(f'\nAll {count + 1} sample units have been added to the queue {rabbit.queue_name}')
     return sample_units
 
 
