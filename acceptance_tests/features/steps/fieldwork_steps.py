@@ -32,6 +32,7 @@ def _callback(ch, method, _properties, body, context):
         if _message_matches(sample_unit, root):
             del context.expected_sample_units[index]
             ch.basic_ack(delivery_tag=method.delivery_tag)
+            print('Have matching msg')
             break
     else:
         assert False, 'Found message on Action.Field case queue which did not match any expected sample units'

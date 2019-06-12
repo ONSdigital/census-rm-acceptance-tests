@@ -13,7 +13,7 @@ def before_all(context):
                    Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
     add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_UAC_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
                    Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_FIELD_TEST_ROUTE, Config.RABBITMQ_FIELD_TEST_ROUTE,
+    add_test_queue(Config.RABBITMQ_AMQP, Config.RABBITMQ_FIELD_TEST_ROUTE, Config.RABBITMQ_FIELD_EXCHNAGE_NAME,
                    Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, 'direct')
 
 
@@ -21,7 +21,7 @@ def after_all(context):
     with RabbitContext() as rabbit:
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-        rabbit.channel.queue_delete(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
+        # rabbit.channel.queue_delete(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
 def before_scenario(context, scenario):
