@@ -2,7 +2,6 @@ import functools
 import json
 import logging
 
-import pika
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import (
@@ -45,10 +44,9 @@ def store_all_msgs_in_context(ch, method, _properties, body, context, expected_m
         ch.stop_consuming()
 
 
-def add_test_queue(rabbitmq_amqp, binding_key, exchange_name, queue_name, exchange_type='topic'):
-    rabbitmq_connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_amqp))
-    channel = rabbitmq_connection.channel()
-    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
-    channel.queue_declare(queue=queue_name, durable=True)
-    channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)
-    logger.info('Successfully add test queue to rabbitmq', exchange=exchange_name, binding=binding_key)
+def add_test_queue(binding_key, exchange_name, queue_name, exchange_type='topic'):
+    with RabbitContext() as rabbit:
+        rabbit.channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
+        rabbit.channel.queue_declare(queue=queue_name, durable=True)
+        rabbit.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)
+        logger.info('Successfully add test queue to rabbitmq', exchange=exchange_name, binding=binding_key)
