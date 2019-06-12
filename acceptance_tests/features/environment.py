@@ -21,6 +21,7 @@ def after_all(context):
     with RabbitContext() as rabbit:
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
+        rabbit.channel.queue_delete(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
 def before_scenario(context, scenario):
