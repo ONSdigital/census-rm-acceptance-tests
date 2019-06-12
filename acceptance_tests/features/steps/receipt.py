@@ -2,20 +2,21 @@ import functools
 import json
 import time
 from datetime import datetime
+
 from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.utilities.date_utilities import convert_datetime_to_str
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 
 @step("a case receipt notification is received")
 def create_receipt_received_message_from_eq(context):
     context.receipted_case_id = get_first_case_by_event_type(context.messages_received, 'UAC_UPDATED')
-    with RabbitContext(queue_name='Case.Responses') as rabbit:
+    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
         rabbit.publish_message(
             message=_create_receipt_received_json(context.receipted_case_id),
             content_type='application/json')
