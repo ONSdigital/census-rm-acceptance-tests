@@ -2,7 +2,6 @@ import os
 
 
 class Config:
-
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
@@ -20,7 +19,7 @@ class Config:
     RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
     RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
     RABBITMQ_VHOST = os.getenv('RABBITMQ_VHOST', '/')
-    RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'case.sample.inbound')
+    RABBITMQ_SAMPLE_INBOUND_QUEUE = os.getenv('RABBITMQ_QUEUE', 'case.sample.inbound')
     RABBITMQ_RH_OUTBOUND_CASE_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_CASE_QUEUE', 'case.rh.case')
     RABBITMQ_RH_OUTBOUND_UAC_QUEUE = os.getenv('RABBITMQ_RH_OUTBOUND_UAC_QUEUE', 'case.rh.uac')
     RABBITMQ_UNADDRESSED_REQUEST_QUEUE = os.getenv('RABBITMQ_UNADDRESSED_REQUEST_QUEUE', 'unaddressedRequestQueue')
@@ -40,3 +39,13 @@ class Config:
 
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+
+    # For test queues
+    RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST = 'case.rh.case.test'
+    RABBITMQ_CASE_TEST_ROUTE = os.getenv('RH_CASE_ROUTING_KEY', 'event.case.*')
+    RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST = 'case.rh.uac.test'
+    RABBITMQ_UAC_TEST_ROUTE = os.getenv('RH_UAC_ROUTING_KEY', "event.uac.*")
+    RABBITMQ_RH_EXCHANGE_NAME = os.getenv('RH_EXCHANGE_NAME', "events")
+    RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST = 'Action.Field.Test'
+    RABBITMQ_FIELD_TEST_ROUTE = os.getenv('FWMT_ROUTING_KEY', 'Action.Field.binding')
+    RABBITMQ_FIELD_EXCHNAGE_NAME = os.getenv('FWMT_EXCHANGE_NAME', 'action-outbound-exchange')
