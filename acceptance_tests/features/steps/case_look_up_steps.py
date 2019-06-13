@@ -53,7 +53,7 @@ def get_non_existent_case_id(context):
 
 @then('caseapi returns multiple cases for a UPRN')
 def find_multiple_cases_by_uprn(context):
-    response = requests.get(f'{caseapi_url}uprn/10008677190')
+    response = requests.get(f'{caseapi_url}uprn/10008677191')
     response.raise_for_status()
 
     response_data = json.loads(response.content)
