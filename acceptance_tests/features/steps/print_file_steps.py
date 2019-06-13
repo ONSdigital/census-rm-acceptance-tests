@@ -1,4 +1,3 @@
-import functools
 import hashlib
 import json
 import logging
@@ -6,8 +5,8 @@ import logging
 from behave import then
 from retrying import retry
 from structlog import wrap_logger
-from acceptance_tests.utilities.print_file_helper import create_expected_csv_lines, create_expected_wales_csv_lines
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.print_file_helper import create_expected_questionaire_csv_lines, \
+    create_expected_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
@@ -15,32 +14,9 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@then('messages are emitted to RH and Action Scheduler')
-def gather_messages_emitted(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(_callback, context=context))
-
-    # the case created events have been received and we are now expecting the same number of uacupdated events (2x)
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(_callback, context=context, multiplier=2))
-
-
-@then('messages are emitted to RH and Action Scheduler for wales questionnaire')
-def gather_messages_emitted_wales(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(_callback, context=context))
-
-    # for Welsh questionnaires there are 2 uac_created events plus a case created event
-    # so there are 3 events in total
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(_callback, context=context, multiplier=3))
-
-
-@then('correctly formatted "{prefix}" print files are created for wales questionnaire')
+@then('correctly formatted "{prefix}" print files are created for questionnaire')
 def check_correct_wales_files_on_sftp_server(context, prefix):
-    expected_csv_lines = create_expected_wales_csv_lines(context, prefix)
+    expected_csv_lines = create_expected_questionaire_csv_lines(context, prefix)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
@@ -50,7 +26,7 @@ def check_correct_files_on_sftp_server(context, prefix):
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-def _callback(ch, method, _properties, body, context, multiplier=1):
+def _msgs_received(ch, method, _properties, body, context, multiplier=1):
     parsed_body = json.loads(body)
     context.messages_received.append(parsed_body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -70,7 +46,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
         _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, prefix)
 
 
-@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=5000, stop_max_attempt_number=24)
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, prefix):
     logger.debug('Checking for files on SFTP server')
 
@@ -123,15 +99,7 @@ def _get_matching_manifest_file(filename, files):
 def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     actual_file_contents = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{csv_file.filename}')
 
-    if "P_IC_ICL1" in prefix:
-        country = 'England'
-        purpose = 'Initial contact letter households'
-    if "P_IC_ICL2" in prefix:
-        country = 'Wales'
-        purpose = 'Initial contact letter households'
-    if "P_IC_H2" in prefix:
-        country = 'Wales'
-        purpose = 'Initial contact questionnaire households'
+    purpose, country = _get_country_and_purpose(prefix)
 
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
@@ -154,3 +122,25 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     )
 
     return manifest
+
+
+def _get_country_and_purpose(prefix):
+    if "P_IC_ICL1" == prefix:
+        return 'Initial contact letter households', 'England'
+
+    if "P_IC_ICL2" == prefix:
+        return 'Initial contact letter households', 'Wales'
+
+    if "P_IC_ICL4" == prefix:
+        return 'Initial contact letter households', 'Northern Ireland'
+
+    if "P_IC_H1" == prefix:
+        return 'Initial contact questionnaire households', 'England'
+
+    if "P_IC_H2" == prefix:
+        return 'Initial contact questionnaire households', 'Wales'
+
+    if "P_IC_H4" == prefix:
+        return 'Initial contact questionnaire households', 'Northern Ireland'
+
+    assert False, f'Unexpected Prefix: {prefix}'

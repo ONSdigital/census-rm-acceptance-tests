@@ -21,7 +21,7 @@ def send_unaddressed_message(context, questionnaire_type):
 @then("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(_uac_callback, context=context))
 
     assert context.expected_message_received
