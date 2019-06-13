@@ -54,7 +54,8 @@ class Config:
     SFTP_HOST = os.getenv('SFTP_HOST', 'localhost')
     SFTP_PORT = os.getenv('SFTP_PORT', '122')
     SFTP_USERNAME = os.getenv('SFTP_USERNAME', 'centos')
-    SFTP_KEY_FILENAME = os.getenv('SFTP_KEY_FILENAME', 'id_rsa')
+    SFTP_KEY_FILENAME = os.getenv('SFTP_KEY_FILENAME', None)
+    SFTP_KEY = os.getenv('SFTP_KEY', None)
     SFTP_PASSPHRASE = os.getenv('SFTP_PASSPHRASE', 'secret')
     SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp/print_service')
 

@@ -41,8 +41,11 @@ echo "Running RM Acceptance Tests [`kubectl config current-context`]..."
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --image=$IMAGE --restart=Never \
     $(while read env; do echo --env=${env}; done < kubernetes.env) \
-    --env=SFTP_USERNAME=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
-    --env=SFTP_PASSWORD=$(kubectl get secret sftp-credentials -o=jsonpath="{.data.password}" | base64 --decode) \
+    --env=SFTP_HOST=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.host}" | base64 --decode) \
+    --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
+    --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
+    --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
+    --env=SFTP_DIR=${GCP_PROJECT}/upload/print_service/ \
     --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
     --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
     --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
