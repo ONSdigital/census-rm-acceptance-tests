@@ -55,7 +55,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
 
 # Run acceptance tests for unaddressed batch
 # Pre-delete to avoid unintentionally running with an old image
-BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/temp-image-location/qid-batch-runner.yml
+BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/master/generate_qid_batch.py
 kubectl delete deploy qid-batch-runner --force --now || true
 kubectl apply -f ${BATCH_RUNNER_CONFIG}
 kubectl rollout status deploy qid-batch-runner --watch=true
