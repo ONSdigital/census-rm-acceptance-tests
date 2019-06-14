@@ -34,6 +34,10 @@ To run the acceptance tests (`latest` image in GCR) in a pod in census-rm-ci:
 ```bash
 ./run_gke.sh
 ```
+To run the acceptance tests in a pod in a dev GCP project with a dummy SFTP server:
+```bash
+USE_LOCAL_SFTP=true ENV=test-env ./run_gke.sh
+```
 To run a locally-modified version of the acceptance tests in a pod in a dev GCP project (builds and pushes the docker image to the project's GCR):
 ```bash
 BUILD=true ENV=test-env ./run_gke.sh

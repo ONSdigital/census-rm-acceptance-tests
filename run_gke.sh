@@ -38,23 +38,43 @@ if [ "$NAMESPACE" ]; then
 fi
 echo "Running RM Acceptance Tests [`kubectl config current-context`]..."
 
-kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
-    --image=$IMAGE --restart=Never \
-    $(while read env; do echo --env=${env}; done < kubernetes.env) \
-    --env=SFTP_HOST=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.host}" | base64 --decode) \
-    --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
-    --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
-    --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
-    --env=SFTP_DIR=${GCP_PROJECT}/upload/print_service/ \
-    --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
-    --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
-    --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
-    --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
-    --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
-    --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
-    --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
-    --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
-    -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
+if [ -z "$USE_LOCAL_SFTP" ]; then
+    kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
+        --image=$IMAGE --restart=Never \
+        $(while read env; do echo --env=${env}; done < kubernetes.env) \
+        --env=SFTP_HOST=sftp \
+        --env=SFTP_USERNAME=testuser \
+        --env=SFTP_PASSWORD=testpassword \
+        --env=SFTP_DIR=upload/print_service/ \
+        --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
+        --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
+        --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
+        --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
+        --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
+        --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
+        --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
+        --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
+        -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
+else
+    kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
+        --image=$IMAGE --restart=Never \
+        $(while read env; do echo --env=${env}; done < kubernetes.env) \
+        --env=SFTP_HOST=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.host}" | base64 --decode) \
+        --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
+        --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
+        --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
+        --env=SFTP_DIR=${GCP_PROJECT}/upload/print_service/ \
+        --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
+        --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
+        --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
+        --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
+        --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
+        --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
+        --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
+        --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
+        -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
+fi
+
 
 # Run acceptance tests for unaddressed batch
 # Pre-delete to avoid unintentionally running with an old image
