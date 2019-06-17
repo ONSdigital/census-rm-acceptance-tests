@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 
 import paramiko
@@ -9,10 +10,18 @@ class SftpUtility:
     def __init__(self):
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        if Config.SFTP_KEY:
+            private_key_string = base64.b64decode(Config.SFTP_KEY).decode("utf-8")
+            with open('sftp_private_key', 'w') as key_file:
+                key_file.write(private_key_string)
+                Config.SFTP_KEY_FILENAME = key_file.name
+
         self.ssh_client.connect(hostname=Config.SFTP_HOST,
                                 port=int(Config.SFTP_PORT),
                                 username=Config.SFTP_USERNAME,
-                                password=Config.SFTP_PASSWORD,
+                                key_filename=Config.SFTP_KEY_FILENAME,
+                                passphrase=Config.SFTP_PASSPHRASE,
                                 look_for_keys=False,
                                 timeout=120)
 

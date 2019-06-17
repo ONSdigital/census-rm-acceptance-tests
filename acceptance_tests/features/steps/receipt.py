@@ -3,7 +3,7 @@ import json
 import time
 from datetime import datetime
 
-from behave import when, then, step
+from behave import when, step, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
@@ -13,51 +13,9 @@ from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_q
 from config import Config
 
 
-@step("a case receipt notification is received")
-def create_receipt_received_message_from_eq(context):
-    context.receipted_case_id = get_first_case_by_event_type(context.messages_received, 'UAC_UPDATED')
-    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
-        rabbit.publish_message(
-            message=_create_receipt_received_json(context.receipted_case_id),
-            content_type='application/json')
-
-
-@step("the correct case and uac are emitted")
-def correct_case_and_uac_emitted(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=1, type_filter='UAC_UPDATED'))
-
-    assert len(context.messages_received) == 1
-
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=1, type_filter='CASE_CREATED'))
-    assert len(context.messages_received) == 1
-    context.emitted_case = context.messages_received[0]['payload']['collectionCase']
-    assert context.emitted_case['address']['arid'] == context.sample_units[0]['attributes']['ARID']
-
-
-@step("all correct case and uac messages are emitted")
-def all_correct_cases_and_uacs_emitted(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=5, type_filter='UAC_UPDATED'))
-
-    assert len(context.messages_received) == 5
-
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=5, type_filter='CASE_CREATED'))
-    assert len(context.messages_received) == 5
-
-
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     _publish_object_finalize(context, case_id=context.emitted_case['id'])
     assert context.sent_to_gcp is True
 
@@ -65,7 +23,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,
@@ -75,6 +33,19 @@ def uac_updated_msg_emitted(context):
     uac = context.messages_received[0]['payload']['uac']
     assert uac['caseId'] == context.emitted_case['id']
     assert uac['active'] is False
+
+
+@step("a case receipt notification is received")
+def create_receipt_received_message_from_eq(context):
+    case_created_events = context.all_messages_received[0]
+
+    # First case in list will be receipted
+    context.receipted_case_id = case_created_events[0]['payload']['collectionCase']['id']
+
+    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
+        rabbit.publish_message(
+            message=_create_receipt_received_json(context.receipted_case_id),
+            content_type='application/json')
 
 
 def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="0"):
