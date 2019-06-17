@@ -38,7 +38,7 @@ if [ "$NAMESPACE" ]; then
 fi
 echo "Running RM Acceptance Tests [`kubectl config current-context`]..."
 
-PROJECT_NAME_CONFIG = $(kubectl get configmap project-config -o=jsonpath="{.data.project-name}")
+PROJECT_NAME_CONFIG=$(kubectl get configmap project-config -o=jsonpath="{.data.project-name}")
 
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --image=$IMAGE --restart=Never \
