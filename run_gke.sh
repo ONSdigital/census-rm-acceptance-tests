@@ -38,7 +38,7 @@ if [ "$NAMESPACE" ]; then
 fi
 echo "Running RM Acceptance Tests [`kubectl config current-context`]..."
 
-PROJECT_NAME_CONFIG=$(kubectl get configmap project-config -o=jsonpath="{.data.project-name}")
+SFTP_TARGET_DIRECTORY=$(kubectl get configmap project-config -o=jsonpath="{.data.sftp-target-directory}")
 
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --image=$IMAGE --restart=Never \
@@ -47,7 +47,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
     --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
     --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
-    --env=SFTP_DIR=${PROJECT_NAME_CONFIG}/upload/print_service/ \
+    --env=SFTP_DIR=${SFTP_TARGET_DIRECTORY}/print_service/ \
     --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
     --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
     --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
