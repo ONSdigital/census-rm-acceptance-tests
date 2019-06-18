@@ -5,11 +5,11 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     expected_data = defaultdict(dict)
 
     for uac in context.uac_created_events:
-        if ignore_case_id == None or uac['payload']['uac']['caseId'] != ignore_case_id:
+        if ignore_case_id is None or uac['payload']['uac']['caseId'] != ignore_case_id:
             expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
 
     for case in context.case_created_events:
-        if ignore_case_id == None or case['payload']['collectionCase']['id'] != ignore_case_id:
+        if ignore_case_id is None or case['payload']['collectionCase']['id'] != ignore_case_id:
             expected_data = _add_expected_case_data(case, expected_data)
 
     return [
