@@ -83,17 +83,3 @@ def _create_receipt_received_json(case_id) -> str:
     create_receipt_received = {'case_id': case_id,
                                'response_dateTime': convert_datetime_to_str(datetime.now())}
     return json.dumps(create_receipt_received)
-
-
-def get_first_case_by_event_type(messages, event_type):
-    case_id = None
-
-    for message in messages:
-        if message['event']['type'] == event_type:
-            case_id = message['payload']['uac']['caseId']
-            break
-
-    if case_id is None:
-        assert False
-
-    return case_id
