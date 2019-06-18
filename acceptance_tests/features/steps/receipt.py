@@ -37,10 +37,8 @@ def uac_updated_msg_emitted(context):
 
 @step("a case receipt notification is received")
 def create_receipt_received_message_from_eq(context):
-    case_created_events = context.all_messages_received[0]
-
     # First case in list will be receipted
-    context.receipted_case_id = case_created_events[0]['payload']['collectionCase']['id']
+    context.receipted_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
     with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
         rabbit.publish_message(

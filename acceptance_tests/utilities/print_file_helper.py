@@ -1,33 +1,15 @@
 from collections import defaultdict
 
 
-def create_expected_csv_lines(context, prefix):
+def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     expected_data = defaultdict(dict)
 
     for uac in context.uac_created_events:
-        expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
-
-    for case in context.case_created_events:
-        expected_data = _add_expected_case_data(case, expected_data)
-
-    return [
-        _create_expected_csv_line(case, prefix)
-        for case in expected_data.values()
-    ]
-
-
-def create_expected_unreceipted_csv_lines(context, prefix, ignore_case_id):
-    expected_data = defaultdict(dict)
-
-    case_created_events = context.all_messages_received[0]
-    uac_created_events = context.all_messages_received[1]
-
-    for uac in uac_created_events:
-        if uac['payload']['uac']['caseId'] != ignore_case_id:
+        if ignore_case_id == None or uac['payload']['uac']['caseId'] != ignore_case_id:
             expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
 
-    for case in case_created_events:
-        if case['payload']['collectionCase']['id'] != ignore_case_id:
+    for case in context.case_created_events:
+        if ignore_case_id == None or case['payload']['collectionCase']['id'] != ignore_case_id:
             expected_data = _add_expected_case_data(case, expected_data)
 
     return [

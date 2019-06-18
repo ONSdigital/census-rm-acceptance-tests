@@ -11,7 +11,6 @@ from config import Config
 @step("messages are emitted to RH and Action Scheduler with {qid_list_param} qids")
 def gather_messages_emitted_with_qids(context, qid_list_param):
     context.messages_received = []
-    context.all_messages_received = []
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
@@ -20,7 +19,6 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
     assert len(context.messages_received) == len(context.sample_units)
     _test_cases_correct(context)
 
-    context.all_messages_received.append(context.messages_received)
     context.messages_received = []
 
     context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, qid_list_param)
@@ -31,7 +29,6 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
     assert len(context.messages_received) == len(context.expected_uacs_cases)
     _test_uacs_correct(context)
 
-    context.all_messages_received.append(context.messages_received)
     context.messages_received = []
 
 
