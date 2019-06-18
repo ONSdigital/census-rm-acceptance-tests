@@ -52,12 +52,19 @@ def validate_unaddressed_print_file(context):
     try:
         subprocess.run(
             ['docker', 'run',
-             '--env', f'RABBITMQ_SERVICE_HOST=rabbitmq',
-             '--env', f'RABBITMQ_SERVICE_PORT=5672',
-             '--env', f'DB_PORT=5432',
-             '--env', f'DB_HOST=postgres',
+             '--env', 'DB_HOST=postgres',
+             '--env', 'DB_PORT=5432',
+             '--env', 'OUR_PUBLIC_KEY_PATH=dummy_keys/our_dummy_public.asc',
+             '--env', 'OTHER_PUBLIC_KEY_PATH=dummy_keys/supplier_dummy_public.asc',
+             '--env', 'RABBITMQ_SERVICE_HOST=rabbitmq',
+             '--env', 'RABBITMQ_SERVICE_PORT=5672',
+             '--env', 'SFTP_DIRECTORY=Documents/sftp/',
+             '--env', 'SFTP_HOST=sftp',
+             '--env', 'SFTP_KEY_FILENAME=dummy_keys/dummy_rsa',
+             '--env', 'SFTP_PASSPHRASE=secret',
+             '--env', 'SFTP_USERNAME=centos',
              '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
              'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
             check=True)
     except subprocess.CalledProcessError:
-        raise AssertionError(f'Unaddressed print file test failed')
+        raise AssertionError('Unaddressed print file test failed')
