@@ -28,6 +28,8 @@ run:
       gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
 
+      SFTP_TARGET_DIRECTORY=$(kubectl get configmap project-config -o=jsonpath="{.data.sftp-target-directory}")
+
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
@@ -40,7 +42,7 @@ run:
       --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
       --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
       --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
-      --env=SFTP_DIR=${GCP_PROJECT_NAME}/upload/print_service/ \
+      --env=SFTP_DIR=${SFTP_TARGET_DIRECTORY}/print_service/ \
       --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
       --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
       --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \

@@ -46,6 +46,10 @@ Build and push a locally-modified version of the acceptance tests and then run i
 ```bash
 BUILD=true IMAGE="eu.gcr.io/census-rm-at/rm/census-rm-acceptance-tests:latest" ENV=test-env ./run_gke.sh
 ```
+To run the acceptance tests against a different branch of the QID batch runner:
+```bash
+QID_BATCH_BRANCH=<branch> ./run_gke.sh
+```
 
 ### Script Environment variables
 

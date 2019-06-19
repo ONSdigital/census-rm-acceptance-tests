@@ -38,7 +38,7 @@ if [ "$NAMESPACE" ]; then
 fi
 echo "Running RM Acceptance Tests [`kubectl config current-context`]..."
 
-PROJECT_NAME_CONFIG=$(kubectl get configmap project-config -o=jsonpath="{.data.project-name}")
+SFTP_TARGET_DIRECTORY=$(kubectl get configmap project-config -o=jsonpath="{.data.sftp-target-directory}")
 
 kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --image=$IMAGE --restart=Never \
@@ -47,7 +47,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=SFTP_USERNAME=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.username}" | base64 --decode) \
     --env=SFTP_KEY=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.private-key}") \
     --env=SFTP_PASSPHRASE=$(kubectl get secret sftp-ssh-credentials -o=jsonpath="{.data.passphrase}" | base64 --decode) \
-    --env=SFTP_DIR=${PROJECT_NAME_CONFIG}/upload/print_service/ \
+    --env=SFTP_DIR=${SFTP_TARGET_DIRECTORY}/print_service/ \
     --env=REDIS_SERVICE_HOST=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-host}") \
     --env=REDIS_SERVICE_PORT=$(kubectl get configmap redis-config -o=jsonpath="{.data.redis-port}") \
     --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
@@ -58,9 +58,14 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
+if [ -z "$QID_BATCH_BRANCH" ]; then
+    QID_BATCH_BRANCH=master
+fi
+
+
 # Run acceptance tests for unaddressed batch
 # Pre-delete to avoid unintentionally running with an old image
-BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/master/qid-batch-runner.yml
+BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/$QID_BATCH_BRANCH/qid-batch-runner.yml
 kubectl delete deploy qid-batch-runner --force --now || true
 kubectl apply -f ${BATCH_RUNNER_CONFIG}
 kubectl rollout status deploy qid-batch-runner --watch=true
