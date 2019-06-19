@@ -58,9 +58,14 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
+if [ -z "$QID_BATCH_BRANCH" ]; then
+    QID_BATCH_BRANCH=master
+fi
+
+
 # Run acceptance tests for unaddressed batch
 # Pre-delete to avoid unintentionally running with an old image
-BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/master/qid-batch-runner.yml
+BATCH_RUNNER_CONFIG=https://raw.githubusercontent.com/ONSdigital/census-rm-qid-batch-runner/$QID_BATCH_BRANCH/qid-batch-runner.yml
 kubectl delete deploy qid-batch-runner --force --now || true
 kubectl apply -f ${BATCH_RUNNER_CONFIG}
 kubectl rollout status deploy qid-batch-runner --watch=true
