@@ -45,6 +45,6 @@ Feature: Checks that input sample files and action rules results in correct prin
   Scenario: Receipted Cases are excluded from print files
     Given an action rule of type ICL1E is set 10 seconds in the future
     And sample file "sample_input_england_census_spec.csv" is loaded
-    Then messages are emitted to RH and Action Scheduler with [01] qids
+    When messages are emitted to RH and Action Scheduler with [01] qids
     And a case receipt notification is received
-    And only unreceipted cases appear in "P_IC_ICL1" print files
+    Then only unreceipted cases appear in "P_IC_ICL1" print files
