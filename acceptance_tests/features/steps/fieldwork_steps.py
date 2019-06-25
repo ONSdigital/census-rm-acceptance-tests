@@ -3,6 +3,7 @@ import functools
 from behave import then
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 import xml.etree.ElementTree as ET
@@ -30,6 +31,7 @@ def _callback(ch, method, _properties, body, context):
 
     for index, sample_unit in enumerate(context.expected_sample_units):
         if _message_matches(sample_unit, root):
+            _message_valid(sample_unit, root)
             del context.expected_sample_units[index]
             ch.basic_ack(delivery_tag=method.delivery_tag)
             print('Have matching msg')
@@ -43,3 +45,9 @@ def _callback(ch, method, _properties, body, context):
 
 def _message_matches(sample_unit, root):
     return root.find('.//arid').text == sample_unit['attributes']['ARID']
+
+
+def _message_valid(sample_unit, root):
+    tc.assertEqual(sample_unit['attributes']['LATITUDE'], root.find('.//latitude').text)
+    tc.assertEqual(sample_unit['attributes']['LONGITUDE'], root.find('.//longitude').text)
+    tc.assertEqual(sample_unit['attributes']['POSTCODE'], root.find('.//postcode').text)
