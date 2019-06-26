@@ -5,6 +5,7 @@ import logging
 from behave import then
 from retrying import retry
 from structlog import wrap_logger
+
 from acceptance_tests.utilities.print_file_helper import create_expected_questionaire_csv_lines, \
     create_expected_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
@@ -23,6 +24,12 @@ def check_correct_wales_files_on_sftp_server(context, prefix):
 @then('correctly formatted "{prefix}" print files are created')
 def check_correct_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
+
+
+@then('only unreceipted cases appear in "{prefix}" print files')
+def check_correct_unreceipted_files_on_sftp_server(context, prefix):
+    expected_csv_lines = create_expected_csv_lines(context, prefix, context.receipted_case_id)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
@@ -54,7 +61,10 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
 
     actual_content_list = sftp_utility.get_files_content_as_list(files)
 
-    if set(actual_content_list) != set(expected_csv_lines):
+    actual_content_list.sort()
+    expected_csv_lines.sort()
+
+    if actual_content_list != expected_csv_lines:
         file_names = [f.filename for f in files]
         logger.info('Unable to find all expected data in existing files', files_found=file_names,
                     expected_csv_lines=expected_csv_lines, actual_content_list=actual_content_list)

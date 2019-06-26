@@ -9,8 +9,9 @@ from config import Config
 
 
 @step("messages are emitted to RH and Action Scheduler with {qid_list_param} qids")
-def gather_messages_emitted(context, qid_list_param):
+def gather_messages_emitted_with_qids(context, qid_list_param):
     context.messages_received = []
+
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.sample_units),
@@ -19,6 +20,7 @@ def gather_messages_emitted(context, qid_list_param):
     _test_cases_correct(context)
 
     context.messages_received = []
+
     context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, qid_list_param)
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
@@ -26,6 +28,7 @@ def gather_messages_emitted(context, qid_list_param):
                                                       type_filter='UAC_UPDATED'))
     assert len(context.messages_received) == len(context.expected_uacs_cases)
     _test_uacs_correct(context)
+
     context.messages_received = []
 
 

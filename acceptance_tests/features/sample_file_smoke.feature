@@ -41,3 +41,10 @@ Feature: Checks that input sample files and action rules results in correct prin
     Then messages are emitted to RH and Action Scheduler with [04] qids
     And correctly formatted "P_IC_H4" print files are created for questionnaire
     And there is a correct "P_IC_H4" manifest file for each csv file written
+
+  Scenario: Receipted Cases are excluded from print files
+    Given an action rule of type ICL1E is set 10 seconds in the future
+    And sample file "sample_input_england_census_spec.csv" is loaded
+    When messages are emitted to RH and Action Scheduler with [01] qids
+    And a case receipt notification is received
+    Then only unreceipted cases appear in "P_IC_ICL1" print files
