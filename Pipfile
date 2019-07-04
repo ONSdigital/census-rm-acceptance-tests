@@ -14,6 +14,10 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
+census-rm-sample-loader = {editable = true, git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "916-source-of-truth"}
 
 [requires]
 python_version = "3.6"
+
+[packages]
+

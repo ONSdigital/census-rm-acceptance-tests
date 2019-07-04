@@ -1,8 +1,7 @@
 import json
 
 from behave import step
-
-from acceptance_tests.utilities.sample_loader.load_sample import load_sample_file
+from load_sample import load_sample_file
 
 
 @step('sample file "{sample_file_name}" is loaded')
