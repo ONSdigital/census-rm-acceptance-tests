@@ -115,20 +115,20 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
 
     _file = dict(
-        sizeBytes=expected_size,
-        md5sum=md5_hash,
-        relativePath='.\\',
+        sizeBytes=str(expected_size),
+        md5Sum=md5_hash,
+        relativePath='./',
         name=csv_file.filename
     )
 
     manifest = dict(
-        schemaVersion=1,
+        schemaVersion='1',
         files=[_file],
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
         description=f'{purpose} - {country}',
         dataset="PPD1.1",
-        version=1
+        version='1'
     )
 
     return manifest

@@ -2,6 +2,7 @@ import base64
 from datetime import datetime
 
 import paramiko
+import pgpy
 
 from config import Config
 
@@ -56,7 +57,8 @@ class SftpUtility:
     def _get_file_lines_as_list(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
             content = sftp_file.read().decode('utf-8')
-            return content.rstrip().split('\n')
+            decrypted_content = self.decrypt_message(content)
+            return decrypted_content.rstrip().split('\n')
 
     def get_file_contents_as_string(self, file_path):
         with self._sftp_client.open(file_path) as sftp_file:
@@ -64,3 +66,11 @@ class SftpUtility:
 
     def get_file_size(self, file_path):
         return self._sftp_client.lstat(file_path).st_size
+
+    def decrypt_message(self, message):
+        our_key, _ = pgpy.PGPKey.from_file('our_dummy_private.asc')
+        with our_key.unlock('test'):
+            encrypted_text_message = pgpy.PGPMessage.from_blob(message)
+            message_text = our_key.decrypt(encrypted_text_message)
+
+            return message_text.message
