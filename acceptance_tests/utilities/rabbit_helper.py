@@ -3,10 +3,7 @@ import json
 import logging
 
 from structlog import wrap_logger
-
-from acceptance_tests.utilities.rabbit_context import (
-    RabbitContext
-)
+from rabbit_context import RabbitContext
 
 logger = wrap_logger(logging.getLogger(__name__))
 

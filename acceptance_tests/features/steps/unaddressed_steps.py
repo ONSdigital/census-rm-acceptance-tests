@@ -6,7 +6,7 @@ import subprocess
 from behave import then, when
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.rabbit_context import RabbitContext
+from rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config

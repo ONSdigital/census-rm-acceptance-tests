@@ -63,7 +63,7 @@
         "census-rm-sample-loader": {
             "editable": true,
             "git": "https://github.com/ONSdigital/census-rm-sample-loader",
-            "ref": "aa6d629edae8ae5c65f497d1af17285052bcfaab"
+            "ref": "f26060d4ec82b129256bbc980541412642346cfc"
         },
         "certifi": {
             "hashes": [
