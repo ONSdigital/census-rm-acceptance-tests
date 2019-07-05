@@ -6,6 +6,7 @@ Feature: Checks that input sample files and action rules results in correct prin
     Then messages are emitted to RH and Action Scheduler with [01] qids
     And correctly formatted "P_IC_ICL1" print files are created
     And there is a correct "P_IC_ICL1" manifest file for each csv file written
+    And events of pack code "P_IC_ICL1" are logged against the case
 
   Scenario: Successful sample file upload and Wales ICL print file
     Given an action rule of type ICL2W is set 10 seconds in the future
