@@ -18,7 +18,7 @@ def before_all(_):
 
 
 def after_all(context):
-    with RabbitContext() as rabbit:
+    with RabbitContext(port=Config.RABBITMQ_PORT) as rabbit:
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
         rabbit.channel.queue_delete(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
@@ -33,7 +33,7 @@ def before_scenario(context, _):
 
 
 def _purge_queues():
-    with RabbitContext() as rabbit:
+    with RabbitContext(port=Config.RABBITMQ_PORT) as rabbit:
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
