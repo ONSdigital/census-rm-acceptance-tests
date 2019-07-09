@@ -46,5 +46,5 @@ Feature: Checks that input sample files and action rules results in correct prin
     Given an action rule of type ICL1E is set 10 seconds in the future
     And sample file "sample_input_england_census_spec.csv" is loaded
     When messages are emitted to RH and Action Scheduler with [01] qids
-    And a case receipt notification is received
+    And the receipt msg for a created case is put on the GCP pubsub
     Then only unreceipted cases appear in "P_IC_ICL1" print files
