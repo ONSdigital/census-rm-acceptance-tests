@@ -6,11 +6,11 @@ from behave import then
 from retrying import retry
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PACK_CODE_TO_DATASET
 from acceptance_tests.utilities.print_file_helper import create_expected_questionaire_csv_lines, \
     create_expected_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
-from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -59,7 +59,7 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
 
     files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv")
 
-    actual_content_list = sftp_utility.get_files_content_as_list(files)
+    actual_content_list = sftp_utility.get_files_content_as_list(files, prefix)
 
     actual_content_list.sort()
     expected_csv_lines.sort()
@@ -85,14 +85,15 @@ def _check_manifest_files_created(context, prefix):
                 if manifest_file is None:
                     assert False, f'Failed to find manifest file for {csv_file.filename}'
 
-                actual_manifest = _get_actual_manifest(sftp_utility, manifest_file)
+                actual_manifest = _get_actual_manifest(sftp_utility, manifest_file, prefix)
                 creation_datetime = actual_manifest['manifestCreated']
                 expected_manifest = _create_expected_manifest(sftp_utility, csv_file, creation_datetime, prefix)
                 tc.assertDictEqual(actual_manifest, expected_manifest)
 
 
-def _get_actual_manifest(sftp_utility, manifest_file):
-    actual_manifest_json = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{manifest_file.filename}')
+def _get_actual_manifest(sftp_utility, manifest_file, prefix):
+    actual_manifest_json = sftp_utility.get_file_contents_as_string(f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}/'
+                                                                    f'{manifest_file.filename}')
     return json.loads(actual_manifest_json)
 
 
@@ -107,12 +108,13 @@ def _get_matching_manifest_file(filename, files):
 
 
 def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
-    actual_file_contents = sftp_utility.get_file_contents_as_string(f'{Config.SFTP_DIR}/{csv_file.filename}')
+    actual_file_contents = sftp_utility.get_file_contents_as_string(f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}'
+                                                                    f'/{csv_file.filename}')
 
     purpose, country = _get_country_and_purpose(prefix)
 
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
-    expected_size = sftp_utility.get_file_size(f'{Config.SFTP_DIR}/{csv_file.filename}')
+    expected_size = sftp_utility.get_file_size(f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}/{csv_file.filename}')
 
     _file = dict(
         sizeBytes=str(expected_size),
@@ -127,7 +129,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
         description=f'{purpose} - {country}',
-        dataset="PPD1.1",
+        dataset=PACK_CODE_TO_DATASET[prefix],
         version='1'
     )
 

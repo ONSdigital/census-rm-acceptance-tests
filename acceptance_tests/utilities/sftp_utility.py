@@ -4,6 +4,7 @@ from datetime import datetime
 import paramiko
 import pgpy
 
+from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY
 from config import Config
 
 
@@ -34,7 +35,7 @@ class SftpUtility:
         self.ssh_client.close()
 
     def get_all_files_after_time(self, period_start_time, prefix, suffix=""):
-        files = self._sftp_client.listdir_attr(Config.SFTP_DIR)
+        files = self._sftp_client.listdir_attr(PACK_CODE_TO_SFTP_DIRECTORY[prefix])
         period = period_start_time.strftime('%Y-%m-%d')
 
         return [
@@ -44,11 +45,11 @@ class SftpUtility:
                 and period_start_time <= datetime.fromtimestamp(_file.st_mtime)
             ]
 
-    def get_files_content_as_list(self, files):
+    def get_files_content_as_list(self, files, prefix):
         actual_content = []
 
         for _file in files:
-            file_path = f'{Config.SFTP_DIR}/{_file.filename}'
+            file_path = f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}/{_file.filename}'
             content_list = self._get_file_lines_as_list(file_path)
             actual_content.extend(content_list)
 
