@@ -35,7 +35,8 @@ class Config:
     SFTP_KEY_FILENAME = os.getenv('SFTP_KEY_FILENAME', 'dummy_sftp_private_key')
     SFTP_KEY = os.getenv('SFTP_KEY', None)
     SFTP_PASSPHRASE = os.getenv('SFTP_PASSPHRASE', 'secret')
-    SFTP_DIR = os.getenv('SFTP_DIR', 'Documents/sftp/print_service')
+    SFTP_PPO_DIRECTORY = os.getenv('SFTP_PPO_DIRECTORY', 'ppo_dev/print_services/')
+    SFTP_QM_DIRECTORY = os.getenv('SFTP_QM_DIRECTORY', 'qmprint_dev/print_services/')
 
     RECEIPT_TOPIC_PROJECT = os.getenv('RECEIPT_TOPIC_PROJECT', 'project')
     RECEIPT_TOPIC_ID = os.getenv('RECEIPT_TOPIC_ID', 'eq-submission-topic')

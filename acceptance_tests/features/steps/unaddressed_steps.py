@@ -58,7 +58,7 @@ def validate_unaddressed_print_file(context):
              '--env', 'OTHER_PUBLIC_KEY_PATH=dummy_keys/supplier_dummy_public.asc',
              '--env', 'RABBITMQ_SERVICE_HOST=rabbitmq',
              '--env', 'RABBITMQ_SERVICE_PORT=5672',
-             '--env', 'SFTP_DIRECTORY=Documents/sftp/',
+             '--env', f'SFTP_DIRECTORY={Config.SFTP_QM_DIRECTORY}',
              '--env', 'SFTP_HOST=sftp',
              '--env', 'SFTP_KEY_FILENAME=dummy_keys/dummy_rsa',
              '--env', 'SFTP_PASSPHRASE=secret',
