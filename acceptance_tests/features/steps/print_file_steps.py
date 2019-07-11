@@ -29,7 +29,7 @@ def check_correct_files_on_sftp_server(context, prefix):
 
 @then('only unreceipted cases appear in "{prefix}" print files')
 def check_correct_unreceipted_files_on_sftp_server(context, prefix):
-    expected_csv_lines = create_expected_csv_lines(context, prefix, context.receipted_case_id)
+    expected_csv_lines = create_expected_csv_lines(context, prefix, context.emitted_case['id'])
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
