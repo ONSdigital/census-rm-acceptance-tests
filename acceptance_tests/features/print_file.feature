@@ -54,4 +54,3 @@ Feature: Checks that input sample files and action rules results in correct prin
     When messages are emitted to RH and Action Scheduler with [01] qids
     And the receipt msg for a created case is put on the GCP pubsub
     Then only unreceipted cases appear in "P_IC_ICL1" print files
-    And events of pack code "P_IC_ICL1" are logged against the case
