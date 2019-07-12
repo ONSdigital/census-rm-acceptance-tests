@@ -12,9 +12,9 @@ Feature: Checks that input sample files and action rules results in correct prin
     Given an action rule of type ICL2W is set 10 seconds in the future
     When sample file "sample_input_wales_census_spec.csv" is loaded
     Then messages are emitted to RH and Action Scheduler with [02] qids
-    And correctly formatted "P_IC_ICL2" print files are created
-    And there is a correct "P_IC_ICL2" manifest file for each csv file written
-    And events of pack code "P_IC_ICL2" are logged against the case
+    And correctly formatted "P_IC_ICL2B" print files are created
+    And there is a correct "P_IC_ICL2B" manifest file for each csv file written
+    And events of pack code "P_IC_ICL2B" are logged against the case
 
   Scenario: Successful sample file upload and NI ICL print file
     Given an action rule of type ICL4N is set 10 seconds in the future

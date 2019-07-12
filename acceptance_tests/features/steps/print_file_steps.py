@@ -140,7 +140,7 @@ def _get_country_and_purpose(prefix):
     if "P_IC_ICL1" == prefix:
         return 'Initial contact letter households', 'England'
 
-    if "P_IC_ICL2" == prefix:
+    if "P_IC_ICL2B" == prefix:
         return 'Initial contact letter households', 'Wales'
 
     if "P_IC_ICL4" == prefix:
