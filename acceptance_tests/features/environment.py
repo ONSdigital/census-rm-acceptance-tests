@@ -2,7 +2,9 @@ import base64
 import json
 import uuid
 from datetime import datetime
+
 from rabbit_context import RabbitContext
+
 from acceptance_tests.utilities.rabbit_helper import add_test_queue
 from config import Config
 
