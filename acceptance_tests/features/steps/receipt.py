@@ -6,7 +6,7 @@ from datetime import datetime
 from behave import when, step, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
-from rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 from acceptance_tests.utilities.date_utilities import convert_datetime_to_str
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context

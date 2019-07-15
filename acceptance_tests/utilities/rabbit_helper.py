@@ -3,7 +3,7 @@ import json
 import logging
 
 from structlog import wrap_logger
-from rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 from config import Config
 
