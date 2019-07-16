@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
-    rabbit = RabbitContext(queue_name=queue, port=Config.RABBITMQ_PORT)
+    rabbit = RabbitContext(queue_name=queue)
     connection = rabbit.open_connection()
 
     connection.call_later(
@@ -44,7 +44,7 @@ def store_all_msgs_in_context(ch, method, _properties, body, context, expected_m
 
 
 def add_test_queue(binding_key, exchange_name, queue_name, exchange_type='topic'):
-    with RabbitContext(port=Config.RABBITMQ_PORT) as rabbit:
+    with RabbitContext() as rabbit:
         rabbit.channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
         rabbit.channel.queue_declare(queue=queue_name, durable=True)
         rabbit.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)

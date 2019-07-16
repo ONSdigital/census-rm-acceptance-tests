@@ -40,7 +40,7 @@ def create_receipt_received_message_from_eq(context):
     # First case in list will be receipted
     context.receipted_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
-    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE, port=Config.RABBITMQ_PORT) as rabbit:
+    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
         rabbit.publish_message(
             message=_create_receipt_received_json(context.receipted_case_id),
             content_type='application/json')
