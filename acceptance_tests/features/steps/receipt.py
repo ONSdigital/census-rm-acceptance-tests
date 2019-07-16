@@ -3,16 +3,16 @@ import json
 import time
 from datetime import datetime
 
-from behave import when, step, then
+from behave import when, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 from acceptance_tests.utilities.date_utilities import convert_datetime_to_str
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
 
 
+@when("the receipt msg for a created case is put on the GCP pubsub")
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
@@ -33,17 +33,6 @@ def uac_updated_msg_emitted(context):
     uac = context.messages_received[0]['payload']['uac']
     assert uac['caseId'] == context.emitted_case['id']
     assert uac['active'] is False
-
-
-@step("a case receipt notification is received")
-def create_receipt_received_message_from_eq(context):
-    # First case in list will be receipted
-    context.receipted_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
-    with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_EQ_QUEUE) as rabbit:
-        rabbit.publish_message(
-            message=_create_receipt_received_json(context.receipted_case_id),
-            content_type='application/json')
 
 
 def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="0"):
