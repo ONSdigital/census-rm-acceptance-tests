@@ -5,8 +5,6 @@ import logging
 from structlog import wrap_logger
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 
-from config import Config
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
