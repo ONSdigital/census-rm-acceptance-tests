@@ -50,6 +50,4 @@ class Config:
     RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST = 'case.rh.uac.test'
     RABBITMQ_UAC_TEST_ROUTE = os.getenv('RH_UAC_ROUTING_KEY', "event.uac.*")
     RABBITMQ_RH_EXCHANGE_NAME = os.getenv('RH_EXCHANGE_NAME', "events")
-    RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST = 'Action.Field.Test'
-    RABBITMQ_FIELD_TEST_ROUTE = os.getenv('FWMT_ROUTING_KEY', 'Action.Field.binding')
-    RABBITMQ_FIELD_EXCHNAGE_NAME = os.getenv('FWMT_EXCHANGE_NAME', 'action-outbound-exchange')
+    RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST = 'RM.Field'
