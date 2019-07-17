@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7a746caa408acedd9c4139c82ea7c5b4025477fdf240bbb8da1fc8e1bba43a64"
+            "sha256": "729378de961a9fa44311042969a211966fa4aab7121e435239f36cf3495581c3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -63,7 +63,7 @@
         "census-rm-sample-loader": {
             "editable": true,
             "git": "https://github.com/ONSdigital/census-rm-sample-loader",
-            "ref": "d51a881611809a302277b1dec52512fd8f13482d"
+            "ref": "06bcf3fa4cc23cb31f5e956db8ded6f48cf26c2b"
         },
         "certifi": {
             "hashes": [
@@ -347,11 +347,11 @@
         },
         "pika": {
             "hashes": [
-                "sha256:0c50285f00a8b4816f2c9a44469107d9e738ba3a90386f14b625d8cceef4f6ae",
-                "sha256:5ba83d3daffccb92788d24facdab62a3db6aa03b8a6d709b03dc792d35c0dfe8"
+                "sha256:4e1a1a6585a41b2341992ec32aadb7a919d649eb82904fd8e4a4e0871c8cf3af",
+                "sha256:9fa76ba4b65034b878b2b8de90ff8660a59d925b087c5bb88f8fdbb4b64a1dbf"
             ],
             "index": "pypi",
-            "version": "==1.0.1"
+            "version": "==1.1.0"
         },
         "protobuf": {
             "hashes": [

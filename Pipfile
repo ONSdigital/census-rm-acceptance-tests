@@ -14,7 +14,7 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
-census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "916-source-of-truth"}
+census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v0.0.1"}
 pgpy = "*"
 
 [requires]
