@@ -11,7 +11,7 @@ from acceptance_tests.utilities.rabbit_context import (
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=400):
+def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
     rabbit = RabbitContext(queue_name=queue)
     connection = rabbit.open_connection()
 
