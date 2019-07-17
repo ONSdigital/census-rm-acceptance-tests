@@ -16,7 +16,8 @@ from config import Config
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
-    _publish_object_finalize(context, case_id=context.emitted_case['id'])
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     assert context.sent_to_gcp is True
 
 
