@@ -57,7 +57,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, prefix):
     logger.debug('Checking for files on SFTP server')
 
-    files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv")
+    files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv.gpg")
 
     actual_content_list = sftp_utility.get_files_content_as_list(files, prefix)
 
