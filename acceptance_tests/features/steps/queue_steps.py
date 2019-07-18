@@ -18,7 +18,6 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
                                                       type_filter='CASE_CREATED'))
     assert len(context.messages_received) == len(context.sample_units)
     _test_cases_correct(context)
-
     context.messages_received = []
 
     context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, qid_list_param)
@@ -28,7 +27,6 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
                                                       type_filter='UAC_UPDATED'))
     assert len(context.messages_received) == len(context.expected_uacs_cases)
     _test_uacs_correct(context)
-
     context.messages_received = []
 
 
