@@ -78,7 +78,7 @@ def _check_manifest_files_created(context, prefix):
         files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, prefix)
 
         for _file in files:
-            if _file.filename.endswith(".csv"):
+            if _file.filename.endswith(".csv.gpg"):
                 csv_file = _file
                 manifest_file = _get_matching_manifest_file(csv_file.filename, files)
 
@@ -98,7 +98,7 @@ def _get_actual_manifest(sftp_utility, manifest_file, prefix):
 
 
 def _get_matching_manifest_file(filename, files):
-    manifest_filename = filename.replace(".csv", ".manifest")
+    manifest_filename = filename.replace(".csv.gpg", ".manifest")
 
     for _file in files:
         if _file.filename == manifest_filename:
