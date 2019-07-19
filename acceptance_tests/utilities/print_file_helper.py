@@ -25,7 +25,7 @@ def create_expected_questionaire_csv_lines(context, prefix):
         expected_data = _add_expected_uac_data(uac, expected_data)
 
     for case in context.case_created_events:
-        expected_data = _add_expected_case_data(case, expected_data)
+        expected_data = _add_expected_questionnaire_case_data(case, expected_data)
 
     return [
         _create_expected_questionaire_csv_line(case, prefix)
@@ -64,6 +64,21 @@ def _add_expected_case_data(message, expected_data):
     return expected_data
 
 
+def _add_expected_questionnaire_case_data(message, expected_data):
+    case_key = message['payload']['collectionCase']['id']
+
+    expected_data[case_key]['coordinator_id'] = message['payload']['collectionCase']['fieldCoordinatorId']
+
+    address_obj = message['payload']['collectionCase']['address']
+    expected_data[case_key]['address_line_1'] = address_obj['addressLine1']
+    expected_data[case_key]['address_line_2'] = address_obj['addressLine2']
+    expected_data[case_key]['address_line_3'] = address_obj['addressLine3']
+    expected_data[case_key]['town_name'] = address_obj['townName']
+    expected_data[case_key]['postcode'] = address_obj['postcode']
+
+    return expected_data
+
+
 def _create_expected_csv_line(case, prefix):
     return (
         f'{case["uac"]}|'
@@ -84,7 +99,7 @@ def _create_expected_questionaire_csv_line(case, prefix):
         f'{case["qid"]}|'
         f'{case.get("uac_wales", "")}|'
         f'{case.get("qid_wales", "")}|'
-        f'{case["case_ref"]}|'
+        f'{case["coordinator_id"]}|'
         f'|||'
         f'{case["address_line_1"]}|'
         f'{case["address_line_2"]}|'
