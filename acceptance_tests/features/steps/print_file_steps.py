@@ -12,6 +12,7 @@ from acceptance_tests.utilities.print_file_helper import create_expected_questio
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 
