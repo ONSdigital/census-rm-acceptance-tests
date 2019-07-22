@@ -58,7 +58,7 @@ def _check_notification_files_have_all_the_expected_data(context, expected_csv_l
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, prefix):
     logger.debug('Checking for files on SFTP server')
 
-    files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv")
+    files = sftp_utility.get_all_files_after_time(start_of_test, prefix, ".csv.gpg")
 
     actual_content_list = sftp_utility.get_files_content_as_list(files, prefix)
 
@@ -79,7 +79,7 @@ def _check_manifest_files_created(context, prefix):
         files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, prefix)
 
         for _file in files:
-            if _file.filename.endswith(".csv"):
+            if _file.filename.endswith(".csv.gpg"):
                 csv_file = _file
                 manifest_file = _get_matching_manifest_file(csv_file.filename, files)
 
@@ -99,7 +99,7 @@ def _get_actual_manifest(sftp_utility, manifest_file, prefix):
 
 
 def _get_matching_manifest_file(filename, files):
-    manifest_filename = filename.replace(".csv", ".manifest")
+    manifest_filename = filename.replace(".csv.gpg", ".manifest")
 
     for _file in files:
         if _file.filename == manifest_filename:
