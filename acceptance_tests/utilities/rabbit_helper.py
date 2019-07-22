@@ -8,13 +8,19 @@ from acceptance_tests.utilities.rabbit_context import RabbitContext
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
+def start_listening_to_rabbit_queue(queue, on_message_callback, delay_callback=None, delay=1, timeout=30):
     rabbit = RabbitContext(queue_name=queue)
     connection = rabbit.open_connection()
 
     connection.call_later(
         delay=timeout,
         callback=functools.partial(_timeout_callback, rabbit))
+
+    if delay_callback:
+        connection.call_later(
+            delay=delay,
+            callback=delay_callback)
+
     rabbit.channel.basic_consume(
         queue=queue,
         on_message_callback=on_message_callback)
