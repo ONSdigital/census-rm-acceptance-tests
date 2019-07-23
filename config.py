@@ -51,3 +51,4 @@ class Config:
     RABBITMQ_UAC_TEST_ROUTE = os.getenv('RH_UAC_ROUTING_KEY', "event.uac.*")
     RABBITMQ_RH_EXCHANGE_NAME = os.getenv('RH_EXCHANGE_NAME', "events")
     RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST = 'RM.Field'
+
