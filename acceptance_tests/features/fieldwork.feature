@@ -6,4 +6,5 @@ Feature: Send messages to fieldwork management tool to keep it in sync with RM
     Then the action instruction messages are emitted to FWMT where the case has a treatment code of "HH_QF2R1E"
 
   Scenario: Refused cases are sent to the Fieldwork Management Tool
-    Given an action instruction cancel message is emitted to FWMT when refusal received
+    Given a refusal event message is received
+    Then an action instruction cancel message is emitted to FWMT

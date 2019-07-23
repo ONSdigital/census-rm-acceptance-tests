@@ -48,15 +48,8 @@ class RabbitContext:
         if not self._connection.is_open:
             raise RabbitConnectionClosedError
 
-        if exchange:
-            self.channel.basic_publish(
-                exchange=exchange,
-                routing_key=routing_key,
-                body=message,
-                properties=pika.BasicProperties(content_type=content_type))
-        else:
-            self.channel.basic_publish(
-                exchange=self._exchange,
-                routing_key=self.queue_name,
-                body=message,
-                properties=pika.BasicProperties(content_type=content_type))
+        self.channel.basic_publish(
+            exchange=exchange or self._exchange,
+            routing_key=routing_key or self.queue_name,
+            body=message,
+            properties=pika.BasicProperties(content_type=content_type))

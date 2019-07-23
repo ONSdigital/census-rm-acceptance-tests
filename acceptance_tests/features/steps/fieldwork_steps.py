@@ -23,12 +23,24 @@ def fwmt_messages_received(context, treatment_code):
     assert not context.expected_sample_units, 'Some messages are missing'
 
 
-@given('an action instruction cancel message is emitted to FWMT when refusal received')
+@given('a refusal event message is received')
+def refusal_message(context):
+    with RabbitContext() as rabbit:
+        message = '{"event":{"type":"REFUSAL_RECEIVED","source":"eOMtThyhVNLWUZNRcBaQKxI","channel":'\
+                  '"yedUsFwdkelQbxeTeQOvaScfqIOOmaa","dateTime":"2019-01-01T00:00:00.000000Z","transactionId":'\
+                  '"RYtGKbgicZaHCBRQDSx"},"payload":{"refusal":{"type":"EXTRAORDINARY_REFUSAL","report":'\
+                  '"VLhpfQGTMDYpsBZxvfBoeygjb","agentId":"UMaAIKKIkknjWEXJUfPxxQHeWKEJ","collectionCase":{"id":'\
+                  '"dpHYZGhtgdntugzvvKAXLhM"}}}}'
+
+        rabbit.publish_message(message, 'application/json',  Config.RABBITMQ_EVENT_EXCHANGE,
+                               Config.RABBITMQ_REFUSAL_ROUTING_KEY)
+
+
+@then('an action instruction cancel message is emitted to FWMT')
 def refusal_received(context):
     context.seen_expected_fwmt_message = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                                    functools.partial(_refusal_callback, context=context),
-                                    _delay_callback)
+                                    functools.partial(_refusal_callback, context=context))
     assert context.seen_expected_fwmt_message, 'Expected message not seen'
 
 
@@ -58,25 +70,13 @@ def _refusal_callback(ch, method, _properties, body, context):
 
     if not root[0].tag == 'actionCancel':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        assert False, 'Unexpected message on Action.Field case queue'
+        assert False, 'Unexpected message on Action.Field queue'
 
     tc.assertEqual('dpHYZGhtgdntugzvvKAXLhM', root.find('.//caseId').text)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     context.seen_expected_fwmt_message = True
     ch.stop_consuming()
-
-
-def _delay_callback():
-    with RabbitContext() as rabbit:
-        message = '{"event":{"type":"REFUSAL_RECEIVED","source":"eOMtThyhVNLWUZNRcBaQKxI","channel":'\
-                  '"yedUsFwdkelQbxeTeQOvaScfqIOOmaa","dateTime":"2019-01-01T00:00:00.000000Z","transactionId":'\
-                  '"RYtGKbgicZaHCBRQDSx"},"payload":{"refusal":{"type":"EXTRAORDINARY_REFUSAL","report":'\
-                  '"VLhpfQGTMDYpsBZxvfBoeygjb","agentId":"UMaAIKKIkknjWEXJUfPxxQHeWKEJ","collectionCase":{"id":'\
-                  '"dpHYZGhtgdntugzvvKAXLhM"}}}}'
-
-        rabbit.publish_message(message, 'application/json',  Config.RABBITMQ_EVENT_EXCHANGE,
-                               Config.RABBITMQ_REFUSAL_ROUTING_KEY)
 
 
 def _message_matches(sample_unit, root):
