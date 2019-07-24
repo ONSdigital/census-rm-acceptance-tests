@@ -19,6 +19,15 @@ def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
+    _publish_object_finalize(context, questionnaire_id=questionnaire_id, case_id=context.emitted_case["id"])
+    assert context.sent_to_gcp is True
+
+
+@when("the receipt msg for the created case is put on the GCP pubsub with just qid")
+def receipt_msg_published_to_gcp_pubsub_just_qid(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     assert context.sent_to_gcp is True
 
