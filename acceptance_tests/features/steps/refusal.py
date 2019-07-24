@@ -9,13 +9,13 @@ from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from config import Config
 
-
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
 @then("a refusal message for a created case is received")
 def create_refusal(context):
-    context.refused_case_id = context.sample_units[0]['id']
+    context.refused_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.refused_questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
     message = json.dumps(
         {
@@ -28,6 +28,7 @@ def create_refusal(context):
         },
         "payload": {
             "refusal": {
+                "questionnaireId": context.refused_questionnaire_id,
                 "type": "HARD_REFUSAL",
                 "report": "Test refusal",
                 "agentId": None,
@@ -65,7 +66,7 @@ def check_case_events(context):
     response = requests.get(f'{caseapi_url}{context.refused_case_id}?caseEvents=true').content.decode("utf-8")
     response_json = json.loads(response)
     for case_event in response_json['caseEvents']:
-        if case_event['eventType'] == 'REFUSAL_RECEIVED':
+        if case_event['description'] == 'Refusal Received':
             return
     assert False
 
