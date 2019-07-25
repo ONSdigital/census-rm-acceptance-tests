@@ -15,6 +15,7 @@ def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
     connection.call_later(
         delay=timeout,
         callback=functools.partial(_timeout_callback, rabbit))
+
     rabbit.channel.basic_consume(
         queue=queue,
         on_message_callback=on_message_callback)
