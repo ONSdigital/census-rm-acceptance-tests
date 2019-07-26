@@ -19,40 +19,40 @@ def create_refusal(context):
 
     message = json.dumps(
         {
-        "event": {
-            "type": "REFUSAL_RECEIVED",
-            "source": "CONTACT_CENTRE_API",
-            "channel": "CC",
-            "dateTime": "2019-07-07T22:37:11.988+0000",
-            "transactionId": "a6f9f129-f582-4011-8b48-d787c45cab26"
-        },
-        "payload": {
-            "refusal": {
-                "questionnaireId": context.refused_questionnaire_id,
-                "type": "HARD_REFUSAL",
-                "report": "Test refusal",
-                "agentId": None,
-                "collectionCase": {
-                    "id": context.refused_case_id
-                },
-                "contact": {
-                    "title": "Mr",
-                    "forename": "Test",
-                    "surname": "Testing",
-                    "email": None,
-                    "telNo": "01234123123"
-                },
-                "address": {
-                    "addressLine1": "123",
-                    "addressLine2": "Fake Street",
-                    "addressLine3": "",
-                    "townName": "Test Town",
-                    "postcode": "XX1 XX1",
-                    "region": "W"
+            "event": {
+                "type": "REFUSAL_RECEIVED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2019-07-07T22:37:11.988+0000",
+                "transactionId": "a6f9f129-f582-4011-8b48-d787c45cab26"
+            },
+            "payload": {
+                "refusal": {
+                    "questionnaireId": context.refused_questionnaire_id,
+                    "type": "HARD_REFUSAL",
+                    "report": "Test refusal",
+                    "agentId": None,
+                    "collectionCase": {
+                        "id": context.refused_case_id
+                    },
+                    "contact": {
+                        "title": "Mr",
+                        "forename": "Test",
+                        "surname": "Testing",
+                        "email": None,
+                        "telNo": "01234123123"
+                    },
+                    "address": {
+                        "addressLine1": "123",
+                        "addressLine2": "Fake Street",
+                        "addressLine3": "",
+                        "townName": "Test Town",
+                        "postcode": "XX1 XX1",
+                        "region": "W"
+                    }
                 }
             }
         }
-    }
     )
 
     with RabbitContext(queue_name=Config.RABBITMQ_INBOUND_REFUSAL_QUEUE) as rabbit:
