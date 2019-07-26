@@ -63,8 +63,8 @@ def create_refusal(context):
 
 @then("the case is marked as refused")
 def check_case_events(context):
-    response = requests.get(f'{caseapi_url}{context.refused_case_id}?caseEvents=true').content.decode("utf-8")
-    response_json = json.loads(response)
+    response = requests.get(f'{caseapi_url}{context.refused_case_id}', params={'caseEvents': True})
+    response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Refusal Received':
             return
