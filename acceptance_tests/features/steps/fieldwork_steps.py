@@ -87,3 +87,6 @@ def _message_valid(sample_unit, root):
     tc.assertEqual(sample_unit['attributes']['LATITUDE'], root.find('.//latitude').text)
     tc.assertEqual(sample_unit['attributes']['LONGITUDE'], root.find('.//longitude').text)
     tc.assertEqual(sample_unit['attributes']['POSTCODE'], root.find('.//postcode').text)
+    tc.assertEqual('false', root.find('.//undeliveredAsAddress').text)
+    tc.assertEqual('false', root.find('.//blankQreReturned').text)
+    tc.assertEqual('CENSUS', root.find('.//surveyName').text)
