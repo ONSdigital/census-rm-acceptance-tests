@@ -12,7 +12,6 @@ from acceptance_tests.utilities.print_file_helper import create_expected_questio
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -25,6 +24,12 @@ def check_correct_wales_files_on_sftp_server(context, prefix):
 @then('correctly formatted "{prefix}" print files are created')
 def check_correct_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
+
+
+@then('only unrefused cases appear in "{prefix}" print files')
+def check_correct_unrefused_files_on_sftp_server(context, prefix):
+    expected_csv_lines = create_expected_csv_lines(context, prefix, context.refused_case_id)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
