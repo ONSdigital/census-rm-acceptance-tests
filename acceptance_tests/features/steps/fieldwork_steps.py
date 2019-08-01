@@ -1,13 +1,11 @@
 import functools
+import xml.etree.ElementTree as ET
 
-from behave import then, given
+from behave import then
 
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
-
-import xml.etree.ElementTree as ET
 
 
 @then('the action instruction messages are emitted to FWMT where the case has a treatment code of "{treatment_code}"')
@@ -21,19 +19,6 @@ def fwmt_messages_received(context, treatment_code):
                                     functools.partial(_callback, context=context))
 
     assert not context.expected_sample_units, 'Some messages are missing'
-
-
-@given('a refusal event message is received')
-def refusal_message(context):
-    with RabbitContext() as rabbit:
-        message = '{"event":{"type":"REFUSAL_RECEIVED","source":"eOMtThyhVNLWUZNRcBaQKxI","channel":'\
-                  '"yedUsFwdkelQbxeTeQOvaScfqIOOmaa","dateTime":"2019-01-01T00:00:00.000000Z","transactionId":'\
-                  '"RYtGKbgicZaHCBRQDSx"},"payload":{"refusal":{"type":"EXTRAORDINARY_REFUSAL","report":'\
-                  '"VLhpfQGTMDYpsBZxvfBoeygjb","agentId":"UMaAIKKIkknjWEXJUfPxxQHeWKEJ","collectionCase":{"id":'\
-                  '"dpHYZGhtgdntugzvvKAXLhM"}}}}'
-
-        rabbit.publish_message(message, 'application/json',  Config.RABBITMQ_EVENT_EXCHANGE,
-                               Config.RABBITMQ_REFUSAL_ROUTING_KEY)
 
 
 @then('an action instruction cancel message is emitted to FWMT')
@@ -72,7 +57,7 @@ def _refusal_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         assert False, 'Unexpected message on Action.Field queue'
 
-    tc.assertEqual('dpHYZGhtgdntugzvvKAXLhM', root.find('.//caseId').text)
+    tc.assertEqual(context.refused_case_id, root.find('.//caseId').text)
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     context.seen_expected_fwmt_message = True
