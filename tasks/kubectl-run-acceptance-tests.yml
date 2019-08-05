@@ -10,6 +10,7 @@ params:
   GCP_PROJECT_NAME:
   KUBERNETES_CLUSTER:
   ACCEPTANCE_TESTS_IMAGE:
+  BATCH_RUNNER_CONFIG:
 
 inputs:
 - name: acceptance-tests-repo
@@ -27,8 +28,6 @@ run:
       # Use gcloud service account to configure kubectl
       gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
-
-      SFTP_TARGET_DIRECTORY=$(kubectl get configmap project-config -o=jsonpath="{.data.sftp-target-directory}")
 
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each
@@ -58,7 +57,7 @@ run:
       # Run acceptance tests for unaddressed batch
       # Pre-delete to avoid unintentionally running with an old image
       kubectl delete deploy qid-batch-runner --force --now || true
-      kubectl apply -f batch-runner-repo/qid-batch-runner.yml
+      kubectl apply -f ${BATCH_RUNNER_CONFIG}
       kubectl rollout status deploy qid-batch-runner --watch=true
       kubectl exec -it $(kubectl get pods -o name | grep -m1 qid-batch-runner | cut -d'/' -f 2) \
       -- /bin/bash /app/run_acceptance_tests.sh
