@@ -29,8 +29,6 @@ run:
       gcloud auth activate-service-account --key-file ~/gcloud-service-key.json
       gcloud container clusters get-credentials ${KUBERNETES_CLUSTER} --zone europe-west2 --project ${GCP_PROJECT_NAME}
 
-      SFTP_TARGET_DIRECTORY=$(kubectl get configmap project-config -o=jsonpath="{.data.sftp-target-directory}")
-
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
