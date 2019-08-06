@@ -1,4 +1,6 @@
 import json
+import time
+
 import requests
 from behave import step
 
@@ -41,6 +43,7 @@ def create_refusal(context):
 
 @step("a fulfilment request event is logged")
 def check_case_events(context):
+    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{caseapi_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
