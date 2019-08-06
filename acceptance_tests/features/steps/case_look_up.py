@@ -55,6 +55,9 @@ def generate_uacqid_pair(context):
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     response = requests.post(url=caseapi_uacqid_pair_url, data=context.uacqid_json, headers=headers)
     assert response.status_code == 201
+    response_data = json.loads(response.content)
+    assert 'uac' in response_data, 'uac missing in response'
+    assert 'qid' in response_data, 'qid missing in response'
 
 
 @then('caseapi should return a 404 when queried')
