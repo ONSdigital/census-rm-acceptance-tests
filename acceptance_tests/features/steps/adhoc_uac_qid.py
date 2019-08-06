@@ -9,7 +9,7 @@ caseapi_uacqid_pair_url = f'{Config.CASEAPI_SERVICE}/uacqid/create'
 
 @when('a UAC/QID pair is requested with a valid questionnaire type')
 def generate_post_request_body(context):
-    context.uacqid_json = {"questionnaireType":"01"}
+    context.uacqid_json = {"questionnaireType": "01"}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     context.response = requests.post(url=caseapi_uacqid_pair_url, data=json.dumps(context.uacqid_json), headers=headers)
 
