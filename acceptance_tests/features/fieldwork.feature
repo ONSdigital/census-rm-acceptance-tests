@@ -5,6 +5,8 @@ Feature: Send messages to fieldwork management tool to keep it in sync with RM
     And sample file "sample_for_print_stories.csv" is loaded
     Then the action instruction messages are emitted to FWMT where the case has a treatment code of "HH_QF2R1E"
 
+
+#    Make this e2e?  actually test boundaries
   Scenario: Refused cases are sent to the Fieldwork Management Tool
     Given a refusal event message is received
     Then an action instruction cancel message is emitted to FWMT
