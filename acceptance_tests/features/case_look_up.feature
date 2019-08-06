@@ -27,6 +27,3 @@ Feature: Case look up for the contact centre
     Given a random caseRef is generated
     Then caseapi should return a 404 when queried
 
-  Scenario: Check a UAC QID pair can be generated
-    Given a valid questionnaire id in json
-    Then caseapi should return a 201

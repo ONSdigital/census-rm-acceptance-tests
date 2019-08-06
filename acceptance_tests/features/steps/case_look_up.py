@@ -12,7 +12,6 @@ from config import Config
 logger = wrap_logger(logging.getLogger(__name__))
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
-caseapi_uacqid_pair_url = f'{Config.CASEAPI_SERVICE}/uacqid/create'
 
 
 @then('a case can be retrieved from the caseapi service')
@@ -43,21 +42,6 @@ def generate_random_caseref(context):
     context.random_caseref = randint(15000000, 19999999)
     context.test_endpoint_with_non_existent_value = f'ref/{context.random_caseref}'
     logger.info(f'Dummy caseRef = {context.random_caseref}')
-
-
-@given('a valid questionnaire id in json')
-def generate_post_request_body(context):
-    context.uacqid_json = '{"questionnaire_id":"1"}'
-
-
-@then('caseapi should return a 201')
-def generate_uacqid_pair(context):
-    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-    response = requests.post(url=caseapi_uacqid_pair_url, data=context.uacqid_json, headers=headers)
-    assert response.status_code == 201
-    response_data = json.loads(response.content)
-    assert 'uac' in response_data, 'uac missing in response'
-    assert 'qid' in response_data, 'qid missing in response'
 
 
 @then('caseapi should return a 404 when queried')
