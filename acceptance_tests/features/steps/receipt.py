@@ -1,14 +1,12 @@
 import functools
 import json
 import time
-from datetime import datetime
 
 from behave import when, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 import xml.etree.ElementTree as ET
 
-from acceptance_tests.utilities.date_utilities import convert_datetime_to_str
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
 
@@ -102,9 +100,3 @@ def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
-
-
-def _create_receipt_received_json(case_id) -> str:
-    create_receipt_received = {'case_id': case_id,
-                               'response_dateTime': convert_datetime_to_str(datetime.now())}
-    return json.dumps(create_receipt_received)
