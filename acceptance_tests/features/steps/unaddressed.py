@@ -23,11 +23,10 @@ def send_unaddressed_message(context, questionnaire_type):
             content_type='application/json')
 
 
-@then("an UACUpdated message of questionnaire type {questionnaire_type} linking a questionnaire to a case is sent")
-def check_linked_message_is_received(context, questionnaire_type):
+@when("a Questionnaire Linked message is received")
+def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
     context.linked_uac = context.uac_created_events[0]['payload']['uac']
-    context.expected_questionnaire_type = questionnaire_type
 
     questionnaire_linked_message = {
         'event': {
@@ -60,7 +59,7 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
-@then("a UACUpdated message linking a Questionnaire to a case is emitted to RH")
+@then("a Questionnaire Linked event is logged")
 def check_questionnaire_linked_message_is_received(context):
     context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
@@ -91,7 +90,7 @@ def _questionnaire_linked_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    tc.assertEqual(context.expected_questionnaire_type, parsed_body['payload']['uac']['questionnaireId'][:2])
+    tc.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
     tc.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
