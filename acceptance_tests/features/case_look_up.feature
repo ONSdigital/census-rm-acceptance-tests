@@ -26,3 +26,4 @@ Feature: Case look up for the contact centre
   Scenario: Check non-existent caseRef returns a 404 status code
     Given a random caseRef is generated
     Then caseapi should return a 404 when queried
+
