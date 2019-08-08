@@ -30,7 +30,7 @@ def check_linked_message_is_received(context):
 
     questionnaire_linked_message = {
         'event': {
-            'type': 'RESPONSE_RECEIVED',
+            'type': 'QUESTIONNAIRE_LINKED',
             'source': 'FIELDWORK_GATEWAY',
             'channel': 'FIELD',
             "dateTime": "2011-08-12T20:17:46.384Z",
@@ -59,8 +59,8 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
-@then("a Questionnaire Linked event is logged")
-def check_questionnaire_linked_message_is_received(context):
+@then("a UACUpdated message linked to a case is emitted to RH and Action Scheduler")
+def check_questionnaire_linked_message_is_sent(context):
     context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(_questionnaire_linked_callback, context=context))

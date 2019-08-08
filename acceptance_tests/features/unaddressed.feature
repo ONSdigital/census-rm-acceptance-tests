@@ -8,7 +8,7 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     Given sample file "sample_for_questionnaire_linked.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] qids
     When a Questionnaire Linked message is received
-    Then a Questionnaire Linked event is logged
+    Then a UACUpdated message linked to a case is emitted to RH and Action Scheduler
 
   @local-docker
   Scenario: Correct print files generated
