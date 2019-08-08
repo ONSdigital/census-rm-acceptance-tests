@@ -34,7 +34,7 @@ def uac_updated_msg_emitted(context):
     assert uac['active'] is False
 
 
-def _publish_object_finalize(context, case_id="0", tx_id="0", questionnaire_id="0"):
+def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
