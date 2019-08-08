@@ -17,6 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
+
 @when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
     context.expected_questionnaire_type = questionnaire_type
