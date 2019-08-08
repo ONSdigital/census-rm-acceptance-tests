@@ -2,7 +2,9 @@ import functools
 import json
 import logging
 import subprocess
+import time
 
+import requests
 from behave import then, when
 from structlog import wrap_logger
 
@@ -13,6 +15,7 @@ from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
@@ -23,7 +26,7 @@ def send_unaddressed_message(context, questionnaire_type):
             content_type='application/json')
 
 
-@when("a Questionnaire Linked message is received")
+@when("a Questionnaire Linked message is sent")
 def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
     context.linked_uac = context.uac_created_events[0]['payload']['uac']
@@ -59,13 +62,16 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
-@then("a UACUpdated message linked to a case is emitted to RH and Action Scheduler")
-def check_questionnaire_linked_message_is_sent(context):
-    context.expected_message_received = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-                                    functools.partial(_questionnaire_linked_callback, context=context))
-
-    assert context.expected_message_received
+@then("a Questionnaire Linked event is logged")
+def check_case_events(context):
+    case_id = context.linked_case['id']
+    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
+    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response_json = response.json()
+    for case_event in response_json['caseEvents']:
+        if case_event['description'] == 'Questionnaire Linked':
+            return
+    assert False
 
 
 def _uac_callback(ch, method, _properties, body, context):
