@@ -41,6 +41,7 @@ def _purge_queues():
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
         rabbit.channel.queue_purge(queue=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE)
+        rabbit.channel.queue_purge(queue=Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE)
 
 
 def _setup_google_auth():
