@@ -25,10 +25,13 @@ def create_refusal(context):
             },
             "payload": {
                 "fulfilmentRequest": {
-                    "fulfilmentCode": "P_IC_ICL1",
+                    "fulfilmentCode": "P_OR_H1",
                     "caseId": context.fulfilment_requested_case_id,
-                    "address": "",
-                    "contact": ""
+                    "contact": {
+                        "title": "Mrs",
+                        "forename": "Test",
+                        "surname": "McTest"
+                    }
                 }
             }
         }
