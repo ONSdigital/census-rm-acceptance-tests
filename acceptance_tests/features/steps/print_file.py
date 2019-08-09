@@ -7,7 +7,7 @@ from retrying import retry
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PACK_CODE_TO_DATASET
-from acceptance_tests.utilities.print_file_helper import create_expected_questionaire_csv_lines, \
+from acceptance_tests.utilities.print_file_helper import create_expected_questionnaire_csv_lines, \
     create_expected_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
@@ -17,7 +17,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 @then('correctly formatted "{prefix}" print files are created for questionnaire')
 def check_correct_wales_files_on_sftp_server(context, prefix):
-    expected_csv_lines = create_expected_questionaire_csv_lines(context, prefix)
+    expected_csv_lines = create_expected_questionnaire_csv_lines(context, prefix)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 

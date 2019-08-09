@@ -4,14 +4,17 @@ import time
 import requests
 from behave import step
 
+from acceptance_tests.features.steps.print_file import _check_notification_files_have_all_the_expected_data
+from acceptance_tests.utilities.print_file_helper import create_expected_on_request_questionnaire_csv
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from config import Config
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
+case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@step("a fulfilment request message for a created case is sent")
-def create_refusal(context):
+@step('a PQ fulfilment request event with fulfilment code "{pack_code}" is received by RM')
+def send_fulfilment_requested_event(context, pack_code):
+    time.sleep(2)
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
 
     message = json.dumps(
@@ -25,10 +28,13 @@ def create_refusal(context):
             },
             "payload": {
                 "fulfilmentRequest": {
-                    "fulfilmentCode": "P_IC_ICL1",
+                    "fulfilmentCode": pack_code,
                     "caseId": context.fulfilment_requested_case_id,
-                    "address": "",
-                    "contact": ""
+                    "contact": {
+                        "title": "Mrs",
+                        "forename": "Test",
+                        "surname": "McTest"
+                    }
                 }
             }
         }
@@ -44,9 +50,15 @@ def create_refusal(context):
 @step("a fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{caseapi_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
+    response = requests.get(f'{case_api_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Fulfilment Request Received':
             return
     assert False
+
+
+@step('correctly formatted "{pack_code}" on request questionnaire print files are created')
+def correct_on_request_questionnaire_print_files(context, pack_code):
+    expected_csv_lines = create_expected_on_request_questionnaire_csv(context, pack_code)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)

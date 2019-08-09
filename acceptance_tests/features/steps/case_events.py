@@ -8,7 +8,7 @@ from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 
-@step("messages are emitted to RH and Action Scheduler with {qid_list_param} qids")
+@step("messages are emitted to RH and Action Scheduler with {qid_list_param} questionnaire types")
 def gather_messages_emitted_with_qids(context, qid_list_param):
     context.messages_received = []
 
