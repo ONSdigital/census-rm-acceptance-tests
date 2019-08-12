@@ -2,7 +2,9 @@ import functools
 import json
 import logging
 import subprocess
+import time
 
+import requests
 from behave import then, when
 from structlog import wrap_logger
 
@@ -13,6 +15,8 @@ from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
+
 
 @when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
@@ -20,6 +24,33 @@ def send_unaddressed_message(context, questionnaire_type):
     with RabbitContext(queue_name=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE) as rabbit:
         rabbit.publish_message(
             message=json.dumps({'questionnaireType': questionnaire_type}),
+            content_type='application/json')
+
+
+@when("a Questionnaire Linked message is sent")
+def check_linked_message_is_received(context):
+    context.linked_case = context.case_created_events[1]['payload']['collectionCase']
+    context.linked_uac = context.uac_created_events[0]['payload']['uac']
+
+    questionnaire_linked_message = {
+        'event': {
+            'type': 'QUESTIONNAIRE_LINKED',
+            'source': 'FIELDWORK_GATEWAY',
+            'channel': 'FIELD',
+            "dateTime": "2011-08-12T20:17:46.384Z",
+            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        'payload': {
+            'uac': {
+                "caseId": context.linked_case['id'],
+                'questionnaireId': context.linked_uac['questionnaireId']
+            }
+        }
+    }
+
+    with RabbitContext(queue_name=Config.RABBITMQ_QUESTIONNAIRE_LINKED_QUEUE) as rabbit:
+        rabbit.publish_message(
+            message=json.dumps(questionnaire_linked_message),
             content_type='application/json')
 
 
@@ -32,6 +63,18 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
+@then("a Questionnaire Linked event is logged")
+def check_case_events(context):
+    case_id = context.linked_case['id']
+    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
+    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response_json = response.json()
+    for case_event in response_json['caseEvents']:
+        if case_event['description'] == 'Questionnaire Linked':
+            return
+    assert False
+
+
 def _uac_callback(ch, method, _properties, body, context):
     parsed_body = json.loads(body)
 
@@ -42,6 +85,20 @@ def _uac_callback(ch, method, _properties, body, context):
     tc.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
     tc.assertEqual(context.expected_questionnaire_type, parsed_body['payload']['uac']['questionnaireId'][:2])
     tc.assertIsNone(parsed_body['payload']['uac']['caseId'])
+    context.expected_message_received = True
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
+
+
+def _questionnaire_linked_callback(ch, method, _properties, body, context):
+    parsed_body = json.loads(body)
+
+    if not parsed_body['event']['type'] == 'UAC_UPDATED':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        return
+
+    tc.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
+    tc.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
