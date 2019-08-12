@@ -5,6 +5,7 @@ import time
 from behave import when, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
+import xml.etree.ElementTree as ET
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
@@ -15,6 +16,15 @@ from config import Config
 def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
+    assert context.sent_to_gcp is True
+
+
+@when("the receipt msg for the created case is put on the GCP pubsub with just qid")
+def receipt_msg_published_to_gcp_pubsub_just_qid(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     assert context.sent_to_gcp is True
 
@@ -32,6 +42,30 @@ def uac_updated_msg_emitted(context):
     uac = context.messages_received[0]['payload']['uac']
     assert uac['caseId'] == context.emitted_case['id']
     assert uac['active'] is False
+
+
+@then("a ActionCancelled event is sent to field work management")
+def action_cancelled_event_sent_to_fwm(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+        _field_work_receipt_callback, context=context))
+
+    expected_id = context.emitted_case["id"]
+    assert context.case_id == expected_id
+    assert context.reason == 'RECEIPTED'
+
+
+def _field_work_receipt_callback(ch, method, _properties, body, context):
+    root = ET.fromstring(body)
+
+    if not root[0].tag == 'actionCancel':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        assert False, 'Unexpected message on Action.Field case queue, wanted actionCancel'
+
+    context.reason = root[0].find('.//reason').text
+    context.case_id = root[0].find('.//caseId').text
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
 
 
 def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
