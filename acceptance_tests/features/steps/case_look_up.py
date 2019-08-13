@@ -81,7 +81,50 @@ def check_case_events(context, pack_code):
         case_id = case['payload']['collectionCase']['id']
         response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
         response_json = json.loads(response)
+
         for caseEvent in response_json['caseEvents']:
             if caseEvent['eventType'] == 'PRINT_CASE_SELECTED':
                 return
         assert False
+
+
+@then('events of type "{event_type}" are logged against the case')
+def correct_event_type_logged(context, event_type):
+    for case in context.case_created_events:
+        case_id = case['payload']['collectionCase']['id']
+        response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
+        response_json = json.loads(response)
+
+        for caseEvent in response_json['caseEvents']:
+            if caseEvent['eventType'] == event_type:
+                return
+        assert False
+
+
+@then("events logged against the case are {event_type_list}")
+def correct_event_types_logged(context, event_type_list):
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+
+    for case in context.case_created_events:
+        expected_logged_event_types_copy = expected_logged_event_types.copy()
+        case_id = case['payload']['collectionCase']['id']
+        response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
+        response_json = json.loads(response)
+
+        actual_logged_events = response_json['caseEvents']
+
+        assert len(actual_logged_events) == len( expected_logged_event_types ), "wrong number of events logged"
+
+        for case_event in actual_logged_events:
+            for index, expected_event in enumerate(expected_logged_event_types):
+                type = case_event['eventType']
+                if case_event['eventType'] == expected_event:
+                    del expected_logged_event_types_copy[index]
+                    continue
+
+        if len(expected_logged_event_types_copy) > 0:
+            assert False, "didn't log expected event types"
+
+
+    # any useful test here?
+    assert True
