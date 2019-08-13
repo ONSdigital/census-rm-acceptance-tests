@@ -47,15 +47,12 @@ def send_fulfilment_requested_event(context, pack_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@step("a fulfilment request event is logged")
+@step("the fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{case_api_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
     response_json = response.json()
-    for case_event in response_json['caseEvents']:
-        if case_event['description'] == 'Fulfilment Request Received':
-            return
-    assert False
+    assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in response_json['caseEvents'])
 
 
 @step('correctly formatted "{pack_code}" on request questionnaire print files are created')

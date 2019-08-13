@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@then('a case can be retrieved from the caseapi service')
+@then("a case can be retrieved from the case API service")
 def get_case_by_id(context):
     case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
@@ -44,14 +44,14 @@ def generate_random_caseref(context):
     logger.info(f'Dummy caseRef = {context.random_caseref}')
 
 
-@then('caseapi should return a 404 when queried')
+@then('case API should return a 404 when queried')
 def get_non_existent_case_id(context):
     response = requests.get(f'{caseapi_url}{context.test_endpoint_with_non_existent_value}')
 
     assert response.status_code == 404, 'Case returned'
 
 
-@then('caseapi returns multiple cases for a UPRN')
+@then('case API returns multiple cases for a UPRN')
 def find_multiple_cases_by_uprn(context):
     response = requests.get(f'{caseapi_url}uprn/10008677190')
     response.raise_for_status()

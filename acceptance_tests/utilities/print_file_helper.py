@@ -110,36 +110,27 @@ def _create_expected_questionnaire_csv_line(case, prefix):
 
 
 def create_expected_on_request_questionnaire_csv(context, pack_code):
-    expected_data = defaultdict(dict)
-
-    for uac in context.uac_created_events:
-        if uac['payload']['uac']['caseId'] == context.fulfilment_requested_case_id:
-            expected_data = _add_expected_uac_data(uac, expected_data)
-            break
-    else:
-        raise AssertionError('Could not find expected case ID in UAC created events')
-
     for case in context.case_created_events:
         if case['payload']['collectionCase']['id'] == context.fulfilment_requested_case_id:
-            expected_data = _add_expected_questionnaire_case_data(case, expected_data)
-        break
+            fulfilment_requested_case = case['payload']['collectionCase']
+            break
     else:
         raise AssertionError('Could not find expected case ID in case created events')
+    return [_create_expected_on_request_questionnaire_csv_line(fulfilment_requested_case, pack_code,
+                                                               context.fulfilment_request_uac,
+                                                               context.fulfilment_request_qid)]
 
-    assert expected_data.get(context.fulfilment_requested_case_id), 'Wrong case used to populate expected data'
-    return [_create_expected_on_request_questionnaire_csv_line(tuple(expected_data.values())[0], pack_code)]
 
-
-def _create_expected_on_request_questionnaire_csv_line(case, pack_code):
+def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid):
     return (
-        f'{case["uac"]}|'
-        f'{case["qid"]}'
+        f'{uac}|'
+        f'{qid}'
         f'||||'
         f'Mrs|Test|McTest|'
-        f'{case["address_line_1"]}|'
-        f'{case["address_line_2"]}|'
-        f'{case["address_line_3"]}|'
-        f'{case["town_name"]}|'
-        f'{case["postcode"]}|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
         f'{pack_code}'
     )
