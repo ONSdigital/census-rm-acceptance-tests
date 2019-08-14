@@ -13,11 +13,14 @@ def before_all(_context):
                    Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
     add_test_queue(Config.RABBITMQ_UAC_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
                    Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
+    add_test_queue("", Config.RABBITMQ_OUTBOUND_ADAPTER_EXCHANGE, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+                   exchange_type='direct')
 
 
 def after_all(_context):
     purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
+                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
 def before_scenario(context, _):
@@ -26,14 +29,14 @@ def before_scenario(context, _):
     context.action_plan_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     purge_queues(Config.RABBITMQ_INBOUND_REFUSAL_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                  Config.RABBITMQ_SAMPLE_INBOUND_QUEUE,
                  Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE)
 
 

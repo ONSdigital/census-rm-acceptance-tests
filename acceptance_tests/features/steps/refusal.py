@@ -16,7 +16,6 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 @step("a refusal message for a created case is received")
 def create_refusal(context):
     context.refused_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
-    context.refused_questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
     message = json.dumps(
         {
@@ -29,7 +28,6 @@ def create_refusal(context):
             },
             "payload": {
                 "refusal": {
-                    "questionnaireId": context.refused_questionnaire_id,
                     "type": "HARD_REFUSAL",
                     "report": "Test refusal",
                     "agentId": None,
