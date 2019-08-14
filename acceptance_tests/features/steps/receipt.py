@@ -50,8 +50,7 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    expected_id = context.emitted_case["id"]
-    assert context.case_id == expected_id
+    assert context.fwmt_emitted_case_id == context.emitted_case["id"]
     assert context.addressType == 'HH'
 
 
@@ -63,7 +62,7 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
         assert False, 'Unexpected message on Action.Field case queue, wanted actionCancel'
 
     context.addressType = root[0].find('.//addressType').text
-    context.case_id = root[0].find('.//caseId').text
+    context.fwmt_emitted_case_id = root[0].find('.//caseId').text
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
