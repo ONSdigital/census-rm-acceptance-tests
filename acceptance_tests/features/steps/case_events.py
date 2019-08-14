@@ -9,8 +9,8 @@ from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 
-@step("messages are emitted to RH and Action Scheduler with {qid_list_param} questionnaire types")
-def gather_messages_emitted_with_qids(context, qid_list_param):
+@step("messages are emitted to RH and Action Scheduler with {questionnaire_types} questionnaire types")
+def gather_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
@@ -22,7 +22,7 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
     _test_cases_correct(context)
     context.messages_received = []
 
-    context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, qid_list_param)
+    context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, questionnaire_types)
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.expected_uacs_cases),
@@ -33,19 +33,19 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
     context.messages_received = []
 
 
-def _get_extended_case_created_events_for_uacs(context, qid_list_param):
-    qid_list = qid_list_param.replace('[', '').replace(']', '').split(',')
+def _get_extended_case_created_events_for_uacs(context, questionnaire_types):
+    questionnaire_types_list = questionnaire_types.replace('[', '').replace(']', '').split(',')
     expected_uacs_cases = context.case_created_events.copy()
 
     # 1st pass
     for uac in expected_uacs_cases:
-        uac['expected_qid'] = qid_list[0]
+        uac['expected_questionnaire_type'] = questionnaire_types_list[0]
 
     # If there's 2, current scenario Welsh.  Could be a fancy loop, but not much point
-    if len(qid_list) == 2:
-        second_expected_uacs = context.case_created_events.copy()
+    if len(questionnaire_types_list) == 2:
+        second_expected_uacs = copy.deepcopy(context.case_created_events)
         for uac in second_expected_uacs:
-            uac['expected_qid'] = qid_list[1]
+            uac['expected_questionnaire_type'] = questionnaire_types_list[1]
 
         expected_uacs_cases.extend(second_expected_uacs)
 
@@ -67,11 +67,11 @@ def _test_cases_correct(context):
 
 
 def _sample_matches_rh_message(sample_unit, rh_message):
-    return sample_unit['attributes']['ADDRESS_LINE1'] == \
-           rh_message['payload']['collectionCase']['address']['addressLine1'] \
-           and sample_unit['attributes']['ADDRESS_LINE2'] == \
-           rh_message['payload']['collectionCase']['address']['addressLine2'] \
-           and sample_unit['attributes']['REGION'][0] == rh_message['payload']['collectionCase']['address']['region']
+    return (sample_unit['attributes']['ADDRESS_LINE1'] ==
+            rh_message['payload']['collectionCase']['address']['addressLine1']
+            and sample_unit['attributes']['ADDRESS_LINE2'] ==
+            rh_message['payload']['collectionCase']['address']['addressLine2']
+            and sample_unit['attributes']['REGION'][0] == rh_message['payload']['collectionCase']['address']['region'])
 
 
 def _test_uacs_correct(context):
@@ -81,8 +81,9 @@ def _test_uacs_correct(context):
         _validate_uac_message(msg)
 
         for index, case_created_event in enumerate(context.expected_uacs_cases):
-            if _uac_message_matches_rh_message(case_created_event, msg) \
-                    and msg['payload']['uac']['questionnaireId'][:2] == case_created_event['expected_qid']:
+            if (_uac_message_matches_rh_message(case_created_event, msg)
+                    and (msg['payload']['uac']['questionnaireId'][:2]
+                         == case_created_event['expected_questionnaire_type'])):
                 del context.expected_uacs_cases[index]
                 break
         else:

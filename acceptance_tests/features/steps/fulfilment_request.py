@@ -4,9 +4,7 @@ import time
 import requests
 from behave import step
 
-from acceptance_tests.features.steps.case_events import get_first_case_created_event
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -18,7 +16,7 @@ def get_first_case(context):
 
 @step('a PQ fulfilment request event with fulfilment code "{pack_code}" is received by RM')
 def send_fulfilment_requested_event(context, pack_code):
-    context.fulfilment_requested_case = get_first_case(context)
+    context.first_case = get_first_case(context)
 
     message = json.dumps(
         {
@@ -32,7 +30,7 @@ def send_fulfilment_requested_event(context, pack_code):
             "payload": {
                 "fulfilmentRequest": {
                     "fulfilmentCode": pack_code,
-                    "caseId": context.fulfilment_requested_case['id'],
+                    "caseId": context.first_case['id'],
                     "contact": {
                         "title": "Mrs",
                         "forename": "Test",
@@ -54,6 +52,6 @@ def send_fulfilment_requested_event(context, pack_code):
 @step("the fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{case_api_url}{context.fulfilment_requested_case["id"]}', params={'caseEvents': True})
+    response = requests.get(f'{case_api_url}{context.first_case["id"]}', params={'caseEvents': True})
     response_json = response.json()
     assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in response_json['caseEvents'])

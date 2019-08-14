@@ -110,9 +110,9 @@ def _create_expected_questionnaire_csv_line(case, prefix):
 
 
 def create_expected_on_request_questionnaire_csv(context, pack_code):
-    return [_create_expected_on_request_questionnaire_csv_line(context.fulfilment_requested_case, pack_code,
-                                                               context.fulfilment_request_uac,
-                                                               context.fulfilment_request_qid)]
+    return [_create_expected_on_request_questionnaire_csv_line(context.first_case, pack_code,
+                                                               context.requested_uac,
+                                                               context.requested_qid)]
 
 
 def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid):

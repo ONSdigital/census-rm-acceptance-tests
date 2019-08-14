@@ -1,11 +1,11 @@
 import functools
 import json
 import time
+import xml.etree.ElementTree as ET
 
 from behave import when, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
-import xml.etree.ElementTree as ET
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config

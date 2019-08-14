@@ -1,9 +1,9 @@
 import json
 import logging
-import requests
-
 from random import randint
 from uuid import uuid4
+
+import requests
 from behave import then, given
 from structlog import wrap_logger
 
