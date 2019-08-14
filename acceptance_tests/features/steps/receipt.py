@@ -52,7 +52,7 @@ def action_cancelled_event_sent_to_fwm(context):
 
     expected_id = context.emitted_case["id"]
     assert context.case_id == expected_id
-    assert context.reason == 'RECEIPTED'
+    assert context.addressType == 'HH'
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
@@ -62,7 +62,7 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         assert False, 'Unexpected message on Action.Field case queue, wanted actionCancel'
 
-    context.reason = root[0].find('.//reason').text
+    context.addressType = root[0].find('.//addressType').text
     context.case_id = root[0].find('.//caseId').text
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
