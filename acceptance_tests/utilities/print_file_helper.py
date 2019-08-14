@@ -110,13 +110,7 @@ def _create_expected_questionnaire_csv_line(case, prefix):
 
 
 def create_expected_on_request_questionnaire_csv(context, pack_code):
-    for case in context.case_created_events:
-        if case['payload']['collectionCase']['id'] == context.fulfilment_requested_case_id:
-            fulfilment_requested_case = case['payload']['collectionCase']
-            break
-    else:
-        raise AssertionError('Could not find expected case ID in case created events')
-    return [_create_expected_on_request_questionnaire_csv_line(fulfilment_requested_case, pack_code,
+    return [_create_expected_on_request_questionnaire_csv_line(context.fulfilment_requested_case, pack_code,
                                                                context.fulfilment_request_uac,
                                                                context.fulfilment_request_qid)]
 

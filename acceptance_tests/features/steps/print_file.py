@@ -3,37 +3,39 @@ import json
 import logging
 
 from behave import then
+from behave.step_registry import step
 from retrying import retry
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PACK_CODE_TO_DATASET
+from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PACK_CODE_TO_DATASET, \
+    PACK_CODE_TO_DESCRIPTION
 from acceptance_tests.utilities.print_file_helper import create_expected_questionnaire_csv_lines, \
-    create_expected_csv_lines
+    create_expected_csv_lines, create_expected_on_request_questionnaire_csv
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-@then('correctly formatted "{prefix}" print files are created for questionnaire')
+@then('correctly formatted "{pack_code}" print files are created for questionnaire')
 def check_correct_wales_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_questionnaire_csv_lines(context, prefix)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-@then('correctly formatted "{prefix}" print files are created')
+@then('correctly formatted "{pack_code}" print files are created')
 def check_correct_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-@then('only unrefused cases appear in "{prefix}" print files')
+@then('only unrefused cases appear in "{pack_code}" print files')
 def check_correct_unrefused_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix, context.refused_case_id)
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
 
 
-@then('only unreceipted cases appear in "{prefix}" print files')
+@then('only unreceipted cases appear in "{pack_code}" print files')
 def check_correct_unreceipted_files_on_sftp_server(context, prefix):
     expected_csv_lines = create_expected_csv_lines(context, prefix, context.emitted_case['id'])
     _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, prefix)
@@ -48,7 +50,7 @@ def _msgs_received(ch, method, _properties, body, context, multiplier=1):
         ch.stop_consuming()
 
 
-@then('there is a correct "{prefix}" manifest file for each csv file written')
+@then('there is a correct "{pack_code}" manifest file for each csv file written')
 def check_manifest_files(context, prefix):
     logger.debug("checking manifest files exist for csv files")
     _check_manifest_files_created(context, prefix)
@@ -117,8 +119,6 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     actual_file_contents = sftp_utility.get_file_contents_as_string(f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}'
                                                                     f'/{csv_file.filename}')
 
-    purpose, country = _get_country_and_purpose(prefix)
-
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{PACK_CODE_TO_SFTP_DIRECTORY[prefix]}/{csv_file.filename}')
 
@@ -134,7 +134,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
         files=[_file],
         sourceName="ONS_RM",
         manifestCreated=created_datetime,
-        description=f'{purpose} - {country}',
+        description=PACK_CODE_TO_DESCRIPTION[prefix],
         dataset=PACK_CODE_TO_DATASET[prefix],
         version='1'
     )
@@ -142,23 +142,8 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, prefix):
     return manifest
 
 
-def _get_country_and_purpose(prefix):
-    if "P_IC_ICL1" == prefix:
-        return 'Initial contact letter households', 'England'
-
-    if "P_IC_ICL2B" == prefix:
-        return 'Initial contact letter households', 'Wales'
-
-    if "P_IC_ICL4" == prefix:
-        return 'Initial contact letter households', 'Northern Ireland'
-
-    if "P_IC_H1" == prefix:
-        return 'Initial contact questionnaire households', 'England'
-
-    if "P_IC_H2" == prefix:
-        return 'Initial contact questionnaire households', 'Wales'
-
-    if "P_IC_H4" == prefix:
-        return 'Initial contact questionnaire households', 'Northern Ireland'
-
-    assert False, f'Unexpected Prefix: {prefix}'
+@step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
+def correct_on_request_questionnaire_print_files(context, fulfilment_code):
+    expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)

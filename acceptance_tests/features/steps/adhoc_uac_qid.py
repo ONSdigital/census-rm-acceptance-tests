@@ -12,7 +12,7 @@ caseapi_uacqid_pair_url = f'{Config.CASEAPI_SERVICE}/uacqid/create'
 
 @when('a UAC/QID pair is requested with questionnaire type "{questionnaire_type}"')
 def generate_post_request_body(context, questionnaire_type):
-    context.uacqid_json = {"questionnaireType": questionnaire_type, "caseId": context.fulfilment_requested_case_id}
+    context.uacqid_json = {"questionnaireType": questionnaire_type, "caseId": context.fulfilment_requested_case['id']}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     context.response = requests.post(url=caseapi_uacqid_pair_url, data=json.dumps(context.uacqid_json), headers=headers)
 
@@ -34,7 +34,7 @@ def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
                                                       expected_msg_count=1,
                                                       type_filter='UAC_UPDATED'))
     uac_updated_event = context.messages_received[0]
-    assert uac_updated_event['payload']['uac']['caseId'] == context.fulfilment_requested_case_id, \
+    assert uac_updated_event['payload']['uac']['caseId'] == context.fulfilment_requested_case['id'], \
         'Fulfilment request UAC updated event found with wrong case ID'
     assert uac_updated_event['payload']['uac']['questionnaireId'].startswith(questionnaire_type), \
         'Fulfilment request UAC updated event found with wrong questionnaire type'

@@ -3,7 +3,8 @@ import functools
 
 from behave import step
 
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
+    store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
@@ -17,6 +18,7 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
                                                       expected_msg_count=len(context.sample_units),
                                                       type_filter='CASE_CREATED'))
     assert len(context.messages_received) == len(context.sample_units)
+    context.case_created_events = context.messages_received.copy()
     _test_cases_correct(context)
     context.messages_received = []
 
@@ -26,6 +28,7 @@ def gather_messages_emitted_with_qids(context, qid_list_param):
                                                       expected_msg_count=len(context.expected_uacs_cases),
                                                       type_filter='UAC_UPDATED'))
     assert len(context.messages_received) == len(context.expected_uacs_cases)
+    context.uac_created_events = context.messages_received.copy()
     _test_uacs_correct(context)
     context.messages_received = []
 
@@ -36,23 +39,20 @@ def _get_extended_case_created_events_for_uacs(context, qid_list_param):
 
     # 1st pass
     for uac in expected_uacs_cases:
-        eu = qid_list[0]
-        uac['expected_qid'] = eu
+        uac['expected_qid'] = qid_list[0]
 
     # If there's 2, current scenario Welsh.  Could be a fancy loop, but not much point
     if len(qid_list) == 2:
-        second_uacs = copy.deepcopy(context.case_created_events)
-        for uac in second_uacs:
-            eu = qid_list[1]
-            uac['expected_qid'] = eu
+        second_expected_uacs = context.case_created_events.copy()
+        for uac in second_expected_uacs:
+            uac['expected_qid'] = qid_list[1]
 
-        expected_uacs_cases.extend(second_uacs)
+        expected_uacs_cases.extend(second_expected_uacs)
 
     return expected_uacs_cases
 
 
 def _test_cases_correct(context):
-    context.case_created_events = context.messages_received.copy()
     context.expected_sample_units = context.sample_units.copy()
 
     for msg in context.case_created_events:
@@ -76,7 +76,6 @@ def _sample_matches_rh_message(sample_unit, rh_message):
 
 def _test_uacs_correct(context):
     assert len(context.messages_received) == len(context.expected_uacs_cases)
-    context.uac_created_events = context.messages_received.copy()
 
     for msg in context.uac_created_events:
         _validate_uac_message(msg)
@@ -102,3 +101,12 @@ def _validate_case(parsed_body):
     tc.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
     tc.assertEqual('ACTIONABLE', parsed_body['payload']['collectionCase']['state'])
     tc.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
+
+
+def get_first_case_created_event(context):
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(store_first_message_in_context, context=context,
+                                                      type_filter='CASE_CREATED'))
+    first_case_created_event = context.first_message
+    del context.first_message
+    return first_case_created_event

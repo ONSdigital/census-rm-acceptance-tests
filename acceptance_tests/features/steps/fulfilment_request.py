@@ -4,18 +4,21 @@ import time
 import requests
 from behave import step
 
-from acceptance_tests.features.steps.print_file import _check_notification_files_have_all_the_expected_data
-from acceptance_tests.utilities.print_file_helper import create_expected_on_request_questionnaire_csv
+from acceptance_tests.features.steps.case_events import get_first_case_created_event
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
+def get_first_case(context):
+    return context.case_created_events[0]['payload']['collectionCase']
+
+
 @step('a PQ fulfilment request event with fulfilment code "{pack_code}" is received by RM')
 def send_fulfilment_requested_event(context, pack_code):
-    time.sleep(2)
-    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.fulfilment_requested_case = get_first_case(context)
 
     message = json.dumps(
         {
@@ -29,7 +32,7 @@ def send_fulfilment_requested_event(context, pack_code):
             "payload": {
                 "fulfilmentRequest": {
                     "fulfilmentCode": pack_code,
-                    "caseId": context.fulfilment_requested_case_id,
+                    "caseId": context.fulfilment_requested_case['id'],
                     "contact": {
                         "title": "Mrs",
                         "forename": "Test",
@@ -40,6 +43,7 @@ def send_fulfilment_requested_event(context, pack_code):
         }
     )
 
+    time.sleep(2)
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
@@ -50,12 +54,6 @@ def send_fulfilment_requested_event(context, pack_code):
 @step("the fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{case_api_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
+    response = requests.get(f'{case_api_url}{context.fulfilment_requested_case["id"]}', params={'caseEvents': True})
     response_json = response.json()
     assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in response_json['caseEvents'])
-
-
-@step('correctly formatted "{pack_code}" on request questionnaire print files are created')
-def correct_on_request_questionnaire_print_files(context, pack_code):
-    expected_csv_lines = create_expected_on_request_questionnaire_csv(context, pack_code)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
