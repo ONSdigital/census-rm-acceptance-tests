@@ -2,8 +2,7 @@ import hashlib
 import json
 import logging
 
-from behave import then
-from behave.step_registry import step
+from behave import then, step
 from retrying import retry
 from structlog import wrap_logger
 
@@ -54,6 +53,13 @@ def _msgs_received(ch, method, _properties, body, context, multiplier=1):
 def check_manifest_files(context, pack_code):
     logger.debug("checking manifest files exist for csv files")
     _check_manifest_files_created(context, pack_code)
+
+
+@step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
+def correct_on_request_questionnaire_print_files(context, fulfilment_code):
+    expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
+    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
 
 
 def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
@@ -140,10 +146,3 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
     )
 
     return manifest
-
-
-@step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
-def correct_on_request_questionnaire_print_files(context, fulfilment_code):
-    expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
-    _check_manifest_files_created(context, fulfilment_code)
