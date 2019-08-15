@@ -29,7 +29,7 @@ def send_unaddressed_message(context, questionnaire_type):
 
 @when("a Questionnaire Linked message is sent")
 def check_linked_message_is_received(context):
-    context.linked_case = context.case_created_events[1]['payload']['collectionCase']
+    context.linked_case = context.case_created_events[0]['payload']['collectionCase']
     context.linked_uac = context.uac_created_events[0]['payload']['uac']
 
     questionnaire_linked_message = {
@@ -63,6 +63,21 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
+@then("a CaseUpdated message is emitted to RH and Action Scheduler")
+def check_case_updated_message_is_emitted(context):
+    time.sleep(2)  # Give case processor a chance to process the receipt event
+
+    # skip receipt case updated message
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(_questionnaire_linked_callback, context=context))
+
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(_questionnaire_linked_callback, context=context))
+
+    tc.assertEqual(context.linked_case_id, context.linked_case['id'])
+    tc.assertEqual(True, context.linked_receipt_received)
+
+
 @then("a Questionnaire Linked event is logged")
 def check_case_events(context):
     case_id = context.linked_case['id']
@@ -93,13 +108,15 @@ def _uac_callback(ch, method, _properties, body, context):
 def _questionnaire_linked_callback(ch, method, _properties, body, context):
     parsed_body = json.loads(body)
 
-    if not parsed_body['event']['type'] == 'UAC_UPDATED':
+    event_type = parsed_body['event']['type']
+
+    if not event_type == 'CASE_UPDATED':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    tc.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
-    tc.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
-    context.expected_message_received = True
+    context.linked_case_id = parsed_body['payload']['collectionCase']['id']
+    context.linked_receipt_received = parsed_body['payload']['collectionCase']['receiptReceived']
+
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
