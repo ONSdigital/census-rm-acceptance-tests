@@ -7,7 +7,7 @@ from behave import step
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from config import Config
 
-case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
+get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
 def get_first_case(context):
@@ -52,6 +52,7 @@ def send_fulfilment_requested_event(context, pack_code):
 @step("the fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{case_api_url}{context.first_case["id"]}', params={'caseEvents': True})
-    response_json = response.json()
-    assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in response_json['caseEvents'])
+    response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})
+    assert 200 <= response.status_code <= 299, 'Get cases API call failed'
+    cases = response.json()
+    assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in cases['caseEvents'])
