@@ -98,3 +98,19 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
+
+
+@then('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
+def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='CASE_UPDATED'))
+
+    assert len(context.messages_received) == 1
+    case = context.messages_received[0]['payload']['collectionCase']
+    assert case['id'] == context.emitted_case['id']
+    assert case[case_field] == bool(expected_field_value)
+    context.emitted_case_updated = case
