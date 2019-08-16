@@ -54,7 +54,7 @@ def send_fulfilment_requested_event(context, pack_code):
 @step("a UAC fulfilment request message for a created case is sent")
 def create_uac_fulfilment_message(context):
     requests.get(f'{notify_stub_url}/reset')
-    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.case_for_events_check = {'id': context.uac_created_events[0]['payload']['uac']['caseId']}
 
     message = json.dumps(
         {
@@ -68,7 +68,7 @@ def create_uac_fulfilment_message(context):
             "payload": {
                 "fulfilmentRequest": {
                     "fulfilmentCode": "UACHHT1",
-                    "caseId": context.fulfilment_requested_case_id,
+                    "caseId": context.case_for_events_check['id'],
                     "contact": {
                         "telNo": "01234567"
                     }
@@ -82,17 +82,6 @@ def create_uac_fulfilment_message(context):
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
-
-
-@step("a fulfilment request event is logged")
-def check_case_events_logged(context):
-    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
-    response_json = response.json()
-    for case_event in response_json['caseEvents']:
-        if case_event['description'] == 'Fulfilment Request Received':
-            return
-    assert False
 
 
 @step("notify api was called")

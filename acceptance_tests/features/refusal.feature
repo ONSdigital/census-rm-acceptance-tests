@@ -8,3 +8,4 @@ Feature: Handle refusal message
     Then only unrefused cases appear in "P_IC_ICL1" print files
     And the case is marked as refused
     And an action instruction cancel message is emitted to FWMT
+    Then events logged for case are [SAMPLE_LOADED,REFUSAL_RECEIVED]

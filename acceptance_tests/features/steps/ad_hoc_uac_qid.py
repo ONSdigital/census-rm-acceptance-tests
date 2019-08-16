@@ -42,3 +42,5 @@ def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
         'Fulfilment request UAC updated event found with wrong questionnaire type'
     context.requested_uac = uac_updated_event['payload']['uac']['uac']
     context.requested_qid = uac_updated_event['payload']['uac']['questionnaireId']
+
+    context.case_for_events_check = {'id': uac_updated_event['payload']['uac']['caseId']}

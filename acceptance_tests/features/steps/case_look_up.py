@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from random import randint
 from uuid import uuid4
 
@@ -108,9 +109,11 @@ def correct_event_types_logged(context, event_type_list):
         _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
 
 
-@then("events logged for receipted cases are {event_type_list}")
-def event_logged_for_receipting(context, event_type_list):
-    actual_logged_events = _get_logged_events_for_case_by_id(context.emitted_case_updated['id'])
+@then("events logged for case are {event_type_list}")
+def event_logged_for_case(context, event_type_list):
+    # give the system time to process the events
+    time.sleep(1)
+    actual_logged_events = _get_logged_events_for_case_by_id(context.case_for_events_check['id'])
     _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
 
 

@@ -4,14 +4,14 @@ Feature: Handle fulfilment request events
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request message for a created case is sent
-    Then a fulfilment request event is logged
+    Then events logged for case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
 
   Scenario: UAC fulfilment request event logged and sent to notify service
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request message for a created case is sent
-    Then a fulfilment request event is logged
+    Then events logged for case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
     And notify api was called
 
 
@@ -21,7 +21,7 @@ Feature: Handle fulfilment request events
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
-    And the fulfilment request event is logged
+    Then events logged for case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
     Examples: Fulfilment codes
       | fulfilment code | questionnaire type |
