@@ -2,13 +2,12 @@ import base64
 import json
 import uuid
 from datetime import datetime
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 
-from acceptance_tests.utilities.rabbit_helper import add_test_queue
+from acceptance_tests.utilities.rabbit_helper import add_test_queue, purge_queues
 from config import Config
 
 
-def before_all(_):
+def before_all(_context):
     _setup_google_auth()
     add_test_queue(Config.RABBITMQ_CASE_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
                    Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
@@ -18,11 +17,10 @@ def before_all(_):
                    exchange_type='direct')
 
 
-def after_all(context):
-    with RabbitContext() as rabbit:
-        rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
-        rabbit.channel.queue_delete(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-        rabbit.channel.queue_delete(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
+def after_all(_context):
+    purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
 def before_scenario(context, _):
@@ -30,25 +28,17 @@ def before_scenario(context, _):
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
-    _purge_queues()
-
-
-def _purge_queues():
-    with RabbitContext() as rabbit:
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_INBOUND_REFUSAL_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE)
-        rabbit.channel.queue_purge(queue=Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
+    purge_queues(Config.RABBITMQ_INBOUND_REFUSAL_QUEUE,
+                 Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                 Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                 Config.RABBITMQ_SAMPLE_INBOUND_QUEUE,
+                 Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+                 Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
+                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
 
 def _setup_google_auth():
