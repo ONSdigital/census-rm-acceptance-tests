@@ -76,19 +76,6 @@ def find_case_by_caseRef(context):
     assert response.status_code == 200, 'Case ref not found'
 
 
-@then('events of pack code "{pack_code}" are logged against the case')
-def check_case_events(context, pack_code):
-    for case in context.case_created_events:
-        case_id = case['payload']['collectionCase']['id']
-        response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
-        response_json = json.loads(response)
-
-        for caseEvent in response_json['caseEvents']:
-            if caseEvent['eventType'] == 'PRINT_CASE_SELECTED':
-                return
-        assert False
-
-
 @then('events of type "{event_type}" are logged against the case')
 def correct_event_type_logged(context, event_type):
     for case in context.case_created_events:

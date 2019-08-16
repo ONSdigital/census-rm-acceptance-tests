@@ -1,3 +1,4 @@
+
 Feature: Case processor handles receipt message from pubsub service
   Case LogEvent set on our system (can we test for this now)
 
