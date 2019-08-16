@@ -37,7 +37,8 @@ def before_scenario(context, _):
                  Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE,
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                 Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE)
+                 Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
+                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
 
 def _setup_google_auth():
