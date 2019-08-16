@@ -7,12 +7,16 @@ from behave import step
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from config import Config
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
+get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@step("a fulfilment request message for a created case is sent")
-def create_refusal(context):
-    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+def get_first_case(context):
+    return context.case_created_events[0]['payload']['collectionCase']
+
+
+@step('a PQ fulfilment request event with fulfilment code "{pack_code}" is received by RM')
+def send_fulfilment_requested_event(context, pack_code):
+    context.first_case = get_first_case(context)
 
     message = json.dumps(
         {
@@ -25,8 +29,8 @@ def create_refusal(context):
             },
             "payload": {
                 "fulfilmentRequest": {
-                    "fulfilmentCode": "P_OR_H1",
-                    "caseId": context.fulfilment_requested_case_id,
+                    "fulfilmentCode": pack_code,
+                    "caseId": context.first_case['id'],
                     "contact": {
                         "title": "Mrs",
                         "forename": "Test",
@@ -37,6 +41,7 @@ def create_refusal(context):
         }
     )
 
+    time.sleep(2)
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
@@ -44,12 +49,10 @@ def create_refusal(context):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@step("a fulfilment request event is logged")
+@step("the fulfilment request event is logged")
 def check_case_events(context):
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{caseapi_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
-    response_json = response.json()
-    for case_event in response_json['caseEvents']:
-        if case_event['description'] == 'Fulfilment Request Received':
-            return
-    assert False
+    response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})
+    assert 200 <= response.status_code <= 299, 'Get cases API call failed'
+    cases = response.json()
+    assert any(case_event['description'] == 'Fulfilment Request Received' for case_event in cases['caseEvents'])

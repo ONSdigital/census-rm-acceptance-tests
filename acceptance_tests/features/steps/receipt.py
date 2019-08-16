@@ -1,11 +1,11 @@
 import functools
 import json
 import time
+import xml.etree.ElementTree as ET
 
 from behave import when, then
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
-import xml.etree.ElementTree as ET
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
@@ -50,9 +50,8 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    expected_id = context.emitted_case["id"]
-    assert context.case_id == expected_id
-    assert context.reason == 'RECEIPTED'
+    assert context.fwmt_emitted_case_id == context.emitted_case["id"]
+    assert context.addressType == 'HH'
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
@@ -62,8 +61,8 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         assert False, 'Unexpected message on Action.Field case queue, wanted actionCancel'
 
-    context.reason = root[0].find('.//reason').text
-    context.case_id = root[0].find('.//caseId').text
+    context.addressType = root[0].find('.//addressType').text
+    context.fwmt_emitted_case_id = root[0].find('.//caseId').text
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
