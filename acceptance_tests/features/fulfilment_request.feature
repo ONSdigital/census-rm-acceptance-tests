@@ -1,5 +1,20 @@
 Feature: Handle fulfilment request events
 
+  Scenario: Log event when a fulfilment request event is received
+    Given sample file "sample_input_england_census_spec.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When a UAC fulfilment request message for a created case is sent
+    Then a fulfilment request event is logged
+
+
+  Scenario: UAC fulfilment request event logged and sent to notify service
+    Given sample file "sample_input_england_census_spec.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When a UAC fulfilment request message for a created case is sent
+    Then a fulfilment request event is logged
+    And notify api was called
+
+
   Scenario Outline: Generate print file and log an event when an England fulfilment request event is received
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
