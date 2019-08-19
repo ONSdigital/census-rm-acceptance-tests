@@ -9,7 +9,7 @@ from behave import then, when
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, purge_queues
 from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
@@ -29,6 +29,9 @@ def send_unaddressed_message(context, questionnaire_type):
 
 @when("a Questionnaire Linked message is sent")
 def check_linked_message_is_received(context):
+    # Delete receipt event
+    purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
+
     context.linked_case = context.case_created_events[0]['payload']['collectionCase']
     context.linked_uac = context.uac_created_events[0]['payload']['uac']
 
@@ -65,24 +68,18 @@ def check_uac_message_is_received(context):
 
 @then("a CaseUpdated message is emitted to RH and Action Scheduler")
 def check_case_updated_message_is_emitted(context):
-    time.sleep(2)  # Give case processor a chance to process the receipt event
-
-    # skip receipt case updated message
+    context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(_questionnaire_linked_callback, context=context))
+    assert context.expected_message_received
 
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                                    functools.partial(_questionnaire_linked_callback, context=context))
-
-    tc.assertEqual(context.linked_case_id, context.linked_case['id'])
-    tc.assertEqual(True, context.linked_receipt_received)
 
 
 @then("a Questionnaire Linked event is logged")
 def check_case_events(context):
-    case_id = context.linked_case['id']
+    context.linked_case_id = context.linked_case['id']
     time.sleep(2)  # Give case processor a chance to process the fulfilment request event
-    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response = requests.get(f'{caseapi_url}{context.linked_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Questionnaire Linked':
@@ -108,15 +105,13 @@ def _uac_callback(ch, method, _properties, body, context):
 def _questionnaire_linked_callback(ch, method, _properties, body, context):
     parsed_body = json.loads(body)
 
-    event_type = parsed_body['event']['type']
-
-    if not event_type == 'CASE_UPDATED':
+    if not parsed_body['event']['type'] == 'CASE_UPDATED':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    context.linked_case_id = parsed_body['payload']['collectionCase']['id']
-    context.linked_receipt_received = parsed_body['payload']['collectionCase']['receiptReceived']
-
+    tc.assertEqual(context.linked_case_id, parsed_body['payload']['collectionCase']['id'])
+    tc.assertEqual(True, parsed_body['payload']['collectionCase']['receiptReceived'])
+    context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
