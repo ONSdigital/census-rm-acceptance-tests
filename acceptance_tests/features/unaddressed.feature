@@ -6,7 +6,7 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
 
   Scenario: Questionnaire linked to case
     Given sample file "sample_for_questionnaire_linked.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] qids
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When the receipt msg for a created case is put on the GCP pubsub
     And a Questionnaire Linked message is sent
     Then a Questionnaire Linked event is logged

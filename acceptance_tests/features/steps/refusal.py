@@ -1,13 +1,12 @@
 import functools
 import json
-from xml.etree import ElementTree as ET
 
 import requests
 from behave import step
 
+from acceptance_tests.features.steps.receipt import _field_work_receipt_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
-from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -75,19 +74,7 @@ def check_case_events(context):
 def refusal_received(context):
     context.seen_expected_fwmt_message = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                                    functools.partial(_refusal_callback, context=context))
-    assert context.seen_expected_fwmt_message, 'Expected message not seen'
+                                    functools.partial(_field_work_receipt_callback, context=context))
 
-
-def _refusal_callback(ch, method, _properties, body, context):
-    root = ET.fromstring(body)
-
-    if not root[0].tag == 'actionCancel':
-        ch.basic_nack(delivery_tag=method.delivery_tag)
-        assert False, 'Unexpected message on Action.Field queue'
-
-    tc.assertEqual(context.refused_case_id, root.find('.//caseId').text)
-    ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    context.seen_expected_fwmt_message = True
-    ch.stop_consuming()
+    assert context.fwmt_emitted_case_id == context.refused_case_id
+    assert context.addressType == 'HH'

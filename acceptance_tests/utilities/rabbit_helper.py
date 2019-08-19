@@ -3,6 +3,7 @@ import json
 import logging
 
 from structlog import wrap_logger
+
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -42,9 +43,25 @@ def store_all_msgs_in_context(ch, method, _properties, body, context, expected_m
         ch.stop_consuming()
 
 
+def store_first_message_in_context(ch, method, _properties, body, context, type_filter=None):
+    parsed_body = json.loads(body)
+    if parsed_body['event']['type'] == type_filter or type_filter is None:
+        context.first_message = parsed_body
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        ch.stop_consuming()
+    else:
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+
+
 def add_test_queue(binding_key, exchange_name, queue_name, exchange_type='topic'):
     with RabbitContext() as rabbit:
         rabbit.channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
         rabbit.channel.queue_declare(queue=queue_name, durable=True)
         rabbit.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)
         logger.info('Successfully add test queue to rabbitmq', exchange=exchange_name, binding=binding_key)
+
+
+def purge_queues(*queues):
+    with RabbitContext() as rabbit:
+        for queue in queues:
+            rabbit.channel.queue_purge(queue=queue)
