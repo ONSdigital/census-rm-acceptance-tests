@@ -74,7 +74,6 @@ def check_case_updated_message_is_emitted(context):
     assert context.expected_message_received
 
 
-
 @then("a Questionnaire Linked event is logged")
 def check_case_events(context):
     context.linked_case_id = context.linked_case['id']
