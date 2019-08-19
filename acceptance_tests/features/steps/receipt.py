@@ -112,4 +112,5 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
     assert len(context.messages_received) == 1
     context.case_for_events_check = context.messages_received[0]['payload']['collectionCase']
     assert context.case_for_events_check['id'] == context.emitted_case['id']
-    assert context.case_for_events_check[case_field] == bool(expected_field_value)
+    assert str(context.case_for_events_check[case_field]) == expected_field_value
+
