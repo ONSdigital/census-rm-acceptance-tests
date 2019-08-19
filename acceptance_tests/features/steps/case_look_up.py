@@ -75,7 +75,7 @@ def find_case_by_caseRef(context):
     assert response.status_code == 200, 'Case ref not found'
 
 
-@then('events of pack code "{pack_code}" are logged against the case')
+@then('events of pack code "{fulfilment_code}" are logged against the case')
 def check_case_events(context, pack_code):
     for case in context.case_created_events:
         case_id = case['payload']['collectionCase']['id']
