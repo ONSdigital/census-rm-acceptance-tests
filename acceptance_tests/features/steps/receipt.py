@@ -20,6 +20,14 @@ def receipt_msg_published_to_gcp_pubsub(context):
     assert context.sent_to_gcp is True
 
 
+@when("the offline receipt msg for the created case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsub(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    assert context.sent_to_gcp is True
+
+
 @when("the receipt msg for the created case is put on the GCP pubsub with just qid")
 def receipt_msg_published_to_gcp_pubsub_just_qid(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
@@ -88,6 +96,35 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
                                eventType='OBJECT_FINALIZE',
                                bucketId='eq-bucket',
                                objectId=tx_id)
+    if not future.done():
+        time.sleep(1)
+    try:
+        future.result(timeout=30)
+    except GoogleAPIError:
+        return
+
+    print(f'Message published to {topic_path}')
+
+    context.sent_to_gcp = True
+
+
+def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+    context.sent_to_gcp = False
+
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
+
+    data = json.dumps({
+        "dateTime": "2008-08-24T00:00:00Z",
+        "transactionId": tx_id,
+        "questionnaireId": questionnaire_id,
+        "channel": "PQRS"
+    })
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
     if not future.done():
         time.sleep(1)
     try:
