@@ -126,11 +126,11 @@ def child_case_is_emitted(context):
                                                       type_filter='CASE_CREATED'))
     assert len(context.messages_received) == 1
     child_case_arid = context.messages_received[0]['payload']['collectionCase']['address']['estabArid']
-    parent_case_arid = _get_parent_case_arid(context)
+    parent_case_arid = _get_parent_case_estabd_arid(context)
 
     assert child_case_arid == parent_case_arid, "Parent and child Arids must match to link cases"
 
 
-def _get_parent_case_arid(context):
+def _get_parent_case_estabd_arid(context):
     response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}')
     return response.json()['estabArid']
