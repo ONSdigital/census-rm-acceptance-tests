@@ -96,7 +96,7 @@ def correct_event_types_logged(context, event_type_list):
         _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
 
 
-@then("events logged for case are {event_type_list}")
+@then("the events logged for the case are {event_type_list}")
 def event_logged_for_case(context, event_type_list):
     # give the system time to process the events
     time.sleep(1)
