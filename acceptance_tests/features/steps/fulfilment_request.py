@@ -46,7 +46,7 @@ def send_print_fulfilment_request(context, fulfilment_code):
             }
         }
     )
-    
+
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
