@@ -46,7 +46,7 @@ def send_print_fulfilment_request(context, fulfilment_code):
             }
         }
     )
-    # time.sleep(2)
+    
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
