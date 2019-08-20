@@ -52,7 +52,7 @@ def send_fulfilment_requested_event(context, pack_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@when('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
+@step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
 def create_uac_fulfilment_message(context, fulfilment_code):
     requests.get(f'{notify_stub_url}/reset')
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
@@ -125,7 +125,6 @@ def child_case_is_emitted(context):
                                                       expected_msg_count=1,
                                                       type_filter='CASE_CREATED'))
     assert len(context.messages_received) == 1
-    add = context.messages_received[0]['payload']['collectionCase']['address']
     child_case_arid = context.messages_received[0]['payload']['collectionCase']['address']['estabArid']
     parent_case_arid = _get_parent_case_arid(context)
 
