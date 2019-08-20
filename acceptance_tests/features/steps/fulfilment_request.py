@@ -97,13 +97,14 @@ def check_case_events_logged(context):
     assert False
 
 
-@step("notify api was called")
-def check_notify_api_call(context):
+@step('notify api was called with template id "{expected_template_id}"')
+def check_notify_api_call(context, expected_template_id):
     response = requests.get(f'{notify_stub_url}/log')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
     assert len(response_json) == 1, "Incorrect number of responses"
-    assert response_json[0]["phone_number"] == '01234567', "Invalid expected phone number"
+    assert response_json[0]["phone_number"] == '01234567', "Incorrect phone number"
+    assert response_json[0]["template_id"] == expected_template_id, "Incorrect template Id"
 
 
 @step("the fulfilment request event is logged")
