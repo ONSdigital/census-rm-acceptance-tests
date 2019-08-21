@@ -46,7 +46,7 @@ class Config:
     RECEIPT_TOPIC_PROJECT = os.getenv('RECEIPT_TOPIC_PROJECT', 'project')
     OFFLINE_RECEIPT_TOPIC_PROJECT = os.getenv('OFFLINE_RECEIPT_TOPIC_PROJECT', 'offline-project')
     RECEIPT_TOPIC_ID = os.getenv('RECEIPT_TOPIC_ID', 'eq-submission-topic')
-    OFFLINE_RECEIPT_TOPIC_ID = os.getenv('OFFLINE_RECEIPT_TOPIC_ID', 'offline-receipting-topic')
+    OFFLINE_RECEIPT_TOPIC_ID = os.getenv('OFFLINE_RECEIPT_TOPIC_ID', 'offline-receipt-topic')
 
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
