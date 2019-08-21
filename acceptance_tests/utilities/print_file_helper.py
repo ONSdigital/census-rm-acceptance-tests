@@ -128,3 +128,20 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
         f'{case["address"]["postcode"]}|'
         f'{pack_code}'
     )
+
+
+def create_expected_supplementary_materials_csv(context, fulfilment_code):
+    return [_create_expected_supplementary_materials_csv_line(context.first_case, fulfilment_code)]
+
+
+def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
+    return (
+        f'|{case["caseRef"]}|'
+        f'Mrs|Test|McTest|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{fulfilment_code}'
+    )
