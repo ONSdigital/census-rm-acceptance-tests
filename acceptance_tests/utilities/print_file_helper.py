@@ -33,6 +33,24 @@ def create_expected_questionnaire_csv_lines(context, prefix):
     ]
 
 
+def create_expected_reminder_letter_csv_lines(context, pack_code):
+    expected_data = defaultdict(dict)
+
+    expected_reminder_case_created_events = (case for case in context.case_created_events
+                                             if case['payload']['collectionCase']['id'] in context.reminder_case_ids)
+
+    for uac in context.reminder_uac_updated_events:
+        expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+
+    for case in expected_reminder_case_created_events:
+        expected_data = _add_expected_case_data(case, expected_data)
+
+    return [
+        _create_expected_csv_line(case, pack_code)
+        for case in expected_data.values()
+    ]
+
+
 def _add_expected_uac_data(message, expected_data):
     case_id = message['payload']['uac']['caseId']
     uac_payload = message['payload']['uac']

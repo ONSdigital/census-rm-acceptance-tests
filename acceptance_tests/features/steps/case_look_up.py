@@ -4,8 +4,10 @@ from random import randint
 from uuid import uuid4
 
 import requests
-from behave import then, given
+from behave import then, given, step
 from structlog import wrap_logger
+
+from acceptance_tests.utilities.test_case_helper import tc
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -92,7 +94,35 @@ def event_logged_for_case(context, event_type_list):
     check_if_event_list_is_exact_match(event_type_list, context.emitted_case['id'])
 
 
+def _check_if_event_is_logged(expected_event_type, actual_logged_events):
+    actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
+    tc.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
+                   msg=(f'Expected event type = {expected_event_type},'
+                        f' actual logged event types = {actual_logged_event_types}'))
+
+
+@step('"{event_type}" events are logged against the cases included in the reminder')
+def check_print_case_selected_event_is_logged_against_reminder_cases(context, event_type):
+    for case_id in context.reminder_case_ids:
+        actual_logged_events = get_logged_events_for_case_by_id(case_id)
+        _check_if_event_is_logged(event_type, actual_logged_events)
+
+
+@then("events logged for receipted cases are {event_type_list}")
+def event_logged_for_receipting(context, event_type_list):
+    actual_logged_events = get_logged_events_for_case_by_id(context.emitted_case_updated['id'])
+    _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
+
+
 def get_logged_events_for_case_by_id(case_id):
     response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
     response_json = json.loads(response)
     return response_json['caseEvents']
+
+
+def _check_if_event_list_is_exact_match(event_type_list, actual_logged_events):
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+    actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
+
+    tc.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
+                        msg="Actual logged event types did not match expected")
