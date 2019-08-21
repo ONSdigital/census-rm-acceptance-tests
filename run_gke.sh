@@ -54,7 +54,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=RECEIPT_TOPIC_PROJECT=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-project-id}") \
     --env=RECEIPT_TOPIC_ID=$(kubectl get configmap pubsub-config -o=jsonpath="{.data.receipt-topic-name}") \
     --env=OFFLINE_RECEIPT_TOPIC_PROJECT=$(kubectl get configmap project-config -o=jsonpath="{.data.project-name}") \
-    --env=OFFLINE_RECEIPT_TOPIC_ID=offline-receipting-topic \
+    --env=OFFLINE_RECEIPT_TOPIC_ID=offline-receipt-topic \
     --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
     --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
     --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
