@@ -6,7 +6,8 @@ import requests
 from behave import step
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
+from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
 from config import Config
 
 notify_stub_url = f'{Config.NOTIFY_STUB_SERVICE}'
@@ -17,10 +18,13 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
-@step('a PQ fulfilment request event with fulfilment code "{pack_code}" is received by RM')
-def send_fulfilment_requested_event(context, pack_code):
-    context.first_case = get_first_case(context)
+@step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
+def send_pq_fulfilment_requested_event(context, fulfilment_code):
+    send_print_fulfilment_request(context, fulfilment_code)
 
+
+def send_print_fulfilment_request(context, fulfilment_code):
+    context.first_case = get_first_case(context)
     message = json.dumps(
         {
             "event": {
@@ -32,7 +36,7 @@ def send_fulfilment_requested_event(context, pack_code):
             },
             "payload": {
                 "fulfilmentRequest": {
-                    "fulfilmentCode": pack_code,
+                    "fulfilmentCode": fulfilment_code,
                     "caseId": context.first_case['id'],
                     "contact": {
                         "title": "Mrs",
@@ -44,7 +48,6 @@ def send_fulfilment_requested_event(context, pack_code):
         }
     )
 
-    time.sleep(2)
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
@@ -134,3 +137,12 @@ def child_case_is_emitted(context):
 def _get_parent_case_estabd_arid(context):
     response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}')
     return response.json()['estabArid']
+
+
+@step('a supplementary materials fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
+def send_supplementary_materials_fulfilment_requested_event(context, fulfilment_code):
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(store_first_message_in_context, context=context,
+                                                      type_filter='CASE_CREATED'))
+    context.case_created_events = [context.first_message]
+    send_print_fulfilment_request(context, fulfilment_code)
