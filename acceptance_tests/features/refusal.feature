@@ -1,7 +1,7 @@
 Feature: Handle refusal message
 
   Scenario: Refusal message results in case excluded from action plan
-    Given an action rule of type "ICL1E" is set 10 seconds in the future
+    Given an action rule of type "ICL1E" is set 4 seconds in the future
     And sample file "sample_for_refusals.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a refusal message for a created case is received

@@ -19,8 +19,8 @@ Feature: Case processor handles receipt message from pubsub service
     And an ActionCancelled event is sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
-    Scenario: Receipted Cases are excluded from print files
-    Given an action rule of type "ICL1E" is set 10 seconds in the future
+  Scenario: Receipted Cases are excluded from print files
+    Given an action rule of type "ICL1E" is set 4 seconds in the future
     And sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When the receipt msg for a created case is put on the GCP pubsub
