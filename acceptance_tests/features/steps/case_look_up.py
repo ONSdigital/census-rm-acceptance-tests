@@ -1,17 +1,14 @@
 import json
 import logging
-import time
 from random import randint
 from uuid import uuid4
 
 import requests
 from behave import then, given
 from structlog import wrap_logger
-
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
-
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
@@ -89,38 +86,14 @@ def correct_event_type_logged(context, event_type):
         assert False
 
 
-@then("events logged against the case are {event_type_list}")
-def correct_event_types_logged(context, event_type_list):
-    for case in context.case_created_events:
-        actual_logged_events = _get_logged_events_for_case_by_id(case['payload']['collectionCase']['id'])
-        _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
-
-
 @then("the events logged for the case are {event_type_list}")
 def event_logged_for_case(context, event_type_list):
-    # give the system time to process the events
-    time.sleep(1)
-    actual_logged_events = _get_logged_events_for_case_by_id(context.case_for_events_check['id'])
-    _check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
+    actual_logged_events = get_logged_events_for_case_by_id(context.emitted_case['id'])
+    from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
+    check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
 
 
-def _get_logged_events_for_case_by_id(case_id):
+def get_logged_events_for_case_by_id(case_id):
     response = requests.get(f'{caseapi_url}{case_id}?caseEvents=true').content.decode("utf-8")
     response_json = json.loads(response)
     return response_json['caseEvents']
-
-
-def _check_if_event_list_is_exact_match(event_type_list, actual_logged_events):
-    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
-    expected_logged_event_types_copy = expected_logged_event_types.copy()
-
-    assert len(actual_logged_events) == len(expected_logged_event_types), "wrong number of events logged"
-
-    for case_event in actual_logged_events:
-        for expected_event in expected_logged_event_types:
-            if case_event['eventType'] == expected_event:
-                expected_logged_event_types_copy.remove(expected_event)
-                break
-
-    if len(expected_logged_event_types_copy) > 0:
-        assert False, "didn't log expected event types"

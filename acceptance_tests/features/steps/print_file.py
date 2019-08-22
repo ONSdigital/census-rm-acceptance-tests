@@ -9,7 +9,7 @@ from structlog import wrap_logger
 from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PACK_CODE_TO_DATASET, \
     PACK_CODE_TO_DESCRIPTION
 from acceptance_tests.utilities.print_file_helper import create_expected_questionnaire_csv_lines, \
-    create_expected_csv_lines, create_expected_on_request_questionnaire_csv
+    create_expected_csv_lines, create_expected_on_request_questionnaire_csv, create_expected_supplementary_materials_csv
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 
@@ -19,25 +19,25 @@ logger = wrap_logger(logging.getLogger(__name__))
 @then('correctly formatted "{pack_code}" print files are created for questionnaire')
 def check_correct_wales_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_questionnaire_csv_lines(context, pack_code)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
 @then('correctly formatted "{pack_code}" print files are created')
 def check_correct_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_csv_lines(context, pack_code)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
 @then('only unrefused cases appear in "{pack_code}" print files')
 def check_correct_unrefused_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_csv_lines(context, pack_code, context.refused_case_id)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
 @then('only unreceipted cases appear in "{pack_code}" print files')
 def check_correct_unreceipted_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_csv_lines(context, pack_code, context.emitted_case['id'])
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
 def _msgs_received(ch, method, _properties, body, context, multiplier=1):
@@ -58,11 +58,19 @@ def check_manifest_files(context, pack_code):
 @step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
 def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
-    _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
 
 
-def _check_notification_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
+@then('correctly formatted on request supplementary material print'
+      ' and manifest files for "{fulfilment_code}" are created')
+def correct_supplementary_material_print_files(context, fulfilment_code):
+    expected_csv_lines = create_expected_supplementary_materials_csv(context, fulfilment_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
+
+
+def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
     with SftpUtility() as sftp_utility:
         _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, pack_code)
 
@@ -74,17 +82,11 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
     files = sftp_utility.get_all_files_after_time(start_of_test, pack_code, ".csv.gpg")
 
     actual_content_list = sftp_utility.get_files_content_as_list(files, pack_code)
-
+    if not actual_content_list:
+        raise FileNotFoundError
     actual_content_list.sort()
     expected_csv_lines.sort()
-
-    if actual_content_list != expected_csv_lines:
-        file_names = [f.filename for f in files]
-        logger.info('Unable to find all expected data in existing files', files_found=file_names,
-                    expected_csv_lines=expected_csv_lines, actual_content_list=actual_content_list)
-        raise FileNotFoundError
-
-    return True
+    assert actual_content_list == expected_csv_lines, 'Print file contents did not match expected'
 
 
 def _check_manifest_files_created(context, pack_code):
