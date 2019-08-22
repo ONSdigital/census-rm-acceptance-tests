@@ -1,6 +1,5 @@
 import functools
 import json
-import time
 
 import requests
 from behave import step
