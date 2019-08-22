@@ -1,4 +1,5 @@
 from behave import step
+from retrying import retry
 
 from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 
@@ -6,11 +7,12 @@ from acceptance_tests.features.steps.case_look_up import get_logged_events_for_c
 @step("events logged against the case are {event_type_list}")
 def correct_event_types_logged(context, event_type_list):
     for case in context.case_created_events:
-        actual_logged_events = get_logged_events_for_case_by_id(case['payload']['collectionCase']['id'])
-        check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
+        check_if_event_list_is_exact_match(event_type_list, case['payload']['collectionCase']['id'])
 
 
-def check_if_event_list_is_exact_match(event_type_list, actual_logged_events):
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_if_event_list_is_exact_match(event_type_list, case_id):
+    actual_logged_events = get_logged_events_for_case_by_id(case_id)
     expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
     expected_logged_event_types_copy = expected_logged_event_types.copy()
 
