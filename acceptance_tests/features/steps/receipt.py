@@ -118,6 +118,6 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 
 
 @step("the events logged for the receipted case are {expected_event_list}")
-def check_loggged_events_for_receipted_case(context, expected_event_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.reciepted_emitted_case['id'] )
+def check_logged_events_for_receipted_case(context, expected_event_list):
+    actual_logged_events = get_logged_events_for_case_by_id(context.reciepted_emitted_case['id'])
     check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)

@@ -20,21 +20,19 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
+# @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
+# def send_pq_fulfilment_requested_event(context, fulfilment_code):
+#     context.first_case = get_first_case(context)
+#     _build_fulfilment_msg_and_send(fulfilment_code, context.first_case['id'])
+
+
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_pq_fulfilment_requested_event(context, fulfilment_code):
+    send_print_fulfilment_request(context, fulfilment_code)
+
+
+def send_print_fulfilment_request(context, fulfilment_code):
     context.first_case = get_first_case(context)
-    _build_fulfilment_msg_and_send(fulfilment_code, context.first_case['id'])
-
-
-@step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
-def create_uac_fulfilment_message(context, fulfilment_code):
-    requests.get(f'{notify_stub_url}/reset')
-    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
-
-    _build_fulfilment_msg_and_send(fulfilment_code, context.fulfilment_requested_case_id)
-
-
-def _build_fulfilment_msg_and_send(fulfilment_code, fulfilment_case_id):
     message = json.dumps(
         {
             "event": {
@@ -47,7 +45,42 @@ def _build_fulfilment_msg_and_send(fulfilment_code, fulfilment_case_id):
             "payload": {
                 "fulfilmentRequest": {
                     "fulfilmentCode": fulfilment_code,
-                    "caseId": fulfilment_case_id,
+                    "caseId": context.first_case['id'],
+                    "contact": {
+                        "title": "Mrs",
+                        "forename": "Test",
+                        "surname": "McTest"
+                    }
+                }
+            }
+        }
+    )
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
+
+
+@step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
+def create_uac_fulfilment_message(context, fulfilment_code):
+    requests.get(f'{notify_stub_url}/reset')
+    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+
+    message = json.dumps(
+        {
+            "event": {
+                "type": "FULFILMENT_REQUESTED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2019-07-07T22:37:11.988+0000",
+                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+            },
+            "payload": {
+                "fulfilmentRequest": {
+                    "fulfilmentCode": fulfilment_code,
+                    "caseId": context.fulfilment_requested_case_id,
                     "address": {},
                     "contact": {
                         "telNo": "01234567",
@@ -63,9 +96,9 @@ def _build_fulfilment_msg_and_send(fulfilment_code, fulfilment_case_id):
             content_type='application/json',
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
+
 @step("a fulfilment request event is logged")
 def check_case_events_logged(context):
-    # time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
