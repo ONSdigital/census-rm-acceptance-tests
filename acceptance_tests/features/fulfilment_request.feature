@@ -29,6 +29,10 @@ Feature: Handle fulfilment request events
       | P_OR_H2         | 02                 |
       | P_OR_H2W        | 03                 |
       | P_OR_H4         | 04                 |
+      | P_OR_HC1        | 11                 |
+      | P_OR_HC2        | 12                 |
+      | P_OR_HC2W       | 13                 |
+      | P_OR_HC4        | 14                 |
 
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
