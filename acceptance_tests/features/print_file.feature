@@ -14,7 +14,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
       | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
 
-  Scenario Outline: Generate print files and log events for initial contact letters
+  Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given an action rule of type "<action type>" is set 2 seconds in the future
     When sample file "<sample file>" is loaded
     Then messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
