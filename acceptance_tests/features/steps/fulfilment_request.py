@@ -1,6 +1,5 @@
 import functools
 import json
-import time
 
 import requests
 from behave import step
@@ -18,12 +17,6 @@ get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
-
-
-# @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
-# def send_pq_fulfilment_requested_event(context, fulfilment_code):
-#     context.first_case = get_first_case(context)
-#     _build_fulfilment_msg_and_send(fulfilment_code, context.first_case['id'])
 
 
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
@@ -109,7 +102,7 @@ def check_case_events_logged(context):
 
 @step('notify api was called with template id "{expected_template_id}"')
 def check_notify_api_call(context, expected_template_id):
-    time.sleep(2)
+    # time.sleep(2)
     response = requests.get(f'{notify_stub_url}/log')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
@@ -120,7 +113,6 @@ def check_notify_api_call(context, expected_template_id):
 
 @step("the fulfilment request event is logged")
 def check_case_events(context):
-    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})
     assert 200 <= response.status_code <= 299, 'Get cases API call failed'
     cases = response.json()
