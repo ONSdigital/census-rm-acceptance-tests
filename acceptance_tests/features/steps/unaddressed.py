@@ -84,7 +84,6 @@ def _uac_callback(ch, method, _properties, body, context):
 
     tc.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
     tc.assertEqual(context.expected_questionnaire_type, parsed_body['payload']['uac']['questionnaireId'][:2])
-    tc.assertNotIn('caseId', parsed_body['payload']['uac'].keys())
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()

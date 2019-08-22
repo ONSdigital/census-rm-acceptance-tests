@@ -30,6 +30,8 @@ class Config:
     RABBITMQ_REFUSAL_ROUTING_KEY = os.getenv('RABBITMQ_REFUSAL_ROUTING_KEY', 'event.respondent.refusal')
     RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY = os.getenv('RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY',
                                                           'event.fulfilment.request')
+    RABBITMQ_INVALID_ADDRESS_ROUTING_KEY = os.getenv('RABBITMQ_INVALID_ADDRESS_ROUTING_KEY',
+                                                     'event.case.address.update')
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
