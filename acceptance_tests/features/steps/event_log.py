@@ -20,7 +20,7 @@ def check_print_case_selected_event_is_logged_against_reminder_cases(context, ev
 
 @step("events logged for receipted cases are {event_type_list}")
 def event_logged_for_receipting(context, event_type_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.emitted_case_updated['id'])
+    actual_logged_events = get_logged_events_for_case_by_id(context.receipted_emitted_case['id'])
     check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
 
 
