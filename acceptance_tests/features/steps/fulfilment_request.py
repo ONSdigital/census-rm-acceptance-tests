@@ -1,10 +1,12 @@
 import functools
 import json
-import time
 
 import requests
 from behave import step
+from retrying import retry
 
+from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
+from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
@@ -91,7 +93,6 @@ def create_uac_fulfilment_message(context, fulfilment_code):
 
 @step("a fulfilment request event is logged")
 def check_case_events_logged(context):
-    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
@@ -102,6 +103,11 @@ def check_case_events_logged(context):
 
 @step('notify api was called with template id "{expected_template_id}"')
 def check_notify_api_call(context, expected_template_id):
+    check_notify_api_called_with_correct_template_id(expected_template_id)
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_notify_api_called_with_correct_template_id(expected_template_id):
     response = requests.get(f'{notify_stub_url}/log')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
@@ -112,7 +118,6 @@ def check_notify_api_call(context, expected_template_id):
 
 @step("the fulfilment request event is logged")
 def check_case_events(context):
-    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
     response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})
     assert 200 <= response.status_code <= 299, 'Get cases API call failed'
     cases = response.json()
@@ -146,3 +151,15 @@ def send_supplementary_materials_fulfilment_requested_event(context, fulfilment_
                                                       type_filter='CASE_CREATED'))
     context.case_created_events = [context.first_message]
     send_print_fulfilment_request(context, fulfilment_code)
+
+
+@step("the fulfilment request case has these events logged {expected_event_list}")
+def check_fulfilment_events(context, expected_event_list):
+    actual_logged_events = get_logged_events_for_case_by_id(context.fulfilment_requested_case_id)
+    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)
+
+
+@step("the questionnaire fulfilment case has these events logged {expected_event_list}")
+def check_questionair_fulfilment_events(context, expected_event_list):
+    actual_logged_events = get_logged_events_for_case_by_id(context.first_case['id'])
+    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)

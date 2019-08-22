@@ -4,6 +4,8 @@ import json
 import requests
 from behave import step
 
+from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
+from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.receipt import _field_work_receipt_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
@@ -78,3 +80,9 @@ def refusal_received(context):
 
     assert context.fwmt_emitted_case_id == context.refused_case_id
     assert context.addressType == 'HH'
+
+
+@step("the events logged for the refusal case are {expected_event_list}")
+def check_refusal_event_logging(context, expected_event_list):
+    actual_logged_events = get_logged_events_for_case_by_id(context.refused_case_id)
+    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)
