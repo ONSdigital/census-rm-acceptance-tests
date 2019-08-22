@@ -1,8 +1,10 @@
 import functools
 import json
+import time
 
 import requests
 from behave import step
+from retrying import retry
 
 from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
@@ -102,7 +104,11 @@ def check_case_events_logged(context):
 
 @step('notify api was called with template id "{expected_template_id}"')
 def check_notify_api_call(context, expected_template_id):
-    # time.sleep(2)
+    check_notify_api_called_with_correct_template_id(expected_template_id)
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_notify_api_called_with_correct_template_id(expected_template_id):
     response = requests.get(f'{notify_stub_url}/log')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
