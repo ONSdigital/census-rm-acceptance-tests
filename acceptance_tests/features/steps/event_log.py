@@ -14,8 +14,7 @@ def correct_event_types_logged(context, event_type_list):
 @step('"{event_type}" events are logged against the cases included in the reminder')
 def check_print_case_selected_event_is_logged_against_reminder_cases(context, event_type):
     for case_id in context.reminder_case_ids:
-        actual_logged_events = get_logged_events_for_case_by_id(case_id)
-        _check_if_event_is_logged(event_type, actual_logged_events)
+        _check_if_event_is_logged(event_type, case_id)
 
 
 @step("events logged for receipted cases are {event_type_list}")
@@ -34,7 +33,9 @@ def check_if_event_list_is_exact_match(event_type_list, case_id):
                         msg="Actual logged event types did not match expected")
 
 
-def _check_if_event_is_logged(expected_event_type, actual_logged_events):
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def _check_if_event_is_logged(expected_event_type, case_id):
+    actual_logged_events = get_logged_events_for_case_by_id(case_id)
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
     tc.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
                    msg=(f'Expected event type = {expected_event_type},'
