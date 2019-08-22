@@ -5,7 +5,6 @@ import requests
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
@@ -155,11 +154,9 @@ def send_supplementary_materials_fulfilment_requested_event(context, fulfilment_
 
 @step("the fulfilment request case has these events logged {expected_event_list}")
 def check_fulfilment_events(context, expected_event_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.fulfilment_requested_case_id)
-    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)
+    check_if_event_list_is_exact_match(expected_event_list, context.fulfilment_requested_case_id)
 
 
 @step("the questionnaire fulfilment case has these events logged {expected_event_list}")
-def check_questionair_fulfilment_events(context, expected_event_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.first_case['id'])
-    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)
+def check_questionaire_fulfilment_events(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])

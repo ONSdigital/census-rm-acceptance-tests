@@ -7,7 +7,6 @@ from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
-from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
@@ -119,5 +118,4 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 
 @step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_receipted_case(context, expected_event_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.reciepted_emitted_case['id'])
-    check_if_event_list_is_exact_match(expected_event_list, actual_logged_events)
+    check_if_event_list_is_exact_match(expected_event_list, context.reciepted_emitted_case['id'])

@@ -88,9 +88,8 @@ def correct_event_type_logged(context, event_type):
 
 @then("the events logged for the case are {event_type_list}")
 def event_logged_for_case(context, event_type_list):
-    actual_logged_events = get_logged_events_for_case_by_id(context.emitted_case['id'])
     from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-    check_if_event_list_is_exact_match(event_type_list, actual_logged_events)
+    check_if_event_list_is_exact_match(event_type_list, context.emitted_case['id'])
 
 
 def get_logged_events_for_case_by_id(case_id):
