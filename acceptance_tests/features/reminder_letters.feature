@@ -1,6 +1,6 @@
 Feature: Print files for reminder letters can be generated and uploaded
 
-  Scenario Outline: Reminder letters can be generated from a scheduled action rule
+  Scenario Outline: Generate print files and log events for scheduled reminder letters
     Given sample file "<sample file>" is loaded
     And an action rule of type "<pack code>" is set 2 seconds in the future
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
@@ -9,7 +9,7 @@ Feature: Print files for reminder letters can be generated and uploaded
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
 
-    Examples: Reminder pack codes
+    Examples: Reminder letter: <pack code>
       | pack code     | questionnaire types | number of matching cases | sample file                          |
       | P_RL_1RL1_1   | [01]                | 2                        | sample_input_england_census_spec.csv |
       | P_RL_2RL2B_3a | [02]                | 2                        | sample_input_wales_census_spec.csv   |

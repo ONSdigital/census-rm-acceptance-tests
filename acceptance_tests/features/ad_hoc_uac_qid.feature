@@ -6,7 +6,7 @@ Feature: A UAC/QID pair can be requested for a case
     When a UAC/QID pair is requested with questionnaire type "<questionnaire type>"
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
 
-    Examples: Questionnaire types
+    Examples: Questionnaire type: <questionnaire type>
       | questionnaire type |
       | 01                 |
       | 02                 |

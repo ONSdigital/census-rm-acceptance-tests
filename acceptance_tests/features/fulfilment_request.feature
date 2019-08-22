@@ -23,7 +23,7 @@ Feature: Handle fulfilment request events
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
     And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
-    Examples: Questionnaires
+    Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
       | P_OR_H2         | 02                 |
@@ -51,13 +51,13 @@ Feature: Handle fulfilment request events
     Then correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
 
-    Examples: Large print questionnaires
+    Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
       | P_LP_HL1        |
       | P_LP_HL2W       |
       | P_LP_HL4        |
 
-    Examples: Translation Booklets
+    Examples: Translation Booklet: <fulfilment code>
       | fulfilment code |
       | P_TB_TBARA1     |
       | P_TB_TBPOL4     |
