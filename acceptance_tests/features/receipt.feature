@@ -26,4 +26,4 @@ Feature: Case processor handles receipt message from pubsub service
     When the receipt msg for a created case is put on the GCP pubsub
     Then only unreceipted cases appear in "P_IC_ICL1" print files
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,PRINT_CASE_SELECTED]
+    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
