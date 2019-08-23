@@ -45,7 +45,7 @@ def uac_updated_msg_emitted(context):
     assert uac['active'] is False
 
 
-@then("a ActionCancelled event is sent to field work management")
+@then("an ActionCancelled event is sent to field work management")
 def action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
