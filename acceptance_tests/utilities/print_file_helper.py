@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from acceptance_tests.utilities.test_case_helper import tc
+
 
 def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     expected_data = defaultdict(dict)
@@ -47,6 +49,31 @@ def create_expected_reminder_letter_csv_lines(context, pack_code):
 
     return [
         _create_expected_csv_line(case, pack_code)
+        for case in expected_data.values()
+    ]
+
+
+def create_expected_reminder_questionnaire_csv_lines(context, pack_code):
+    expected_data = defaultdict(dict)
+
+    expected_reminder_case_created_events = (case for case in context.case_created_events
+                                             if case['payload']['collectionCase']['id'] in context.reminder_case_ids)
+
+    for uac in context.reminder_uac_updated_events:
+        if not uac['payload']['uac']['questionnaireId'].startswith('03'):
+            expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+            expected_data[uac['payload']['uac']['caseId']]['qid'] = uac['payload']['uac']['questionnaireId']
+        elif not expected_data[uac['payload']['uac']['caseId']].get('uac_wales'):
+            expected_data[uac['payload']['uac']['caseId']]['uac_wales'] = uac['payload']['uac']['uac']
+            expected_data[uac['payload']['uac']['caseId']]['qid_wales'] = uac['payload']['uac']['questionnaireId']
+        else:
+            tc.fail('Too many reminder UAC Updated events for case')
+
+    for case in expected_reminder_case_created_events:
+        expected_data = _add_expected_questionnaire_case_data(case, expected_data)
+
+    return [
+        _create_expected_questionnaire_csv_line(case, pack_code)
         for case in expected_data.values()
     ]
 
@@ -111,6 +138,23 @@ def _create_expected_csv_line(case, prefix):
 
 
 def _create_expected_questionnaire_csv_line(case, prefix):
+    return (
+        f'{case["uac"]}|'
+        f'{case["qid"]}|'
+        f'{case.get("uac_wales", "")}|'
+        f'{case.get("qid_wales", "")}|'
+        f'{case["coordinator_id"]}|'
+        f'|||'
+        f'{case["address_line_1"]}|'
+        f'{case["address_line_2"]}|'
+        f'{case["address_line_3"]}|'
+        f'{case["town_name"]}|'
+        f'{case["postcode"]}|'
+        f'{prefix}'
+    )
+
+
+def _create_expected_reminder_questionnaire_csv_line(case, prefix):
     return (
         f'{case["uac"]}|'
         f'{case["qid"]}|'
