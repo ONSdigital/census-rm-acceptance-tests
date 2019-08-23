@@ -4,16 +4,16 @@ Feature: Handle fulfilment request events
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request "UACHHT1" message for a created case is sent
-    Then a fulfilment request event is logged
     And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
   Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request "UACIT1" message for a created case is sent
-    Then a fulfilment request event is logged
-    And a new child case is emitted to RH and Action Scheduler
+    Then a new child case is emitted to RH and Action Scheduler
     And notify api was called with template id "1ccd02a4-9b90-4234-ab7a-9215cb498f14"
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
@@ -21,7 +21,7 @@ Feature: Handle fulfilment request events
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
-    And the fulfilment request event is logged
+    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
     Examples: Questionnaires
       | fulfilment code | questionnaire type |
