@@ -33,6 +33,19 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
+@step('UAC Updated events for the new reminder UAC QID pairs are emitted'
+      ' for the {number_of_matching_cases:d} cases with matching treatment codes')
+def gather_uac_updated_events(context, number_of_matching_cases):
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=number_of_matching_cases,
+                                                      type_filter='UAC_UPDATED'))
+    assert len(context.messages_received) == number_of_matching_cases
+    context.reminder_uac_updated_events = context.messages_received.copy()
+    context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
+    context.messages_received = []
+
+
 def _get_extended_case_created_events_for_uacs(context, questionnaire_types):
     questionnaire_types_list = questionnaire_types.replace('[', '').replace(']', '').split(',')
     expected_uacs_cases = context.case_created_events.copy()
