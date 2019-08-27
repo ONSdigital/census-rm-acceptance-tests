@@ -30,6 +30,21 @@ Feature: Handle fulfilment request events
       | P_OR_H2W        | 03                 |
       | P_OR_H4         | 04                 |
 
+  Scenario Outline: Generate print files and log events for continuation questionnaire fulfilment requests
+    Given sample file "sample_1_english_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
+    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+    And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
+    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+
+    Examples: Continuation Questionnaires
+      | fulfilment code | questionnaire type |
+      | P_OR_HC1        | 11                 |
+      | P_OR_HC2        | 12                 |
+      | P_OR_HC2W       | 13                 |
+      | P_OR_HC4        | 14                 |
+
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
     When a supplementary materials fulfilment request event with fulfilment code "<fulfilment code>" is received by RM

@@ -19,6 +19,7 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
+@step('a PQ continuation fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_pq_fulfilment_requested_event(context, fulfilment_code):
     send_print_fulfilment_request(context, fulfilment_code)
@@ -115,6 +116,7 @@ def check_notify_api_called_with_correct_template_id(expected_template_id):
     assert response_json[0]["template_id"] == expected_template_id, "Incorrect template Id"
 
 
+@step("the continuation fulfilment request event is logged")
 @step("the fulfilment request event is logged")
 def check_case_events(context):
     response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})

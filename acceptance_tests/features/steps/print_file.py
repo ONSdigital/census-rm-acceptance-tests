@@ -55,6 +55,7 @@ def check_manifest_files(context, pack_code):
     _check_manifest_files_created(context, pack_code)
 
 
+@step('correctly formatted on request contn questionnaire print and manifest files for "{fulfilment_code}" are created')
 @step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
 def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
