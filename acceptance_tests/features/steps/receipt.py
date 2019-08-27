@@ -3,10 +3,11 @@ import json
 import time
 import xml.etree.ElementTree as ET
 
-from behave import when, then
+from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
+from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
 
@@ -52,7 +53,7 @@ def uac_updated_msg_emitted(context):
     assert uac['active'] is False
 
 
-@then("a ActionCancelled event is sent to field work management")
+@then("an ActionCancelled event is sent to field work management")
 def action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
@@ -147,7 +148,11 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
                                         type_filter='CASE_UPDATED'))
 
     assert len(context.messages_received) == 1
-    case = context.messages_received[0]['payload']['collectionCase']
-    assert case['id'] == context.emitted_case['id']
-    assert case[case_field] == bool(expected_field_value)
-    context.emitted_case_updated = case
+    context.reciepted_emitted_case = context.messages_received[0]['payload']['collectionCase']
+    assert context.reciepted_emitted_case['id'] == context.emitted_case['id']
+    assert str(context.reciepted_emitted_case[case_field]) == expected_field_value
+
+
+@step("the events logged for the receipted case are {expected_event_list}")
+def check_logged_events_for_receipted_case(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.reciepted_emitted_case['id'])
