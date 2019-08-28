@@ -10,7 +10,8 @@ from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PAC
     PACK_CODE_TO_DESCRIPTION
 from acceptance_tests.utilities.print_file_helper import create_expected_questionnaire_csv_lines, \
     create_expected_csv_lines, create_expected_on_request_questionnaire_csv, \
-    create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines
+    create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines, \
+    create_expected_reminder_questionnaire_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import tc
 
@@ -32,6 +33,12 @@ def check_correct_files_on_sftp_server(context, pack_code):
 @then('correctly formatted "{pack_code}" reminder letter print files are created')
 def check_correct_reminder_letter_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_reminder_letter_csv_lines(context, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+
+
+@then('correctly formatted "{pack_code}" reminder questionnaire print files are created')
+def check_correct_reminder_questionnaire_files_on_sftp_server(context, pack_code):
+    expected_csv_lines = create_expected_reminder_questionnaire_csv_lines(context, pack_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
@@ -94,7 +101,7 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
         raise FileNotFoundError
     actual_content_list.sort()
     expected_csv_lines.sort()
-    assert actual_content_list == expected_csv_lines, 'Print file contents did not match expected'
+    tc.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
 
 
 def _check_manifest_files_created(context, pack_code):

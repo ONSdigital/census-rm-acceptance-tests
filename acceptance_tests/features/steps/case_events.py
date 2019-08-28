@@ -33,14 +33,26 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
-@step('UAC Updated events for the new reminder UAC QID pairs are emitted'
-      ' for the {number_of_matching_cases:d} cases with matching treatment codes')
+@step('UAC Updated events emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
 def gather_uac_updated_events(context, number_of_matching_cases):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=number_of_matching_cases,
                                                       type_filter='UAC_UPDATED'))
     assert len(context.messages_received) == number_of_matching_cases
+    context.reminder_uac_updated_events = context.messages_received.copy()
+    context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
+    context.messages_received = []
+
+
+@step('2 UAC Updated events are emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
+def gather_welsh_reminder_uac_events(context, number_of_matching_cases):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=number_of_matching_cases * 2,
+                                                      type_filter='UAC_UPDATED'))
+    tc.assertEquals(len(context.messages_received), number_of_matching_cases * 2)
     context.reminder_uac_updated_events = context.messages_received.copy()
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
@@ -76,7 +88,7 @@ def _test_cases_correct(context):
                 del context.expected_sample_units[index]
                 break
         else:
-            assert False, 'Could not find sample unit'
+            tc.fail(msg='Could not find sample unit')
 
 
 def _sample_matches_rh_message(sample_unit, rh_message):
@@ -124,3 +136,41 @@ def get_first_case_created_event(context):
     first_case_created_event = context.first_message
     del context.first_message
     return first_case_created_event
+
+
+def get_cases_and_uac_event_messages(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=len(context.sample_units),
+                                                      type_filter='CASE_CREATED'))
+    context.case_created_events = context.messages_received.copy()
+    _test_cases_correct(context)
+    context.messages_received = []
+
+    context.welsh_cases = [case['payload']['collectionCase'] for case in context.case_created_events
+                           if case['payload']['collectionCase']['treatmentCode'].startswith('HH_Q')
+                           and case['payload']['collectionCase']['treatmentCode'].endswith('W')]
+
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=get_expected_uac_count(context),
+                                                      type_filter='UAC_UPDATED'))
+    context.uac_created_events = context.messages_received.copy()
+    _test_uacs_updated_correct(context)
+    context.messages_received = []
+
+
+def _test_uacs_updated_correct(context):
+    case_ids = set(case['payload']['collectionCase']['id'] for case in context.case_created_events)
+    tc.assertSetEqual(set(uac['payload']['uac']['caseId'] for uac in context.uac_created_events), case_ids)
+    welsh_uac_count = len(tuple(uac_updated_event for uac_updated_event in context.uac_created_events if
+                                uac_updated_event['payload']['uac']['questionnaireId'].startswith('03')))
+    non_welsh_uac_count = len(context.uac_created_events) - welsh_uac_count
+    tc.assertEqual(non_welsh_uac_count, len(context.case_created_events))
+
+    tc.assertEqual(welsh_uac_count, len(context.welsh_cases))
+
+
+def get_expected_uac_count(context):
+    return len(context.welsh_cases) + len(context.case_created_events)
