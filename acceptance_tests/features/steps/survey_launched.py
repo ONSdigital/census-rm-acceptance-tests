@@ -8,7 +8,7 @@ from config import Config
 
 
 @step("a survey launched for a created case is received")
-def create_refusal(context):
+def create_survey_launch_event(context):
     context.survey_launched_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
@@ -39,5 +39,5 @@ def create_refusal(context):
 
 
 @step("the events logged for the survey launched case are {expected_event_list}")
-def check_refusal_event_logging(context, expected_event_list):
+def check_survey_launch_event_logging(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.survey_launched_case_id)
