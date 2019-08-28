@@ -59,6 +59,8 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
     --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
+    --env=NOTIFY_STUB_HOST=notify-stub \
+    --env=NOTIFY_STUB_PORT=80 \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
 if [ -z "$QID_BATCH_BRANCH" ]; then
