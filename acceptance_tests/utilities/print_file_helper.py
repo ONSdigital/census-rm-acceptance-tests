@@ -154,23 +154,6 @@ def _create_expected_questionnaire_csv_line(case, prefix):
     )
 
 
-def _create_expected_reminder_questionnaire_csv_line(case, prefix):
-    return (
-        f'{case["uac"]}|'
-        f'{case["qid"]}|'
-        f'{case.get("uac_wales", "")}|'
-        f'{case.get("qid_wales", "")}|'
-        f'{case["coordinator_id"]}|'
-        f'|||'
-        f'{case["address_line_1"]}|'
-        f'{case["address_line_2"]}|'
-        f'{case["address_line_3"]}|'
-        f'{case["town_name"]}|'
-        f'{case["postcode"]}|'
-        f'{prefix}'
-    )
-
-
 def create_expected_on_request_questionnaire_csv(context, pack_code):
     return [_create_expected_on_request_questionnaire_csv_line(context.first_case, pack_code,
                                                                context.requested_uac,
