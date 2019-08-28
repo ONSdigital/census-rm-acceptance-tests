@@ -148,11 +148,11 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
                                         type_filter='CASE_UPDATED'))
 
     assert len(context.messages_received) == 1
-    context.reciepted_emitted_case = context.messages_received[0]['payload']['collectionCase']
-    assert context.reciepted_emitted_case['id'] == context.emitted_case['id']
-    assert str(context.reciepted_emitted_case[case_field]) == expected_field_value
+    context.receipted_emitted_case = context.messages_received[0]['payload']['collectionCase']
+    assert context.receipted_emitted_case['id'] == context.emitted_case['id']
+    assert str(context.receipted_emitted_case[case_field]) == expected_field_value
 
 
 @step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_receipted_case(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.reciepted_emitted_case['id'])
+    check_if_event_list_is_exact_match(expected_event_list, context.receipted_emitted_case['id'])

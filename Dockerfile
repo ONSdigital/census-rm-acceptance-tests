@@ -1,6 +1,7 @@
 FROM python:3.6-slim
 
+RUN pip3 install pipenv
+RUN apt-get update -y && apt-get install -y curl git
 WORKDIR /app
 COPY . /app
-RUN apt-get update -y && apt-get install -y python-pip curl git
-RUN pip3 install pipenv && pipenv install --system --deploy --dev
+RUN pipenv install --system --deploy --dev
