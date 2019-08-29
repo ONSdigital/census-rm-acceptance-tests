@@ -80,6 +80,7 @@ def create_uac_fulfilment_message(context, fulfilment_code):
                 "fulfilmentRequest": {
                     "fulfilmentCode": fulfilment_code,
                     "caseId": context.fulfilment_requested_case_id,
+                    "individualCaseId": "d2541acb-230a-4ade-8123-eee2310c9144",
                     "address": {},
                     "contact": {
                         "telNo": "01234567",

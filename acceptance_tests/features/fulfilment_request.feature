@@ -13,7 +13,7 @@ Feature: Handle fulfilment request events
     When a UAC fulfilment request "UACIT1" message for a created case is sent
     Then a new child case is emitted to RH and Action Scheduler
     And notify api was called with template id "1ccd02a4-9b90-4234-ab7a-9215cb498f14"
-    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
