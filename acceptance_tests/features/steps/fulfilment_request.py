@@ -252,3 +252,16 @@ def step_impl(context, fulfilment_code):
 @step("the individual case has these events logged {expected_event_list}")
 def check_individual_case_events_logged(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
+
+
+@step("a new Case Created is emitted")
+def step_impl(context):
+    context.messages_received = []
+
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=1,
+                                                      type_filter='CASE_CREATED'))
+    assert len(context.messages_received) == len(context.sample_units)
+    context.case_created_events = context.messages_received.copy()
+    context.messages_received = []
