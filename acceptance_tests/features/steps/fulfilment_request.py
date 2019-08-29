@@ -1,5 +1,6 @@
 import functools
 import json
+import uuid
 
 import requests
 from behave import step
@@ -21,7 +22,7 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
-@step('an individual questionaire fulfilment request "{fulfilment_code}" message for a created case is sent')
+@step('an individual questionnaire fulfilment request "{fulfilment_code}" message for a created case is sent')
 @step('a PQ continuation fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_pq_fulfilment_requested_event(context, fulfilment_code):
@@ -66,7 +67,7 @@ def create_uac_fulfilment_message(context, fulfilment_code):
     requests.get(f'{notify_stub_url}/reset')
 
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
-
+    context.individual_case_id = str(uuid.uuid4())
     message = json.dumps(
         {
             "event": {
@@ -80,10 +81,62 @@ def create_uac_fulfilment_message(context, fulfilment_code):
                 "fulfilmentRequest": {
                     "fulfilmentCode": fulfilment_code,
                     "caseId": context.fulfilment_requested_case_id,
-                    "individualCaseId": "d2541acb-230a-4ade-8123-eee2310c9144",
+                    "individualCaseId": context.individual_case_id,
                     "address": {},
                     "contact": {
                         "telNo": "01234567",
+                    }
+                }
+            }
+        }
+    )
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
+
+
+@step('a print fulfilment request "{fulfilment_code}" message for a created case is sent')
+def create_print_fulfilment_message(context, fulfilment_code):
+    context.first_case = get_first_case(context)
+    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.individual_case_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "FULFILMENT_REQUESTED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2019-07-07T22:37:11.988+0000",
+                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+            },
+            "payload": {
+                "fulfilmentRequest": {
+                    "fulfilmentCode": fulfilment_code,
+                    "caseId": context.fulfilment_requested_case_id,
+                    "individualCaseId": context.individual_case_id,
+                    "address": {
+                        "addressLine1": "1 main street",
+                        "addressLine2": "upper upperingham",
+                        "addressLine3": "",
+                        "townName": "upton",
+                        "postcode": "UP103UP",
+                        "region": "E",
+                        "latitude": "50.863849",
+                        "longitude": "-1.229710",
+                        "uprn": "XXXXXXXXXXXXX",
+                        "arid": "XXXXX",
+                        "addressType": "CE",
+                        "estabType": "XXX"
+                    },
+                    "contact": {
+                        "title": "Ms",
+                        "forename": "jo",
+                        "surname": "smith",
+                        "email": "me@example.com",
+                        "telNo": "+447890000000"
                     }
                 }
             }
@@ -189,8 +242,13 @@ def create_expected_individual_response_csv(context, fulfilment_code):
     )
 
 
-@step('correctly formatted individual response questionaires are are created with "{fulfilment_code}"')
+@step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
 def step_impl(context, fulfilment_code):
     expected_csv_lines = [create_expected_individual_response_csv(context, fulfilment_code)]
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
+
+
+@step("the individual case has these events logged {expected_event_list}")
+def check_individual_case_events_logged(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
