@@ -28,6 +28,8 @@ class Config:
     RABBITMQ_INBOUND_EQ_QUEUE = os.getenv('RABBITMQ_INBOUND_EQ_QUEUE', 'Case.Responses')
     RABBITMQ_EVENT_EXCHANGE = os.getenv('RABBITMQ_EVENT_EXCHANGE', 'events')
     RABBITMQ_REFUSAL_ROUTING_KEY = os.getenv('RABBITMQ_REFUSAL_ROUTING_KEY', 'event.respondent.refusal')
+    RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY = os.getenv('RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY',
+                                                     'event.response.authentication')
     RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY = os.getenv('RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY',
                                                           'event.fulfilment.request')
     RABBITMQ_INVALID_ADDRESS_ROUTING_KEY = os.getenv('RABBITMQ_INVALID_ADDRESS_ROUTING_KEY',
