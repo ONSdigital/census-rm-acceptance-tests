@@ -6,6 +6,8 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
+from acceptance_tests.features.steps.print_file import _check_print_files_have_all_the_expected_data, \
+    _check_manifest_files_created
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
@@ -19,6 +21,7 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
+@step('an individual questionaire fulfilment request "{fulfilment_code}" message for a created case is sent')
 @step('a PQ continuation fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_pq_fulfilment_requested_event(context, fulfilment_code):
@@ -27,6 +30,7 @@ def send_pq_fulfilment_requested_event(context, fulfilment_code):
 
 def send_print_fulfilment_request(context, fulfilment_code):
     context.first_case = get_first_case(context)
+
     message = json.dumps(
         {
             "event": {
@@ -60,6 +64,7 @@ def send_print_fulfilment_request(context, fulfilment_code):
 @step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
 def create_uac_fulfilment_message(context, fulfilment_code):
     requests.get(f'{notify_stub_url}/reset')
+
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
 
     message = json.dumps(
@@ -162,3 +167,29 @@ def check_fulfilment_events(context, expected_event_list):
 @step("the questionnaire fulfilment case has these events logged {expected_event_list}")
 def check_questionaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
+
+
+def create_expected_individual_response_csv(context, fulfilment_code):
+    uac = context.uac_created_events[0]['payload']['uac']['uac']
+    qid = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    case = context.first_case
+
+    return (
+        f'{uac}|'
+        f'{qid}'
+        f'||||'
+        f'Mrs|Test|McTest|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{fulfilment_code}'
+    )
+
+
+@step('correctly formatted individual response questionaires are are created with "{fulfilment_code}"')
+def step_impl(context, fulfilment_code):
+    expected_csv_lines = [create_expected_individual_response_csv(context, fulfilment_code)]
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)

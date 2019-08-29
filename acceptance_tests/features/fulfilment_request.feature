@@ -62,3 +62,18 @@ Feature: Handle fulfilment request events
       | P_TB_TBARA1     |
       | P_TB_TBPOL4     |
       | P_TB_TBYSH1     |
+
+
+  Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
+    Given sample file "sample_1_english_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When an individual questionaire fulfilment request "<fulfilment code>" message for a created case is sent
+    And correctly formatted individual response questionaires are are created with "<fulfilment code>"
+    And the fulfilment request event is logged
+
+    Examples: Continuation Questionnaires
+      | fulfilment code |
+      | P_OR_I1         |
+      | P_OR_I2         |
+      | P_OR_I2W        |
+      | P_OR_I4         |
