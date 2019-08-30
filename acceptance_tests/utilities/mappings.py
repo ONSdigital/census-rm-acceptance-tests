@@ -56,6 +56,10 @@ PACK_CODE_TO_DATASET = {
     "P_TB_TBARA1": PPD1_3_DATASET,
     "P_TB_TBPOL4": PPD1_3_DATASET,
     "P_TB_TBYSH1": PPD1_3_DATASET,
+    "P_OR_I1": QM3_4_DATASET,
+    "P_OR_I2": QM3_4_DATASET,
+    "P_OR_I2W": QM3_4_DATASET,
+    "P_OR_I4": QM3_4_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -79,4 +83,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_TB_TBARA1": 'Translation Booklet for England & Wales - Arabic',
     "P_TB_TBPOL4": 'Translation Booklet for Northern Ireland - Polish',
     "P_TB_TBYSH1": 'Translation Booklet for England & Wales - Yiddish',
+    "P_OR_I1": 'Individual Questionnaire for England',
+    "P_OR_I2": 'Individual Questionnaire for Wales (English)',
+    "P_OR_I2W": 'Individual Questionnaire for Wales (Welsh)',
+    "P_OR_I4": 'Individual Questionnaire for Northern Ireland (English)'
 }

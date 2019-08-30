@@ -224,20 +224,29 @@ def check_questionaire_fulfilment_events(context, expected_event_list):
 
 
 def create_expected_individual_response_csv(context, fulfilment_code):
-    uac = context.uac_created_events[0]['payload']['uac']['uac']
-    qid = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-    case = context.first_case
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='UAC_UPDATED'))
+
+    uac = context.messages_received[0]['payload']['uac']['uac']
+    qid = context.messages_received[0]['payload']['uac']['questionnaireId']
+
+    individual_case_id = context.messages_received[0]['payload']['uac']['caseId']
+    individual_case = requests.get(f'{get_cases_url}{individual_case_id}').json()
 
     return (
         f'{uac}|'
         f'{qid}'
         f'||||'
-        f'Mrs|Test|McTest|'
-        f'{case["address"]["addressLine1"]}|'
-        f'{case["address"]["addressLine2"]}|'
-        f'{case["address"]["addressLine3"]}|'
-        f'{case["address"]["townName"]}|'
-        f'{case["address"]["postcode"]}|'
+        f'Ms|jo|smith|'
+        f'{individual_case["addressLine1"]}|'
+        f'{individual_case["addressLine2"]}|'
+        f'{individual_case["addressLine3"]}|'
+        f'{individual_case["townName"]}|'
+        f'{individual_case["postcode"]}|'
         f'{fulfilment_code}'
     )
 
