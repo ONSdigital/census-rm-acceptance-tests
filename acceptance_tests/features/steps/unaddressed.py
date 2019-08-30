@@ -76,6 +76,7 @@ def check_uac_message_is_received(context):
 
 @then("a Questionnaire Linked event is logged")
 def check_case_events(context):
+    time.sleep(5)  # Give case processor a chance to process the Questionnaire Linked event
     case_id = context.linked_case_id
     response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
     response_json = response.json()
