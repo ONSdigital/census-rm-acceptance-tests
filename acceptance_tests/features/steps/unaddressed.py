@@ -86,7 +86,7 @@ def check_case_events(context):
 
 
 def _get_case_id_by_questionnaire_id(questionnaire_id):
-    time.sleep(3)  # Give case processor a chance to process the Questionnaire Linked event
+    time.sleep(5)  # Give case processor a chance to process the Questionnaire Linked event
     response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
