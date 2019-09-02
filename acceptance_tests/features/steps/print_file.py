@@ -1,7 +1,6 @@
 import hashlib
 import json
 import logging
-from time import sleep
 
 from behave import then, step
 from retrying import retry
