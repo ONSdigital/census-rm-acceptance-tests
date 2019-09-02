@@ -45,7 +45,6 @@ def check_correct_reminder_questionnaire_files_on_sftp_server(context, pack_code
 
 @then('only unrefused cases appear in "{pack_code}" print files')
 def check_correct_unrefused_files_on_sftp_server(context, pack_code):
-    sleep(5)
     expected_csv_lines = create_expected_csv_lines(context, pack_code, context.refused_case_id)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
@@ -92,7 +91,7 @@ def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, p
         _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, pack_code)
 
 
-@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), stop_max_attempt_number=10, wait_fixed=1000)
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
 def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, pack_code):
     logger.debug('Checking for files on SFTP server')
 
