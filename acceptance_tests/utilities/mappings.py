@@ -4,8 +4,10 @@ QM_SUPPLIER = 'QM'
 PPO_SUPPLIER = 'PPO'
 
 QM3_2_DATASET = 'QM3.2'
+QM3_3_DATASET = 'QM3.3'
 QM3_4_DATASET = 'QM3.4'
 PPD1_1_DATASET = 'PPD1.1'
+PPD1_2_DATASET = 'PPD1.2'
 PPD1_3_DATASET = 'PPD1.3'
 
 PACK_CODE_TO_SFTP_DIRECTORY = {
@@ -33,6 +35,12 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_OR_I2": Config.SFTP_QM_DIRECTORY,
     "P_OR_I2W": Config.SFTP_QM_DIRECTORY,
     "P_OR_I4": Config.SFTP_QM_DIRECTORY
+    "P_RL_1RL1_1": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_2RL2B_3a": Config.SFTP_PPO_DIRECTORY,
+    "P_QU_H1": Config.SFTP_QM_DIRECTORY,
+    "P_QU_H2": Config.SFTP_QM_DIRECTORY,
+    "P_QU_H4": Config.SFTP_QM_DIRECTORY,
+
 }
 
 PACK_CODE_TO_DATASET = {
@@ -60,6 +68,11 @@ PACK_CODE_TO_DATASET = {
     "P_OR_I2": QM3_4_DATASET,
     "P_OR_I2W": QM3_4_DATASET,
     "P_OR_I4": QM3_4_DATASET
+    "P_RL_1RL1_1": PPD1_2_DATASET,
+    "P_RL_2RL2B_3a": PPD1_2_DATASET,
+    "P_QU_H1": QM3_3_DATASET,
+    "P_QU_H2": QM3_3_DATASET,
+    "P_QU_H4": QM3_3_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -86,5 +99,10 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_OR_I1": 'Individual Questionnaire for England',
     "P_OR_I2": 'Individual Questionnaire for Wales (English)',
     "P_OR_I2W": 'Individual Questionnaire for Wales (Welsh)',
-    "P_OR_I4": 'Individual Questionnaire for Northern Ireland (English)'
+    "P_OR_I4": 'Individual Questionnaire for Northern Ireland (English)',
+    "P_RL_1RL1_1": '1st Reminder, Letter - for England addresses',
+    "P_RL_2RL2B_3a": '3rd Reminder, Letter - for Wales addresses',
+    "P_QU_H1": '3rd Reminder, Questionnaire - for England addresses',
+    "P_QU_H2": '3rd Reminder, Questionnaire - for Wales addresses',
+    "P_QU_H4": '2nd Reminder, Questionnaire - for Ireland addresses'
 }

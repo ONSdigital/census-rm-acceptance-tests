@@ -6,7 +6,7 @@ from behave import given
 from acceptance_tests.controllers.action_controller import create_action_plan, create_action_rule
 
 
-@given('an action rule of type {action_type} is set {action_rule_delay} seconds in the future')
+@given('an action rule of type "{action_type}" is set {action_rule_delay} seconds in the future')
 def setup_action_rule(context, action_type, action_rule_delay):
     action_plan_response_body = create_action_plan(context.action_plan_id)
 
@@ -23,7 +23,12 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'ICHHQE': {'treatmentCode': ['HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', 'HH_QF3R3AE']},
         'ICHHQW': {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']},
         'ICHHQN': {'treatmentCode': ['HH_3QSFN']},
-        'FF2QE': {'treatmentCode': ['HH_QF2R1E']}
+        'FF2QE': {'treatmentCode': ['HH_QF2R1E']},
+        'P_RL_1RL1_1': {'treatmentCode': ['HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E',
+                                          'HH_QFNR1E']},
+        'P_RL_2RL2B_3a': {'treatmentCode': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',
+                                            'HH_QFNR3AW']},
+        'P_QU_H2': {'treatmentCode': ['HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW']},
     }
 
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers_for_action_type[action_type],

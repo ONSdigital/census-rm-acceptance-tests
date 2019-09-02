@@ -21,6 +21,14 @@ def receipt_msg_published_to_gcp_pubsub(context):
     assert context.sent_to_gcp is True
 
 
+@when("the offline receipt msg for the created case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsub(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    assert context.sent_to_gcp is True
+
+
 @when("the receipt msg for the created case is put on the GCP pubsub with just qid")
 def receipt_msg_published_to_gcp_pubsub_just_qid(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
@@ -101,6 +109,35 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
+def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+    context.sent_to_gcp = False
+
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
+
+    data = json.dumps({
+        "dateTime": "2008-08-24T00:00:00Z",
+        "transactionId": tx_id,
+        "questionnaireId": questionnaire_id,
+        "channel": "PQRS"
+    })
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    if not future.done():
+        time.sleep(1)
+    try:
+        future.result(timeout=30)
+    except GoogleAPIError:
+        return
+
+    print(f'Message published to {topic_path}')
+
+    context.sent_to_gcp = True
+
+
 @then('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
     context.messages_received = []
@@ -111,11 +148,11 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
                                         type_filter='CASE_UPDATED'))
 
     assert len(context.messages_received) == 1
-    context.reciepted_emitted_case = context.messages_received[0]['payload']['collectionCase']
-    assert context.reciepted_emitted_case['id'] == context.emitted_case['id']
-    assert str(context.reciepted_emitted_case[case_field]) == expected_field_value
+    context.receipted_emitted_case = context.messages_received[0]['payload']['collectionCase']
+    assert context.receipted_emitted_case['id'] == context.emitted_case['id']
+    assert str(context.receipted_emitted_case[case_field]) == expected_field_value
 
 
 @step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_receipted_case(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.reciepted_emitted_case['id'])
+    check_if_event_list_is_exact_match(expected_event_list, context.receipted_emitted_case['id'])
