@@ -68,7 +68,7 @@ Feature: Handle fulfilment request events
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a print fulfilment request "<fulfilment code>" message for a created case is sent
+    When an individual print fulfilment request "<fulfilment code>" is received by RM
     Then a new Case Created is emitted
     And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
     And the fulfilment request event is logged

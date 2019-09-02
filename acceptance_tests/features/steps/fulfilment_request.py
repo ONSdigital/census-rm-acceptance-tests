@@ -98,8 +98,8 @@ def create_uac_fulfilment_message(context, fulfilment_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@step('a print fulfilment request "{fulfilment_code}" message for a created case is sent')
-def create_print_fulfilment_message(context, fulfilment_code):
+@step('an individual print fulfilment request "{fulfilment_code}" is received by RM')
+def create_individual_print_fulfilment_message(context, fulfilment_code):
     context.first_case = get_first_case(context)
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
     context.individual_case_id = str(uuid.uuid4())
@@ -252,7 +252,7 @@ def create_expected_individual_response_csv(context, fulfilment_code):
 
 
 @step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
-def step_impl(context, fulfilment_code):
+def check_individual_questionnaire_print_requests(context, fulfilment_code):
     expected_csv_lines = [create_expected_individual_response_csv(context, fulfilment_code)]
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
