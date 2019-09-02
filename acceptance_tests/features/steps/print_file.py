@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+from time import sleep
 
 from behave import then, step
 from retrying import retry
@@ -44,6 +45,7 @@ def check_correct_reminder_questionnaire_files_on_sftp_server(context, pack_code
 
 @then('only unrefused cases appear in "{pack_code}" print files')
 def check_correct_unrefused_files_on_sftp_server(context, pack_code):
+    sleep(5)
     expected_csv_lines = create_expected_csv_lines(context, pack_code, context.refused_case_id)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
