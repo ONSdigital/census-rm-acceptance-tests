@@ -73,7 +73,7 @@ Feature: Handle fulfilment request events
     And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
     And the fulfilment request event is logged
 
-    Examples: Continuation Questionnaires
+    Examples: Individual Response Questionnaires fulfilment codes
       | fulfilment code |
       | P_OR_I1         |
       | P_OR_I2         |
