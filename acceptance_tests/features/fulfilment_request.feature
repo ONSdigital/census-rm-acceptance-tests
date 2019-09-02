@@ -76,6 +76,6 @@ Feature: Handle fulfilment request events
     Examples: Continuation Questionnaires
       | fulfilment code |
       | P_OR_I1         |
-#      | P_OR_I2         |
-#      | P_OR_I2W        |
-#      | P_OR_I4         |
+      | P_OR_I2         |
+      | P_OR_I2W        |
+      | P_OR_I4         |
