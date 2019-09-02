@@ -1,21 +1,14 @@
 import functools
 import json
 import time
+import xml.etree.ElementTree as ET
 
-from behave import when, then, step
+from behave import when, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
-import xml.etree.ElementTree as ET
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from config import Config
-
-
-@when("the undelivered PPO message put on GCP pubsub")
-def undelivered_ppo_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
-    _publish_ppo_undelivered_mail(context, context.emitted_case['caseRef'])
-    assert context.sent_to_gcp is True
 
 
 @when("an undelivered mail QM message is put on GCP pubsub")
@@ -27,7 +20,7 @@ def undelivered_qm_published_to_gcp_pubsub(context):
 
 
 @when("an undelivered mail PPO message is put on GCP pubsub")
-def undelivered_qm_published_to_gcp_pubsub(context):
+def undelivered_ppo_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     case_ref = context.emitted_case['caseRef']
     _publish_ppo_undelivered_mail(context, case_ref=case_ref)
