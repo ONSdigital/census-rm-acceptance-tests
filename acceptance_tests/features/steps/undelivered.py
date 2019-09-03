@@ -80,7 +80,7 @@ def _publish_ppo_undelivered_mail(context, case_ref):
     context.sent_to_gcp = True
 
 
-def _publish_qm_undelivered_mail(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+def _publish_qm_undelivered_mail(context, questionnaire_id):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
@@ -89,9 +89,7 @@ def _publish_qm_undelivered_mail(context, tx_id="3d14675d-a25d-4672-a0fe-b960586
 
     data = json.dumps({
         "dateTime": "2008-08-24T00:00:00Z",
-        "transactionId": tx_id,
-        "questionnaireId": questionnaire_id,
-        "channel": "PQRS"
+        "questionnaireId": questionnaire_id
     })
 
     future = publisher.publish(topic_path,
