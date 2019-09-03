@@ -264,7 +264,7 @@ def check_individual_case_events_logged(context, expected_event_list):
 
 
 @step("a new Case Created is emitted")
-def step_impl(context):
+def check_new_case_emitted(context):
     context.messages_received = []
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
@@ -273,4 +273,6 @@ def step_impl(context):
                                                       type_filter='CASE_CREATED'))
     assert len(context.messages_received) == len(context.sample_units)
     context.case_created_events = context.messages_received.copy()
+
+    assert context.case_created_events[0]['payload']['collectionCase']['id'] == context.individual_case_id
     context.messages_received = []
