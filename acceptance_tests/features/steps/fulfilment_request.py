@@ -9,6 +9,7 @@ from retrying import retry
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.print_file import _check_print_files_have_all_the_expected_data, \
     _check_manifest_files_created
+from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
@@ -225,7 +226,7 @@ def check_questionaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
 
 
-def create_expected_individual_response_csv(context, fulfilment_code):
+def get_qid_and_uac_from_emitted_child_uac(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(
@@ -233,28 +234,16 @@ def create_expected_individual_response_csv(context, fulfilment_code):
                                         expected_msg_count=1,
                                         type_filter='UAC_UPDATED'))
 
-    uac = context.messages_received[0]['payload']['uac']['uac']
-    qid = context.messages_received[0]['payload']['uac']['questionnaireId']
-
-    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
-
-    return (
-        f'{uac}|'
-        f'{qid}'
-        f'||||'
-        f'Ms|jo|smith|'
-        f'{individual_case["addressLine1"]}|'
-        f'{individual_case["addressLine2"]}|'
-        f'{individual_case["addressLine3"]}|'
-        f'{individual_case["townName"]}|'
-        f'{individual_case["postcode"]}|'
-        f'{fulfilment_code}'
-    )
+    return context.messages_received[0]['payload']['uac']['uac'], context.messages_received[0]['payload']['uac'][
+        'questionnaireId']
 
 
 @step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
 def check_individual_questionnaire_print_requests(context, fulfilment_code):
-    expected_csv_lines = [create_expected_individual_response_csv(context, fulfilment_code)]
+    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
+    uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
+    expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
+
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
 
