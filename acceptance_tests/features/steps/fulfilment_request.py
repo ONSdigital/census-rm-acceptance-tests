@@ -197,6 +197,8 @@ def child_case_is_emitted(context):
     parent_case_arid = _get_parent_case_estabd_arid(context)
 
     assert child_case_arid == parent_case_arid, "Parent and child Arids must match to link cases"
+    context.case_created_events = context.messages_received.copy()
+    assert context.case_created_events[0]['payload']['collectionCase']['id'] == context.individual_case_id
 
 
 def _get_parent_case_estabd_arid(context):
@@ -234,8 +236,7 @@ def create_expected_individual_response_csv(context, fulfilment_code):
     uac = context.messages_received[0]['payload']['uac']['uac']
     qid = context.messages_received[0]['payload']['uac']['questionnaireId']
 
-    individual_case_id = context.messages_received[0]['payload']['uac']['caseId']
-    individual_case = requests.get(f'{get_cases_url}{individual_case_id}').json()
+    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
 
     return (
         f'{uac}|'
@@ -261,18 +262,3 @@ def check_individual_questionnaire_print_requests(context, fulfilment_code):
 @step("the individual case has these events logged {expected_event_list}")
 def check_individual_case_events_logged(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
-
-
-@step("a new Case Created is emitted")
-def check_new_case_emitted(context):
-    context.messages_received = []
-
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=1,
-                                                      type_filter='CASE_CREATED'))
-    assert len(context.messages_received) == len(context.sample_units)
-    context.case_created_events = context.messages_received.copy()
-
-    assert context.case_created_events[0]['payload']['collectionCase']['id'] == context.individual_case_id
-    context.messages_received = []

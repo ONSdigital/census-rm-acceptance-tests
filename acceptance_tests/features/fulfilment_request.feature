@@ -69,7 +69,7 @@ Feature: Handle fulfilment request events
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When an individual print fulfilment request "<fulfilment code>" is received by RM
-    Then a new Case Created is emitted
+    Then a new child case is emitted to RH and Action Scheduler
     And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
     And the fulfilment request event is logged
 
