@@ -4,7 +4,7 @@ import logging
 import subprocess
 
 import requests
-from behave import then, when
+from behave import when, step
 from retrying import retry
 from structlog import wrap_logger
 
@@ -27,13 +27,13 @@ def send_unaddressed_message(context, questionnaire_type):
             content_type='application/json')
 
 
-@when("a Questionnaire Linked message is sent")
+@step("a Questionnaire Linked message is sent")
 def send_linked_message(context):
     check_linked_message_is_received(context)
     context.linked_case_id = context.linked_case['id']
 
 
-@when("an Individual Questionnaire Linked message is sent")
+@step("an Individual Questionnaire Linked message is sent")
 def send_individual_linked_message(context):
     check_linked_message_is_received(context)
     context.linked_case_id = _get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
@@ -65,7 +65,7 @@ def check_linked_message_is_received(context):
             content_type='application/json')
 
 
-@then("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
+@step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
@@ -74,7 +74,7 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
-@then("a Questionnaire Linked event is logged")
+@step("a Questionnaire Linked event is logged")
 def check_questionaire_linked_logging(context):
     check_question_linked_event_is_logged(context)
 
