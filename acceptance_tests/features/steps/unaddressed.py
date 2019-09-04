@@ -2,10 +2,10 @@ import functools
 import json
 import logging
 import subprocess
-import time
 
 import requests
 from behave import then, when
+from retrying import retry
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -75,8 +75,12 @@ def check_uac_message_is_received(context):
 
 
 @then("a Questionnaire Linked event is logged")
-def check_case_events(context):
-    time.sleep(5)  # Give case processor a chance to process the Questionnaire Linked event
+def check_questionaire_linked_logging(context):
+    check_question_linked_event_is_logged(context)
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_question_linked_event_is_logged(context):
     case_id = context.linked_case_id
     response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
     response_json = response.json()
@@ -86,8 +90,8 @@ def check_case_events(context):
     assert False
 
 
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
 def _get_case_id_by_questionnaire_id(questionnaire_id):
-    time.sleep(5)  # Give case processor a chance to process the Questionnaire Linked event
     response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
