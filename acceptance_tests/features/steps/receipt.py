@@ -138,7 +138,7 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     context.sent_to_gcp = True
 
 
-@then('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
+@step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
