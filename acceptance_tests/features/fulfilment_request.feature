@@ -13,7 +13,8 @@ Feature: Handle fulfilment request events
     When a UAC fulfilment request "UACIT1" message for a created case is sent
     Then a new child case is emitted to RH and Action Scheduler
     And notify api was called with template id "1ccd02a4-9b90-4234-ab7a-9215cb498f14"
-    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
+    And the individual case has these events logged [RM_UAC_CREATED]
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
@@ -62,3 +63,19 @@ Feature: Handle fulfilment request events
       | P_TB_TBARA1     |
       | P_TB_TBPOL4     |
       | P_TB_TBYSH1     |
+
+
+  Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
+    Given sample file "sample_1_english_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When an individual print fulfilment request "<fulfilment code>" is received by RM
+    Then a new child case is emitted to RH and Action Scheduler
+    And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
+    And the fulfilment request event is logged
+
+    Examples: Individual Response Questionnaires fulfilment codes
+      | fulfilment code |
+      | P_OR_I1         |
+      | P_OR_I2         |
+      | P_OR_I2W        |
+      | P_OR_I4         |
