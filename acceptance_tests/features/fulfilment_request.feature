@@ -65,6 +65,7 @@ Feature: Handle fulfilment request events
       | P_TB_TBYSH1     |
 
 
+<<<<<<< HEAD
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
@@ -87,4 +88,5 @@ Feature: Handle fulfilment request events
     And an action rule of type "FF2QE" is set 10 seconds in the future
     When a UAC fulfilment request "UACIT1" message for a created case is sent
     Then the action instruction messages are emitted to FWMT where the case has a treatment code of "HH_QF2R1E"
+
 
