@@ -190,18 +190,3 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
         f'{case["address"]["postcode"]}|'
         f'{fulfilment_code}'
     )
-
-
-def create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code):
-    return (
-        f'{uac}|'
-        f'{qid}'
-        f'||||'
-        f'Ms|jo|smith|'
-        f'{individual_case["addressLine1"]}|'
-        f'{individual_case["addressLine2"]}|'
-        f'{individual_case["addressLine3"]}|'
-        f'{individual_case["townName"]}|'
-        f'{individual_case["postcode"]}|'
-        f'{fulfilment_code}'
-    )

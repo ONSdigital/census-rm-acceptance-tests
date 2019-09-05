@@ -1,15 +1,11 @@
 import functools
 import json
-import uuid
 
 import requests
 from behave import step
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.print_file import _check_print_files_have_all_the_expected_data, \
-    _check_manifest_files_created
-from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
@@ -23,7 +19,6 @@ def get_first_case(context):
     return context.case_created_events[0]['payload']['collectionCase']
 
 
-@step('an individual questionnaire fulfilment request "{fulfilment_code}" message for a created case is sent')
 @step('a PQ continuation fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 @step('a PQ fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_pq_fulfilment_requested_event(context, fulfilment_code):
@@ -32,7 +27,6 @@ def send_pq_fulfilment_requested_event(context, fulfilment_code):
 
 def send_print_fulfilment_request(context, fulfilment_code):
     context.first_case = get_first_case(context)
-
     message = json.dumps(
         {
             "event": {
@@ -66,9 +60,8 @@ def send_print_fulfilment_request(context, fulfilment_code):
 @step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
 def create_uac_fulfilment_message(context, fulfilment_code):
     requests.get(f'{notify_stub_url}/reset')
-
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
-    context.individual_case_id = str(uuid.uuid4())
+
     message = json.dumps(
         {
             "event": {
@@ -82,62 +75,9 @@ def create_uac_fulfilment_message(context, fulfilment_code):
                 "fulfilmentRequest": {
                     "fulfilmentCode": fulfilment_code,
                     "caseId": context.fulfilment_requested_case_id,
-                    "individualCaseId": context.individual_case_id,
                     "address": {},
                     "contact": {
                         "telNo": "01234567",
-                    }
-                }
-            }
-        }
-    )
-
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
-
-
-@step('an individual print fulfilment request "{fulfilment_code}" is received by RM')
-def create_individual_print_fulfilment_message(context, fulfilment_code):
-    context.first_case = get_first_case(context)
-    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
-    context.individual_case_id = str(uuid.uuid4())
-    message = json.dumps(
-        {
-            "event": {
-                "type": "FULFILMENT_REQUESTED",
-                "source": "CONTACT_CENTRE_API",
-                "channel": "CC",
-                "dateTime": "2019-07-07T22:37:11.988+0000",
-                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
-            },
-            "payload": {
-                "fulfilmentRequest": {
-                    "fulfilmentCode": fulfilment_code,
-                    "caseId": context.fulfilment_requested_case_id,
-                    "individualCaseId": context.individual_case_id,
-                    "address": {
-                        "addressLine1": "1 main street",
-                        "addressLine2": "upper upperingham",
-                        "addressLine3": "",
-                        "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E",
-                        "latitude": "50.863849",
-                        "longitude": "-1.229710",
-                        "uprn": "XXXXXXXXXXXXX",
-                        "arid": "XXXXX",
-                        "addressType": "CE",
-                        "estabType": "XXX"
-                    },
-                    "contact": {
-                        "title": "Ms",
-                        "forename": "jo",
-                        "surname": "smith",
-                        "email": "me@example.com",
-                        "telNo": "+447890000000"
                     }
                 }
             }
@@ -198,8 +138,6 @@ def child_case_is_emitted(context):
     parent_case_arid = _get_parent_case_estabd_arid(context)
 
     assert child_case_arid == parent_case_arid, "Parent and child Arids must match to link cases"
-    context.case_created_events = context.messages_received.copy()
-    assert context.case_created_events[0]['payload']['collectionCase']['id'] == context.individual_case_id
 
 
 def _get_parent_case_estabd_arid(context):
@@ -224,30 +162,3 @@ def check_fulfilment_events(context, expected_event_list):
 @step("the questionnaire fulfilment case has these events logged {expected_event_list}")
 def check_questionaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
-
-
-def get_qid_and_uac_from_emitted_child_uac(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=1,
-                                        type_filter='UAC_UPDATED'))
-
-    return context.messages_received[0]['payload']['uac']['uac'], context.messages_received[0]['payload']['uac'][
-        'questionnaireId']
-
-
-@step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
-def check_individual_questionnaire_print_requests(context, fulfilment_code):
-    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
-    uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
-    expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
-
-    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
-    _check_manifest_files_created(context, fulfilment_code)
-
-
-@step("the individual case has these events logged {expected_event_list}")
-def check_individual_case_events_logged(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
