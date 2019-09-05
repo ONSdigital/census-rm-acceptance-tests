@@ -65,7 +65,6 @@ Feature: Handle fulfilment request events
       | P_TB_TBYSH1     |
 
 
-<<<<<<< HEAD
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
@@ -82,7 +81,6 @@ Feature: Handle fulfilment request events
       | P_OR_I4         |
 
 
-    
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
     And an action rule of type "FF2QE" is set 10 seconds in the future
