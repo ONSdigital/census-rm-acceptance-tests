@@ -1,6 +1,7 @@
 import functools
 import json
 import time
+import uuid
 import xml.etree.ElementTree as ET
 
 from behave import when, step
@@ -59,7 +60,8 @@ def _publish_ppo_undelivered_mail(context, case_ref):
 
     topic_path = publisher.topic_path(Config.PPO_UNDELIVERED_PROJECT_ID, Config.PPO_UNDELIVERED_TOPIC_NAME)
 
-    data = json.dumps({"dateTime": "2019-08-03T14:30:01Z",
+    data = json.dumps({"transactionId": str(uuid.uuid4()),
+                       "dateTime": "2019-08-03T14:30:01Z",
                        "caseRef": case_ref,
                        "productCode": "P_OR_H1",
                        "channel": "PPO",
@@ -88,6 +90,7 @@ def _publish_qm_undelivered_mail(context, questionnaire_id):
     topic_path = publisher.topic_path(Config.QM_UNDELIVERED_PROJECT_ID, Config.QM_UNDELIVERED_TOPIC_NAME)
 
     data = json.dumps({
+        "transactionId": str(uuid.uuid4()),
         "dateTime": "2008-08-24T00:00:00Z",
         "questionnaireId": questionnaire_id
     })
