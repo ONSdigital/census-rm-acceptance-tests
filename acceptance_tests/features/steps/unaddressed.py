@@ -2,10 +2,10 @@ import functools
 import json
 import logging
 import subprocess
-import time
 
 import requests
-from behave import then, when
+from behave import when, step
+from retrying import retry
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -27,7 +27,18 @@ def send_unaddressed_message(context, questionnaire_type):
             content_type='application/json')
 
 
-@when("a Questionnaire Linked message is sent")
+@step("a Questionnaire Linked message is sent")
+def send_linked_message(context):
+    check_linked_message_is_received(context)
+    context.linked_case_id = context.linked_case['id']
+
+
+@step("an Individual Questionnaire Linked message is sent")
+def send_individual_linked_message(context):
+    check_linked_message_is_received(context)
+    context.linked_case_id = _get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+
+
 def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
     context.linked_uac = context.uac_created_events[0]['payload']['uac']
@@ -43,7 +54,7 @@ def check_linked_message_is_received(context):
         'payload': {
             'uac': {
                 "caseId": context.linked_case['id'],
-                'questionnaireId': context.linked_uac['questionnaireId']
+                'questionnaireId': context.expected_questionnaire_id
             }
         }
     }
@@ -54,7 +65,7 @@ def check_linked_message_is_received(context):
             content_type='application/json')
 
 
-@then("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
+@step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
@@ -63,16 +74,28 @@ def check_uac_message_is_received(context):
     assert context.expected_message_received
 
 
-@then("a Questionnaire Linked event is logged")
-def check_case_events(context):
-    case_id = context.linked_case['id']
-    time.sleep(2)  # Give case processor a chance to process the fulfilment request event
+@step("a Questionnaire Linked event is logged")
+def check_questionaire_linked_logging(context):
+    check_question_linked_event_is_logged(context)
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_question_linked_event_is_logged(context):
+    case_id = context.linked_case_id
     response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Questionnaire Linked':
             return
     assert False
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def _get_case_id_by_questionnaire_id(questionnaire_id):
+    response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
+    assert response.status_code == 200, "Unexpected status code"
+    response_json = response.json()
+    return response_json['id']
 
 
 def _uac_callback(ch, method, _properties, body, context):
@@ -83,7 +106,8 @@ def _uac_callback(ch, method, _properties, body, context):
         return
 
     tc.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
-    tc.assertEqual(context.expected_questionnaire_type, parsed_body['payload']['uac']['questionnaireId'][:2])
+    context.expected_questionnaire_id = parsed_body['payload']['uac']['questionnaireId']
+    tc.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
