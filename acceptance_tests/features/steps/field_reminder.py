@@ -1,56 +1,60 @@
 import functools
 import xml.etree.ElementTree as ET
 
-from behave import then
+from behave import step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
-from acceptance_tests.utilities.test_case_helper import tc
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@then('the action instruction messages are emitted to FWMT where the case has a treatment code of "{treatment_code}"')
+@step('the action instruction messages for only the HH case are emitted to FWMT where the case has a treatment code of'
+      ' "{treatment_code}"')
+@step('the action instruction messages are emitted to FWMT where the case has a treatment code of "{treatment_code}"')
 def fwmt_messages_received(context, treatment_code):
-    context.expected_sample_units = [
-        sample_unit
-        for sample_unit in context.sample_units.copy() if sample_unit['attributes']['TREATMENT_CODE'] == treatment_code
+    context.expected_cases_for_action = [
+        case_created['payload']['collectionCase'] for case_created in context.case_created_events
+        if case_created['payload']['collectionCase']['treatmentCode'] == treatment_code
     ]
+    context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                                    functools.partial(_callback, context=context))
+                                    functools.partial(fieldwork_message_callback, context=context))
 
-    assert not context.expected_sample_units, 'Some messages are missing'
+    test_helper.assertFalse(context.expected_cases_for_action,
+                            msg="Didn't find all expected fieldwork action instruction messages")
 
 
-def _callback(ch, method, _properties, body, context):
-    root = ET.fromstring(body)
+def fieldwork_message_callback(ch, method, _properties, body, context):
+    action_instruction = ET.fromstring(body)
 
-    if not root[0].tag == 'actionRequest':
+    if not action_instruction[0].tag == 'actionRequest':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        assert False, 'Unexpected message on Action.Field case queue'
+        test_helper.fail('Unexpected message on Action.Field case queue')
 
-    for index, sample_unit in enumerate(context.expected_sample_units):
-        if _message_matches(sample_unit, root):
-            _message_valid(sample_unit, root)
-            del context.expected_sample_units[index]
+    for index, case in enumerate(context.expected_cases_for_action):
+        if _message_matches(case, action_instruction):
+            _message_valid(case, action_instruction)
+            del context.expected_cases_for_action[index]
             ch.basic_ack(delivery_tag=method.delivery_tag)
-            print('Have matching msg')
             break
     else:
-        assert False, 'Found message on Action.Field case queue which did not match any expected sample units'
+        test_helper.fail(msg='Found message on Action.Field case queue which did not match any expected sample units')
 
-    if not context.expected_sample_units:
+    if not context.expected_cases_for_action:
         ch.stop_consuming()
 
 
-def _message_matches(sample_unit, root):
-    return root.find('.//arid').text == sample_unit['attributes']['ARID']
+def _message_matches(case, action_instruction):
+    return action_instruction.find('.//caseId').text == case['id']
 
 
-def _message_valid(sample_unit, root):
-    tc.assertEqual(sample_unit['attributes']['LATITUDE'], root.find('.//latitude').text)
-    tc.assertEqual(sample_unit['attributes']['LONGITUDE'], root.find('.//longitude').text)
-    tc.assertEqual(sample_unit['attributes']['POSTCODE'], root.find('.//postcode').text)
-    tc.assertEqual('false', root.find('.//undeliveredAsAddress').text)
-    tc.assertEqual('false', root.find('.//blankQreReturned').text)
-    tc.assertEqual('CENSUS', root.find('.//surveyName').text)
-    tc.assertEqual(sample_unit['attributes']['ESTAB_TYPE'], root.find('.//estabType').text)
+def _message_valid(case, action_instruction):
+    test_helper.assertEqual(case['address']['latitude'], action_instruction.find('.//latitude').text)
+    test_helper.assertEqual(case['address']['longitude'], action_instruction.find('.//longitude').text)
+    test_helper.assertEqual(case['address']['postcode'], action_instruction.find('.//postcode').text)
+    test_helper.assertEqual('false', action_instruction.find('.//undeliveredAsAddress').text)
+    test_helper.assertEqual('false', action_instruction.find('.//blankQreReturned').text)
+    test_helper.assertEqual('CENSUS', action_instruction.find('.//surveyName').text)
+    test_helper.assertEqual(case['address']['estabType'], action_instruction.find('.//estabType').text)
+    test_helper.assertEqual(case['address']['arid'], action_instruction.find('.//arid').text)

@@ -1,3 +1,3 @@
 from unittest import TestCase
 
-tc = TestCase('__init__')
+test_helper = TestCase('__init__')
