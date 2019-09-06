@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from acceptance_tests.utilities.test_case_helper import tc
+from acceptance_tests.utilities.test_case_helper import test_helper
 
 
 def create_expected_csv_lines(context, prefix, ignore_case_id=None):
@@ -67,7 +67,7 @@ def create_expected_reminder_questionnaire_csv_lines(context, pack_code):
             expected_data[uac['payload']['uac']['caseId']]['uac_wales'] = uac['payload']['uac']['uac']
             expected_data[uac['payload']['uac']['caseId']]['qid_wales'] = uac['payload']['uac']['questionnaireId']
         else:
-            tc.fail('Too many reminder UAC Updated events for case')
+            test_helper.fail('Too many reminder UAC Updated events for case')
 
     for case in expected_reminder_case_created_events:
         expected_data = _add_expected_questionnaire_case_data(case, expected_data)
