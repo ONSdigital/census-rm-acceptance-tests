@@ -22,6 +22,12 @@ def event_logged_for_receipting(context, event_type_list):
     check_if_event_list_is_exact_match(event_type_list, context.emitted_case['id'])
 
 
+@step('the events logged against the tranche 2 fieldwork cases are {event_type_list}')
+def events_logged_for_fieldwork_cases(context, event_type_list):
+    for case_id in context.fieldwork_case_ids:
+        check_if_event_list_is_exact_match(event_type_list, case_id)
+
+
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_if_event_list_is_exact_match(event_type_list, case_id):
     actual_logged_events = get_logged_events_for_case_by_id(case_id)
@@ -38,4 +44,4 @@ def _check_if_event_is_logged(expected_event_type, case_id):
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
     test_helper.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
                             msg=(f'Expected event type = {expected_event_type},'
-                        f' actual logged event types = {actual_logged_event_types}'))
+                                 f' actual logged event types = {actual_logged_event_types}'))

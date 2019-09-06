@@ -120,7 +120,8 @@ def _questionnaire_linked_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    test_helper.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
+    test_helper.assertEqual(context.linked_uac['questionnaireId'][:2],
+                            parsed_body['payload']['uac']['questionnaireId'][:2])
     test_helper.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)

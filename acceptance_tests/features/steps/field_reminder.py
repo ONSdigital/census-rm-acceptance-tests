@@ -1,7 +1,7 @@
 import functools
 import xml.etree.ElementTree as ET
 
-from behave import then, step
+from behave import step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -16,6 +16,7 @@ def fwmt_messages_received(context, treatment_code):
         case_created['payload']['collectionCase'] for case_created in context.case_created_events
         if case_created['payload']['collectionCase']['treatmentCode'] == treatment_code
     ]
+    context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                                     functools.partial(fieldwork_message_callback, context=context))
