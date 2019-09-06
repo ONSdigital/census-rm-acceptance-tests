@@ -40,6 +40,12 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_QU_H1": Config.SFTP_QM_DIRECTORY,
     "P_QU_H2": Config.SFTP_QM_DIRECTORY,
     "P_QU_H4": Config.SFTP_QM_DIRECTORY,
+    "P_RD_2RL1_1": Config.SFTP_PPO_DIRECTORY,
+    "P_RD_2RL2B_1": Config.SFTP_PPO_DIRECTORY,
+    "P_RD_2RL1_2": Config.SFTP_PPO_DIRECTORY,
+    "P_RD_2RL2B_2": Config.SFTP_PPO_DIRECTORY,
+    "P_RD_2RL1_3": Config.SFTP_PPO_DIRECTORY,
+    "P_RD_2RL2B_3": Config.SFTP_PPO_DIRECTORY
 
 }
 
@@ -72,7 +78,13 @@ PACK_CODE_TO_DATASET = {
     "P_RL_2RL2B_3a": PPD1_2_DATASET,
     "P_QU_H1": QM3_3_DATASET,
     "P_QU_H2": QM3_3_DATASET,
-    "P_QU_H4": QM3_3_DATASET
+    "P_QU_H4": QM3_3_DATASET,
+    "P_RD_2RL1_1": PPD1_2_DATASET,
+    "P_RD_2RL2B_1": PPD1_2_DATASET,
+    "P_RD_2RL1_2": PPD1_2_DATASET,
+    "P_RD_2RL2B_2": PPD1_2_DATASET,
+    "P_RD_2RL1_3": PPD1_2_DATASET,
+    "P_RD_2RL2B_3": PPD1_2_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -104,5 +116,11 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RL_2RL2B_3a": '3rd Reminder, Letter - for Wales addresses',
     "P_QU_H1": '3rd Reminder, Questionnaire - for England addresses',
     "P_QU_H2": '3rd Reminder, Questionnaire - for Wales addresses',
-    "P_QU_H4": '2nd Reminder, Questionnaire - for Ireland addresses'
+    "P_QU_H4": '2nd Reminder, Questionnaire - for Ireland addresses',
+    "P_RD_2RL1_1": "Response driven reminder group 1 English",
+    "P_RD_2RL2B_1":	"Response driven reminder group 1 Welsh",
+    "P_RD_2RL1_2":	"Response driven reminder group 2 English",
+    "P_RD_2RL2B_2":	"Response driven reminder group 2 Welsh",
+    "P_RD_2RL1_3":	"Response driven reminder group 3 English",
+    "P_RD_2RL2B_3":	"Response driven reminder group 3 Welsh"
 }
