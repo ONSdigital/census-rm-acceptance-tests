@@ -83,8 +83,8 @@ Feature: Handle fulfilment request events
 
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
-    And an action rule of type "FF2QE" is set 10 seconds in the future
+    And an action rule of type "FF2QE" is set 5 seconds in the future
     When a UAC fulfilment request "UACIT1" message for a created case is sent
-    Then the action instruction messages are emitted to FWMT where the case has a treatment code of "HH_QF2R1E"
-
+    Then the action instruction messages for only the HH case are emitted to FWMT where the case has a treatment code of "HH_QF2R1E"
+    And an individual case has been created and only has logged events of [RM_UAC_CREATED]
 

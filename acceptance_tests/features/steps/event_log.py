@@ -2,7 +2,7 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
-from acceptance_tests.utilities.test_case_helper import tc
+from acceptance_tests.utilities.test_case_helper import test_helper
 
 
 @step("events logged against the case are {event_type_list}")
@@ -28,14 +28,14 @@ def check_if_event_list_is_exact_match(event_type_list, case_id):
     expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
 
-    tc.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
-                        msg="Actual logged event types did not match expected")
+    test_helper.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
+                                 msg="Actual logged event types did not match expected")
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def _check_if_event_is_logged(expected_event_type, case_id):
     actual_logged_events = get_logged_events_for_case_by_id(case_id)
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
-    tc.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
-                   msg=(f'Expected event type = {expected_event_type},'
+    test_helper.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
+                            msg=(f'Expected event type = {expected_event_type},'
                         f' actual logged event types = {actual_logged_event_types}'))

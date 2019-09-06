@@ -10,7 +10,7 @@ from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
-from acceptance_tests.utilities.test_case_helper import tc
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -105,9 +105,9 @@ def _uac_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    tc.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
+    test_helper.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
     context.expected_questionnaire_id = parsed_body['payload']['uac']['questionnaireId']
-    tc.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
+    test_helper.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
@@ -120,8 +120,8 @@ def _questionnaire_linked_callback(ch, method, _properties, body, context):
         ch.basic_nack(delivery_tag=method.delivery_tag)
         return
 
-    tc.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
-    tc.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
+    test_helper.assertEqual(context.linked_uac['questionnaireId'][:2], parsed_body['payload']['uac']['questionnaireId'][:2])
+    test_helper.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
