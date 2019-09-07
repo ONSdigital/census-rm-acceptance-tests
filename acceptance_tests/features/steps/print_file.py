@@ -13,7 +13,7 @@ from acceptance_tests.utilities.print_file_helper import create_expected_questio
     create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines, \
     create_expected_reminder_questionnaire_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
-from acceptance_tests.utilities.test_case_helper import tc
+from acceptance_tests.utilities.test_case_helper import test_helper
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -101,7 +101,7 @@ def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines
         raise FileNotFoundError
     actual_content_list.sort()
     expected_csv_lines.sort()
-    tc.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
+    test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
 
 
 def _check_manifest_files_created(context, pack_code):
@@ -119,7 +119,7 @@ def _check_manifest_files_created(context, pack_code):
                 actual_manifest = _get_actual_manifest(sftp_utility, manifest_file, pack_code)
                 creation_datetime = actual_manifest['manifestCreated']
                 expected_manifest = _create_expected_manifest(sftp_utility, csv_file, creation_datetime, pack_code)
-                tc.assertDictEqual(actual_manifest, expected_manifest)
+                test_helper.assertDictEqual(actual_manifest, expected_manifest)
 
 
 def _get_actual_manifest(sftp_utility, manifest_file, pack_code):

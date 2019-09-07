@@ -23,7 +23,7 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'ICHHQE': {'treatmentCode': ['HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', 'HH_QF3R3AE']},
         'ICHHQW': {'treatmentCode': ['HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', 'HH_QF3R3AW']},
         'ICHHQN': {'treatmentCode': ['HH_3QSFN']},
-        'FF2QE': {'treatmentCode': ['HH_QF2R1E']},
+        'FIELD': {'treatmentCode': ['HH_QF2R1E']},
         'P_RL_1RL1_1': {'treatmentCode': ['HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E',
                                           'HH_QFNR1E']},
         'P_RL_2RL2B_3a': {'treatmentCode': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',

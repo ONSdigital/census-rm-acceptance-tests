@@ -221,8 +221,13 @@ def check_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.fulfilment_requested_case_id)
 
 
+@step("an individual case has been created and only has logged events of {expected_event_list}")
+def check_individual_fulfilment_events(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
+
+
 @step("the questionnaire fulfilment case has these events logged {expected_event_list}")
-def check_questionaire_fulfilment_events(context, expected_event_list):
+def check_questionnaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
 
 
