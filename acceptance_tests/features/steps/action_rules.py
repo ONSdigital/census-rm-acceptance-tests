@@ -29,6 +29,12 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'P_RL_2RL2B_3a': {'treatmentCode': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',
                                             'HH_QFNR3AW']},
         'P_QU_H2': {'treatmentCode': ['HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW']},
+        'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542']},
+        'P_RD_2RL2B_1': {'lsoa': ['E01014669']},
+        'P_RD_2RL1_2': {'lsoa': ['E01014543', 'E01014544']},
+        'P_RD_2RL2B_2': {'lsoa': ['E01033361', 'E01015005']},
+        'P_RD_2RL1_3': {'lsoa': ['E01014545']},
+        'P_RD_2RL2B_3': {'lsoa': ['E01014897']}
     }
 
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifiers_for_action_type[action_type],
