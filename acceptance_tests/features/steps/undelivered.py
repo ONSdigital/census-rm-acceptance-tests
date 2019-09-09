@@ -61,7 +61,7 @@ def _publish_ppo_undelivered_mail(context, case_ref):
     topic_path = publisher.topic_path(Config.PPO_UNDELIVERED_PROJECT_ID, Config.PPO_UNDELIVERED_TOPIC_NAME)
 
     data = json.dumps({"transactionId": str(uuid.uuid4()),
-                       "dateTime": "2019-08-03T14:30:01Z",
+                       "dateTime": "2019-08-03T14:30:01",
                        "caseRef": case_ref,
                        "productCode": "P_OR_H1",
                        "channel": "PPO",
@@ -91,7 +91,7 @@ def _publish_qm_undelivered_mail(context, questionnaire_id):
 
     data = json.dumps({
         "transactionId": str(uuid.uuid4()),
-        "dateTime": "2008-08-24T00:00:00Z",
+        "dateTime": "2008-08-24T00:00:00",
         "questionnaireId": questionnaire_id
     })
 
