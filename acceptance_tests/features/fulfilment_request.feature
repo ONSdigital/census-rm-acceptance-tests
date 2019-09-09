@@ -22,7 +22,7 @@ Feature: Handle fulfilment request events
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
@@ -37,7 +37,7 @@ Feature: Handle fulfilment request events
     When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
     Examples: Continuation Questionnaires
       | fulfilment code | questionnaire type |
