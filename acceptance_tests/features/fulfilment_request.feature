@@ -12,7 +12,7 @@ Feature: Handle fulfilment request events
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request "UACIT1" message for a created case is sent
     Then a new child case is emitted to RH and Action Scheduler
-    And notify api was called with template id "1ccd02a4-9b90-4234-ab7a-9215cb498f14"
+    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
     And the individual case has these events logged [RM_UAC_CREATED]
 
