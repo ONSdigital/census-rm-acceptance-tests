@@ -36,21 +36,3 @@ Feature: Case processor handles receipt message from pubsub service
     Then only unreceipted cases appear in "P_IC_ICL1" print files
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
-
-
-  Scenario Outline:  Generate print files and log events for response driven reminders
-    Given sample file "<sample file>" is loaded successfully
-    And an action rule of type "<pack code>" is set 2 seconds in the future
-    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
-    Then correctly formatted "<pack code>" reminder letter print files are created
-    And there is a correct "<pack code>" manifest file for each csv file written
-    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
-
-    Examples: Reminder contact letter: <pack code>
-      | pack code    | number of matching cases | sample file                                        |
-      | P_RD_2RL1_1  | 3                        | sample_input_england_response_driven_reminders.csv |
-      | P_RD_2RL2B_1 | 1                        | sample_input_wales_census_spec.csv                 |
-      | P_RD_2RL1_2  | 2                        | sample_input_england_response_driven_reminders.csv |
-      | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
-      | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
-      | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv
