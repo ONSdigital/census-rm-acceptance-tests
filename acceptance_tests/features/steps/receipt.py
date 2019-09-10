@@ -117,7 +117,7 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
 
     data = json.dumps({
-        "dateTime": "2008-08-24T00:00:00Z",
+        "dateTime": "2008-08-24T00:00:00",
         "transactionId": tx_id,
         "questionnaireId": questionnaire_id,
         "channel": "PQRS"
