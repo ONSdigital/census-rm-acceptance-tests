@@ -54,3 +54,21 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     Examples: Initial contact questionnaire: <pack code>
       | pack code | number of matching cases | sample file                           |
       | P_QU_H2   | 3                        | sample_for_reminder_questionnaire.csv |
+
+
+  Scenario Outline:  Generate print files and log events for response driven reminders
+    Given sample file "<sample file>" is loaded successfully
+    And an action rule of type "<pack code>" is set 2 seconds in the future
+    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
+    Then correctly formatted "<pack code>" reminder letter print files are created
+    And there is a correct "<pack code>" manifest file for each csv file written
+    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
+
+    Examples: Reminder contact letter: <pack code>
+      | pack code    | number of matching cases | sample file                                        |
+      | P_RD_2RL1_1  | 3                        | sample_input_england_response_driven_reminders.csv |
+      | P_RD_2RL2B_1 | 1                        | sample_input_wales_census_spec.csv                 |
+      | P_RD_2RL1_2  | 2                        | sample_input_england_response_driven_reminders.csv |
+      | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
+      | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
+      | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
