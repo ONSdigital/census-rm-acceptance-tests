@@ -59,10 +59,12 @@ def check_linked_message_is_received(context):
         }
     }
 
-    with RabbitContext(queue_name=Config.RABBITMQ_QUESTIONNAIRE_LINKED_QUEUE) as rabbit:
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=json.dumps(questionnaire_linked_message),
-            content_type='application/json')
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
+
 
 
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
