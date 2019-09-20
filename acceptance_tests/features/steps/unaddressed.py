@@ -66,7 +66,6 @@ def check_linked_message_is_received(context):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
