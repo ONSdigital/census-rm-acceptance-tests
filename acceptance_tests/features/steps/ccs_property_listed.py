@@ -12,7 +12,7 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @step("a CCS Property Listed event is sent")
 def send_ccs_property_listed_event(context):
-    context.fieldwork_case = uuid.uuid4()
+    context.case_id = str(uuid.uuid4())
 
     message = json.dumps({
         "event": {
@@ -25,16 +25,16 @@ def send_ccs_property_listed_event(context):
         "payload": {
             "CCSProperty": {
                 "collectionCase": {
-                    "id": context.fieldwork_case
+                    "id": context.case_id
                 },
                 "sampleUnit": {
-                    "addressType": "HH",
-                    "estabType": "",
+                    "addressType": "NR",
+                    "estabType": "Non-residential",
                     "addressLevel": "U",
-                    "organisationName": "",
-                    "addressLine1": "1 main street",
-                    "addressLine2": "upper upperingham",
-                    "addressLine3": "",
+                    "organisationName": "Testy McTest",
+                    "addressLine1": "123 Fake street",
+                    "addressLine2": "Upper upperingham",
+                    "addressLine3": "Newport",
                     "townName": "upton",
                     "postcode": "UP103UP",
                     "latitude": "50.863849",
@@ -66,5 +66,9 @@ def send_ccs_property_listed_event(context):
 
 @step("the CCS Property Listed case is created")
 def check_case_created(context):
-    response = requests.get(f"{caseapi_url}{context.context.fieldwork_case}", params={'caseEvents': True})
-    assert response.status_code == 200, 'CCS Property Listed case has not been created'
+    response = requests.get(f"{caseapi_url}{context.case_id}")
+    assert response.status_code == 200, 'CCS Property Listed case not found'
+
+    response_json = response.json()
+    assert response_json['caseType'] == 'NR'    # caseType is derived from addressType for CCS
+
