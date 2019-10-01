@@ -1,11 +1,13 @@
+import functools
 import json
 import uuid
 
 import requests
-from behave import step
+from behave import step, then
 from retrying import retry
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from config import Config
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -73,4 +75,18 @@ def check_case_created(context):
 
     response_json = response.json()
     assert response_json['caseType'] == 'NR'    # caseType is derived from addressType for CCS
+
+
+@then("the correct ActionInstruction is sent to FWMT")
+def check_correct_CCS_actionInstruction_sent_to_FWMT(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='CASE_UPDATED'))
+
+    assert len(context.messages_received) == 1
+    emitted_action_instruction = context.messages_received[0]
+    assert emitted_action_instruction == 1
 
