@@ -3,6 +3,7 @@ import uuid
 
 import requests
 from behave import step
+from retrying import retry
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from config import Config
@@ -65,6 +66,7 @@ def send_ccs_property_listed_event(context):
 
 
 @step("the CCS Property Listed case is created")
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_created(context):
     response = requests.get(f"{caseapi_url}{context.case_id}")
     assert response.status_code == 200, 'CCS Property Listed case not found'
