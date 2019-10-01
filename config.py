@@ -35,6 +35,8 @@ class Config:
                                                           'event.fulfilment.request')
     RABBITMQ_INVALID_ADDRESS_ROUTING_KEY = os.getenv('RABBITMQ_INVALID_ADDRESS_ROUTING_KEY',
                                                      'event.case.address.update')
+    RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY = os.getenv('RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY',
+                                                          'event.ccs.propertylisting')
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
