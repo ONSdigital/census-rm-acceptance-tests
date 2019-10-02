@@ -80,7 +80,7 @@ def check_case_created(context):
 
 
 @then("the correct ActionInstruction is sent to FWMT")
-def check_correct_CCS_actionInstruction_sent_to_FWMT(context):
+def check_correct_ccs_actioninstruction_sent_to_fwmt(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                                     functools.partial(
