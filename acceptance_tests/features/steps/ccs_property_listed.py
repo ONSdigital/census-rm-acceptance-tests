@@ -2,12 +2,14 @@ import functools
 import json
 import uuid
 
+import xml.etree.ElementTree as ET
 import requests
 from behave import step, then
 from retrying import retry
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -73,8 +75,8 @@ def check_case_created(context):
     response = requests.get(f"{caseapi_url}{context.case_id}")
     assert response.status_code == 200, 'CCS Property Listed case not found'
 
-    response_json = response.json()
-    assert response_json['caseType'] == 'NR'    # caseType is derived from addressType for CCS
+    context.ccs_case = response.json()
+    assert context.ccs_case['caseType'] == 'NR'  # caseType is derived from addressType for CCS
 
 
 @then("the correct ActionInstruction is sent to FWMT")
@@ -82,11 +84,26 @@ def check_correct_CCS_actionInstruction_sent_to_FWMT(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                                     functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=1,
-                                        type_filter='CASE_UPDATED'))
+                                        field_callback, context=context))
 
-    assert len(context.messages_received) == 1
-    emitted_action_instruction = context.messages_received[0]
-    assert emitted_action_instruction == 1
+    action_instruction = context.emitted_action_instruction
 
+    test_helper.assertEqual(context.ccs_case['id'], action_instruction.find('.//caseId').text)
+    test_helper.assertEqual(context.ccs_case['latitude'], action_instruction.find('.//latitude').text)
+    test_helper.assertEqual(context.ccs_case['longitude'], action_instruction.find('.//longitude').text)
+    test_helper.assertEqual(context.ccs_case['postcode'], action_instruction.find('.//postcode').text)
+    test_helper.assertEqual('false', action_instruction.find('.//undeliveredAsAddress').text)
+    test_helper.assertEqual('false', action_instruction.find('.//blankQreReturned').text)
+    test_helper.assertEqual('CCS', action_instruction.find('.//surveyName').text)
+    test_helper.assertEqual(context.ccs_case['estabType'], action_instruction.find('.//estabType').text)
+
+
+def field_callback(ch, method, _properties, body, context):
+    context.emitted_action_instruction = ET.fromstring(body)
+
+    if not context.emitted_action_instruction[0].tag == 'actionRequest':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        test_helper.fail('Unexpected message on Action.Field case queue')
+
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
