@@ -33,7 +33,7 @@ def send_ccs_property_listed_event(context):
                     "id": context.case_id
                 },
                 "sampleUnit": {
-                    "addressType": "NR",
+                    "addressType": "HH",
                     "estabType": "Non-residential",
                     "addressLevel": "U",
                     "organisationName": "Testy McTest",
@@ -46,17 +46,6 @@ def send_ccs_property_listed_event(context):
                     "longitude": "-1.229710",
                     "fieldcoordinatorId": "XXXXXXXXXX",
                     "fieldofficerId": "XXXXXXXXXXXXX"
-                },
-                "uac": {
-                    "questionnaireId": "1110000009"
-                },
-                "refusal": {
-                    "type": "HARD_REFUSAL",
-                    "report": "respondent too busy",
-                    "agentId": "110001"
-                },
-                "invalidAddress": {
-                    "reason": "DEMOLISHED"
                 }
             }
         }
@@ -76,7 +65,7 @@ def check_case_created(context):
     assert response.status_code == 200, 'CCS Property Listed case not found'
 
     context.ccs_case = response.json()
-    assert context.ccs_case['caseType'] == 'NR'  # caseType is derived from addressType for CCS
+    assert context.ccs_case['caseType'] == 'HH'  # caseType is derived from addressType for CCS
 
 
 @then("the correct ActionInstruction is sent to FWMT")
