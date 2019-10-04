@@ -34,7 +34,7 @@ def send_ccs_property_listed_event(context):
                 },
                 "sampleUnit": {
                     "addressType": "HH",
-                    "estabType": "Non-residential",
+                    "estabType": "Household",
                     "addressLevel": "U",
                     "organisationName": "Testy McTest",
                     "addressLine1": "123 Fake street",
