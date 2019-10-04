@@ -4,9 +4,10 @@ from random import randint
 from uuid import uuid4
 
 import requests
-from behave import then, given
+from behave import then, given, step
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -19,7 +20,7 @@ def get_case_by_id(context):
 
     response = requests.get(f'{case_api_url}{case_id}')
 
-    assert response.status_code == 200, 'Case not found'
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
 
 
 @given('a random caseId is generated')
@@ -47,7 +48,7 @@ def generate_random_case_ref(context):
 def get_non_existent_case_id(context):
     response = requests.get(f'{case_api_url}{context.test_endpoint_with_non_existent_value}')
 
-    assert response.status_code == 404, 'Case returned'
+    test_helper.assertEqual(response.status_code, 404, 'Unexpected case returned')
 
 
 @then('case API returns multiple cases for a UPRN')
@@ -71,7 +72,15 @@ def find_case_by_case_ref(context):
 
     response = requests.get(f'{case_api_url}ref/{case_ref}')
 
-    assert response.status_code == 200, 'Case ref not found'
+    test_helper.assertEqual(response.status_code, 200, 'Case ref not found')
+
+
+@step('the case API returns the CCS QID for the new case')
+def get_ccs_qid_for_case_id(context):
+    response = requests.get(f'{case_api_url}ccs/{context.ccs_case["id"]}/qid')
+    test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
+    response_json = json.loads(response.text)
+    test_helper.assertEqual(response_json['qid'][0:3], '712', 'CCS QID has incorrect questionnaire type or tranche ID')
 
 
 def get_logged_events_for_case_by_id(case_id):
