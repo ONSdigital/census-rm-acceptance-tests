@@ -2,12 +2,14 @@ import functools
 import json
 import logging
 import subprocess
+import time
 
 import requests
-from behave import when, step
+from behave import when, step, then
 from retrying import retry
 from structlog import wrap_logger
 
+from acceptance_tests.features.steps.receipt import _publish_offline_receipt
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -150,3 +152,18 @@ def validate_unaddressed_print_file(context):
             check=True)
     except subprocess.CalledProcessError:
         raise AssertionError('Unaddressed print file test failed')
+
+
+@step("a receipt for the unlinked UAC-QID pair is received")
+def send_receipt_for_unaddressed(context):
+    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
+    assert context.sent_to_gcp
+
+
+@then("the world doesn't end")
+def the_world_does_not_end(context):
+    # Without digging directly into the DB we can't check if Case Processor handled correctly.
+    # Without digging directly into Fieldwork Adapter's logs, we can't see the warning message.
+    # We can do nothing except assume that everything's fine - the world didn't end.
+    time.sleep(10)
+    pass
