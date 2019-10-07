@@ -48,7 +48,7 @@ def generate_random_case_ref(context):
 def get_non_existent_case_id(context):
     response = requests.get(f'{case_api_url}{context.test_endpoint_with_non_existent_value}')
 
-    test_helper.assertEqual(response.status_code, 404, 'Unexpected case returned')
+    test_helper.assertEqual(response.status_code, 404, 'A case was returned when none were expected')
 
 
 @then('case API returns multiple cases for a UPRN')
