@@ -1,8 +1,8 @@
 import functools
 import json
 import uuid
-
 import xml.etree.ElementTree as ET
+
 import requests
 from behave import step
 from retrying import retry
@@ -84,12 +84,12 @@ def _get_ccs_property_listed_event(case_id, questionnaire_id=None):
 
 @step("the CCS Property Listed case is created")
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_case_created(context):
+def check_ccs_case_created(context):
     response = requests.get(f"{caseapi_url}{context.case_id}")
-    assert response.status_code == 200, 'CCS Property Listed case not found'
+    test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
     context.ccs_case = response.json()
-    assert context.ccs_case['caseType'] == 'HH'  # caseType is derived from addressType for CCS
+    test_helper.assertEqual(context.ccs_case['caseType'], 'HH')  # caseType is derived from addressType for CCS
 
 
 @step("the correct ActionInstruction is sent to FWMT")

@@ -11,3 +11,4 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     When a CCS Property Listed event is sent with a qid
     And the CCS Property Listed case is created
     And no ActionInstruction is sent to FWMT
+    And the case API returns the CCS QID for the new case
