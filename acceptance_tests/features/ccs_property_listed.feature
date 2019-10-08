@@ -7,7 +7,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And the case API returns the CCS QID for the new case
 
   Scenario: Log event when a CCS Property Listed event is received with a qid
-    When an unaddressed message of questionnaire type 71 is sent
+    Given an unaddressed message of questionnaire type 71 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     When a CCS Property Listed event is sent with a qid
     And the CCS Property Listed case is created
