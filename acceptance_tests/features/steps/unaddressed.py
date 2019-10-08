@@ -167,22 +167,21 @@ def check_message_redelivery_rate(context):
     time.sleep(2)  # Wait a couple of seconds for all hell to break loose
 
     v_host = urllib.parse.quote(Config.RABBITMQ_VHOST, safe='')
-    queue_details = requests.get(
+    response = requests.get(
         f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
-        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
 
-    queue_details.raise_for_status()
-
+    response.raise_for_status()
+    queue_details = response.json()
     redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
 
-    test_helper.assertEqual(redeliver_rate, 0, "Redeliver rate should be zero")
-
-    queue_details = requests.get(
+    response = requests.get(
         f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
-        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
 
-    queue_details.raise_for_status()
-
+    response.raise_for_status()
+    queue_details = response.json()
     redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
 
-    test_helper.assertEqual(redeliver_rate, 0, "Redeliver rate should be zero")
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
