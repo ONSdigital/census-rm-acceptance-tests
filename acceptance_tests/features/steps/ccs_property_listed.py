@@ -7,6 +7,7 @@ import requests
 from behave import step
 from retrying import retry
 
+from acceptance_tests.features.steps.unaddressed import get_case_id_by_questionnaire_id
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
@@ -128,3 +129,9 @@ def check_no_msg_sent_fwmt(context):
                                 functools.partial(
                                     store_all_msgs_in_context, context=context,
                                     expected_msg_count=0))
+
+
+@step("the CCS Case created is set against the correct qid")
+def check_created_uacqid_link_has_new_ccs_against_it(context):
+    linked_ccs_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+    assert linked_ccs_case_id == context.case_id
