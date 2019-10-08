@@ -10,7 +10,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     Given an unaddressed message of questionnaire type 71 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     When a CCS Property Listed event is sent with a qid
-    And the CCS Property Listed case is created
+    Then the CCS Property Listed case is created
     And the CCS Case created is set against the correct qid
     And no ActionInstruction is sent to FWMT
 
