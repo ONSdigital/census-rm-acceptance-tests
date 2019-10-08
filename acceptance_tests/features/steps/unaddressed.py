@@ -171,14 +171,18 @@ def check_message_redelivery_rate(context):
         f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
         auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
 
-    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate', 0)
+    queue_details.raise_for_status()
 
-    assert redeliver_rate == 0
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+
+    test_helper.assertEqual(redeliver_rate, 0, "Redeliver rate should be zero")
 
     queue_details = requests.get(
         f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
         auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
 
-    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate', 0)
+    queue_details.raise_for_status()
 
-    assert redeliver_rate == 0
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+
+    test_helper.assertEqual(redeliver_rate, 0, "Redeliver rate should be zero")
