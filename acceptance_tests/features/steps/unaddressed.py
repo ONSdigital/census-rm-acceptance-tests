@@ -2,12 +2,16 @@ import functools
 import json
 import logging
 import subprocess
+import time
+import urllib
 
 import requests
-from behave import when, step
+from behave import when, step, then
+from requests.auth import HTTPBasicAuth
 from retrying import retry
 from structlog import wrap_logger
 
+from acceptance_tests.features.steps.receipt import _publish_offline_receipt
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -150,3 +154,34 @@ def validate_unaddressed_print_file(context):
             check=True)
     except subprocess.CalledProcessError:
         raise AssertionError('Unaddressed print file test failed')
+
+
+@step("a receipt for the unlinked UAC-QID pair is received")
+def send_receipt_for_unaddressed(context):
+    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
+    assert context.sent_to_gcp
+
+
+@then("message redelivery does not go bananas")
+def check_message_redelivery_rate(context):
+    time.sleep(2)  # Wait a couple of seconds for all hell to break loose
+
+    v_host = urllib.parse.quote(Config.RABBITMQ_VHOST, safe='')
+    response = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
+
+    response.raise_for_status()
+    queue_details = response.json()
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
+
+    response = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
+
+    response.raise_for_status()
+    queue_details = response.json()
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
