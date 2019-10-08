@@ -3,9 +3,11 @@ import json
 import logging
 import subprocess
 import time
+import urllib
 
 import requests
 from behave import when, step, then
+from requests.auth import HTTPBasicAuth
 from retrying import retry
 from structlog import wrap_logger
 
@@ -160,10 +162,23 @@ def send_receipt_for_unaddressed(context):
     assert context.sent_to_gcp
 
 
-@then("the world doesn't end")
-def the_world_does_not_end(context):
-    # Without digging directly into the DB we can't check if Case Processor handled correctly.
-    # Without digging directly into Fieldwork Adapter's logs, we can't see the warning message.
-    # We can do nothing except assume that everything's fine - the world didn't end.
-    time.sleep(10)
-    pass
+@then("message redelivery does not go bananas")
+def check_message_redelivery_rate(context):
+    time.sleep(2)  # Wait a couple of seconds for all hell to break loose
+
+    v_host = urllib.parse.quote(Config.RABBITMQ_VHOST, safe='')
+    queue_details = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
+
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate', 0)
+
+    assert redeliver_rate == 0
+
+    queue_details = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD)).json()
+
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate', 0)
+
+    assert redeliver_rate == 0
