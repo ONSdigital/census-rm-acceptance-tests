@@ -22,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
+@step('an unaddressed message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
     context.expected_questionnaire_type = questionnaire_type
     with RabbitContext(queue_name=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE) as rabbit:
@@ -40,7 +40,7 @@ def send_linked_message(context):
 @step("an Individual Questionnaire Linked message is sent")
 def send_individual_linked_message(context):
     check_linked_message_is_received(context)
-    context.linked_case_id = _get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+    context.linked_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
 
 
 def check_linked_message_is_received(context):
@@ -96,7 +96,7 @@ def check_question_linked_event_is_logged(context):
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def _get_case_id_by_questionnaire_id(questionnaire_id):
+def get_case_id_by_questionnaire_id(questionnaire_id):
     response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
