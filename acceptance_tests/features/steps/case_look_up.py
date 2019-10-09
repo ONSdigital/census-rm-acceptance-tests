@@ -81,6 +81,7 @@ def get_ccs_qid_for_case_id(context):
     test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
     response_json = json.loads(response.text)
     test_helper.assertEqual(response_json['qid'][0:3], '712', 'CCS QID has incorrect questionnaire type or tranche ID')
+    test_helper.assertTrue(response_json['active'])
 
 
 def get_logged_events_for_case_by_id(case_id):
