@@ -19,30 +19,35 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @step("a CCS Property Listed event is sent")
 def send_ccs_property_listed_event(context):
-    context.case_id = str(uuid.uuid4())
-
-    message = _get_ccs_property_listed_event(context.case_id)
-
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY)
+    message = _create_ccs_property_listed_event(context)
+    _send_ccs_case_list_msg_to_rabbit(message)
 
 
 @step("a CCS Property Listed event is sent with a qid")
 def send_ccs_property_listed_event_with_qid(context):
+    message = _create_ccs_property_listed_event(context)
+    message['payload']['CCSProperty']['uac'] = {
+        "questionnaireId": context.expected_questionnaire_id
+    }
+
+    _send_ccs_case_list_msg_to_rabbit(message)
+
+
+@step('a CCS Property Listed event is sent with refusal')
+def send_ccs_property_listed_event_with_refusal(context):
+    message = _create_ccs_property_listed_event(context)
+    message['payload']['CCSProperty']['refusal'] = {
+        "type": "HARD_REFUSAL",
+        "report": "respondent too busy",
+        "agentId": "110001"
+    }
+
+    _send_ccs_case_list_msg_to_rabbit(message)
+
+
+def _create_ccs_property_listed_event(context, address_type="HH"):
     context.case_id = str(uuid.uuid4())
-    message = _get_ccs_property_listed_event(context.case_id, context.expected_questionnaire_id)
 
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY)
-
-
-def _get_ccs_property_listed_event(case_id, questionnaire_id=None):
     message = {
         "event": {
             "type": "CCS_ADDRESS_LISTED",
@@ -54,10 +59,10 @@ def _get_ccs_property_listed_event(case_id, questionnaire_id=None):
         "payload": {
             "CCSProperty": {
                 "collectionCase": {
-                    "id": case_id
+                    "id": context.case_id
                 },
                 "sampleUnit": {
-                    "addressType": "HH",
+                    "addressType": address_type,
                     "estabType": "Household",
                     "addressLevel": "U",
                     "organisationName": "Testy McTest",
@@ -75,22 +80,27 @@ def _get_ccs_property_listed_event(case_id, questionnaire_id=None):
         }
     }
 
-    if questionnaire_id:
-        message['payload']['CCSProperty']['uac'] = {
-            "questionnaireId": questionnaire_id
-        }
-
-    return json.dumps(message)
+    return message
 
 
-@step("the CCS Property Listed case is created")
+def _send_ccs_case_list_msg_to_rabbit(message):
+    json_message = json.dumps(message)
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=json_message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY)
+
+
+@step('the CCS Property Listed case is created with case_type "{case_type}"')
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_ccs_case_created(context):
-    response = requests.get(f"{caseapi_url}{context.case_id}")
+def check_case_created(context, case_type):
+    response = requests.get(f'{caseapi_url}{context.case_id}', params={'caseEvents': True})
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
     context.ccs_case = response.json()
-    test_helper.assertEqual(context.ccs_case['caseType'], 'HH')  # caseType is derived from addressType for CCS
+    test_helper.assertEqual(context.ccs_case['caseType'], case_type)  # caseType is derived from addressType for CCS
 
 
 @step("the correct ActionInstruction is sent to FWMT")
@@ -131,7 +141,13 @@ def check_no_msg_sent_fwmt(context):
                                     expected_msg_count=0))
 
 
+@step("the CCS case listed event is logged")
+def ccs_case_event_logged(context):
+    # currently no way of testing refusal set so just test event logged and didn't break anything
+    test_helper.assertEqual(context.ccs_case['caseEvents'][0]['eventType'], 'CCS_ADDRESS_LISTED')
+
+
 @step("the CCS Case created is set against the correct qid")
 def check_created_uacqid_link_has_new_ccs_against_it(context):
     linked_ccs_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
-    assert linked_ccs_case_id == context.case_id
+    test_helper.assertEqual(linked_ccs_case_id, context.case_id)
