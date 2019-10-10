@@ -2,12 +2,16 @@ import functools
 import json
 import logging
 import subprocess
+import time
+import urllib
 
 import requests
-from behave import when, step
+from behave import when, step, then
+from requests.auth import HTTPBasicAuth
 from retrying import retry
 from structlog import wrap_logger
 
+from acceptance_tests.features.steps.receipt import _publish_offline_receipt
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -18,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@when('an unaddressed message of questionnaire type {questionnaire_type} is sent')
+@step('an unaddressed message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
     context.expected_questionnaire_type = questionnaire_type
     with RabbitContext(queue_name=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE) as rabbit:
@@ -36,7 +40,7 @@ def send_linked_message(context):
 @step("an Individual Questionnaire Linked message is sent")
 def send_individual_linked_message(context):
     check_linked_message_is_received(context)
-    context.linked_case_id = _get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+    context.linked_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
 
 
 def check_linked_message_is_received(context):
@@ -92,7 +96,7 @@ def check_question_linked_event_is_logged(context):
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def _get_case_id_by_questionnaire_id(questionnaire_id):
+def get_case_id_by_questionnaire_id(questionnaire_id):
     response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
     assert response.status_code == 200, "Unexpected status code"
     response_json = response.json()
@@ -150,3 +154,34 @@ def validate_unaddressed_print_file(context):
             check=True)
     except subprocess.CalledProcessError:
         raise AssertionError('Unaddressed print file test failed')
+
+
+@step("a receipt for the unlinked UAC-QID pair is received")
+def send_receipt_for_unaddressed(context):
+    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
+    assert context.sent_to_gcp
+
+
+@then("message redelivery does not go bananas")
+def check_message_redelivery_rate(context):
+    time.sleep(2)  # Wait a couple of seconds for all hell to break loose
+
+    v_host = urllib.parse.quote(Config.RABBITMQ_VHOST, safe='')
+    response = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
+
+    response.raise_for_status()
+    queue_details = response.json()
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
+
+    response = requests.get(
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
+        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
+
+    response.raise_for_status()
+    queue_details = response.json()
+    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
+
+    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
