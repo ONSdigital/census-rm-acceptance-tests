@@ -151,11 +151,6 @@ def check_no_msg_sent_fwmt(context):
                                     expected_msg_count=0))
 
 
-@step("the CCS case has address invalid true")
-def ccs_case_has_invalid_address_true(context):
-    test_helper.assertEqual(context.ccs_case['addressInvalid'], True)
-
-
 @step("the CCS case listed event is logged")
 def ccs_case_event_logged(context):
     # currently no way of testing refusal set so just test event logged and didn't break anything

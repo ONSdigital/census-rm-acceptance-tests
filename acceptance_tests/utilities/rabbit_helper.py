@@ -67,7 +67,7 @@ def purge_queues(*queues):
             rabbit.channel.queue_purge(queue=queue)
 
 
-def check_no_msgs_sent_to_queue(queue, on_message_callback, timeout=10):
+def check_no_msgs_sent_to_queue(queue, on_message_callback, timeout=5):
     rabbit = RabbitContext(queue_name=queue)
     connection = rabbit.open_connection()
 
