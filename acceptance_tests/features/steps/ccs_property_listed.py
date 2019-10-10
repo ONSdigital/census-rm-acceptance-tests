@@ -33,16 +33,6 @@ def send_ccs_property_listed_event_with_qid(context):
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
-@step('a CCS Property Listed event is sent with an address invalid event and addressType "{address_type}"')
-def send_ccs_property_listed_event_with_invalid_address(context, address_type):
-    message = _create_ccs_property_listed_event(context, address_type)
-    message['payload']['CCSProperty']['invalidAddress'] = {
-        "reason": "NON_RESIDENTIAL"
-    }
-
-    _send_ccs_case_list_msg_to_rabbit(message)
-
-
 @step('a CCS Property Listed event is sent with refusal')
 def send_ccs_property_listed_event_with_refusal(context):
     message = _create_ccs_property_listed_event(context)
