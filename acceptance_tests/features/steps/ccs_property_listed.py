@@ -110,7 +110,7 @@ def check_case_created(context, case_type):
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
     context.ccs_case = response.json()
-    test_helper.assertEqual(context.ccs_case['caseType'], case_type) # caseType is derived from addressType for CCS
+    test_helper.assertEqual(context.ccs_case['caseType'], case_type)
 
 
 @step("the correct ActionInstruction is sent to FWMT")
