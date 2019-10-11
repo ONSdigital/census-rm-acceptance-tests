@@ -20,3 +20,10 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And no ActionInstruction is sent to FWMT
     And the case API returns the CCS QID for the new case
 
+  Scenario: CCS Listed with Address invalid
+    When a CCS Property Listed event is sent with an address invalid event and addressType "NR"
+    Then the CCS Property Listed case is created with case_type "NR"
+    And the CCS case listed event is logged
+    And no ActionInstruction is sent to FWMT
+    And the case API returns the CCS QID for the new case
+
