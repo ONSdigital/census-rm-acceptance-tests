@@ -27,3 +27,13 @@ Feature: Case look up for the contact centre
     Given a random caseRef is generated
     Then case API should return a 404 when queried
 
+  Scenario: Check case-api returns correct fields for a CENSUS case
+    Given sample file "sample_1_english_unit.csv" is loaded
+    Then messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Then a case can be retrieved from the case API service
+    And it contains the correct fields for a CENSUS case
+
+  Scenario: Check case-api returns correct fields for a CCS case
+    When a CCS Property Listed event is sent
+    Then the CCS Property Listed case is created with case_type "HH"
+    And it contains the correct fields for a CCS case
