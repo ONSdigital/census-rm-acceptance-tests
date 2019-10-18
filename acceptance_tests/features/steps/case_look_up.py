@@ -20,9 +20,9 @@ def get_case_by_id(context):
 
     response = requests.get(f'{case_api_url}{case_id}')
 
-    context.response = response.json()
-
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
+
+    context.case_details = response.json()
 
 
 @given('a random caseId is generated')
@@ -88,31 +88,31 @@ def get_ccs_qid_for_case_id(context):
 
 @step('it contains the correct fields for a CENSUS case')
 def check_census_case_fields(context):
-    assert context.response['caseRef']
-    assert context.response['arid']
-    assert context.response['estabArid']
-    assert context.response['estabType']
-    assert context.response['uprn']
-    assert context.response['collectionExerciseId']
-    test_helper.assertEqual(context.response['surveyType'], "CENSUS")
-    assert context.response['createdDateTime']
-    assert context.response['addressLine1']
-    assert context.response['addressLine2']
-    assert context.response['addressLine3']
-    assert context.response['townName']
-    assert context.response['postcode']
-    assert context.response['addressLevel']
-    assert context.response['abpCode']
-    assert context.response['region']
-    assert context.response['latitude']
-    assert context.response['longitude']
-    assert context.response['oa']
-    assert context.response['lsoa']
-    assert context.response['msoa']
-    assert context.response['lad']
-    assert context.response['state']
-    assert context.response['id']
-    assert context.response['caseType']
+    assert context.case_details['caseRef']
+    assert context.case_details['arid']
+    assert context.case_details['estabArid']
+    assert context.case_details['estabType']
+    assert context.case_details['uprn']
+    assert context.case_details['collectionExerciseId']
+    test_helper.assertEqual(context.case_details['surveyType'], "CENSUS")
+    assert context.case_details['createdDateTime']
+    assert context.case_details['addressLine1']
+    assert context.case_details['addressLine2']
+    assert context.case_details['addressLine3']
+    assert context.case_details['townName']
+    assert context.case_details['postcode']
+    assert context.case_details['addressLevel']
+    assert context.case_details['abpCode']
+    assert context.case_details['region']
+    assert context.case_details['latitude']
+    assert context.case_details['longitude']
+    assert context.case_details['oa']
+    assert context.case_details['lsoa']
+    assert context.case_details['msoa']
+    assert context.case_details['lad']
+    assert context.case_details['state']
+    assert context.case_details['id']
+    assert context.case_details['caseType']
 
 
 @step('it contains the correct fields for a CCS case')
