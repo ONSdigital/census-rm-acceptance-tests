@@ -22,6 +22,8 @@ def get_case_by_id(context):
 
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
 
+    context.case_details = response.json()
+
 
 @given('a random caseId is generated')
 def generate_random_uuid(context):
@@ -82,6 +84,64 @@ def get_ccs_qid_for_case_id(context):
     response_json = json.loads(response.text)
     test_helper.assertEqual(response_json['qid'][0:3], '712', 'CCS QID has incorrect questionnaire type or tranche ID')
     test_helper.assertTrue(response_json['active'])
+
+
+@step('it contains the correct fields for a CENSUS case')
+def check_census_case_fields(context):
+    assert context.case_details['caseRef']
+    assert context.case_details['arid']
+    assert context.case_details['estabArid']
+    assert context.case_details['estabType']
+    assert context.case_details['uprn']
+    assert context.case_details['collectionExerciseId']
+    test_helper.assertEqual(context.case_details['surveyType'], "CENSUS")
+    assert context.case_details['createdDateTime']
+    assert context.case_details['addressLine1']
+    assert context.case_details['addressLine2']
+    assert context.case_details['addressLine3']
+    assert context.case_details['townName']
+    assert context.case_details['postcode']
+    assert context.case_details['addressLevel']
+    assert context.case_details['abpCode']
+    assert context.case_details['region']
+    assert context.case_details['latitude']
+    assert context.case_details['longitude']
+    assert context.case_details['oa']
+    assert context.case_details['lsoa']
+    assert context.case_details['msoa']
+    assert context.case_details['lad']
+    assert context.case_details['state']
+    assert context.case_details['id']
+    assert context.case_details['caseType']
+
+
+@step('it contains the correct fields for a CCS case')
+def check_ccs_case_fields(context):
+    assert context.ccs_case['caseRef']
+    test_helper.assertFalse(context.ccs_case['arid'])
+    test_helper.assertFalse(context.ccs_case['estabArid'])
+    assert context.ccs_case['estabType']
+    test_helper.assertFalse(context.ccs_case['uprn'])
+    assert context.ccs_case['collectionExerciseId']
+    test_helper.assertEqual(context.ccs_case['surveyType'], "CCS")
+    assert context.ccs_case['createdDateTime']
+    assert context.ccs_case['addressLine1']
+    assert context.ccs_case['addressLine2']
+    assert context.ccs_case['addressLine3']
+    assert context.ccs_case['townName']
+    assert context.ccs_case['postcode']
+    assert context.ccs_case['addressLevel']
+    test_helper.assertFalse(context.ccs_case['abpCode'])
+    test_helper.assertFalse(context.ccs_case['region'])
+    assert context.ccs_case['latitude']
+    assert context.ccs_case['longitude']
+    test_helper.assertFalse(context.ccs_case['oa'])
+    test_helper.assertFalse(context.ccs_case['lsoa'])
+    test_helper.assertFalse(context.ccs_case['msoa'])
+    test_helper.assertFalse(context.ccs_case['lad'])
+    assert context.ccs_case['state']
+    assert context.ccs_case['id']
+    assert context.ccs_case['caseType']
 
 
 def get_logged_events_for_case_by_id(case_id):
