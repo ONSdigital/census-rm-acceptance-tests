@@ -45,6 +45,16 @@ def send_ccs_property_listed_event_with_refusal(context):
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
+@step('a CCS Property Listed event is sent with an address invalid event and addressType "{address_type}"')
+def send_ccs_property_listed_event_with_invalid_address(context, address_type):
+    message = _create_ccs_property_listed_event(context, address_type)
+    message['payload']['CCSProperty']['invalidAddress'] = {
+        "reason": "NON_RESIDENTIAL"
+    }
+
+    _send_ccs_case_list_msg_to_rabbit(message)
+
+
 def _create_ccs_property_listed_event(context, address_type="HH"):
     context.case_id = str(uuid.uuid4())
 
@@ -100,7 +110,7 @@ def check_case_created(context, case_type):
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
     context.ccs_case = response.json()
-    test_helper.assertEqual(context.ccs_case['caseType'], case_type)  # caseType is derived from addressType for CCS
+    test_helper.assertEqual(context.ccs_case['caseType'], case_type)
 
 
 @step("the correct ActionInstruction is sent to FWMT")
