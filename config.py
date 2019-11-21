@@ -80,3 +80,29 @@ class Config:
     NOTIFY_STUB_HOST = os.getenv('NOTIFY_STUB_HOST', 'localhost')
     NOTIFY_STUB_PORT = os.getenv('NOTIFY_STUB_PORT', '8917')
     NOTIFY_STUB_SERVICE = f'{PROTOCOL}://{NOTIFY_STUB_HOST}:{NOTIFY_STUB_PORT}'
+
+    EXCEPTIONMANAGER_CONNECTION_HOST = os.getenv('EXCEPTIONMANAGER_CONNECTION_HOST', 'localhost')
+    EXCEPTIONMANAGER_CONNECTION_PORT = os.getenv('EXCEPTIONMANAGER_CONNECTION_PORT', '8666')
+    EXCEPTION_MANAGER_URL = f'http://{EXCEPTIONMANAGER_CONNECTION_HOST}:{EXCEPTIONMANAGER_CONNECTION_PORT}'
+
+    RABBITMQ_QUEUES = ['Action.Field',
+                       'Case.Responses',
+                       'FieldworkAdapter.Refusals',
+                       'FieldworkAdapter.invalidAddress',
+                       'FieldworkAdapter.uacUpdated',
+                       'action.events',
+                       'action.fulfilment',
+                       'action.undeliveredMailQueue',
+                       'case.action',
+                       'case.ccsPropertyListedQueue',
+                       'case.fulfilments',
+                       'case.invalidAddressQueue',
+                       'case.questionnairelinked',
+                       'case.refusals',
+                       'case.sample.inbound',
+                       'case.uac-qid-created',
+                       'case.undeliveredMailQueue',
+                       'notify.enriched.fulfilment',
+                       'notify.fulfilments',
+                       'survey.launched',
+                       'unaddressedRequestQueue']

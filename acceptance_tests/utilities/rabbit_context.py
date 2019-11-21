@@ -1,4 +1,5 @@
 import pika
+from pika.spec import PERSISTENT_DELIVERY_MODE
 
 from acceptance_tests.utilities.exceptions import RabbitConnectionClosedError
 from config import Config
@@ -52,4 +53,4 @@ class RabbitContext:
             exchange=exchange or self._exchange,
             routing_key=routing_key or self.queue_name,
             body=message,
-            properties=pika.BasicProperties(content_type=content_type))
+            properties=pika.BasicProperties(content_type=content_type, delivery_mode=PERSISTENT_DELIVERY_MODE))
