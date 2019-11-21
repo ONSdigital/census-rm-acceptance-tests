@@ -2,8 +2,8 @@ import hashlib
 import json
 import random
 import time
-
 import requests
+
 from behave import when, then, step
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
