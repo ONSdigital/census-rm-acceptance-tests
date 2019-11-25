@@ -4,23 +4,13 @@ import time
 import uuid
 import requests
 
-from behave import when, then, step
+from behave import then, given
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 
-@step('queues are free of messages')
-def clear_queues(context):
-    for i in range(0, 4):
-        purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
-        time.sleep(1)
-    time.sleep(5)
-    requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
-
-
-@when('a bad message is placed on each of the queues')
+@given('a bad message is placed on each of the queues')
 def publish_bad_message(context):
     message_hashes = []
     for queue in Config.RABBITMQ_QUEUES:
@@ -42,7 +32,7 @@ def publish_bad_message(context):
     context.message_hashes = message_hashes
 
 
-@then('the hash of the bad message is seen multiple times')
+@then("each bad message is seen multiple times by the exception manager")
 def check_for_bad_messages(context):
     time.sleep(30)
     response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages/summary')
