@@ -1,7 +1,7 @@
 import hashlib
 import json
-import random
 import time
+import uuid
 import requests
 
 from behave import when, then, step
@@ -13,7 +13,9 @@ from config import Config
 
 @step('queues are free of messages')
 def clear_queues(context):
-    purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
+    for i in range(0, 4):
+        purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
+        time.sleep(1)
     time.sleep(5)
     requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
 
@@ -26,7 +28,7 @@ def publish_bad_message(context):
             {
                 "message": "This is a dodgy message",
                 "queueName": queue,
-                "randomNumber": random.randint(1, 1000)
+                "uniqueness": str(uuid.uuid4())
             }
         )
 
@@ -42,7 +44,7 @@ def publish_bad_message(context):
 
 @then('the hash of the bad message is seen multiple times')
 def check_for_bad_messages(context):
-    time.sleep(20)
+    time.sleep(30)
     response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages/summary')
     bad_messages = response.json()
 
