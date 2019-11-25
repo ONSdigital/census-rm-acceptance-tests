@@ -46,15 +46,15 @@ def before_scenario(context, _):
 
 def before_tag(context, tag):
     if tag == "clear_for_bad_messages":
-        __clear_queues_for_bad_messages()
+        _clear_queues_for_bad_messages_and_reset_exception_manager()
 
 
 def after_tag(context, tag):
     if tag == "clear_for_bad_messages":
-        __clear_queues_for_bad_messages()
+        _clear_queues_for_bad_messages_and_reset_exception_manager()
 
 
-def __clear_queues_for_bad_messages():
+def _clear_queues_for_bad_messages_and_reset_exception_manager():
     for i in range(0, 4):
         purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
         time.sleep(1)
