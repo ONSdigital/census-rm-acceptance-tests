@@ -66,6 +66,8 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=RABBITMQ_HTTP_PORT=15672 \
     --env=NOTIFY_STUB_HOST=notify-stub \
     --env=NOTIFY_STUB_PORT=80 \
+    --env=EXCEPTIONMANAGER_CONNECTION_HOST=exception-manager \
+    --env=EXCEPTIONMANAGER_CONNECTION_PORT=80 \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
 if [ -z "$QID_BATCH_BRANCH" ]; then

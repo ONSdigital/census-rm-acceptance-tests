@@ -1,6 +1,9 @@
 import base64
 import json
+import time
 import uuid
+import requests
+
 from datetime import datetime
 
 from acceptance_tests.utilities.rabbit_helper import add_test_queue, purge_queues
@@ -39,6 +42,24 @@ def before_scenario(context, _):
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
                  Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
+
+
+def before_tag(context, tag):
+    if tag == "clear_for_bad_messages":
+        _clear_queues_for_bad_messages_and_reset_exception_manager()
+
+
+def after_tag(context, tag):
+    if tag == "clear_for_bad_messages":
+        _clear_queues_for_bad_messages_and_reset_exception_manager()
+
+
+def _clear_queues_for_bad_messages_and_reset_exception_manager():
+    for i in range(0, 4):
+        purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
+        time.sleep(1)
+    time.sleep(5)
+    requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
 
 
 def _setup_google_auth():
