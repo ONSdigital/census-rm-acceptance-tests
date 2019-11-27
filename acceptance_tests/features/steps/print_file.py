@@ -147,7 +147,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
 
     _file = dict(
         sizeBytes=str(expected_size),
-        md5Sum=md5_hash,
+        md5sum=md5_hash,
         relativePath='./',
         name=csv_file.filename
     )
