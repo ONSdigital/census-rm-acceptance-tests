@@ -19,3 +19,6 @@ pgpy = "*"
 
 [requires]
 python_version = "3.6"
+
+[packages]
+flake8 = "*"
