@@ -86,6 +86,7 @@ class Config:
     EXCEPTION_MANAGER_URL = f'http://{EXCEPTIONMANAGER_CONNECTION_HOST}:{EXCEPTIONMANAGER_CONNECTION_PORT}'
 
     RABBITMQ_QUEUES = ['Action.Field',
+                       'Action.Printer',
                        'Case.Responses',
                        'FieldworkAdapter.Refusals',
                        'FieldworkAdapter.invalidAddress',
