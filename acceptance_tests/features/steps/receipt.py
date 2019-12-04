@@ -9,6 +9,7 @@ from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
@@ -18,7 +19,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
-    assert context.sent_to_gcp is True
+    test_helper.assertTrue(context.sent_to_gcp)
 
 
 @when("the offline receipt msg for the created case is put on the GCP pubsub")
@@ -26,7 +27,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
-    assert context.sent_to_gcp is True
+    test_helper.assertTrue(context.sent_to_gcp)
 
 
 @when("the receipt msg for the created case is put on the GCP pubsub with just qid")
@@ -35,7 +36,7 @@ def receipt_msg_published_to_gcp_pubsub_just_qid(context):
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
-    assert context.sent_to_gcp is True
+    test_helper.assertTrue(context.sent_to_gcp)
 
 
 @then("a uac_updated msg is emitted with active set to false")
@@ -47,10 +48,10 @@ def uac_updated_msg_emitted(context):
                                         expected_msg_count=1,
                                         type_filter='UAC_UPDATED'))
 
-    assert len(context.messages_received) == 1
+    test_helper.assertEqual(len(context.messages_received), 1)
     uac = context.messages_received[0]['payload']['uac']
-    assert uac['caseId'] == context.emitted_case['id']
-    assert uac['active'] is False
+    test_helper.assertEqual(uac['caseId'], context.emitted_case['id'])
+    test_helper.assertFalse(uac['active'])
 
 
 @then("an ActionCancelled event is sent to field work management")
@@ -59,8 +60,8 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    assert context.fwmt_emitted_case_id == context.emitted_case["id"]
-    assert context.addressType == 'HH'
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.addressType, 'HH')
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
@@ -68,7 +69,7 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     if not root[0].tag == 'actionCancel':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        assert False, 'Unexpected message on Action.Field case queue, wanted actionCancel'
+        test_helper.fail('Unexpected message on Action.Field case queue, wanted actionCancel')
 
     context.addressType = root[0].find('.//addressType').text
     context.fwmt_emitted_case_id = root[0].find('.//caseId').text
@@ -147,10 +148,10 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
                                         expected_msg_count=1,
                                         type_filter='CASE_UPDATED'))
 
-    assert len(context.messages_received) == 1
+    test_helper.assertEqual(len(context.messages_received), 1)
     context.receipted_emitted_case = context.messages_received[0]['payload']['collectionCase']
-    assert context.receipted_emitted_case['id'] == context.emitted_case['id']
-    assert str(context.receipted_emitted_case[case_field]) == expected_field_value
+    test_helper.assertEqual(context.receipted_emitted_case['id'], context.emitted_case['id'])
+    test_helper.assertEqual(str(context.receipted_emitted_case[case_field]), expected_field_value)
 
 
 @step("the events logged for the receipted case are {expected_event_list}")

@@ -17,7 +17,7 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.sample_units),
                                                       type_filter='CASE_CREATED'))
-    assert len(context.messages_received) == len(context.sample_units)
+    test_helper.assertEqual(len(context.messages_received), len(context.sample_units))
     context.case_created_events = context.messages_received.copy()
     _test_cases_correct(context)
     context.messages_received = []
@@ -27,7 +27,7 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.expected_uacs_cases),
                                                       type_filter='UAC_UPDATED'))
-    assert len(context.messages_received) == len(context.expected_uacs_cases)
+    test_helper.assertEqual(len(context.messages_received), len(context.expected_uacs_cases))
     context.uac_created_events = context.messages_received.copy()
     _test_uacs_correct(context)
     context.messages_received = []
@@ -39,7 +39,7 @@ def gather_uac_updated_events(context, number_of_matching_cases):
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=number_of_matching_cases,
                                                       type_filter='UAC_UPDATED'))
-    assert len(context.messages_received) == number_of_matching_cases
+    test_helper.assertEqual(len(context.messages_received), number_of_matching_cases)
     context.reminder_uac_updated_events = context.messages_received.copy()
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
@@ -88,7 +88,7 @@ def _test_cases_correct(context):
                 del context.expected_sample_units[index]
                 break
         else:
-            test_helper.fail(msg='Could not find sample unit')
+            test_helper.fail('Could not find sample unit')
 
 
 def _sample_matches_rh_message(sample_unit, rh_message):
@@ -100,7 +100,7 @@ def _sample_matches_rh_message(sample_unit, rh_message):
 
 
 def _test_uacs_correct(context):
-    assert len(context.messages_received) == len(context.expected_uacs_cases)
+    test_helper.assertEqual(len(context.messages_received), len(context.expected_uacs_cases))
 
     for msg in context.uac_created_events:
         _validate_uac_message(msg)
@@ -112,7 +112,7 @@ def _test_uacs_correct(context):
                 del context.expected_uacs_cases[index]
                 break
         else:
-            assert False, 'Could not find UAC Updated event'
+            test_helper.fail('Could not find UAC Updated event')
 
 
 def _validate_uac_message(parsed_body):
