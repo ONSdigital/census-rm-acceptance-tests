@@ -60,12 +60,12 @@ def find_multiple_cases_by_uprn(context):
 
     response_data = json.loads(response.content)
 
-    assert len(response_data) > 1, 'Multiple cases not found'
+    test_helper.assertGreater(len(response_data), 1, 'Multiple cases not found')
     # Check some of the fields aren't blank
     for case in response_data:
-        assert case['id'], 'caseId missing'
-        assert case['caseRef'], 'caseRef missing'
-        assert case['postcode'], 'postcode missing'
+        test_helper.assertTrue(case['id'], 'caseId missing')
+        test_helper.assertTrue(case['caseRef'], 'caseRef missing')
+        test_helper.assertTrue(case['postcode'], 'postcode missing')
 
 
 @then('a case can be retrieved by its caseRef')
@@ -89,60 +89,60 @@ def get_ccs_qid_for_case_id(context):
 
 @step('it contains the correct fields for a CENSUS case')
 def check_census_case_fields(context):
-    assert context.case_details['caseRef']
-    assert context.case_details['arid']
-    assert context.case_details['estabArid']
-    assert context.case_details['estabType']
-    assert context.case_details['uprn']
-    assert context.case_details['collectionExerciseId']
+    test_helper.assertTrue(context.case_details['caseRef'])
+    test_helper.assertTrue(context.case_details['arid'])
+    test_helper.assertTrue(context.case_details['estabArid'])
+    test_helper.assertTrue(context.case_details['estabType'])
+    test_helper.assertTrue(context.case_details['uprn'])
+    test_helper.assertTrue(context.case_details['collectionExerciseId'])
+    test_helper.assertTrue(context.case_details['createdDateTime'])
+    test_helper.assertTrue(context.case_details['addressLine1'])
+    test_helper.assertTrue(context.case_details['addressLine2'])
+    test_helper.assertTrue(context.case_details['addressLine3'])
+    test_helper.assertTrue(context.case_details['townName'])
+    test_helper.assertTrue(context.case_details['postcode'])
+    test_helper.assertTrue(context.case_details['addressLevel'])
+    test_helper.assertTrue(context.case_details['abpCode'])
+    test_helper.assertTrue(context.case_details['region'])
+    test_helper.assertTrue(context.case_details['latitude'])
+    test_helper.assertTrue(context.case_details['longitude'])
+    test_helper.assertTrue(context.case_details['oa'])
+    test_helper.assertTrue(context.case_details['lsoa'])
+    test_helper.assertTrue(context.case_details['msoa'])
+    test_helper.assertTrue(context.case_details['lad'])
+    test_helper.assertTrue(context.case_details['state'])
+    test_helper.assertTrue(context.case_details['id'])
+    test_helper.assertTrue(context.case_details['caseType'])
     test_helper.assertEqual(context.case_details['surveyType'], "CENSUS")
-    assert context.case_details['createdDateTime']
-    assert context.case_details['addressLine1']
-    assert context.case_details['addressLine2']
-    assert context.case_details['addressLine3']
-    assert context.case_details['townName']
-    assert context.case_details['postcode']
-    assert context.case_details['addressLevel']
-    assert context.case_details['abpCode']
-    assert context.case_details['region']
-    assert context.case_details['latitude']
-    assert context.case_details['longitude']
-    assert context.case_details['oa']
-    assert context.case_details['lsoa']
-    assert context.case_details['msoa']
-    assert context.case_details['lad']
-    assert context.case_details['state']
-    assert context.case_details['id']
-    assert context.case_details['caseType']
 
 
 @step('it contains the correct fields for a CCS case')
 def check_ccs_case_fields(context):
-    assert context.ccs_case['caseRef']
+    test_helper.assertTrue(context.ccs_case['caseRef'])
     test_helper.assertFalse(context.ccs_case['arid'])
     test_helper.assertFalse(context.ccs_case['estabArid'])
-    assert context.ccs_case['estabType']
+    test_helper.assertTrue(context.ccs_case['estabType'])
     test_helper.assertFalse(context.ccs_case['uprn'])
-    assert context.ccs_case['collectionExerciseId']
+    test_helper.assertTrue(context.ccs_case['collectionExerciseId'])
     test_helper.assertEqual(context.ccs_case['surveyType'], "CCS")
-    assert context.ccs_case['createdDateTime']
-    assert context.ccs_case['addressLine1']
-    assert context.ccs_case['addressLine2']
-    assert context.ccs_case['addressLine3']
-    assert context.ccs_case['townName']
-    assert context.ccs_case['postcode']
-    assert context.ccs_case['addressLevel']
+    test_helper.assertTrue(context.ccs_case['createdDateTime'])
+    test_helper.assertTrue(context.ccs_case['addressLine1'])
+    test_helper.assertTrue(context.ccs_case['addressLine2'])
+    test_helper.assertTrue(context.ccs_case['addressLine3'])
+    test_helper.assertTrue(context.ccs_case['townName'])
+    test_helper.assertTrue(context.ccs_case['postcode'])
+    test_helper.assertTrue(context.ccs_case['addressLevel'])
     test_helper.assertFalse(context.ccs_case['abpCode'])
     test_helper.assertFalse(context.ccs_case['region'])
-    assert context.ccs_case['latitude']
-    assert context.ccs_case['longitude']
+    test_helper.assertTrue(context.ccs_case['latitude'])
+    test_helper.assertTrue(context.ccs_case['longitude'])
     test_helper.assertFalse(context.ccs_case['oa'])
     test_helper.assertFalse(context.ccs_case['lsoa'])
     test_helper.assertFalse(context.ccs_case['msoa'])
     test_helper.assertFalse(context.ccs_case['lad'])
-    assert context.ccs_case['state']
-    assert context.ccs_case['id']
-    assert context.ccs_case['caseType']
+    test_helper.assertTrue(context.ccs_case['state'])
+    test_helper.assertTrue(context.ccs_case['id'])
+    test_helper.assertTrue(context.ccs_case['caseType'])
 
 
 def get_logged_events_for_case_by_id(case_id):

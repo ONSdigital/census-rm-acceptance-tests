@@ -89,7 +89,7 @@ def _add_expected_uac_data(message, expected_data):
         expected_data[case_id]['uac_wales'] = uac_payload['uac']
         expected_data[case_id]['qid_wales'] = uac_payload['questionnaireId']
     else:
-        assert False, "Unexpected questionnaire type"
+        test_helper.fail('Unexpected questionnaire type')
 
     return expected_data
 

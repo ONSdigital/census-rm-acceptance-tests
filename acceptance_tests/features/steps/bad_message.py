@@ -2,11 +2,12 @@ import hashlib
 import json
 import time
 import uuid
-import requests
 
+import requests
 from behave import then, given
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
@@ -39,5 +40,7 @@ def check_for_bad_messages(context):
     bad_messages = response.json()
 
     for bad_message in bad_messages:
-        assert bad_message['seenCount'] > 1
-        assert bad_message['messageHash'] in context.message_hashes
+        test_helper.assertGreater(bad_message['seenCount'], 1,
+                                  msg=f'Seen count is not greater than 1, failed bad message summary: {bad_message}')
+        test_helper.assertIn(bad_message['messageHash'], context.message_hashes,
+                             msg=f'Unknown bad message hash, message summary: {bad_message}')

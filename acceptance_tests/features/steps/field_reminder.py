@@ -39,7 +39,7 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
             ch.basic_ack(delivery_tag=method.delivery_tag)
             break
     else:
-        test_helper.fail(msg='Found message on Action.Field case queue which did not match any expected sample units')
+        test_helper.fail('Found message on Action.Field case queue which did not match any expected sample units')
 
     if not context.expected_cases_for_action:
         ch.stop_consuming()

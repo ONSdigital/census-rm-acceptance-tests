@@ -5,6 +5,7 @@ import logging
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.test_case_helper import test_helper
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -26,7 +27,7 @@ def start_listening_to_rabbit_queue(queue, on_message_callback, timeout=30):
 def _timeout_callback(rabbit):
     logger.error('Timed out waiting for messages')
     rabbit.close_connection()
-    assert False, "Didn't find the expected number of messages"
+    test_helper.fail("Didn't find the expected number of messages")
 
 
 def store_all_msgs_in_context(ch, method, _properties, body, context, expected_msg_count, type_filter=None):

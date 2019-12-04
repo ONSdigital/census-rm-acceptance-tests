@@ -8,6 +8,7 @@ from acceptance_tests.features.steps.event_log import check_if_event_list_is_exa
 from acceptance_tests.features.steps.receipt import _field_work_receipt_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -68,7 +69,7 @@ def check_case_events(context):
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Refusal Received':
             return
-    assert False
+    test_helper.fail('Did not find "Refusal Received" event')
 
 
 @step('an action instruction cancel message is emitted to FWMT')
@@ -77,8 +78,8 @@ def refusal_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                                     functools.partial(_field_work_receipt_callback, context=context))
 
-    assert context.fwmt_emitted_case_id == context.refused_case_id
-    assert context.addressType == 'HH'
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.refused_case_id)
+    test_helper.assertEqual(context.addressType, 'HH')
 
 
 @step("the events logged for the refusal case are {expected_event_list}")
