@@ -114,7 +114,7 @@ def _check_manifest_files_created(context, pack_code):
                 manifest_file = _get_matching_manifest_file(csv_file.filename, files)
 
                 if manifest_file is None:
-                    assert False, f'Failed to find manifest file for {csv_file.filename}'
+                    test_helper.fail(f'Failed to find manifest file for {csv_file.filename}')
 
                 actual_manifest = _get_actual_manifest(sftp_utility, manifest_file, pack_code)
                 creation_datetime = actual_manifest['manifestCreated']

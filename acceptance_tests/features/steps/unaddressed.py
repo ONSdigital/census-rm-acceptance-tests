@@ -76,7 +76,7 @@ def check_uac_message_is_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(_uac_callback, context=context))
 
-    assert context.expected_message_received
+    test_helper.assertTrue(context.expected_message_received)
 
 
 @step("a Questionnaire Linked event is logged")
@@ -92,13 +92,13 @@ def check_question_linked_event_is_logged(context):
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Questionnaire Linked':
             return
-    assert False
+    test_helper.fail('Did not find questionnaire linked event')
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def get_case_id_by_questionnaire_id(questionnaire_id):
     response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
-    assert response.status_code == 200, "Unexpected status code"
+    test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
     response_json = response.json()
     return response_json['id']
 
@@ -153,13 +153,13 @@ def validate_unaddressed_print_file(context):
              'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
             check=True)
     except subprocess.CalledProcessError:
-        raise AssertionError('Unaddressed print file test failed')
+        test_helper.fail('Unaddressed print file test failed')
 
 
 @step("a receipt for the unlinked UAC-QID pair is received")
 def send_receipt_for_unaddressed(context):
     _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
-    assert context.sent_to_gcp
+    test_helper.assertTrue(context.sent_to_gcp)
 
 
 @then("message redelivery does not go bananas")

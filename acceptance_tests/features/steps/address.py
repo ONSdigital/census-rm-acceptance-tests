@@ -4,6 +4,7 @@ import requests
 from behave import step
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -47,4 +48,4 @@ def check_case_events(context):
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Invalid address':
             return
-    assert False
+    test_helper.fail('Did not find expected invalid address event')
