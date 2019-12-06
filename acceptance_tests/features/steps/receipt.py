@@ -22,11 +22,19 @@ def receipt_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@when("the offline receipt msg for the created case is put on the GCP pubsub")
+@step("the offline receipt msg for the created case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
+@step("the offline receipt msg for a unreceipted case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsub(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_QM_offline_receipt(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
@@ -39,7 +47,7 @@ def receipt_msg_published_to_gcp_pubsub_just_qid(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@then("a uac_updated msg is emitted with active set to false")
+@step("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
@@ -54,7 +62,7 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(uac['active'])
 
 
-@then("an ActionCancelled event is sent to field work management")
+@step("an ActionCancelled event is sent to field work management")
 def action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
@@ -137,6 +145,38 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
+
+
+def _publish_QM_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+    context.sent_to_gcp = False
+
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
+
+    data = json.dumps({
+        "dateTime": "2008-08-24T00:00:00",
+        "transactionId": tx_id,
+        "questionnaireId": questionnaire_id,
+        "channel": "QM",
+        "unreceipt": True
+
+    })
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    if not future.done():
+        time.sleep(1)
+    try:
+        future.result(timeout=30)
+    except GoogleAPIError:
+        return
+
+    print(f'Message published to {topic_path}')
+
+    context.sent_to_gcp = True
+
 
 
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
