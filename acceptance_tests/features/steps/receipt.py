@@ -3,7 +3,7 @@ import json
 import time
 import xml.etree.ElementTree as ET
 
-from behave import when, then, step
+from behave import when, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
@@ -31,7 +31,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
 
 
 @step("the offline receipt msg for a unreceipted case is put on the GCP pubsub")
-def receipt_offline_msg_published_to_gcp_pubsub(context):
+def receipt_offline_msg_published_to_gcp_pubsubs(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_QM_offline_receipt(context, questionnaire_id=questionnaire_id)
@@ -176,7 +176,6 @@ def _publish_QM_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b9605866
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
-
 
 
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
