@@ -8,7 +8,8 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
+    check_no_msgs_sent_to_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -62,7 +63,7 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(uac['active'])
 
 
-@step("a UAC updated messaged is emitted for unreceipted")
+@step("a unreceipted UAC updated message is emitted")
 def uac_updated_msg_emitted_for_unreceipted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
@@ -79,8 +80,21 @@ def uac_updated_msg_emitted_for_unreceipted(context):
 
 
 @step("there are no further ActionCancelled events sent to field work management")
-def no_action_cancelled_event_sent_to_fwm(context):
-    pass
+def check_no_msg_sent_fwmt(context):
+    check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+                                functools.partial(
+                                    store_all_msgs_in_context, context=context,
+                                    expected_msg_count=0))
+
+
+@step("an unreceipted ActionRequest event is sent to field work management")
+def action_request_event_sent_to_fwm(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+        _field_work_action_request_receipt_callback, context=context))
+
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.addressType, 'HH')
 
 
 @step("an ActionCancelled event is sent to field work management")
@@ -102,6 +116,20 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     context.addressType = root[0].find('.//addressType').text
     context.fwmt_emitted_case_id = root[0].find('.//caseId').text
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
+
+
+def _field_work_action_request_receipt_callback(ch, method, _properties, body, context):
+    root = ET.fromstring(body)
+
+    if not root[0].tag == 'actionRequest':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        test_helper.fail('Unexpected message on Action.Field case queue, wanted actionRequest')
+
+    context.addressType = root[0].find('.//addressType').text
+    context.fwmt_emitted_case_id = root[0].find('.//caseId').text
+    context.fwmt_emitted_undelivered_flag = root[0].find('.//undeliveredAsAddress').text
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
@@ -139,7 +167,8 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
-def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0", unreceipt=False):
+def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0",
+                             unreceipt=False):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()

@@ -37,7 +37,7 @@ def action_request_event_sent_to_fwm(context):
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
     test_helper.assertEqual(context.addressType, 'HH')
-    # test_helper.assertEqual(context.fwmt_emitted_undelivered_flag, 'true')
+    test_helper.assertEqual(context.fwmt_emitted_undelivered_flag, 'true')
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
