@@ -48,9 +48,9 @@ Feature: Case processor handles receipt message from pubsub service
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And an ActionCancelled event is sent to field work management
     When a UAC/QID pair is requested with questionnaire type "01"
-    And a UAC updated messaged is emitted
+    And a UAC updated messaged is emitted for unreceipted
     And the offline receipt msg for a unreceipted case is put on the GCP pubsub
-    Then there are no further ActionCancelled events set to field work management
+    Then there are no further ActionCancelled events sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED,RM_UAC_CREATED]
 
   Scenario: Receipted Cases are excluded from print files

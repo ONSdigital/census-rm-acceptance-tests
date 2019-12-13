@@ -62,8 +62,8 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(uac['active'])
 
 
-@step("a UAC updated messaged is emitted")
-def uac_updated_msg_emitted(context):
+@step("a UAC updated messaged is emitted for unreceipted")
+def uac_updated_msg_emitted_for_unreceipted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(
@@ -78,7 +78,7 @@ def uac_updated_msg_emitted(context):
     test_helper.assertTrue(uac['active'])
 
 
-@step('there are no further ActionCancelled events set to field work management')
+@step("there are no further ActionCancelled events sent to field work management")
 def no_action_cancelled_event_sent_to_fwm(context):
     pass
 

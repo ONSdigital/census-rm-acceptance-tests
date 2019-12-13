@@ -2,7 +2,7 @@ import functools
 import json
 
 import requests
-from behave import then, when, step
+from behave import then, step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
