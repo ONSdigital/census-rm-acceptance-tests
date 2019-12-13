@@ -14,7 +14,7 @@ from config import Config
 
 
 @when("the receipt msg for a created case is put on the GCP pubsub")
-@when("the receipt msg for the created case is put on the GCP pubsub")
+@step("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
@@ -60,6 +60,27 @@ def uac_updated_msg_emitted(context):
     uac = context.messages_received[0]['payload']['uac']
     test_helper.assertEqual(uac['caseId'], context.emitted_case['id'])
     test_helper.assertFalse(uac['active'])
+
+
+@step("a UAC updated messaged is emitted")
+def uac_updated_msg_emitted(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=2,
+                                        type_filter='UAC_UPDATED'))
+
+    test_helper.assertEqual(len(context.messages_received), 2)
+    uac = context.messages_received[1]['payload']['uac']
+    context.uac_created_events = [context.messages_received[1]]
+    test_helper.assertEqual(uac['caseId'], context.emitted_case['id'])
+    test_helper.assertTrue(uac['active'])
+
+
+@step('there are no further ActionCancelled events set to field work management')
+def no_action_cancelled_event_sent_to_fwm(context):
+    pass
 
 
 @step("an ActionCancelled event is sent to field work management")

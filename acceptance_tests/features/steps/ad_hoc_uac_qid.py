@@ -11,7 +11,7 @@ from config import Config
 caseapi_uacqid_pair_url = f'{Config.CASEAPI_SERVICE}/uacqid/create'
 
 
-@when('a UAC/QID pair is requested with questionnaire type "{questionnaire_type}"')
+@step('a UAC/QID pair is requested with questionnaire type "{questionnaire_type}"')
 def generate_post_request_body(context, questionnaire_type):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.uacqid_json = {"questionnaireType": questionnaire_type,

@@ -41,6 +41,18 @@ Feature: Case processor handles receipt message from pubsub service
     And an ActionRequest event is sent to field work management
     Then the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
 
+  Scenario: Receive valid receipt followed by a different blank QM questionnaire
+    Given sample file "sample_for_receipting.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    And the receipt msg for the created case is put on the GCP pubsub
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And an ActionCancelled event is sent to field work management
+    When a UAC/QID pair is requested with questionnaire type "01"
+    And a UAC updated messaged is emitted
+    And the offline receipt msg for a unreceipted case is put on the GCP pubsub
+    Then there are no further ActionCancelled events set to field work management
+    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED,RM_UAC_CREATED]
+
   Scenario: Receipted Cases are excluded from print files
     Given an action rule of type "ICL1E" is set 10 seconds in the future
     And sample file "sample_input_england_census_spec.csv" is loaded
