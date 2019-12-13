@@ -34,7 +34,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
 def receipt_offline_msg_published_to_gcp_pubsubs(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-    _publish_QM_offline_receipt(context, questionnaire_id=questionnaire_id)
+    _publish_offline_receipt(context, questionnaire_id=questionnaire_id, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
@@ -139,7 +139,7 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
-def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0", unreceipt=False):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
@@ -150,37 +150,8 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
         "dateTime": "2008-08-24T00:00:00",
         "transactionId": tx_id,
         "questionnaireId": questionnaire_id,
-        "channel": "PQRS"
-    })
-
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
-
-    context.sent_to_gcp = True
-
-
-def _publish_QM_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
-    context.sent_to_gcp = False
-
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
-
-    data = json.dumps({
-        "dateTime": "2008-08-24T00:00:00",
-        "transactionId": tx_id,
-        "questionnaireId": questionnaire_id,
-        "channel": "QM",
-        "unreceipt": True
+        "channel": "PQRS",
+        "unreceipt": unreceipt
 
     })
 
