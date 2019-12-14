@@ -158,7 +158,7 @@ def validate_unaddressed_print_file(context):
 
 @step("a receipt for the unlinked UAC-QID pair is received")
 def send_receipt_for_unaddressed(context):
-    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
+    _publish_offline_receipt(context, channel="PQRS", questionnaire_id=context.expected_questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
