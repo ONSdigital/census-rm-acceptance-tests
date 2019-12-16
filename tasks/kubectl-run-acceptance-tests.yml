@@ -32,6 +32,7 @@ run:
       # Create an acceptance tests pod and run the acceptance tests in it
       # Env vars have to passed one by one as a --env flag each
       # The sleep is to give kubectl time to attach properly, otherwise the first few log lines are lost
+      set +x
       kubectl run acceptance-tests -it --command --rm --quiet \
       --generator=run-pod/v1 \
       --image=${ACCEPTANCE_TESTS_IMAGE} \
@@ -61,13 +62,13 @@ run:
       --env=EXCEPTIONMANAGER_CONNECTION_HOST=exception-manager \
       --env=EXCEPTIONMANAGER_CONNECTION_PORT=80 \
       -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
-
+      set -x
 
       # Run acceptance tests for unaddressed batch
       # Pre-delete to avoid unintentionally running with an old image
       kubectl delete deploy qid-batch-runner --force --now || true
       kubectl apply -f ${BATCH_RUNNER_CONFIG}
       kubectl rollout status deploy qid-batch-runner --watch=true
-      kubectl exec -it $(kubectl get pods -o name | grep -m1 qid-batch-runner | cut -d'/' -f 2) \
+      kubectl exec -it $(kubectl get pods --selector=app=qid-batch-runner -o jsonpath='{.items[*].metadata.name}') \
       -- /bin/bash /app/run_acceptance_tests.sh
       kubectl delete deploy qid-batch-runner --force --now
