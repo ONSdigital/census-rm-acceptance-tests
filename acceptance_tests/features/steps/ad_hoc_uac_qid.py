@@ -18,6 +18,7 @@ def generate_post_request_body(context, questionnaire_type):
                            "caseId": context.first_case['id']}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     context.response = requests.post(url=caseapi_uacqid_pair_url, data=json.dumps(context.uacqid_json), headers=headers)
+    context.new_qid = context.response.json()['qid']
 
 
 @then('case API should return a  new UAC and QID with correct questionnaire type')

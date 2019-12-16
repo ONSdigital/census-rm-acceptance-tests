@@ -28,28 +28,25 @@ Feature: Case processor handles receipt message from pubsub service
     And an ActionCancelled event is sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
-  Scenario: PQRS and QM blank questionnaire
-    Given sample file "sample_for_receipting.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+  Scenario: Receive blank questionnaire receipt from QM
+    Given sample file "sample_for_receipting.csv" is loaded successfully
     And the offline receipt msg for the created case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And an ActionCancelled event is sent to field work management
-    When the offline receipt msg for a unreceipted case is put on the GCP pubsub
-    And a uac_updated msg is emitted with active set to false
+    When the blank questionnaire msg for a case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "False"
     And an unreceipted ActionRequest event is sent to field work management
-    Then the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
+    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
 
   Scenario: Receive valid receipt followed by a different blank QM questionnaire
-    Given sample file "sample_for_receipting.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_for_receipting.csv" is loaded successfully
     And the receipt msg for the created case is put on the GCP pubsub
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And an ActionCancelled event is sent to field work management
     When a UAC/QID pair is requested with questionnaire type "01"
-    And a unreceipted UAC updated message is emitted
-    And the offline receipt msg for a unreceipted case is put on the GCP pubsub
+    And the blank questionnaire receipt for the last generated qid is put on the GCP pubsub
     Then there are no further ActionCancelled events sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED,RM_UAC_CREATED]
 

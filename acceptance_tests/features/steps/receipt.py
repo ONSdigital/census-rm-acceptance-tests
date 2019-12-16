@@ -31,11 +31,17 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@step("the offline receipt msg for a unreceipted case is put on the GCP pubsub")
+@step("the blank questionnaire msg for a case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsubs(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-    _publish_offline_receipt(context, channel="PQRS", questionnaire_id=questionnaire_id, unreceipt=True)
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
+@step("the blank questionnaire receipt for the last generated qid is put on the GCP pubsub")
+def publish_blank_questionnaire_receipt_for_different_qid(context):
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=context.new_qid, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
