@@ -40,6 +40,17 @@ Feature: Case processor handles receipt message from pubsub service
     And an unreceipted ActionRequest event is sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
 
+
+  Scenario: Receive blank questionnaire receipt from QM before PQRS msg
+    Given sample file "sample_for_receipting.csv" is loaded successfully
+    And the blank questionnaire msg for a case is put on the GCP pubsub
+    And a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "False"
+    And an unreceipted ActionRequest event is sent to field work management
+    When  the offline receipt msg for the created case is put on the GCP pubsub
+    Then there are no further ActionCancelled events sent to field work management
+    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
+
   Scenario: Receive valid receipt followed by a different blank QM questionnaire
     Given sample file "sample_for_receipting.csv" is loaded successfully
     And the receipt msg for the created case is put on the GCP pubsub
