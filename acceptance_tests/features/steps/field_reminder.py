@@ -8,13 +8,14 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step('the action instruction messages for only the HH case are emitted to FWMT where the case has a treatment code of'
-      ' "{treatment_code}"')
-@step('the action instruction messages are emitted to FWMT where the case has a treatment code of "{treatment_code}"')
-def fwmt_messages_received(context, treatment_code):
+@step('the action instruction messages for only the HH case are emitted to FWMT where the case has a "{filter_column}" '
+      'of "{treatment_code}"')
+@step(
+    'the action instruction messages are emitted to FWMT where the case has a "{filter_column}" of "{treatment_code}"')
+def fwmt_messages_received(context, filter_column, treatment_code):
     context.expected_cases_for_action = [
         case_created['payload']['collectionCase'] for case_created in context.case_created_events
-        if case_created['payload']['collectionCase']['treatmentCode'] == treatment_code
+        if case_created['payload']['collectionCase'][filter_column] == treatment_code
     ]
     context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
 
