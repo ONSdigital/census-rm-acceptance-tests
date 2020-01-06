@@ -32,15 +32,15 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'P_RD_2RL2B_3': {'lsoa': ['E01014897']}
     }
 
-    build_and_create_aciton_rule(context, classifiers_for_action_type[action_type], action_type, action_rule_delay)
+    build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type, action_rule_delay)
 
 
 @step("an action rule for community estabs is set 5 seconds in the future")
 def create_ce_action_plan(context):
-    build_and_create_aciton_rule(context, {'address_type': ['CE']}, 'FIELD', 5)
+    build_and_create_action_rule(context, {'address_type': ['CE']}, 'FIELD', 5)
 
 
-def build_and_create_aciton_rule(context, classifier, action_type, action_rule_delay):
+def build_and_create_action_rule(context, classifier, action_type, action_rule_delay):
     action_plan_response_body = create_action_plan(context.action_plan_id)
     action_plan_url = action_plan_response_body['_links']['self']['href']
     trigger_date_time = (datetime.utcnow() + timedelta(seconds=int(action_rule_delay))).isoformat() + 'Z'
