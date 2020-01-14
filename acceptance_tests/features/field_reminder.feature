@@ -10,4 +10,4 @@ Feature: Reminder messages are emitted to Field Work Management Tool
   Scenario: send community estab cases to field
     Given sample file "sample_for_ce_stories.csv" is loaded successfully
     When an action rule for community estabs is set 5 seconds in the future
-    Then the action instruction emitted to FWMT where case has a "caseType" of "CE" and CEComplete is "false"
+    Then the action instruction is emitted to FWMT where case has a "caseType" of "CE" and CEComplete is "false"
