@@ -9,7 +9,7 @@ from config import Config
 
 
 @step('the action instruction messages for only the HH case are emitted to FWMT where the case has a "{filter_column}" '
-      'of "{treatment_code}"')
+      'of "{expected_value}"')
 @step(
     'the action instruction messages are emitted to FWMT where the case has a "{filter_column}" of "{expected_value}"')
 def fwmt_messages_received(context, filter_column, expected_value):
@@ -72,3 +72,5 @@ def _message_valid(case, action_instruction, ce1_complete_expected):
     test_helper.assertEqual(case['address']['estabType'], action_instruction.find('.//estabType').text)
     test_helper.assertEqual(case['address']['arid'], action_instruction.find('.//arid').text)
     test_helper.assertEquals(ce1_complete_expected, action_instruction.find('.//ceCE1Complete').text)
+    test_helper.assertEquals(case['ceExpectedCapacity'], int(action_instruction.find('.//ceExpectedResponses').text))
+    test_helper.assertEquals(case['ceActualResponses'], int(action_instruction.find('.//ceActualResponses').text))
