@@ -8,11 +8,11 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step('there is a request for telephone capture for a unit case with case type "{case_type}" and country "{country}"')
-def request_telephone_capture_qid_uac(context, case_type, country):
+@step('there is a request for telephone capture for a unit case with case type "{case_type}" and country "{country_code}"')
+def request_telephone_capture_qid_uac(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
-    test_helper.assertEqual(country, context.first_case['treatmentCode'][-1],
+    test_helper.assertEqual(country_code, context.first_case['treatmentCode'][-1],
                             'Loaded case does not match expected nationality')
     test_helper.assertEqual(case_type, context.first_case['treatmentCode'].split('_')[0],
                             'Loaded case does not match expected case type')
