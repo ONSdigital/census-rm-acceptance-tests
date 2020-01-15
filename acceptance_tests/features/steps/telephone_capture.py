@@ -8,7 +8,8 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step('there is a request for telephone capture for a unit case with case type "{case_type}" and country "{country_code}"')
+@step('there is a request for telephone capture for a unit case '
+      'with case type "{case_type}" and country "{country_code}"')
 def request_telephone_capture_qid_uac(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
