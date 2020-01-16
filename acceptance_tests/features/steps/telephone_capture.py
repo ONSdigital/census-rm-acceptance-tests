@@ -71,7 +71,7 @@ def check_correct_uac_updated_message_is_emitted(context):
 
 
 @step('a UAC updated event is emitted linking the new UAC and QID to the individual case')
-def check_correct_uac_updated_message_is_emitted(context):
+def check_correct_individual_uac_updated_message_is_emitted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                                     functools.partial(store_all_msgs_in_context, context=context,
