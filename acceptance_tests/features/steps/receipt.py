@@ -13,7 +13,6 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@when("the receipt msg for a created case is put on the GCP pubsub")
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
@@ -30,12 +29,11 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@when("the receipt msg for the created case is put on the GCP pubsub with just qid")
-def receipt_msg_published_to_gcp_pubsub_just_qid(context):
+@when("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
-    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-
-    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
+    questionnaire_id = context.requested_qid
+    _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
@@ -157,3 +155,8 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 @step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_receipted_case(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.receipted_emitted_case['id'])
+
+
+@step("the events logged for the case are {expected_event_list}")
+def check_logged_events_for_receipted_case(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.emitted_case['id'])
