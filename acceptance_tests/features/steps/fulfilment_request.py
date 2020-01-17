@@ -9,10 +9,11 @@ from retrying import retry
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.print_file import _check_print_files_have_all_the_expected_data, \
     _check_manifest_files_created
+from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
+    get_qid_and_uac_from_emitted_child_uac
 from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
-from acceptance_tests.utilities.rabbit_helper import store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -187,27 +188,9 @@ def check_case_events(context):
                                for case_event in cases['caseEvents']))
 
 
-@step("a new child case is emitted to RH and Action Scheduler")
-def child_case_is_emitted(context):
-    context.messages_received = []
-
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                                    functools.partial(store_all_msgs_in_context, context=context,
-                                                      expected_msg_count=1,
-                                                      type_filter='CASE_CREATED'))
-    test_helper.assertEqual(len(context.messages_received), 1)
-    child_case_arid = context.messages_received[0]['payload']['collectionCase']['address']['estabArid']
-    parent_case_arid = _get_parent_case_estabd_arid(context)
-
-    test_helper.assertEqual(child_case_arid, parent_case_arid, "Parent and child Arids must match to link cases")
-    context.case_created_events = context.messages_received.copy()
-    test_helper.assertEqual(context.case_created_events[0]['payload']['collectionCase']['id'],
-                            context.individual_case_id)
-
-
-def _get_parent_case_estabd_arid(context):
-    response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}')
-    return response.json()['estabArid']
+@step("a new individual child case for the fulfilment is emitted to RH and Action Scheduler")
+def fulfilment_child_case_is_emitted(context):
+    check_individual_child_case_is_emitted(context, context.fulfilment_requested_case_id, context.individual_case_id)
 
 
 @step('a supplementary materials fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
@@ -232,18 +215,6 @@ def check_individual_fulfilment_events(context, expected_event_list):
 @step("the questionnaire fulfilment case has these events logged {expected_event_list}")
 def check_questionnaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
-
-
-def get_qid_and_uac_from_emitted_child_uac(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=1,
-                                        type_filter='UAC_UPDATED'))
-
-    return context.messages_received[0]['payload']['uac']['uac'], context.messages_received[0]['payload']['uac'][
-        'questionnaireId']
 
 
 @step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')

@@ -11,7 +11,7 @@ Feature: Handle fulfilment request events
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a UAC fulfilment request "UACIT1" message for a created case is sent
-    Then a new child case is emitted to RH and Action Scheduler
+    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
     And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
     And the individual case has these events logged [RM_UAC_CREATED]
@@ -69,7 +69,7 @@ Feature: Handle fulfilment request events
     Given sample file "sample_1_english_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When an individual print fulfilment request "<fulfilment code>" is received by RM
-    Then a new child case is emitted to RH and Action Scheduler
+    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
     And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
     And the fulfilment request event is logged
 
