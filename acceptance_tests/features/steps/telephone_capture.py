@@ -32,7 +32,7 @@ def request_individual_telephone_capture_qid_uac(context, case_type, country_cod
         f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid"
         f"?individual=true"
         f"&individualCaseId={context.individual_case_id}")
-    test_helper.assertEqual(response.status_code, 200)
+    response.raise_for_status()
 
     context.telephone_capture_qid_uac = response.json()
 
