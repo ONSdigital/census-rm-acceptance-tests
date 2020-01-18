@@ -27,3 +27,10 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And no ActionInstruction is sent to FWMT
     And the case API returns the CCS QID for the new case
 
+  Scenario: Receipt of unaddressed continuation questionnaire does not send to Field
+    Given an unaddressed message of questionnaire type 63 is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    And a CCS Property Listed event is sent with a qid
+    And the CCS Property Listed case is created with case_type "HH"
+    When the offline receipt msg for a continuation form from the case is received
+    Then no ActionInstruction is sent to FWMT

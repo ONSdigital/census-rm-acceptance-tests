@@ -30,7 +30,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
 
 
 @when("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
-def receipt_offline_msg_published_to_gcp_pubsub(context):
+def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.requested_qid
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)

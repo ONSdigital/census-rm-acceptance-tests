@@ -156,6 +156,7 @@ def validate_unaddressed_print_file(context):
         test_helper.fail('Unaddressed print file test failed')
 
 
+@step("the offline receipt msg for a continuation form from the case is received")
 @step("a receipt for the unlinked UAC-QID pair is received")
 def send_receipt_for_unaddressed(context):
     _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
