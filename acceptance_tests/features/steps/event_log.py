@@ -24,6 +24,7 @@ def events_logged_for_fieldwork_cases(context, event_type_list):
 
 
 @step("the events logged for the case are {expected_event_list}")
+@step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_emitted_case(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
 
