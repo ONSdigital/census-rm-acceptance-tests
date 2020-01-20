@@ -35,9 +35,9 @@ def setup_action_rule(context, action_type, action_rule_delay):
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type, action_rule_delay)
 
 
-@step("an action rule for community estabs is set 5 seconds in the future")
-def create_ce_action_plan(context):
-    build_and_create_action_rule(context, {'address_type': ['CE']}, 'FIELD', 5)
+@step('an action rule for address type "{address_type}" is set 5 seconds in the future')
+def create_ce_action_plan(context, address_type):
+    build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD', 5)
 
 
 def build_and_create_action_rule(context, classifier, action_type, action_rule_delay):
