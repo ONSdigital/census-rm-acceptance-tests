@@ -50,7 +50,7 @@ def check_correct_unrefused_files_on_sftp_server(context, pack_code):
 
 @then('only unreceipted cases appear in "{pack_code}" print files')
 def check_correct_unreceipted_files_on_sftp_server(context, pack_code):
-    expected_csv_lines = create_expected_csv_lines(context, pack_code, context.emitted_case['id'])
+    expected_csv_lines = create_expected_csv_lines(context, pack_code, context.first_case['id'])
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 

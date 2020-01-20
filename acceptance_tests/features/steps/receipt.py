@@ -7,7 +7,6 @@ from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
-from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -15,7 +14,7 @@ from config import Config
 
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -23,7 +22,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 
 @when("the offline receipt msg for the created case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -31,7 +30,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
 
 @when("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
 def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.requested_qid
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -48,7 +47,7 @@ def uac_updated_msg_emitted(context):
 
     test_helper.assertEqual(len(context.messages_received), 1)
     uac = context.messages_received[0]['payload']['uac']
-    test_helper.assertEqual(uac['caseId'], context.emitted_case['id'])
+    test_helper.assertEqual(uac['caseId'], context.first_case['id'])
     test_helper.assertFalse(uac['active'])
 
 
@@ -58,7 +57,7 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, 'HH')
 
 
@@ -147,16 +146,6 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
                                         type_filter='CASE_UPDATED'))
 
     test_helper.assertEqual(len(context.messages_received), 1)
-    context.receipted_emitted_case = context.messages_received[0]['payload']['collectionCase']
-    test_helper.assertEqual(context.receipted_emitted_case['id'], context.emitted_case['id'])
-    test_helper.assertEqual(str(context.receipted_emitted_case[case_field]), expected_field_value)
-
-
-@step("the events logged for the receipted case are {expected_event_list}")
-def check_logged_events_for_receipted_case(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.receipted_emitted_case['id'])
-
-
-@step("the events logged for the case are {expected_event_list}")
-def check_logged_events_for_emitted_case(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.emitted_case['id'])
+    context.first_case = context.messages_received[0]['payload']['collectionCase']
+    test_helper.assertEqual(context.first_case['id'], context.first_case['id'])
+    test_helper.assertEqual(str(context.first_case[case_field]), expected_field_value)
