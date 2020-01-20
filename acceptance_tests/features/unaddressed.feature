@@ -19,9 +19,9 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     And a Questionnaire Linked event is logged
 
   Scenario: Receipt of unlinked unaddressed
-    When an unaddressed message of questionnaire type 01 is sent
-    Then a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
-    And a receipt for the unlinked UAC-QID pair is received
+    Given an unaddressed message of questionnaire type 01 is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    When a receipt for the unlinked UAC-QID pair is received
     Then message redelivery does not go bananas
 
   @local-docker
