@@ -76,8 +76,11 @@ def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
 
-@step('correctly formatted on request fulfilment questionnaire print and manifest files for "{fulfilment_code}" are created')
-def correct_on_request_questionnaire_print_files(context, fulfilment_code):
+
+@step(
+    'correctly formatted on request fulfilment questionnaire '
+    'print and manifest files for "{fulfilment_code}" are created')
+def correct_on_request_fulfilment_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_fulfilment_questionnaire_csv(context, fulfilment_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)

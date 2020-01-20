@@ -58,18 +58,16 @@ def listen_for_two_ad_hoc_uac_updated_messages(context, questionnaire_type):
     test_helper.assertEqual(len(uac_updated_events), len(context.print_cases),
                             'UAC Updated Events does not match number of Case Created Events')
 
-    for counter, uac in enumerate(uac_updated_events, 0):
-        test_helper.assertEqual(uac['payload']['uac']['caseId'], context.print_cases[counter]['id'],
-                                'Fulfilment request UAC updated event found with wrong case ID')
-
-    # context.requested_uac = uac_updated_events['payload']['uac']['uac']
-    # context.requested_qid = uac_updated_events['payload']['uac']['questionnaireId']
+    context.requested_uac_and_qid = []
 
     for uac in uac_updated_events:
-        for caze in context.print_cases:
-            if caze['id'] == uac['payload']['uac']['caseId']:
-                test_helper.assertTrue(uac['payload']['uac']['questionnaireId'].startswith(questionnaire_type),
-                                       'Fulfilment request UAC updated event found with wrong questionnaire type')
-                context.requested_uac_and_qid = []
-                context.requested_uac_and_qid.append({caze['id']: {'qid': uac['payload']['uac']['questionnaireId'],
-                                                                   'uac': uac['payload']['uac']['uac'], 'case': caze}})
+        compare_case_and_uac(context, questionnaire_type, uac)
+
+
+def compare_case_and_uac(context, questionnaire_type, uac):
+    for caze in context.print_cases:
+        if caze['id'] == uac['payload']['uac']['caseId']:
+            test_helper.assertTrue(uac['payload']['uac']['questionnaireId'].startswith(questionnaire_type),
+                                   'Fulfilment request UAC updated event found with wrong questionnaire type')
+            context.requested_uac_and_qid.append({'qid': uac['payload']['uac']['questionnaireId'],
+                                                  'uac': uac['payload']['uac']['uac'], 'case': caze})

@@ -177,12 +177,11 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
 
 def create_expected_on_request_fulfilment_questionnaire_csv(context, pack_code):
     print_lines = []
-    print(context.requested_uac_and_qid)
     for caze in context.requested_uac_and_qid:
-        print(caze)
         print_lines.append(_create_expected_on_request_fulfilment_questionnaire_csv_line(caze['case'], pack_code,
-                                                                      caze['uac'], caze['qid']))
+                                                                                         caze['uac'], caze['qid']))
     return print_lines
+
 
 def _create_expected_on_request_fulfilment_questionnaire_csv_line(case, pack_code, uac, qid):
     return (

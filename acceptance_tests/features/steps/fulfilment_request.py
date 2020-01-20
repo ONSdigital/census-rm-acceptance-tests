@@ -257,6 +257,12 @@ def check_questionnaire_fulfilment_events(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
 
 
+@step("the multiple questionnaire fulfilment cases have these events logged {expected_event_list}")
+def check_multiple_questionnaire_fulfilment_events(context, expected_event_list):
+    for caze in context.print_cases:
+        check_if_event_list_is_exact_match(expected_event_list, caze['id'])
+
+
 @step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
 def check_individual_questionnaire_print_requests(context, fulfilment_code):
     individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
