@@ -28,7 +28,7 @@ Feature: Case processor handles receipt message from pubsub service
     And an ActionCancelled event is sent to field work management
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
-  Scenario: PQRS receipt for continuation form does not send to Field
+  Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
     Given sample file "sample_for_receipting.csv" is loaded successfully
     And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
     And a UAC updated message with "11" questionnaire type is emitted
