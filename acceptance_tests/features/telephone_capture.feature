@@ -11,7 +11,7 @@ Feature: Telephone capture
 
     Examples:
       | sample file                    | address level | case type | country code | questionnaire type |
-      | sample_1_englis_HH_unit.csv    | U             | HH        | E            | 01                 |
+      | sample_1_english_HH_unit.csv    | U             | HH        | E            | 01                 |
       | sample_1_welsh_HH_unit.csv     | U             | HH        | W            | 02                 |
       | sample_1_ni_HH_unit.csv        | U             | HH        | N            | 04                 |
       | sample_1_english_CE_unit.csv   | U             | CE        | E            | 21                 |
@@ -31,6 +31,6 @@ Feature: Telephone capture
 
     Examples:
       | sample file                 | case type | country code | questionnaire type |
-      | sample_1_englis_HH_unit.csv | HH        | E            | 21                 |
+      | sample_1_english_HH_unit.csv | HH        | E            | 21                 |
       | sample_1_welsh_HH_unit.csv  | HH        | W            | 22                 |
       | sample_1_ni_HH_unit.csv     | HH        | N            | 24                 |
