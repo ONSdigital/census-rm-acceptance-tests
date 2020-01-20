@@ -17,7 +17,7 @@ Feature: Handle fulfilment request events
     And the individual case has these events logged [RM_UAC_CREATED]
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
-    Given sample file "sample_1_english_unit.csv" is loaded
+    Given sample file "sample_1_englis_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
@@ -32,7 +32,7 @@ Feature: Handle fulfilment request events
       | P_OR_H4         | 04                 |
 
   Scenario Outline: Generate print files and log events for continuation questionnaire fulfilment requests
-    Given sample file "sample_1_english_unit.csv" is loaded
+    Given sample file "sample_1_englis_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
@@ -47,7 +47,7 @@ Feature: Handle fulfilment request events
       | P_OR_HC4        | 14                 |
 
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
-    Given sample file "sample_1_english_unit.csv" is loaded
+    Given sample file "sample_1_englis_HH_unit.csv" is loaded
     When a supplementary materials fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
@@ -66,7 +66,7 @@ Feature: Handle fulfilment request events
 
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
-    Given sample file "sample_1_english_unit.csv" is loaded
+    Given sample file "sample_1_englis_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When an individual print fulfilment request "<fulfilment code>" is received by RM
     Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler

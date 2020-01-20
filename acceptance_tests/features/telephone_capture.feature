@@ -11,9 +11,9 @@ Feature: Telephone capture
 
     Examples:
       | sample file                    | address level | case type | country code | questionnaire type |
-      | sample_1_english_unit.csv      | U             | HH        | E            | 01                 |
-      | sample_1_welsh_unit.csv        | U             | HH        | W            | 02                 |
-      | sample_1_ni_unit.csv           | U             | HH        | N            | 04                 |
+      | sample_1_englis_HH_unit.csv    | U             | HH        | E            | 01                 |
+      | sample_1_welsh_HH_unit.csv     | U             | HH        | W            | 02                 |
+      | sample_1_ni_HH_unit.csv        | U             | HH        | N            | 04                 |
       | sample_1_english_CE_unit.csv   | U             | CE        | E            | 21                 |
       | sample_1_welsh_CE_unit.csv     | U             | CE        | W            | 22                 |
       | sample_1_ni_CE_unit.csv        | U             | CE        | N            | 24                 |
@@ -30,7 +30,7 @@ Feature: Telephone capture
     And a UAC updated event is emitted linking the new UAC and QID to the individual case
 
     Examples:
-      | sample file               | case type | country code | questionnaire type |
-      | sample_1_english_unit.csv | HH        | E            | 21                 |
-      | sample_1_welsh_unit.csv   | HH        | W            | 22                 |
-      | sample_1_ni_unit.csv      | HH        | N            | 24                 |
+      | sample file                 | case type | country code | questionnaire type |
+      | sample_1_englis_HH_unit.csv | HH        | E            | 21                 |
+      | sample_1_welsh_HH_unit.csv  | HH        | W            | 22                 |
+      | sample_1_ni_HH_unit.csv     | HH        | N            | 24                 |
