@@ -32,6 +32,46 @@ def send_pq_fulfilment_requested_event(context, fulfilment_code):
     send_print_fulfilment_request(context, fulfilment_code)
 
 
+@step('multiple PQ fulfilment request events with fulfilment code "{fulfilment_code}" is received by RM')
+def send_multiple_pd_fulfilment_events(context, fulfilment_code):
+    send_multiple_print_fulfilment_requests(context, fulfilment_code)
+
+
+def send_multiple_print_fulfilment_requests(context, fulfilment_code):
+    context.print_cases = [caze['payload']['collectionCase'] for caze in context.case_created_events]
+    messages = []
+    for caze in context.print_cases:
+        messages.append(json.dumps(
+            {
+                "event": {
+                    "type": "FULFILMENT_REQUESTED",
+                    "source": "CONTACT_CENTRE_API",
+                    "channel": "CC",
+                    "dateTime": "2019-07-07T22:37:11.988+0000",
+                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+                },
+                "payload": {
+                    "fulfilmentRequest": {
+                        "fulfilmentCode": fulfilment_code,
+                        "caseId": caze['id'],
+                        "contact": {
+                            "title": "Mrs",
+                            "forename": "Test",
+                            "surname": "McTest"
+                        }
+                    }
+                }
+            }
+        ))
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        for message in messages:
+            rabbit.publish_message(
+                message=message,
+                content_type='application/json',
+                routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
+
+
 def send_print_fulfilment_request(context, fulfilment_code):
     context.first_case = get_first_case(context)
 
