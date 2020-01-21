@@ -11,7 +11,6 @@ from requests.auth import HTTPBasicAuth
 from retrying import retry
 from structlog import wrap_logger
 
-from acceptance_tests.features.steps.receipt import _publish_offline_receipt
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -154,13 +153,6 @@ def validate_unaddressed_print_file(context):
             check=True)
     except subprocess.CalledProcessError:
         test_helper.fail('Unaddressed print file test failed')
-
-
-@step("the offline receipt msg for a continuation form from the case is received")
-@step("a receipt for the unlinked UAC-QID pair is received")
-def send_receipt_for_unaddressed(context):
-    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
-    test_helper.assertTrue(context.sent_to_gcp)
 
 
 @then("message redelivery does not go bananas")

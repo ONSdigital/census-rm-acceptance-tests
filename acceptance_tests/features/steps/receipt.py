@@ -61,6 +61,28 @@ def action_cancelled_event_sent_to_fwm(context):
     test_helper.assertEqual(context.addressType, 'HH')
 
 
+@step("the offline receipt msg for a continuation form from the case is received")
+@step("a receipt for the unlinked UAC-QID pair is received")
+def send_receipt_for_unaddressed(context):
+    _publish_offline_receipt(context, questionnaire_id=context.expected_questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
+@step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
+def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='CASE_UPDATED'))
+
+    test_helper.assertEqual(len(context.messages_received), 1)
+    context.first_case = context.messages_received[0]['payload']['collectionCase']
+    test_helper.assertEqual(context.first_case['id'], context.first_case['id'])
+    test_helper.assertEqual(str(context.first_case[case_field]), expected_field_value)
+
+
 def _field_work_receipt_callback(ch, method, _properties, body, context):
     root = ET.fromstring(body)
 
@@ -134,18 +156,3 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
-
-
-@step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
-def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=1,
-                                        type_filter='CASE_UPDATED'))
-
-    test_helper.assertEqual(len(context.messages_received), 1)
-    context.first_case = context.messages_received[0]['payload']['collectionCase']
-    test_helper.assertEqual(context.first_case['id'], context.first_case['id'])
-    test_helper.assertEqual(str(context.first_case[case_field]), expected_field_value)
