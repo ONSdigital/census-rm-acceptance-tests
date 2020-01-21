@@ -25,7 +25,7 @@ Feature: Case look up for the contact centre
     Then case API should return a 404 when queried
 
   Scenario: Check case-api returns correct fields for a CENSUS case
-    Given sample file "sample_1_english_unit.csv" is loaded successfully
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     Then a case can be retrieved from the case API service
     And it contains the correct fields for a CENSUS case
 
