@@ -15,7 +15,7 @@ from config import Config
 
 @when("an undelivered mail QM message is put on GCP pubsub")
 def undelivered_qm_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
     _publish_qm_undelivered_mail(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -23,8 +23,8 @@ def undelivered_qm_published_to_gcp_pubsub(context):
 
 @when("an undelivered mail PPO message is put on GCP pubsub")
 def undelivered_ppo_published_to_gcp_pubsub(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
-    case_ref = context.emitted_case['caseRef']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    case_ref = context.first_case['caseRef']
     _publish_ppo_undelivered_mail(context, case_ref=case_ref)
     test_helper.assertTrue(context.sent_to_gcp)
 
@@ -35,7 +35,7 @@ def action_request_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, 'HH')
     test_helper.assertEqual(context.fwmt_emitted_undelivered_flag, 'true')
 
