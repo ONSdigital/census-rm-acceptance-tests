@@ -51,7 +51,7 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(uac['active'])
 
 
-@then("an ActionCancelled event is sent to field work management")
+@step("an ActionCancelled event is sent to field work management")
 def action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
@@ -61,8 +61,8 @@ def action_cancelled_event_sent_to_fwm(context):
     test_helper.assertEqual(context.addressType, 'HH')
 
 
-@then("a CE/U ActionCancelled event is sent to field work management")
-def action_cancelled_event_sent_to_fwm(context):
+@step("a CE/U ActionCancelled event is sent to field work management")
+def CE_U_action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
@@ -71,8 +71,8 @@ def action_cancelled_event_sent_to_fwm(context):
     test_helper.assertEqual(context.addressType, 'CE')
 
 
-@then("a SPG/U ActionCancelled event is sent to field work management")
-def action_cancelled_event_sent_to_fwm(context):
+@step("a SPG/U ActionCancelled event is sent to field work management")
+def SPG_U_action_cancelled_event_sent_to_fwm(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
