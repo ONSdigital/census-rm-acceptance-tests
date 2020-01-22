@@ -89,9 +89,9 @@ Feature: Handle fulfilment request events
     And an individual case has been created and only has logged events of [RM_UAC_CREATED]
 
 
-  Scenario Outline: Generate print file and log events for multiple questionnaire fulfilment requests
+  Scenario Outline: Generate print file and log events for two questionnaire fulfilment requests
     Given sample file "sample_2_english_units.csv" is loaded successfully
-    When multiple PQ fulfilment request events with fulfilment code "<fulfilment code>" is received by RM
+    When two PQ fulfilment request events with fulfilment code "<fulfilment code>" are received by RM
     Then two UAC updated messages with "<questionnaire type>" questionnaire type are emitted
     And correctly formatted on request fulfilment questionnaire print and manifest files for "<fulfilment code>" are created
     And the multiple questionnaire fulfilment cases have these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]

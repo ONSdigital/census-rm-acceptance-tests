@@ -32,7 +32,7 @@ def send_pq_fulfilment_requested_event(context, fulfilment_code):
     send_print_fulfilment_request(context, fulfilment_code)
 
 
-@step('multiple PQ fulfilment request events with fulfilment code "{fulfilment_code}" is received by RM')
+@step('two PQ fulfilment request events with fulfilment code "{fulfilment_code}" are received by RM')
 def send_multiple_pd_fulfilment_events(context, fulfilment_code):
     send_multiple_print_fulfilment_requests(context, fulfilment_code)
 
