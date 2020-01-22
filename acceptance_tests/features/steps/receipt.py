@@ -67,7 +67,7 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, 'CE')
 
 
@@ -77,7 +77,7 @@ def action_cancelled_event_sent_to_fwm(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
-    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, 'SPG')
 
 
