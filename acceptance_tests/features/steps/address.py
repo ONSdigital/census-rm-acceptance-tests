@@ -12,7 +12,7 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @step('an invalid address message is sent from "{sender}"')
 def invalid_address_message(context, sender):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
     message = json.dumps(
         {
@@ -27,7 +27,7 @@ def invalid_address_message(context, sender):
                 "invalidAddress": {
                     "reason": "DEMOLISHED",
                     "collectionCase": {
-                        "id": context.emitted_case['id']
+                        "id": context.first_case['id']
                     }
                 }
             }
@@ -43,7 +43,7 @@ def invalid_address_message(context, sender):
 
 @step("the case event log records invalid address")
 def check_case_events(context):
-    response = requests.get(f"{caseapi_url}{context.emitted_case['id']}", params={'caseEvents': True})
+    response = requests.get(f"{caseapi_url}{context.first_case['id']}", params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Invalid address':
