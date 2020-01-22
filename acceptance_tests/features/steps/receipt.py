@@ -64,6 +64,26 @@ def action_cancelled_event_sent_to_fwm(context):
     test_helper.assertEqual(context.addressType, 'HH')
 
 
+@then("a CE/U ActionCancelled event is sent to field work management")
+def action_cancelled_event_sent_to_fwm(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+        _field_work_receipt_callback, context=context))
+
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.addressType, 'CE')
+
+
+@then("a SPG/U ActionCancelled event is sent to field work management")
+def action_cancelled_event_sent_to_fwm(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+        _field_work_receipt_callback, context=context))
+
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.emitted_case["id"])
+    test_helper.assertEqual(context.addressType, 'SPG')
+
+
 def _field_work_receipt_callback(ch, method, _properties, body, context):
     root = ET.fromstring(body)
 
