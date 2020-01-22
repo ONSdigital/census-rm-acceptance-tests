@@ -67,9 +67,6 @@ def action_cancelled_event_sent_to_fwm(context):
         test_helper.assertEqual(context.addressType, 'SPG')
 
 
-
-
-
 @step("the offline receipt msg for a continuation form from the case is received")
 @step("a receipt for the unlinked UAC-QID pair is received")
 def send_receipt_for_unaddressed(context):
