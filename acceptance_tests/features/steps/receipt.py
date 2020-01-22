@@ -51,14 +51,15 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(uac['active'])
 
 
-@then("an ActionCancelled event is sent to field work management")
-def action_cancelled_event_sent_to_fwm(context):
+@step('an ActionCancelled event is sent to field work management with addressType "{address_type}"')
+@step('an ActionCancelled Invalid Address event is sent to field work management with addressType "{address_type}"')
+def action_cancelled_event_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
         _field_work_receipt_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
-    test_helper.assertEqual(context.addressType, 'HH')
+    test_helper.assertEqual(context.addressType, address_type)
 
 
 @step("the offline receipt msg for a continuation form from the case is received")
