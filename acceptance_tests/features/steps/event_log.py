@@ -17,15 +17,16 @@ def check_print_case_selected_event_is_logged_against_reminder_cases(context, ev
         _check_if_event_is_logged(event_type, case_id)
 
 
-@step("events logged for receipted cases are {event_type_list}")
-def event_logged_for_receipting(context, event_type_list):
-    check_if_event_list_is_exact_match(event_type_list, context.emitted_case['id'])
-
-
 @step('the events logged against the tranche 2 fieldwork cases are {event_type_list}')
 def events_logged_for_fieldwork_cases(context, event_type_list):
     for case_id in context.fieldwork_case_ids:
         check_if_event_list_is_exact_match(event_type_list, case_id)
+
+
+@step("the events logged for the case are {expected_event_list}")
+@step("the events logged for the receipted case are {expected_event_list}")
+def check_logged_events_for_emitted_case(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)

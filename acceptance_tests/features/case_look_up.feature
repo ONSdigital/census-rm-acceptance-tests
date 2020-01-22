@@ -1,19 +1,16 @@
 Feature: Case look up for the contact centre
 
   Scenario: Find case by caseId
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    Then messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    And a case can be retrieved from the case API service
+    Given sample file "sample_input_england_census_spec.csv" is loaded successfully
+    Then a case can be retrieved from the case API service
 
   Scenario: Find multiple cases from a single UPRN
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    Then messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    And case API returns multiple cases for a UPRN
+    Given sample file "sample_input_england_census_spec.csv" is loaded successfully
+    Then case API returns multiple cases for a UPRN
 
   Scenario: Find case by caseRef
-    When sample file "sample_input_england_census_spec.csv" is loaded
-    Then messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    And a case can be retrieved by its caseRef
+    When sample file "sample_input_england_census_spec.csv" is loaded successfully
+    Then a case can be retrieved by its caseRef
 
   Scenario: Check non-existent caseId returns a 404 status code
     Given a random caseId is generated
@@ -28,8 +25,7 @@ Feature: Case look up for the contact centre
     Then case API should return a 404 when queried
 
   Scenario: Check case-api returns correct fields for a CENSUS case
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    Then messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     Then a case can be retrieved from the case API service
     And it contains the correct fields for a CENSUS case
 
