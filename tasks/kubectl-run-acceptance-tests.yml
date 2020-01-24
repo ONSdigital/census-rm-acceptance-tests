@@ -69,6 +69,7 @@ run:
       kubectl delete deploy qid-batch-runner --force --now || true
       kubectl apply -f ${BATCH_RUNNER_CONFIG}
       kubectl rollout status deploy qid-batch-runner --watch=true
+      sleep 30s
       kubectl exec -it $(kubectl get pods --selector=app=qid-batch-runner -o jsonpath='{.items[*].metadata.name}') \
       -- /bin/bash /app/run_acceptance_tests.sh
       kubectl delete deploy qid-batch-runner --force --now
