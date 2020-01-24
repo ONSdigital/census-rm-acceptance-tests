@@ -11,7 +11,7 @@ Feature: Telephone capture
 
     Examples:
       | sample file                    | address level | case type | country code | questionnaire type |
-      | sample_1_english_HH_unit.csv    | U             | HH        | E            | 01                 |
+      | sample_1_english_HH_unit.csv   | U             | HH        | E            | 01                 |
       | sample_1_welsh_HH_unit.csv     | U             | HH        | W            | 02                 |
       | sample_1_ni_HH_unit.csv        | U             | HH        | N            | 04                 |
       | sample_1_english_CE_unit.csv   | U             | CE        | E            | 21                 |
@@ -21,6 +21,7 @@ Feature: Telephone capture
       | sample_1_welsh_SPG_unit.csv    | U             | SPG       | W            | 02                 |
       | sample_1_english_SPG_estab.csv | E             | SPG       | E            | 01                 |
       | sample_1_welsh_SPG_estab.csv   | E             | SPG       | W            | 02                 |
+    And a fulfilment request event is logged
 
   Scenario Outline: Individual telephone capture request creates new individual case and correct type QID UAC pair and links them
     Given sample file "<sample file>" is loaded successfully
