@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+from google.cloud import storage
 
 from behave import then, step
 from retrying import retry
@@ -14,6 +15,7 @@ from acceptance_tests.utilities.print_file_helper import create_expected_questio
     create_expected_reminder_questionnaire_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
+from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -87,16 +89,17 @@ def correct_supplementary_material_print_files(context, fulfilment_code):
 
 def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
     with SftpUtility() as sftp_utility:
-        _validate_print_file_content(sftp_utility, context.test_start_local_datetime, expected_csv_lines, pack_code)
+        _validate_print_file_content(context, sftp_utility, context.test_start_local_datetime, expected_csv_lines,
+                                     pack_code)
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
-def _validate_print_file_content(sftp_utility, start_of_test, expected_csv_lines, pack_code):
+def _validate_print_file_content(context, sftp_utility, start_of_test, expected_csv_lines, pack_code):
     logger.debug('Checking for files on SFTP server')
 
-    files = sftp_utility.get_all_files_after_time(start_of_test, pack_code, ".csv.gpg")
+    context.expected_print_files = sftp_utility.get_all_files_after_time(start_of_test, pack_code, ".csv.gpg")
 
-    actual_content_list = sftp_utility.get_files_content_as_list(files, pack_code)
+    actual_content_list = sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
     if not actual_content_list:
         raise FileNotFoundError
     actual_content_list.sort()
@@ -163,3 +166,28 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
     )
 
     return manifest
+
+
+@step("the files have all been copied to the bucket")
+def check_files_are_copied_to_gcp_bucket(context):
+    print(f'GCP BUCKET NAME SET TO: {Config.GCP_BUCKET_NAME}')
+
+    if len(Config.GCP_BUCKET_NAME) == 0:
+        logger.info('Ignoring GCP bucket check as bucket name not set')
+
+    logger.info(f'will check gcp bucket {Config.GCP_BUCKET_NAME}')
+
+    client = storage.Client()
+
+    bucket = client.get_bucket(Config.GCP_BUCKET_NAME)
+
+    for print_file in context.expected_print_files:
+        print_file_name = print_file.filename
+        blob = storage.Blob(print_file_name, bucket)
+
+        with open(print_file_name, 'wb+') as file_obj:
+            client.download_blob_to_file(blob, file_obj)
+
+        print(f'downloaded file {print_file_name} from gcp bucket {Config.GCP_BUCKET_NAME}, now loading')
+
+        # Now test this matches..

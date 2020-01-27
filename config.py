@@ -107,3 +107,5 @@ class Config:
                        'notify.fulfilments',
                        'survey.launched',
                        'unaddressedRequestQueue']
+
+    GCP_BUCKET_NAME = os.getenv('GCP_BUCKET_NAME', '')

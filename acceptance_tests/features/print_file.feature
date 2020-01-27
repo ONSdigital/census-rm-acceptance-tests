@@ -7,6 +7,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the files have all been copied to the bucket
 
     Examples: Initial contact letter: <pack code>
       | pack code  | action type | questionnaire types | sample file                          |

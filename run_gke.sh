@@ -66,6 +66,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=NOTIFY_STUB_PORT=80 \
     --env=EXCEPTIONMANAGER_CONNECTION_HOST=exception-manager \
     --env=EXCEPTIONMANAGER_CONNECTION_PORT=80 \
+    --env=GCP_BUCKET_NAME=census-rm-luke-loze-31-sent-print-files \
     -- /bin/bash -c "sleep 2; behave acceptance_tests/features --tags=~@local-docker"
 
 if [ -z "$QID_BATCH_BRANCH" ]; then

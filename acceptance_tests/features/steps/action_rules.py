@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from behave import given, step
+from config import Config
 
 from acceptance_tests.controllers.action_controller import create_action_plan, create_action_rule
 
