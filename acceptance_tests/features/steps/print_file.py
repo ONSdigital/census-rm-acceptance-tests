@@ -170,16 +170,14 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
 
 @step("the files have all been copied to the bucket")
 def check_files_are_copied_to_gcp_bucket(context):
-    print(f'GCP BUCKET NAME SET TO: {Config.GCP_BUCKET_NAME}')
-
-    if len(Config.GCP_BUCKET_NAME) == 0:
+    if len(Config.SENT_PRINT_FILE_BUCKET) == 0:
         logger.info('Ignoring GCP bucket check as bucket name not set')
 
-    logger.info(f'will check gcp bucket {Config.GCP_BUCKET_NAME}')
+    logger.info(f'will check gcp bucket {Config.SENT_PRINT_FILE_BUCKET}')
 
     client = storage.Client()
 
-    bucket = client.get_bucket(Config.GCP_BUCKET_NAME)
+    bucket = client.get_bucket(Config.SENT_PRINT_FILE_BUCKET)
 
     for print_file in context.expected_print_files:
         print_file_name = print_file.filename
@@ -188,6 +186,6 @@ def check_files_are_copied_to_gcp_bucket(context):
         with open(print_file_name, 'wb+') as file_obj:
             client.download_blob_to_file(blob, file_obj)
 
-        print(f'downloaded file {print_file_name} from gcp bucket {Config.GCP_BUCKET_NAME}, now loading')
+        print(f'downloaded file {print_file_name} from gcp bucket {Config.SENT_PRINT_FILE_BUCKET}, now loading')
 
-        # Now test this matches..
+        # TODO: now test that they match, should be exact file compare, no need to decrypt
