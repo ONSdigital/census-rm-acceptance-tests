@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+
 from google.cloud import storage
 
 from behave import then, step
@@ -28,6 +29,7 @@ def check_correct_questionnaire_files_on_sftp_server(context, pack_code):
 
 @then('correctly formatted "{pack_code}" print files are created')
 def check_correct_files_on_sftp_server(context, pack_code):
+    context.expected_pack_code = pack_code
     expected_csv_lines = create_expected_csv_lines(context, pack_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
@@ -183,19 +185,21 @@ def check_files_are_copied_to_gcp_bucket(context):
         logger.info('Ignoring GCP bucket check as bucket name not set')
         return
 
-    logger.info(f'will check gcp bucket {Config.SENT_PRINT_FILE_BUCKET}')
-
     client = storage.Client()
-
     bucket = client.get_bucket(Config.SENT_PRINT_FILE_BUCKET)
 
     for print_file in context.expected_print_files:
-        print_file_name = print_file.filename
-        blob = storage.Blob(print_file_name, bucket)
+        compare_sftp_with_gcp_files(context, bucket, print_file.filename)
+        compare_sftp_with_gcp_files(context, bucket, print_file.filename.replace(".csv.gpg", ".manifest"))
 
-        with open(print_file_name, 'wb+') as file_obj:
-            client.download_blob_to_file(blob, file_obj)
 
-        print(f'downloaded file {print_file_name} from gcp bucket {Config.SENT_PRINT_FILE_BUCKET}, now loading')
+def compare_sftp_with_gcp_files(context, bucket, filename):
+    blob = bucket.get_blob(filename)
+    actual_file_content = blob.download_as_string().decode("utf-8")
 
-        # TODO: now test that they match, should be exact file compare, no need to decrypt
+    with SftpUtility() as sftp_utility:
+        file_path = f'{PACK_CODE_TO_SFTP_DIRECTORY[context.expected_pack_code]}/{filename}'
+        expected_file_content = sftp_utility.get_file_contents_as_string(file_path)
+
+    test_helper.assertEquals(actual_file_content, expected_file_content,
+                             f'file contents {filename} did not match gcp file contents')

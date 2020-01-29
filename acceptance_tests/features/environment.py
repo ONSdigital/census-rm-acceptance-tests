@@ -26,7 +26,11 @@ def after_all(_context):
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
-def before_scenario(context, _):
+def before_scenario(context, scenario):
+    if "run" not in scenario.effective_tags:
+        scenario.skip("Skipped scenario not marked with run")
+        return
+
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())

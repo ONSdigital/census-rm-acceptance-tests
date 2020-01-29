@@ -1,5 +1,6 @@
 Feature: Scheduled print and manifest files can be generated and uploaded
 
+  @run
   Scenario Outline: Generate print files and log events for initial contact letters
 
     Given sample file "<sample file>" is loaded
