@@ -172,6 +172,7 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
 def check_files_are_copied_to_gcp_bucket(context):
     if len(Config.SENT_PRINT_FILE_BUCKET) == 0:
         logger.info('Ignoring GCP bucket check as bucket name not set')
+        return
 
     logger.info(f'will check gcp bucket {Config.SENT_PRINT_FILE_BUCKET}')
 
