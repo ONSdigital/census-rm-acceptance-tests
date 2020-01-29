@@ -44,3 +44,30 @@ def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
                            'Fulfilment request UAC updated event found with wrong questionnaire type')
     context.requested_uac = uac_updated_event['payload']['uac']['uac']
     context.requested_qid = uac_updated_event['payload']['uac']['questionnaireId']
+
+
+@step('two UAC updated messages with "{questionnaire_type}" questionnaire type are emitted')
+def listen_for_two_ad_hoc_uac_updated_messages(context, questionnaire_type):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(store_all_msgs_in_context, context=context,
+                                                      expected_msg_count=2,
+                                                      type_filter='UAC_UPDATED'))
+    uac_updated_events = context.messages_received
+
+    test_helper.assertEqual(len(uac_updated_events), len(context.print_cases),
+                            'UAC Updated Events does not match number of Case Created Events')
+
+    context.requested_uac_and_qid = []
+
+    for uac in uac_updated_events:
+        compare_case_and_uac(context, questionnaire_type, uac)
+
+
+def compare_case_and_uac(context, questionnaire_type, uac):
+    for caze in context.print_cases:
+        if caze['id'] == uac['payload']['uac']['caseId']:
+            test_helper.assertTrue(uac['payload']['uac']['questionnaireId'].startswith(questionnaire_type),
+                                   'Fulfilment request UAC updated event found with wrong questionnaire type')
+            context.requested_uac_and_qid.append({'qid': uac['payload']['uac']['questionnaireId'],
+                                                  'uac': uac['payload']['uac']['uac'], 'case': caze})

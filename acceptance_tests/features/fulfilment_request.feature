@@ -87,3 +87,15 @@ Feature: Handle fulfilment request events
     When a UAC fulfilment request "UACIT1" message for a created case is sent
     Then the action instruction messages for only the HH case are emitted to FWMT where the case has a "treatmentCode" of "HH_QF2R1E"
     And an individual case has been created and only has logged events of [RM_UAC_CREATED]
+
+
+  Scenario Outline: Generate print file and log events for two questionnaire fulfilment requests
+    Given sample file "sample_2_english_units.csv" is loaded successfully
+    When two PQ fulfilment request events with fulfilment code "<fulfilment code>" are received by RM
+    Then two UAC updated messages with "<questionnaire type>" questionnaire type are emitted
+    And correctly formatted on request fulfilment questionnaire print and manifest files for "<fulfilment code>" are created
+    And the multiple questionnaire fulfilment cases have these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+
+    Examples: Questionnaire: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_OR_H1         | 01                 |
