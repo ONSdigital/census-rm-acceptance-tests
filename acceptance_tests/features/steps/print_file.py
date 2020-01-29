@@ -12,7 +12,7 @@ from acceptance_tests.utilities.mappings import PACK_CODE_TO_SFTP_DIRECTORY, PAC
 from acceptance_tests.utilities.print_file_helper import create_expected_questionnaire_csv_lines, \
     create_expected_csv_lines, create_expected_on_request_questionnaire_csv, \
     create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines, \
-    create_expected_reminder_questionnaire_csv_lines
+    create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -75,6 +75,15 @@ def check_manifest_files(context, pack_code):
 @step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
 def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
+
+
+@step(
+    'correctly formatted on request fulfilment questionnaire '
+    'print and manifest files for "{fulfilment_code}" are created')
+def correct_on_request_fulfilment_questionnaire_print_files(context, fulfilment_code):
+    expected_csv_lines = create_expected_on_request_fulfilment_questionnaire_csv(context, fulfilment_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
 

@@ -175,6 +175,29 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
     )
 
 
+def create_expected_on_request_fulfilment_questionnaire_csv(context, pack_code):
+    print_lines = []
+    for caze in context.requested_uac_and_qid:
+        print_lines.append(_create_expected_on_request_fulfilment_questionnaire_csv_line(caze['case'], pack_code,
+                                                                                         caze['uac'], caze['qid']))
+    return print_lines
+
+
+def _create_expected_on_request_fulfilment_questionnaire_csv_line(case, pack_code, uac, qid):
+    return (
+        f'{uac}|'
+        f'{qid}'
+        f'||||'
+        f'Mrs|Test|McTest|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{pack_code}'
+    )
+
+
 def create_expected_supplementary_materials_csv(context, fulfilment_code):
     return [_create_expected_supplementary_materials_csv_line(context.first_case, fulfilment_code)]
 
