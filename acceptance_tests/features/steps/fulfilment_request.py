@@ -195,7 +195,7 @@ def create_individual_print_fulfilment_message(context, fulfilment_code):
 
 @step("a fulfilment request event is logged")
 def check_case_events_logged(context):
-    response = requests.get(f'{get_cases_url}{context.fulfilment_requested_case_id}', params={'caseEvents': True})
+    response = requests.get(f"{get_cases_url}{context.fulfilment_requested_case_id}", params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Fulfilment Request Received':

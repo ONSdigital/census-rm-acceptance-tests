@@ -8,10 +8,11 @@ Feature: Telephone capture
     When there is a request for telephone capture for an address level "<address level>" case with case type "<case type>" and country "<country code>"
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
+    And a fulfilment request event is logged
 
     Examples:
       | sample file                    | address level | case type | country code | questionnaire type |
-      | sample_1_english_HH_unit.csv    | U             | HH        | E            | 01                 |
+      | sample_1_english_HH_unit.csv   | U             | HH        | E            | 01                 |
       | sample_1_welsh_HH_unit.csv     | U             | HH        | W            | 02                 |
       | sample_1_ni_HH_unit.csv        | U             | HH        | N            | 04                 |
       | sample_1_english_CE_unit.csv   | U             | CE        | E            | 21                 |
