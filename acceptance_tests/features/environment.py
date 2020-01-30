@@ -26,7 +26,7 @@ def after_all(_context):
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
-def before_scenario(context):
+def before_scenario(context, _):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
