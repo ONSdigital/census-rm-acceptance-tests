@@ -11,6 +11,7 @@ from acceptance_tests.features.steps.unaddressed import get_case_id_by_questionn
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
+from acceptance_tests.utilities.string_utilities import create_random_postcode
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -80,7 +81,7 @@ def _create_ccs_property_listed_event(context, address_type="HH"):
                     "addressLine2": "Upper upperingham",
                     "addressLine3": "Newport",
                     "townName": "upton",
-                    "postcode": "UP103UP",
+                    "postcode": create_random_postcode(),
                     "latitude": "50.863849",
                     "longitude": "-1.229710",
                     "fieldcoordinatorId": "XXXXXXXXXX",

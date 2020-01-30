@@ -81,11 +81,27 @@ def find_case_by_case_ref(context):
 def get_ccs_qid_for_case_id(context):
     response = requests.get(f'{case_api_url}ccs/{context.ccs_case["id"]}/qid')
     test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
-    response_json = json.loads(response.text)
+    response_json = response.json()
     test_helper.assertEqual(response_json['questionnaireId'][0:3],
                             '712', 'CCS QID has incorrect questionnaire type or tranche ID')
     test_helper.assertTrue(response_json['active'])
 
+
+@step('the case API returns the new CCS case by postcode search')
+def get_ccs_case_by_postcode(context):
+    response = requests.get(f'{case_api_url}ccs/postcode/{context.ccs_case["postcode"]}')
+    response.raise_for_status()
+    found_cases = response.json()
+
+    for case in found_cases:
+        if case['id'] == context.ccs_case['id']:
+            matched_case = case
+            break
+    else:
+        test_helper.fail('Failed to find the new CCS case by postcode search')
+
+    test_helper.assertEqual(context.ccs_case['postcode'], matched_case['postcode'])
+    test_helper.assertEqual(context.ccs_case['caseRef'], matched_case['caseRef'])
 
 @step('it contains the correct fields for a CENSUS case')
 def check_census_case_fields(context):
