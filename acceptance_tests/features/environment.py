@@ -26,11 +26,7 @@ def after_all(_context):
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
 
 
-def before_scenario(context, scenario):
-    if "run" not in scenario.effective_tags:
-        scenario.skip("Skipped scenario not marked with run")
-        return
-
+def before_scenario(context):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
@@ -48,12 +44,12 @@ def before_scenario(context, scenario):
                  Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
 
-def before_tag(context, tag):
+def before_tag(_, tag):
     if tag == "clear_for_bad_messages":
         _clear_queues_for_bad_messages_and_reset_exception_manager()
 
 
-def after_tag(context, tag):
+def after_tag(_, tag):
     if tag == "clear_for_bad_messages":
         _clear_queues_for_bad_messages_and_reset_exception_manager()
 
