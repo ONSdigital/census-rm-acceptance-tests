@@ -103,6 +103,7 @@ def get_ccs_case_by_postcode(context):
     test_helper.assertEqual(context.ccs_case['postcode'], matched_case['postcode'])
     test_helper.assertEqual(context.ccs_case['caseRef'], matched_case['caseRef'])
 
+
 @step('it contains the correct fields for a CENSUS case')
 def check_census_case_fields(context):
     test_helper.assertTrue(context.case_details['caseRef'])
