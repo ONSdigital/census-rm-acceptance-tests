@@ -98,9 +98,7 @@ def telephone_capture_child_case_is_emitted(context):
 @step('there is a request for telephone capture for country "{country_code}"')
 def spg_unit_individual_request(context, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    context.fulfilment_requested_case_id = context.first_case['id']
-    context.telephone_capture_parent_case_id = context.first_case['id']
-    context.individual_case_id = str(uuid.uuid4())
+    context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
     response = requests.get(
         f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid?individual=true")
