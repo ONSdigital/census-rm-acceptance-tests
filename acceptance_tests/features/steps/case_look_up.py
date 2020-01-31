@@ -110,7 +110,6 @@ def check_census_case_fields(context):
     test_helper.assertTrue(context.case_details['lsoa'])
     test_helper.assertTrue(context.case_details['msoa'])
     test_helper.assertTrue(context.case_details['lad'])
-    test_helper.assertTrue(context.case_details['state'])
     test_helper.assertTrue(context.case_details['id'])
     test_helper.assertTrue(context.case_details['caseType'])
     test_helper.assertEqual(context.case_details['surveyType'], "CENSUS")
@@ -140,7 +139,6 @@ def check_ccs_case_fields(context):
     test_helper.assertFalse(context.ccs_case['lsoa'])
     test_helper.assertFalse(context.ccs_case['msoa'])
     test_helper.assertFalse(context.ccs_case['lad'])
-    test_helper.assertTrue(context.ccs_case['state'])
     test_helper.assertTrue(context.ccs_case['id'])
     test_helper.assertTrue(context.ccs_case['caseType'])
 
