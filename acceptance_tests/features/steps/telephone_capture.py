@@ -95,8 +95,8 @@ def telephone_capture_child_case_is_emitted(context):
                                            context.individual_case_id)
 
 
-@step('there is a request for telephone capture for country "{country_code}"')
-def spg_unit_individual_request(context, country_code):
+@step("there is a request for individual telephone capture for and estab case")
+def spg_unit_individual_request(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
