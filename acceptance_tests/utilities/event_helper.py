@@ -53,7 +53,6 @@ def _sample_matches_rh_message(sample_unit, rh_message):
 
 def _validate_case(parsed_body):
     test_helper.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
-    test_helper.assertEqual('ACTIONABLE', parsed_body['payload']['collectionCase']['state'])
     test_helper.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
 
 
