@@ -39,7 +39,7 @@ Feature: Telephone capture
 
    Scenario Outline: Generate and link correct QID type for SPG unit level cases Individual
     Given sample file "<sample file>" is loaded successfully
-    When there is a request for individual telephone capture for and estab case
+    When there is a request for individual telephone capture for a non HH unit case
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
     And a fulfilment request event is logged

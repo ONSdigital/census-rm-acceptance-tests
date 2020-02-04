@@ -95,7 +95,7 @@ def telephone_capture_child_case_is_emitted(context):
                                            context.individual_case_id)
 
 
-@step("there is a request for individual telephone capture for and estab case")
+@step("there is a request for individual telephone capture for a non HH unit case")
 def spg_unit_individual_request(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
