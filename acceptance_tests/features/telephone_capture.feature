@@ -48,4 +48,4 @@ Feature: Telephone capture
       | sample file                    | questionnaire type |
       | sample_1_english_SPG_unit.csv  | 21                 |
       | sample_1_welsh_SPG_unit.csv    | 22                 |
-      | sample_1_NI_SPG_unit.csv       | 24                 |
+      | sample_1_ni_SPG_unit.csv       | 24                 |
