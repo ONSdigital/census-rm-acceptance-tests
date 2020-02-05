@@ -44,12 +44,12 @@ def before_scenario(context, _):
                  Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
 
-def before_tag(context, tag):
+def before_tag(_, tag):
     if tag == "clear_for_bad_messages":
         _clear_queues_for_bad_messages_and_reset_exception_manager()
 
 
-def after_tag(context, tag):
+def after_tag(_, tag):
     if tag == "clear_for_bad_messages":
         _clear_queues_for_bad_messages_and_reset_exception_manager()
 
