@@ -1,12 +1,14 @@
 Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Generate print files and log events for initial contact letters
-    Given an action rule of type "<action type>" is set 2 seconds in the future
-    When sample file "<sample file>" is loaded
-    Then messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    And correctly formatted "<pack code>" print files are created
+
+    Given sample file "<sample file>" is loaded
+    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
+    When set action rule of type "<action type>" when the case loading queues are drained
+    Then correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the files have all been copied to the bucket
 
     Examples: Initial contact letter: <pack code>
       | pack code  | action type | questionnaire types | sample file                          |
@@ -14,11 +16,12 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
       | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
 
+
   Scenario Outline: Generate print files and log events for initial contact questionnaires
-    Given an action rule of type "<action type>" is set 2 seconds in the future
-    When sample file "<sample file>" is loaded
-    Then messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    And correctly formatted "<pack code>" print files are created for questionnaire
+    Given sample file "<sample file>" is loaded
+    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
+    When set action rule of type "<action type>" when the case loading queues are drained
+    Then correctly formatted "<pack code>" print files are created for questionnaire
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
 
@@ -28,9 +31,10 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_H2   | ICHHQW      | [02,03]             | sample_input_census_spec_wales_questionnaire.csv   |
       | P_IC_H4   | ICHHQN      | [04]                | sample_input_census_spec_ni_questionnaire.csv      |
 
+
   Scenario Outline: Generate print files and log events for scheduled reminder letters
     Given sample file "<sample file>" is loaded
-    And an action rule of type "<pack code>" is set 2 seconds in the future
+    When set action rule of type "<pack code>" when the case loading queues are drained
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
     When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
@@ -45,7 +49,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline:  Generate print files and log events for scheduled questionnaire letters
     Given sample file "<sample file>" is loaded successfully
-    And an action rule of type "<pack code>" is set 2 seconds in the future
+    And set action rule of type "<pack code>" when the case loading queues are drained
     When 2 UAC Updated events are emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder questionnaire print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -58,7 +62,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline:  Generate print files and log events for response driven reminders
     Given sample file "<sample file>" is loaded successfully
-    And an action rule of type "<pack code>" is set 2 seconds in the future
+    When set action rule of type "<pack code>" when the case loading queues are drained
     When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
