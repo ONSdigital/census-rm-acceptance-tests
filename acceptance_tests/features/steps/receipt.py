@@ -15,7 +15,11 @@ from config import Config
 @when("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    questionnaire_id = ''
+    for uac in context.uac_created_events:
+        if uac['payload']['uac']['caseId'] == context.first_case['id']:
+            questionnaire_id = uac['payload']['uac']['questionnaireId']
+            break
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
