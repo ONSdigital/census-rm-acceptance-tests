@@ -35,3 +35,17 @@ Feature: Telephone capture
       | sample_1_english_HH_unit.csv | HH        | E            | 21                 |
       | sample_1_welsh_HH_unit.csv  | HH        | W            | 22                 |
       | sample_1_ni_HH_unit.csv     | HH        | N            | 24                 |
+
+
+   Scenario Outline: Generate and link correct QID type for SPG unit level cases Individual
+    Given sample file "<sample file>" is loaded successfully
+    When there is a request for individual telephone capture for a non HH unit case
+    Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
+    And a UAC updated event is emitted linking the new UAC and QID to the requested case
+    And a fulfilment request event is logged
+
+    Examples:
+      | sample file                    | questionnaire type |
+      | sample_1_english_SPG_unit.csv  | 21                 |
+      | sample_1_welsh_SPG_unit.csv    | 22                 |
+      | sample_1_ni_SPG_unit.csv       | 24                 |

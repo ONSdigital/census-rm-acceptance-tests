@@ -93,3 +93,15 @@ def check_correct_individual_uac_updated_message_is_emitted(context):
 def telephone_capture_child_case_is_emitted(context):
     check_individual_child_case_is_emitted(context, context.telephone_capture_parent_case_id,
                                            context.individual_case_id)
+
+
+@step("there is a request for individual telephone capture for a non HH unit case")
+def spg_unit_individual_request(context):
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
+
+    response = requests.get(
+        f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid?individual=true")
+    response.raise_for_status()
+
+    context.telephone_capture_qid_uac = response.json()

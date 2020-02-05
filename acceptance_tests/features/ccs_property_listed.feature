@@ -5,6 +5,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     Then the CCS Property Listed case is created with case_type "HH"
     And the correct ActionInstruction is sent to FWMT
     And the case API returns the CCS QID for the new case
+    And the case API returns the new CCS case by postcode search
 
   Scenario: Log event when a CCS Property Listed event is received with a qid
     When an unaddressed message of questionnaire type 71 is sent
@@ -12,6 +13,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     When a CCS Property Listed event is sent with a qid
     And the CCS Property Listed case is created with case_type "HH"
     And no ActionInstruction is sent to FWMT
+    And the case API returns the new CCS case by postcode search
 
   Scenario: CCS Listed with refusal
     When a CCS Property Listed event is sent with refusal
@@ -19,6 +21,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And the CCS case listed event is logged
     And no ActionInstruction is sent to FWMT
     And the case API returns the CCS QID for the new case
+    And the case API returns the new CCS case by postcode search
 
   Scenario: CCS Listed with Address invalid
     When a CCS Property Listed event is sent with an address invalid event and addressType "NR"
@@ -26,3 +29,4 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And the CCS case listed event is logged
     And no ActionInstruction is sent to FWMT
     And the case API returns the CCS QID for the new case
+    And the case API returns the new CCS case by postcode search
