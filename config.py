@@ -29,6 +29,7 @@ class Config:
     RABBITMQ_EVENT_EXCHANGE = os.getenv('RABBITMQ_EVENT_EXCHANGE', 'events')
     RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY = os.getenv('RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY',
                                                           'event.questionnaire.update')
+    RABBITMQ_SAMPLE_TO_ACTION_QUEUE = 'case.action'
     RABBITMQ_REFUSAL_ROUTING_KEY = os.getenv('RABBITMQ_REFUSAL_ROUTING_KEY', 'event.respondent.refusal')
     RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY = os.getenv('RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY',
                                                      'event.response.authentication')
@@ -107,3 +108,5 @@ class Config:
                        'notify.fulfilments',
                        'survey.launched',
                        'unaddressedRequestQueue']
+
+    SENT_PRINT_FILE_BUCKET = os.getenv('SENT_PRINT_FILE_BUCKET', '')
