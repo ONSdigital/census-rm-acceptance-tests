@@ -49,3 +49,6 @@ Feature: Telephone capture
       | sample_1_english_SPG_unit.csv  | 21                 |
       | sample_1_welsh_SPG_unit.csv    | 22                 |
       | sample_1_ni_SPG_unit.csv       | 24                 |
+      | sample_1_english_CE_estab.csv  | 21                 |
+      | sample_1_welsh_CE_estab.csv    | 22                 |
+      | sample_1_ni_CE_estab.csv       | 24                 |
