@@ -22,7 +22,21 @@ def request_telephone_capture_qid_uac(context, address_level, case_type, country
     context.telephone_capture_qid_uac = response.json()
 
 
-@step('there is a request for individual telephone capture for a unit case '
+@step('there is a request for individual telephone capture for the case '
+      'with case type "{case_type}" and country "{country_code}"')
+def spg_unit_individual_request(context, case_type, country_code):
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
+    _check_case_type_country(context.first_case, case_type, country_code)
+
+    response = requests.get(
+        f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid?individual=true")
+    response.raise_for_status()
+
+    context.telephone_capture_qid_uac = response.json()
+
+
+@step('there is a request for a new HI case for telephone capture for the parent case '
       'with case type "{case_type}" and country "{country_code}"')
 def request_individual_telephone_capture_qid_uac(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
@@ -39,12 +53,16 @@ def request_individual_telephone_capture_qid_uac(context, case_type, country_cod
 
 
 def _check_case_type_country_address_level(case, case_type, country_code, address_level='U'):
+    _check_case_type_country(case, case_type, country_code)
+    test_helper.assertEqual(address_level, case['address']['addressLevel'],
+                            'Loaded case does does not have unit address level')
+
+
+def _check_case_type_country(case, case_type, country_code):
     test_helper.assertEqual(country_code, case['treatmentCode'][-1],
                             'Loaded case does not match expected nationality')
     test_helper.assertEqual(case_type, case['treatmentCode'].split('_')[0],
                             'Loaded case does not match expected case type')
-    test_helper.assertEqual(address_level, case['address']['addressLevel'],
-                            'Loaded case does does not have unit address level')
 
 
 @step('a UAC and QID with questionnaire type "{questionnaire_type}" type are generated and returned')
@@ -93,15 +111,3 @@ def check_correct_individual_uac_updated_message_is_emitted(context):
 def telephone_capture_child_case_is_emitted(context):
     check_individual_child_case_is_emitted(context, context.telephone_capture_parent_case_id,
                                            context.individual_case_id)
-
-
-@step("there is a request for individual telephone capture for a non HH unit case")
-def spg_unit_individual_request(context):
-    context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
-    response = requests.get(
-        f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid?individual=true")
-    response.raise_for_status()
-
-    context.telephone_capture_qid_uac = response.json()
