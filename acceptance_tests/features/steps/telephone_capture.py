@@ -24,7 +24,7 @@ def request_telephone_capture_qid_uac(context, address_level, case_type, country
 
 @step('there is a request for individual telephone capture for the case '
       'with case type "{case_type}" and country "{country_code}"')
-def spg_unit_individual_request(context, case_type, country_code):
+def request_individual_telephone_capture(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
     _check_case_type_country(context.first_case, case_type, country_code)
@@ -38,7 +38,7 @@ def spg_unit_individual_request(context, case_type, country_code):
 
 @step('there is a request for a new HI case for telephone capture for the parent case '
       'with case type "{case_type}" and country "{country_code}"')
-def request_individual_telephone_capture_qid_uac(context, case_type, country_code):
+def request_hi_individual_telephone_capture(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.telephone_capture_parent_case_id = context.first_case['id']
     context.individual_case_id = str(uuid.uuid4())
