@@ -1,10 +1,11 @@
 import json
 import time
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import requests
 from behave import step
+
 from acceptance_tests.controllers.action_controller import create_action_plan, create_action_rule
 from config import Config
 
@@ -13,11 +14,10 @@ from config import Config
 def setup_action_rule_once_case_action_is_drained(context, action_type):
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
-    setup_action_rule(context, action_type, 0)
+    setup_action_rule(context, action_type)
 
 
-@step('an action rule of type "{action_type}" is set {action_rule_delay} seconds in the future')
-def setup_action_rule(context, action_type, action_rule_delay):
+def setup_action_rule(context, action_type):
     classifiers_for_action_type = {
         'ICL1E': {'treatment_code': ['HH_LFNR1E', 'HH_LFNR2E', 'HH_LFNR3AE', 'HH_LF2R1E', 'HH_LF2R2E', 'HH_LF2R3AE',
                                      'HH_LF2R3BE', 'HH_LF3R1E', 'HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE']},
@@ -42,18 +42,21 @@ def setup_action_rule(context, action_type, action_rule_delay):
         'P_RD_2RL2B_3': {'lsoa': ['E01014897']}
     }
 
-    build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type, action_rule_delay)
+    build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
 
 
-@step('an action rule for address type "{address_type}" is set 5 seconds in the future')
+@step('an action rule for address type "{address_type}" is set when loading queues are drained')
 def create_ce_action_plan(context, address_type):
-    build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD', 5)
+    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
+    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
+
+    build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD')
 
 
-def build_and_create_action_rule(context, classifier, action_type, action_rule_delay):
+def build_and_create_action_rule(context, classifier, action_type):
     action_plan_response_body = create_action_plan(context.action_plan_id)
     action_plan_url = action_plan_response_body['_links']['self']['href']
-    trigger_date_time = (datetime.utcnow() + timedelta(seconds=int(action_rule_delay))).isoformat() + 'Z'
+    trigger_date_time = datetime.utcnow().isoformat() + 'Z'
 
     create_action_rule(str(uuid.uuid4()), trigger_date_time, classifier,
                        action_plan_url, action_type)

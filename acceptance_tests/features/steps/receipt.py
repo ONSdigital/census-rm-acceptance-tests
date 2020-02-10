@@ -6,7 +6,10 @@ import xml.etree.ElementTree as ET
 from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
+from retrying import retry
 
+from acceptance_tests.features.steps.action_rules import setup_action_rule
+from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -21,6 +24,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
             break
     else:
         test_helper.fail('Could not find UAC_UPDATED event for receipted case')
+
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
@@ -162,3 +166,20 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
+
+
+@step('set action rule of type "{action_type}" when case receipted')
+def set_action_rule_when_case_receipted(context, action_type):
+    check_if_case_receipted(context)
+    setup_action_rule(context, action_type)
+
+
+@retry(stop_max_attempt_number=30, wait_fixed=1000)
+def check_if_case_receipted(context):
+    events = get_logged_events_for_case_by_id(context.case_created_events[0]['payload']['collectionCase']['id'])
+
+    for event in events:
+        if event['eventType'] == "RESPONSE_RECEIVED":
+            return
+
+    test_helper.fail(f"Case {context.first_case['id']} not yet receipted")
