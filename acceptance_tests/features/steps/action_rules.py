@@ -14,6 +14,10 @@ from config import Config
 def setup_action_rule_once_case_action_is_drained(context, action_type):
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
+    # This sleep is an attempt to capture the rare times that this seems to fail
+    # where either the api is inaccurate, or the actionscheduler has prefetched the case and not yet fully loaded it
+    # and the action rule is set and fired in this small time?
+    time.sleep(1)
     setup_action_rule(context, action_type)
 
 

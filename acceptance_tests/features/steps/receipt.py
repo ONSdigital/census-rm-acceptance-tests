@@ -168,18 +168,18 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     context.sent_to_gcp = True
 
 
-@step('set action rule of type "{action_type}" when case receipted')
-def set_action_rule_when_case_receipted(context, action_type):
-    check_if_case_receipted(context)
+@step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
+def set_action_rule_when_case_receipted(context, action_type, event_type):
+    check_for_event(context, event_type)
     setup_action_rule(context, action_type)
 
 
 @retry(stop_max_attempt_number=30, wait_fixed=1000)
-def check_if_case_receipted(context):
+def check_for_event(context, event_type):
     events = get_logged_events_for_case_by_id(context.case_created_events[0]['payload']['collectionCase']['id'])
 
     for event in events:
-        if event['eventType'] == "RESPONSE_RECEIVED":
+        if event['eventType'] == event_type:
             return
 
-    test_helper.fail(f"Case {context.first_case['id']} not yet receipted")
+    test_helper.fail(f"Case {context.first_case['id']} event_type {event_type} not logged")

@@ -83,8 +83,8 @@ Feature: Handle fulfilment request events
 
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
-    And set action rule of type "FIELD" when the case loading queues are drained
     When a UAC fulfilment request "UACIT1" message for a created case is sent
+    And set action rule of type "FIELD" when case event "FULFILMENT_REQUESTED" is logged
     Then the action instruction messages for only the HH case are emitted to FWMT where the case has a "treatmentCode" of "HH_QF2R1E"
     And an individual case has been created and only has logged events of [RM_UAC_CREATED]
 
