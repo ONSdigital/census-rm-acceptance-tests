@@ -17,11 +17,8 @@ case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
 @then("a case can be retrieved from the case API service")
 def get_case_by_id(context):
     case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
     response = requests.get(f'{case_api_url}{case_id}')
-
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
-
     context.case_details = response.json()
 
 
@@ -113,6 +110,7 @@ def check_census_case_fields(context):
     test_helper.assertTrue(context.case_details['uprn'])
     test_helper.assertTrue(context.case_details['collectionExerciseId'])
     test_helper.assertTrue(context.case_details['createdDateTime'])
+    test_helper.assertTrue(context.case_details['lastUpdated'])
     test_helper.assertTrue(context.case_details['addressLine1'])
     test_helper.assertTrue(context.case_details['addressLine2'])
     test_helper.assertTrue(context.case_details['addressLine3'])
@@ -142,6 +140,7 @@ def check_ccs_case_fields(context):
     test_helper.assertTrue(context.ccs_case['collectionExerciseId'])
     test_helper.assertEqual(context.ccs_case['surveyType'], "CCS")
     test_helper.assertTrue(context.ccs_case['createdDateTime'])
+    test_helper.assertTrue(context.ccs_case['lastUpdated'])
     test_helper.assertTrue(context.ccs_case['addressLine1'])
     test_helper.assertTrue(context.ccs_case['addressLine2'])
     test_helper.assertTrue(context.ccs_case['addressLine3'])
