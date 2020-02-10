@@ -17,11 +17,8 @@ case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
 @then("a case can be retrieved from the case API service")
 def get_case_by_id(context):
     case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
     response = requests.get(f'{case_api_url}{case_id}')
-
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
-
     context.case_details = response.json()
 
 
