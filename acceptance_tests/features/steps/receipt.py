@@ -1,7 +1,6 @@
 import functools
 import json
 import time
-import xml.etree.ElementTree as ET
 
 from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
@@ -94,14 +93,14 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
-    root = ET.fromstring(body)
+    action_close = json.loads(body)
 
-    if not root[0].tag == 'actionCancel':
+    if not action_close['actionInstruction'] == 'CLOSE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue, wanted actionCancel')
+        test_helper.fail('Unexpected message on Action.Field case queue, wanted CLOSE')
 
-    context.addressType = root[0].find('.//addressType').text
-    context.fwmt_emitted_case_id = root[0].find('.//caseId').text
+    context.addressType = action_close['addressType']
+    context.fwmt_emitted_case_id = action_close['caseId']
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
@@ -169,7 +168,7 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
 
 
 @step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
-def set_action_rule_when_case_receipted(context, action_type, event_type):
+def set_action_rule_when_case_event_logged(context, action_type, event_type):
     check_for_event(context, event_type)
     setup_action_rule(context, action_type)
 

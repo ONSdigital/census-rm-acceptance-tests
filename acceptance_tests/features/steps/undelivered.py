@@ -2,7 +2,6 @@ import functools
 import json
 import time
 import uuid
-import xml.etree.ElementTree as ET
 
 from behave import when, step
 from google.api_core.exceptions import GoogleAPIError
@@ -37,19 +36,19 @@ def action_request_event_sent_to_fwm(context):
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, 'HH')
-    test_helper.assertEqual(context.fwmt_emitted_undelivered_flag, 'true')
+    test_helper.assertEqual(context.fwmt_emitted_undelivered_flag, True)
 
 
 def _field_work_receipt_callback(ch, method, _properties, body, context):
-    root = ET.fromstring(body)
+    action_instruction = json.loads(body)
 
-    if not root[0].tag == 'actionRequest':
+    if not action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue, wanted actionRequest')
+        test_helper.fail('Unexpected message on Action.Field case queue, wanted CREATE')
 
-    context.addressType = root[0].find('.//addressType').text
-    context.fwmt_emitted_case_id = root[0].find('.//caseId').text
-    context.fwmt_emitted_undelivered_flag = root[0].find('.//undeliveredAsAddress').text
+    context.addressType = action_instruction['addressType']
+    context.fwmt_emitted_case_id = action_instruction['caseId']
+    context.fwmt_emitted_undelivered_flag = action_instruction['undeliveredAsAddress']
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
