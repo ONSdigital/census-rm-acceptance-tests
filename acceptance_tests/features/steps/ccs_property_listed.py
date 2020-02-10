@@ -1,7 +1,6 @@
 import functools
 import json
 import uuid
-import xml.etree.ElementTree as ET
 
 import requests
 from behave import step
@@ -83,7 +82,7 @@ def _create_ccs_property_listed_event(context, address_type="HH"):
                     "townName": "upton",
                     "postcode": create_random_postcode(),
                     "latitude": "50.863849",
-                    "longitude": "-1.229710",
+                    "longitude": "-1.229714",
                     "fieldcoordinatorId": "XXXXXXXXXX",
                     "fieldofficerId": "XXXXXXXXXXXXX"
                 },
@@ -123,20 +122,18 @@ def check_correct_ccs_actioninstruction_sent_to_fwmt(context):
 
     action_instruction = context.emitted_action_instruction
 
-    test_helper.assertEqual(context.ccs_case['id'], action_instruction.find('.//caseId').text)
-    test_helper.assertEqual(context.ccs_case['latitude'], action_instruction.find('.//latitude').text)
-    test_helper.assertEqual(context.ccs_case['longitude'], action_instruction.find('.//longitude').text)
-    test_helper.assertEqual(context.ccs_case['postcode'], action_instruction.find('.//postcode').text)
-    test_helper.assertEqual('false', action_instruction.find('.//undeliveredAsAddress').text)
-    test_helper.assertEqual('false', action_instruction.find('.//blankQreReturned').text)
-    test_helper.assertEqual('CCS', action_instruction.find('.//surveyName').text)
-    test_helper.assertEqual(context.ccs_case['estabType'], action_instruction.find('.//estabType').text)
+    test_helper.assertEqual(context.ccs_case['id'], action_instruction['caseId'])
+    test_helper.assertEqual(float(context.ccs_case['latitude']), action_instruction['latitude'])
+    test_helper.assertEqual(float(context.ccs_case['longitude']), action_instruction['longitude'])
+    test_helper.assertEqual(context.ccs_case['postcode'], action_instruction['postcode'])
+    test_helper.assertEqual('CCS', action_instruction['surveyName'])
+    test_helper.assertEqual(context.ccs_case['estabType'], action_instruction['estabType'])
 
 
 def field_callback(ch, method, _properties, body, context):
-    context.emitted_action_instruction = ET.fromstring(body)
+    context.emitted_action_instruction = json.loads(body)
 
-    if not context.emitted_action_instruction[0].tag == 'actionRequest':
+    if not context.emitted_action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail('Unexpected message on Action.Field case queue')
 
