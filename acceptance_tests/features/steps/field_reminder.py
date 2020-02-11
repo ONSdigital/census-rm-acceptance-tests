@@ -1,5 +1,5 @@
 import functools
-import xml.etree.ElementTree as ET
+import json
 
 from behave import step
 
@@ -38,9 +38,9 @@ def _check_emitted_action_instructions(context, filter_column, treatment_code, e
 
 
 def fieldwork_message_callback(ch, method, _properties, body, context):
-    action_instruction = ET.fromstring(body)
+    action_instruction = json.loads(body)
 
-    if not action_instruction[0].tag == 'actionRequest':
+    if not action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail('Unexpected message on Action.Field case queue')
 
@@ -59,18 +59,14 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
 
 
 def _message_matches(case, action_instruction):
-    return action_instruction.find('.//caseId').text == case['id']
+    return action_instruction['caseId'] == case['id']
 
 
 def _message_valid(case, action_instruction, ce1_complete_expected):
-    test_helper.assertEqual(case['address']['latitude'], action_instruction.find('.//latitude').text)
-    test_helper.assertEqual(case['address']['longitude'], action_instruction.find('.//longitude').text)
-    test_helper.assertEqual(case['address']['postcode'], action_instruction.find('.//postcode').text)
-    test_helper.assertEqual('false', action_instruction.find('.//undeliveredAsAddress').text)
-    test_helper.assertEqual('false', action_instruction.find('.//blankQreReturned').text)
-    test_helper.assertEqual('CENSUS', action_instruction.find('.//surveyName').text)
-    test_helper.assertEqual(case['address']['estabType'], action_instruction.find('.//estabType').text)
-    test_helper.assertEqual(case['address']['arid'], action_instruction.find('.//arid').text)
-    test_helper.assertEquals(ce1_complete_expected, action_instruction.find('.//ceCE1Complete').text)
-    test_helper.assertEquals(case['ceExpectedCapacity'], int(action_instruction.find('.//ceExpectedResponses').text))
-    test_helper.assertEquals(case['ceActualResponses'], int(action_instruction.find('.//ceActualResponses').text))
+    test_helper.assertEqual(float(case['address']['latitude']), action_instruction['latitude'])
+    test_helper.assertEqual(float(case['address']['longitude']), action_instruction['longitude'])
+    test_helper.assertEqual(case['address']['postcode'], action_instruction['postcode'])
+    test_helper.assertEqual('CENSUS', action_instruction['surveyName'])
+    test_helper.assertEqual(case['address']['estabType'], action_instruction['estabType'])
+    test_helper.assertEquals(case['ceExpectedCapacity'], int(action_instruction['ceExpectedCapacity']))
+    test_helper.assertEquals(case['ceActualResponses'], int(action_instruction['ceActualResponses']))

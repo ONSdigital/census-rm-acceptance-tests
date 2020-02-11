@@ -45,13 +45,16 @@ Feature: Telephone capture
     And a fulfilment request event is logged
 
     Examples:
-      | sample file                   | case type | country code | questionnaire type |
-      | sample_1_english_SPG_unit.csv | SPG       | E            | 21                 |
-      | sample_1_welsh_SPG_unit.csv   | SPG       | W            | 22                 |
-      | sample_1_ni_SPG_unit.csv      | SPG       | N            | 24                 |
-      | sample_1_english_CE_estab.csv | CE        | E            | 21                 |
-      | sample_1_welsh_CE_estab.csv   | CE        | W            | 22                 |
-      | sample_1_ni_CE_estab.csv      | CE        | N            | 24                 |
-      | sample_1_english_CE_unit.csv  | CE        | E            | 21                 |
-      | sample_1_welsh_CE_unit.csv    | CE        | W            | 22                 |
-      | sample_1_ni_CE_unit.csv       | CE        | N            | 24                 |
+      | sample file                    | case type | country code | questionnaire type |
+      | sample_1_english_SPG_unit.csv  | SPG       | E            | 21                 |
+      | sample_1_welsh_SPG_unit.csv    | SPG       | W            | 22                 |
+      | sample_1_ni_SPG_unit.csv       | SPG       | N            | 24                 |
+      | sample_1_english_SPG_estab.csv | SPG       | E            | 21                 |
+      | sample_1_welsh_SPG_estab.csv   | SPG       | W            | 22                 |
+      | sample_1_ni_SPG_estab.csv      | SPG       | N            | 24                 |
+      | sample_1_english_CE_estab.csv  | CE        | E            | 21                 |
+      | sample_1_welsh_CE_estab.csv    | CE        | W            | 22                 |
+      | sample_1_ni_CE_estab.csv       | CE        | N            | 24                 |
+      | sample_1_english_CE_unit.csv   | CE        | E            | 21                 |
+      | sample_1_welsh_CE_unit.csv     | CE        | W            | 22                 |
+      | sample_1_ni_CE_unit.csv        | CE        | N            | 24                 |
