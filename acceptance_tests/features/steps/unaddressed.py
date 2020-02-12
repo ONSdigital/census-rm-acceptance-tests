@@ -149,7 +149,7 @@ def validate_unaddressed_print_file(context):
              '--env', 'SFTP_PASSPHRASE=secret',
              '--env', 'SFTP_USERNAME=centos',
              '--link', 'rabbitmq', '--link', 'postgres', '--network', 'censusrmdockerdev_default', '-t',
-             'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/app/run_acceptance_tests.sh'],
+             'eu.gcr.io/census-rm-ci/rm/census-rm-qid-batch-runner', '/home/qidbatchrunner/run_acceptance_tests.sh'],
             check=True)
     except subprocess.CalledProcessError:
         test_helper.fail('Unaddressed print file test failed')

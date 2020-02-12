@@ -58,7 +58,7 @@ kubectl run acceptance-tests -it --command --rm --quiet --generator=run-pod/v1 \
     --env=QM_UNDELIVERED_PROJECT_ID=$(kubectl get configmap project-config -o=jsonpath="{.data.project-name}") \
     --env=QM_UNDELIVERED_TOPIC_NAME=qm-undelivered-topic \
     --env=GOOGLE_SERVICE_ACCOUNT_JSON=$(kubectl get secret pubsub-credentials -o=jsonpath="{.data['service-account-key\.json']}") \
-    --env=GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-key.json" \
+    --env=GOOGLE_APPLICATION_CREDENTIALS="/home/acceptancetests/service-account-key.json" \
     --env=RABBITMQ_USER=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-username}" | base64 --decode) \
     --env=RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq -o=jsonpath="{.data.rabbitmq-password}" | base64 --decode) \
     --env=RABBITMQ_HTTP_PORT=15672 \
@@ -81,5 +81,5 @@ kubectl delete deploy qid-batch-runner --force --now || true
 kubectl apply -f ${BATCH_RUNNER_CONFIG}
 kubectl rollout status deploy qid-batch-runner --watch=true
 kubectl exec -it $(kubectl get pods -o name | grep -m1 qid-batch-runner | cut -d'/' -f 2) \
--- /bin/bash /app/run_acceptance_tests.sh
+-- /bin/bash /home/qidbatchrunner/run_acceptance_tests.sh
 kubectl delete deploy qid-batch-runner --force --now
