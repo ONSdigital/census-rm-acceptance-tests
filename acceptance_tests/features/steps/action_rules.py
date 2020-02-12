@@ -5,8 +5,11 @@ from datetime import datetime
 
 import requests
 from behave import step
+from retrying import retry
 
 from acceptance_tests.controllers.action_controller import create_action_plan, create_action_rule
+from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
@@ -14,6 +17,11 @@ from config import Config
 def setup_action_rule_once_case_action_is_drained(context, action_type):
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
+    # This sleep is an attempt to capture the rare times that these checks to fail
+    # where either the api is inaccurate/slow, or the actionscheduler has prefetched the case and not yet fully loaded
+    # it and the action rule is set and fired in this small time?
+    # Hopefully there will be a better fix in the near future
+    time.sleep(1)
     setup_action_rule(context, action_type)
 
 
@@ -77,3 +85,20 @@ def get_msg_count(queue_name):
     response_data = json.loads(response.content)
 
     return response_data['messages']
+
+
+@step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
+def set_action_rule_when_case_event_logged(context, action_type, event_type):
+    check_for_event(context, event_type)
+    setup_action_rule(context, action_type)
+
+
+@retry(stop_max_attempt_number=30, wait_fixed=1000)
+def check_for_event(context, event_type):
+    events = get_logged_events_for_case_by_id(context.case_created_events[0]['payload']['collectionCase']['id'])
+
+    for event in events:
+        if event['eventType'] == event_type:
+            return
+
+    test_helper.fail(f"Case {context.first_case['id']} event_type {event_type} not logged")
