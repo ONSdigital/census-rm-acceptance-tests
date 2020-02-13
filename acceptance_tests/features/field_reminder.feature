@@ -8,11 +8,11 @@ Feature: Reminder messages are emitted to Field Work Management Tool
     
   Scenario: send community estab cases to field
     Given sample file "sample_for_ce_stories.csv" is loaded successfully
-    When an action rule for address type "CE" is set when loading queues are drained
+    When a FIELD action rule for address type "CE" is set when loading queues are drained
     Then the action instruction is emitted to FWMT where case has a "caseType" of "CE" and CEComplete is "false"
 
   Scenario: send SPG cases to field
     Given sample file "sample_for_spg_stories.csv" is loaded successfully
-    When an action rule for address type "SPG" is set when loading queues are drained
+    When a FIELD action rule for address type "SPG" is set when loading queues are drained
     Then the action instruction is emitted to FWMT where case has a "caseType" of "SPG" and CEComplete is "false"
 
