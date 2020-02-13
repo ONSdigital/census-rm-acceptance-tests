@@ -14,18 +14,17 @@ from config import Config
 
 
 @step('set action rule of type "{action_type}" when the case loading queues are drained')
-def setup_action_rule_once_case_action_is_drained(context, action_type):
+def setup_print_action_rule_once_case_action_is_drained(context, action_type):
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
-    # This sleep is an attempt to capture the rare times that these checks to fail
-    # where either the api is inaccurate/slow, or the actionscheduler has prefetched the case and not yet fully loaded
-    # it and the action rule is set and fired in this small time?
-    # Hopefully there will be a better fix in the near future
+    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
+    # the sleep is a temporary work around until this is fixed proper
+    # (by checking for all the cases in the action scheduler DB)
     time.sleep(1)
-    setup_action_rule(context, action_type)
+    setup_treatment_code_classified_action_rule(context, action_type)
 
 
-def setup_action_rule(context, action_type):
+def setup_treatment_code_classified_action_rule(context, action_type):
     classifiers_for_action_type = {
         'ICL1E': {'treatment_code': ['HH_LFNR1E', 'HH_LFNR2E', 'HH_LFNR3AE', 'HH_LF2R1E', 'HH_LF2R2E', 'HH_LF2R3AE',
                                      'HH_LF2R3BE', 'HH_LF3R1E', 'HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE']},
@@ -53,11 +52,14 @@ def setup_action_rule(context, action_type):
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
 
 
-@step('an action rule for address type "{address_type}" is set when loading queues are drained')
-def create_ce_action_plan(context, address_type):
+@step('a FIELD action rule for address type "{address_type}" is set when loading queues are drained')
+def create_field_action_plan(context, address_type):
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
     _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
-
+    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
+    # the sleep is a temporary work around until this is fixed proper
+    # (by checking for all the cases in the action scheduler DB)
+    time.sleep(2)
     build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD')
 
 
@@ -90,7 +92,7 @@ def get_msg_count(queue_name):
 @step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
 def set_action_rule_when_case_event_logged(context, action_type, event_type):
     check_for_event(context, event_type)
-    setup_action_rule(context, action_type)
+    setup_treatment_code_classified_action_rule(context, action_type)
 
 
 @retry(stop_max_attempt_number=30, wait_fixed=1000)
