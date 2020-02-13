@@ -124,3 +124,15 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RD_2RL1_3": "Response driven reminder group 3 English",
     "P_RD_2RL2B_3": "Response driven reminder group 3 Welsh"
 }
+
+QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
+    "01": 'H',
+    "02": 'H',
+    "04": 'H',
+    "21": 'I',
+    "22": 'I',
+    "24": 'I',
+    "31": 'C',
+    "32": 'C',
+    "34": 'C',
+}
