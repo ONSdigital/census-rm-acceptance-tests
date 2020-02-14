@@ -5,6 +5,7 @@ import requests
 from behave import step
 
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted
+from acceptance_tests.utilities.mappings import QUESTIONNAIRE_TYPE_TO_FORM_TYPE
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -69,6 +70,9 @@ def _check_case_type_country(case, case_type, country_code):
 def check_telephone_capture_uac_and_qid_type(context, questionnaire_type):
     test_helper.assertIsNotNone(context.telephone_capture_qid_uac.get('uac'))
     test_helper.assertEqual(context.telephone_capture_qid_uac['questionnaireId'][:2], questionnaire_type)
+    test_helper.assertEqual(context.telephone_capture_qid_uac['formType'],
+                            QUESTIONNAIRE_TYPE_TO_FORM_TYPE[questionnaire_type])
+    test_helper.assertEqual(context.telephone_capture_qid_uac['questionnaireType'], questionnaire_type)
 
 
 @step('a UAC updated event is emitted linking the new UAC and QID to the requested case')
