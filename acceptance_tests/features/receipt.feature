@@ -54,7 +54,7 @@ Feature: Case processor handles receipt message from pubsub service
     Given sample file "<sample file>" is loaded successfully
     When there is a request for individual telephone capture for the case with case type "<case type>" and country "E"
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
-    When the receipt msg is put on the GCP pubsub with new individual qid
+    When the receipt msg is put on the GCP pubsub for the telephone capture qid
     And a case_updated msg is emitted where ceActualResponse is "<actual responses>" and receipted is "<receipted>"
 
     Examples:

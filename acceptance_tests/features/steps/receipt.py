@@ -181,7 +181,7 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     context.sent_to_gcp = True
 
 
-@when("the receipt msg is put on the GCP pubsub with new individual qid")
+@when("the receipt msg is put on the GCP pubsub for the telephone capture qid")
 def send_receipt_with_telephone_individual_qid(context):
     individual_qid = context.telephone_capture_qid_uac['questionnaireId']
 
