@@ -90,7 +90,7 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 
 
 @step('a case_updated msg is emitted where ceActualResponse is "{actual_responses}" and receipted is "{receipted}"')
-def step_impl(context, actual_responses, receipted):
+def check_ce_actual_responses_and_receipted(context, actual_responses, receipted):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
                                     functools.partial(
