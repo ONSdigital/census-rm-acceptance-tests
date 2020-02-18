@@ -170,7 +170,7 @@ def check_message_redelivery_rate(context):
     test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
 
     response = requests.get(
-        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.uacUpdated',
+        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.caseUpdated',
         auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
 
     response.raise_for_status()
