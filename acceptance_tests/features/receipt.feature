@@ -43,9 +43,22 @@ Feature: Case processor handles receipt message from pubsub service
     Then no ActionInstruction is sent to FWMT
 
   Scenario: Receipted Cases are excluded from print files
-    And sample file "sample_input_england_census_spec.csv" is loaded successfully
+    Given sample file "sample_input_england_census_spec.csv" is loaded successfully
     When the receipt msg for the created case is put on the GCP pubsub
     And set action rule of type "ICL1E" when case event "RESPONSE_RECEIVED" is logged
     Then only unreceipted cases appear in "P_IC_ICL1" print files
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
+
+  Scenario Outline: Reciepted Cases increment ceActualResponses
+    Given sample file "<sample file>" is loaded successfully
+    When there is a request for individual telephone capture for the case with case type "<case type>" and country "E"
+    Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
+    When the receipt msg is put on the GCP pubsub for the telephone capture qid
+    And a case_updated msg is emitted where ceActualResponse is "<actual responses>" and receipted is "<receipted>"
+
+    Examples:
+      | sample file                   | actual responses | receipted | case type | questionnaire type |
+      | sample_1_english_CE_estab.csv | 1                | False     | CE        | 21                 |
+      | sample_1_english_CE_unit.csv  | 1                | True      | CE        | 21                 |
+
