@@ -116,9 +116,9 @@ def _test_cases_correct(context):
                 context.expected_sample_units.pop(index)
                 break
         else:
-            logger.error('Failed to find all expected sample units',
+            logger.error('To match case created event to any of the expected sample units',
                          unmatched_sample_units=context.expected_sample_units,
-                         case_created_events=context.case_created_events)
+                         case_created_event=event)
             test_helper.fail('Could not find correct case updated messages for all loaded sample units')
 
 
