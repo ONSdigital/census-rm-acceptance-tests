@@ -55,7 +55,7 @@ def after_tag(_, tag):
 
 
 def _clear_queues_for_bad_messages_and_reset_exception_manager():
-    for _ in range(0, 4):
+    for _ in range(4):
         purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
         time.sleep(1)
     time.sleep(5)
