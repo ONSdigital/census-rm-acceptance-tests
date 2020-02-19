@@ -16,7 +16,8 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @step("a refusal message for a created case is received")
 def create_refusal(context):
-    context.refused_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.refused_case_id = context.first_case['id']
 
     message = json.dumps(
         {
