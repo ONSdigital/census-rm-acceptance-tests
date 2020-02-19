@@ -1,11 +1,14 @@
 import functools
+import logging
 
 import requests
+from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
+logger = wrap_logger(logging.getLogger(__name__))
 get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
@@ -108,7 +111,10 @@ def _test_cases_correct(context):
                 del context.expected_sample_units[index]
                 break
         else:
-            test_helper.fail('Could not find sample unit')
+            logger.error('Failed to find all expected sample units',
+                         expected_sample_units=context.expected_sample_units,
+                         case_created_events=context.case_created_events)
+            test_helper.fail('Could not find correct case updated messages for all loaded sample units')
 
 
 def get_expected_uac_count(context):
