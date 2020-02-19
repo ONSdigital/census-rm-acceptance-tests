@@ -6,18 +6,12 @@ import requests
 
 from datetime import datetime
 
-from acceptance_tests.utilities.rabbit_helper import add_test_queue, purge_queues
+from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 
 def before_all(_context):
     _setup_google_auth()
-    add_test_queue(Config.RABBITMQ_CASE_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
-                   Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST)
-    add_test_queue(Config.RABBITMQ_UAC_TEST_ROUTE, Config.RABBITMQ_RH_EXCHANGE_NAME,
-                   Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST)
-    add_test_queue("", Config.RABBITMQ_OUTBOUND_ADAPTER_EXCHANGE, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                   exchange_type='direct')
 
 
 def after_all(_context):
