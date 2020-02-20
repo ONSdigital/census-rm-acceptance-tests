@@ -15,9 +15,9 @@ def before_all(_context):
 
 
 def after_all(_context):
-    purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST)
+    purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
 
 
 def before_scenario(context, _):
@@ -28,12 +28,9 @@ def before_scenario(context, _):
     purge_queues(Config.RABBITMQ_INBOUND_REFUSAL_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                 Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
-                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
                  Config.RABBITMQ_SAMPLE_INBOUND_QUEUE,
                  Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE,
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
                  Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
