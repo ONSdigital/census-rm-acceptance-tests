@@ -15,4 +15,3 @@ Feature: Reminder messages are emitted to Field Work Management Tool
     Given sample file "sample_for_spg_stories.csv" is loaded successfully
     When a FIELD action rule for address type "SPG" is set when loading queues are drained
     Then the action instruction is emitted to FWMT where case has a "caseType" of "SPG" and CEComplete is "false"
-

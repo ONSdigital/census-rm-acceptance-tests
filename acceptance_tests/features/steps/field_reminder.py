@@ -46,7 +46,7 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
 
     for index, case in enumerate(context.expected_cases_for_action):
         if _message_matches(case, action_instruction):
-            _message_valid(case, action_instruction, context.expected_ce1_complete)
+            _message_valid(case, action_instruction)
             del context.expected_cases_for_action[index]
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -62,7 +62,7 @@ def _message_matches(case, action_instruction):
     return action_instruction['caseId'] == case['id']
 
 
-def _message_valid(case, action_instruction, ce1_complete_expected):
+def _message_valid(case, action_instruction):
     test_helper.assertEqual(float(case['address']['latitude']), action_instruction['latitude'])
     test_helper.assertEqual(float(case['address']['longitude']), action_instruction['longitude'])
     test_helper.assertEqual(case['address']['postcode'], action_instruction['postcode'])
@@ -70,3 +70,4 @@ def _message_valid(case, action_instruction, ce1_complete_expected):
     test_helper.assertEqual(case['address']['estabType'], action_instruction['estabType'])
     test_helper.assertEquals(case['ceExpectedCapacity'], int(action_instruction['ceExpectedCapacity']))
     test_helper.assertEquals(case['ceActualResponses'], int(action_instruction['ceActualResponses']))
+    test_helper.assertEquals(case['handDelivery'], action_instruction['handDeliver'])
