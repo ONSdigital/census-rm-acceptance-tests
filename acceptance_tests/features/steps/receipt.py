@@ -8,6 +8,7 @@ from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message
 from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
+from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request, \
     create_individual_print_fulfilment_message
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
@@ -100,7 +101,8 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 
 
 @step(
-    'if "{action_instruction}" not NONE a case updated event with actual responses is "{incremented}" and receipted "{receipted}" for case type "{case_type}"')
+    'if "{action_instruction}" not NONE a case updated event with actual responses is "{incremented}" and receipted '
+    '"{receipted}" for case type "{case_type}"')
 def check_ce_actual_responses_and_receipted(context, action_instruction, incremented, receipted, case_type):
     if action_instruction == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE,
@@ -118,7 +120,6 @@ def check_ce_actual_responses_and_receipted(context, action_instruction, increme
 
     test_helper.assertEqual(len(context.messages_received), 1)
     context.first_case = context.messages_received[0]['payload']['collectionCase']
-
 
     test_helper.assertEqual(context.first_case['id'], context.first_case['id'])
 
@@ -227,7 +228,8 @@ def step_impl(context, qid_type, case_type, country_code, expected_qid):
 
 @when('we get the recceipting qid for "{case_type}" "{address_level}" "{qid_type}" "{country_code}"')
 def set_receipting_qid(context, case_type, address_level, qid_type, country_code):
-    context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
+    context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
+    context.receipting_case = context.loaded_case
 
     if qid_type in ['HH', 'CE1']:
         context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
@@ -268,7 +270,8 @@ def send_receipt(context):
 
 
 @step(
-    'if "{action_instruction_type}" not NONE a msg to field is emitted where ceActualResponse is "{incremented}" with action instruction')
+    'if "{action_instruction_type}" not NONE a msg to field is emitted where ceActualResponse is "{incremented}"'
+    ' with action instruction')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE,
@@ -296,3 +299,40 @@ def check_response_received_logged_against_case(context):
         if case_event['eventType'] == 'RESPONSE_RECEIVED':
             return
     test_helper.fail('Did not find fulfilment request event')
+
+
+@step('the correct events are logged for the loaded case and Ind case as appropriate "{qid_type}" "{case_type}"')
+def check_correct_events_logged_for_receipting_depending_on_qid_type(context, qid_type, case_type):
+    if qid_type in ["HH", "CE1"]:
+        events_expected = "[SAMPLE_LOADED,RESPONSE_RECEIVED]"
+        check_if_event_list_is_exact_match(events_expected, context.loaded_case['id'])
+        return
+
+    if qid_type == 'Cont':
+        events_expected = "[RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED]"
+        check_if_event_list_is_exact_match(events_expected, context.loaded_case['id'])
+        return
+
+    if qid_type == 'Ind':
+        if case_type == "HI":
+            events_expected = "[FULFILMENT_REQUESTED,SAMPLE_LOADED]"
+            check_if_event_list_is_exact_match(events_expected, context.loaded_case['id'])
+
+            check_if_event_list_is_exact_match("[RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED]",
+                                               context.receipting_case['id'])
+            return
+
+        if case_type == "CE":
+            events_expected = "[RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED]"
+            check_if_event_list_is_exact_match(events_expected, context.loaded_case['id'])
+            return
+
+    test_helper.fail(f"qid type {qid_type} and case type {case_type} not mapped to expected event logging logic")
+
+
+@step('the correct events are logged for "{loaded_case_events}" and "{individual_case_events}"')
+def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events):
+    check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
+
+    if len(individual_case_events.replace('[', '').replace(']', '')) > 0:
+        check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])

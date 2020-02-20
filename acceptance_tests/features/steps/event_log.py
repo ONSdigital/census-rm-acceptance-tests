@@ -1,4 +1,3 @@
-import requests
 from behave import step
 from retrying import retry
 
