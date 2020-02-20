@@ -42,7 +42,7 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
 
     if not action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue')
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST} case queue')
 
     for index, case in enumerate(context.expected_cases_for_action):
         if _message_matches(case, action_instruction):
@@ -52,7 +52,9 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
 
             break
     else:
-        test_helper.fail('Found message on Action.Field case queue which did not match any expected sample units')
+        test_helper.fail(
+            f'Found message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST} case queue which did not '
+            f'match any expected sample units')
 
     if not context.expected_cases_for_action:
         ch.stop_consuming()
