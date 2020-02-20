@@ -41,7 +41,8 @@ def before_scenario(context, _):
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
-                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
+                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE,
+                 Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE)
 
 
 def before_tag(_, tag):

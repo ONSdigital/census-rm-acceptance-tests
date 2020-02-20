@@ -52,13 +52,22 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario Outline: Reciepted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
-    When there is a request for individual telephone capture for the case with case type "<case type>" and country "E"
-    Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
-    When the receipt msg is put on the GCP pubsub for the telephone capture qid
-    And a case_updated msg is emitted where ceActualResponse is "<actual responses>" and receipted is "<receipted>"
+    When we get the recceipting qid for "<case type>" "<address level>" "<qid type>" "<country code>"
+    When the receipt msg is put on the GCP pubsub
+    And if "<action instruction>" not NONE a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
+    And if "<action instruction>" not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+    And a response received event is logged against the correct case
 
     Examples:
-      | sample file                   | actual responses | receipted | case type | questionnaire type |
-      | sample_1_english_CE_estab.csv | 1                | False     | CE        | 21                 |
-      | sample_1_english_CE_unit.csv  | 1                | True      | CE        | 21                 |
-
+      | case type | address level | qid type | increment | receipt | action instruction | sample file                   | country code |
+      | HH        | U             | HH       | False     | True    | CLOSE              | sample_1_english_HH_unit.csv  | E            |
+      | HH        | U             | Cont     | False     | False   | NONE               | sample_1_english_HH_unit.csv  | E            |
+      | HI        | U             | Ind      | False     | True    | CLOSE              | sample_1_english_HH_unit.csv  | E            |
+      | CE        | E             | Ind      | True      | False   | CLOSE              | sample_1_english_CE_estab.csv | E            |
+      | CE        | E             | CE1      | False     | True    | CLOSE              | sample_1_english_CE_estab.csv | E            |
+      | CE        | U             | Ind      | True      | AR >= E | CLOSE              | sample_1_english_CE_unit.csv  | E            |
+      | SPG       | E             | HH       | False     | False   | NONE               | sample_1_ni_SPG_estab.csv     | N            |
+      | SPG       | E             | Ind      | False     | False   | NONE               | sample_1_ni_SPG_estab.csv     | N            |
+      | SPG       | U             | HH       | False     | True    | CLOSE              | sample_1_english_SPG_unit.csv | E            |
+      | SPG       | U             | Ind      | False     | False   | NONE               | sample_1_english_SPG_unit.csv | E            |
+      | SPG       | U             | Cont     | False     | False   | NONE               | sample_1_english_SPG_unit.csv | E            |                   
