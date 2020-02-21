@@ -58,15 +58,6 @@ def check_correct_unreceipted_files_on_sftp_server(context, pack_code):
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
-def _msgs_received(ch, method, _properties, body, context, multiplier=1):
-    parsed_body = json.loads(body)
-    context.messages_received.append(parsed_body)
-    ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    if len(context.messages_received) == (len(context.sample_units) * multiplier):
-        ch.stop_consuming()
-
-
 @then('there is a correct "{pack_code}" manifest file for each csv file written')
 def check_manifest_files(context, pack_code):
     logger.debug("checking manifest files exist for csv files")

@@ -1,8 +1,5 @@
 from config import Config
 
-QM_SUPPLIER = 'QM'
-PPO_SUPPLIER = 'PPO'
-
 QM3_2_DATASET = 'QM3.2'
 QM3_3_DATASET = 'QM3.3'
 QM3_4_DATASET = 'QM3.4'

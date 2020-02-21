@@ -17,7 +17,7 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@when("the receipt msg for the created case is put on the GCP pubsub")
+@step("the receipt msg for the created case is put on the GCP pubsub")
 def receipt_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     for uac in context.uac_created_events:
@@ -31,7 +31,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@when("the offline receipt msg for the created case is put on the GCP pubsub")
+@step("the offline receipt msg for the created case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
@@ -39,7 +39,7 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@when("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
+@step("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
 def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.requested_qid
@@ -187,7 +187,7 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
 @step('if required a new qid and case are created for "{case_type}" "{address_level}" "{qid_type}" "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
-    # receipting_case may be over written if a child case is created
+    # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
 
     if qid_type in ['HH', 'CE1']:
