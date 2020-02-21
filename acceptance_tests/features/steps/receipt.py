@@ -229,7 +229,8 @@ def step_impl(context, qid_type, case_type, country_code, expected_qid):
 @when('we get the recceipting qid for "{case_type}" "{address_level}" "{qid_type}" "{country_code}"')
 def set_receipting_qid(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
-    context.receipting_case = context.loaded_case
+    # receipting_case may be over written if a child case is created
+    context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
 
     if qid_type in ['HH', 'CE1']:
         context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
@@ -261,6 +262,9 @@ def set_receipting_qid(context, case_type, address_level, qid_type, country_code
         send_print_fulfilment_request(context, "P_OR_HC1")
         listen_for_ad_hoc_uac_updated_message(context, "11")
         context.qid_to_receipt = context.requested_qid
+        return 
+
+    test_helper.assertFalse(f"Failed to get qid for {qid_type}")
 
 
 @when("the receipt msg is put on the GCP pubsub")
@@ -336,3 +340,19 @@ def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, indi
 
     if len(individual_case_events.replace('[', '').replace(']', '')) > 0:
         check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])
+
+
+@step("a uac_updated msg is emitted with active set to false for the receipted qid")
+def check_uac_updated_msg_sets_receipted_qid_to_unactive(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1,
+                                        type_filter='UAC_UPDATED'))
+
+    test_helper.assertEqual(len(context.messages_received), 1)
+    uac = context.messages_received[0]['payload']['uac']
+    test_helper.assertEqual(uac['caseId'], context.receipting_case['id'])
+    test_helper.assertEquals(uac['questionnaireId'], context.qid_to_receipt)
+    test_helper.assertFalse(uac['active'])

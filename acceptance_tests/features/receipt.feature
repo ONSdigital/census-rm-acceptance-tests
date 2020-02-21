@@ -1,13 +1,6 @@
 Feature: Case processor handles receipt message from pubsub service
   Case LogEvent set on our system
 
-  Scenario: eQ receipt results in UAC updated event sent to RH
-    Given sample file "sample_for_receipting.csv" is loaded successfully
-    When the receipt msg for the created case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "True"
-    And an ActionCancelled event is sent to field work management with addressType "HH"
-    And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
   Scenario: eQ receipt results in UAC updated event sent to RH, simulate missing case_id
     Given sample file "sample_for_receipting.csv" is loaded successfully
@@ -52,10 +45,12 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario Outline: Reciepted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
+#    can the next 2 steps be combined
     When we get the recceipting qid for "<case type>" "<address level>" "<qid type>" "<country>"
     When the receipt msg is put on the GCP pubsub
     Then if "<instruction>" not NONE a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
     And if "<instruction>" not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+    And a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
 
     Examples:
