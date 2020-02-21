@@ -67,10 +67,6 @@ class Config:
     GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
 
     # For test queues
-    RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST = 'case.rh.case.test'
-    RABBITMQ_CASE_TEST_ROUTE = os.getenv('RH_CASE_ROUTING_KEY', 'event.case.*')
-    RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST = 'case.rh.uac.test'
-    RABBITMQ_UAC_TEST_ROUTE = os.getenv('RH_UAC_ROUTING_KEY', "event.uac.*")
     RABBITMQ_RH_EXCHANGE_NAME = os.getenv('RH_EXCHANGE_NAME', "events")
 
     RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE = "RM.Field"

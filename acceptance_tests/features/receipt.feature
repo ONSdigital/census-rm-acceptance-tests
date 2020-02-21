@@ -1,31 +1,35 @@
 Feature: Case processor handles receipt message from pubsub service
-  Case LogEvent set on our system
+
+  Scenario Outline: Reciepted Cases increment ceActualResponses
+    Given sample file "<sample file>" is loaded successfully
+    And if required a new qid and case are created for "<case type>" "<address level>" "<qid type>" "<country>"
+    When the receipt msg is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false for the receipted qid
+    And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
+    Then if "<instruction>" not NONE a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
+    And if "<instruction>" not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+
+    Examples:
+      | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
+      | HH        | U             | HH       | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
+      | HI        | U             | Ind      | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
+      | CE        | E             | Ind      | True      | False   | CLOSE       | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | CE        | E             | CE1      | False     | True    | CLOSE       | sample_1_english_CE_estab.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | CE        | U             | Ind      | True      | AR >= E | CLOSE       | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | SPG       | E             | HH       | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | SPG       | E             | Ind      | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | SPG       | U             | Ind      | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
 
-  Scenario: eQ receipt results in UAC updated event sent to RH, simulate missing case_id
-    Given sample file "sample_for_receipting.csv" is loaded successfully
+  Scenario: Receipted Cases are excluded from print files
+    Given sample file "sample_input_england_census_spec.csv" is loaded successfully
     When the receipt msg for the created case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "True"
-    And an ActionCancelled event is sent to field work management with addressType "HH"
-    And the events logged for the receipted case are [RESPONSE_RECEIVED,SAMPLE_LOADED]
-
-  Scenario: PQRS receipt results in UAC updated event sent to RH
-    Given sample file "sample_for_receipting.csv" is loaded successfully
-    When the offline receipt msg for the created case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "True"
-    And an ActionCancelled event is sent to field work management with addressType "HH"
+    And set action rule of type "ICL1E" when case event "RESPONSE_RECEIVED" is logged
+    Then only unreceipted cases appear in "P_IC_ICL1" print files
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
-  Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
-    Given sample file "sample_for_receipting.csv" is loaded successfully
-    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
-    And a UAC updated message with "11" questionnaire type is emitted
-    When the offline receipt msg for a continuation form from the case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And the events logged for the receipted case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED,RESPONSE_RECEIVED]
-    And no ActionInstruction is sent to FWMT
 
   Scenario: Receipt of unaddressed continuation questionnaire does not send to Field
     Given an unaddressed message of questionnaire type 63 is sent
@@ -35,33 +39,21 @@ Feature: Case processor handles receipt message from pubsub service
     When the offline receipt msg for a continuation form from the case is received
     Then no ActionInstruction is sent to FWMT
 
-  Scenario: Receipted Cases are excluded from print files
-    Given sample file "sample_input_england_census_spec.csv" is loaded successfully
-    When the receipt msg for the created case is put on the GCP pubsub
-    And set action rule of type "ICL1E" when case event "RESPONSE_RECEIVED" is logged
-    Then only unreceipted cases appear in "P_IC_ICL1" print files
+
+  Scenario: PQRS receipt results in UAC updated event sent to RH
+    Given sample file "sample_for_receipting.csv" is loaded successfully
+    When the offline receipt msg for the created case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
+    And an ActionCancelled event is sent to field work management with addressType "HH"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
-  Scenario Outline: Reciepted Cases increment ceActualResponses
-    Given sample file "<sample file>" is loaded successfully
-#    can the next 2 steps be combined
-    When we get the recceipting qid for "<case type>" "<address level>" "<qid type>" "<country>"
-    When the receipt msg is put on the GCP pubsub
-    Then if "<instruction>" not NONE a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
-    And if "<instruction>" not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
-    And a uac_updated msg is emitted with active set to false for the receipted qid
-    And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
 
-    Examples:
-      | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events                               |
-      | HH        | U             | HH       | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                                      |
-      | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                                      |
-      | HI        | U             | Ind      | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED |
-      | CE        | E             | Ind      | True      | False   | CLOSE       | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                                      |
-      | CE        | E             | CE1      | False     | True    | CLOSE       | sample_1_english_CE_estab.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                                      |
-      | CE        | U             | Ind      | True      | AR >= E | CLOSE       | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                                      |
-      | SPG       | E             | HH       | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                                      |
-      | SPG       | E             | Ind      | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                                      |
-      | SPG       | U             | Ind      | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                                      |
-      | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                                      |
+  Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
+    Given sample file "sample_for_receipting.csv" is loaded successfully
+    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
+    And a UAC updated message with "11" questionnaire type is emitted
+    When the offline receipt msg for a continuation form from the case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And the events logged for the receipted case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED,RESPONSE_RECEIVED]
+    And no ActionInstruction is sent to FWMT
