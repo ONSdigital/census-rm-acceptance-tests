@@ -16,7 +16,8 @@ caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 @step("a refusal message for a created case is received")
 def create_refusal(context):
-    context.refused_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.refused_case_id = context.first_case['id']
 
     message = json.dumps(
         {
@@ -75,7 +76,7 @@ def check_case_events(context):
 @step('an action instruction cancel message is emitted to FWMT')
 def refusal_received(context):
     context.seen_expected_fwmt_message = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(_field_work_receipt_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.refused_case_id)

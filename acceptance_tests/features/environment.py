@@ -6,14 +6,12 @@ import requests
 
 from datetime import datetime
 
-from acceptance_tests.utilities.rabbit_helper import add_test_queue, purge_queues
+from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 
 def before_all(_context):
     _setup_google_auth()
-    add_test_queue("", Config.RABBITMQ_OUTBOUND_ADAPTER_EXCHANGE, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
-                   exchange_type='direct')
 
 
 def after_all(_context):
@@ -30,15 +28,11 @@ def before_scenario(context, _):
     purge_queues(Config.RABBITMQ_INBOUND_REFUSAL_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                 Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                  Config.RABBITMQ_SAMPLE_INBOUND_QUEUE,
                  Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE,
                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
                  Config.RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE,
-                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE)
+                 Config.RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE)
 
 
 def before_tag(_, tag):
@@ -52,7 +46,7 @@ def after_tag(_, tag):
 
 
 def _clear_queues_for_bad_messages_and_reset_exception_manager():
-    for i in range(0, 4):
+    for _ in range(4):
         purge_queues(*Config.RABBITMQ_QUEUES, 'delayedRedeliveryQueue', 'RM.Field')
         time.sleep(1)
     time.sleep(5)

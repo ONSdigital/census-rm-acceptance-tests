@@ -1,11 +1,14 @@
 import functools
+import logging
 
 import requests
+from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
+logger = wrap_logger(logging.getLogger(__name__))
 get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
@@ -43,12 +46,15 @@ def get_qid_and_uac_from_emitted_child_uac(context):
         'questionnaireId']
 
 
-def _sample_matches_rh_message(sample_unit, rh_message):
-    return (sample_unit['attributes']['ADDRESS_LINE1'] ==
-            rh_message['payload']['collectionCase']['address']['addressLine1']
-            and sample_unit['attributes']['ADDRESS_LINE2'] ==
-            rh_message['payload']['collectionCase']['address']['addressLine2']
-            and sample_unit['attributes']['REGION'][0] == rh_message['payload']['collectionCase']['address']['region'])
+def _sample_unit_matches_case_event(sample_unit, case_created_event):
+    return (sample_unit['attributes']['ARID'] ==
+            case_created_event['payload']['collectionCase']['address']['arid']
+            and sample_unit['attributes']['ESTAB_ARID'] ==
+            case_created_event['payload']['collectionCase']['address']['estabArid']
+            and sample_unit['attributes']['UPRN'] ==
+            case_created_event['payload']['collectionCase']['address']['uprn']
+            and sample_unit['attributes']['ADDRESS_LEVEL'] ==
+            case_created_event['payload']['collectionCase']['address']['addressLevel'])
 
 
 def _validate_case(parsed_body):
@@ -99,16 +105,21 @@ def _test_uacs_updated_correct(context):
 
 def _test_cases_correct(context):
     context.expected_sample_units = context.sample_units.copy()
+    test_helper.assertEqual(len(context.expected_sample_units), len(context.case_created_events),
+                            'Number of cases loaded and case created events do not match')
 
-    for msg in context.case_created_events:
-        _validate_case(msg)
+    for event in context.case_created_events:
+        _validate_case(event)
 
         for index, sample_unit in enumerate(context.expected_sample_units):
-            if _sample_matches_rh_message(sample_unit, msg):
-                del context.expected_sample_units[index]
+            if _sample_unit_matches_case_event(sample_unit, event):
+                context.expected_sample_units.pop(index)
                 break
         else:
-            test_helper.fail('Could not find sample unit')
+            logger.error('To match case created event to any of the expected sample units',
+                         unmatched_sample_units=context.expected_sample_units,
+                         case_created_event=event)
+            test_helper.fail('Could not find correct case updated messages for all loaded sample units')
 
 
 def get_expected_uac_count(context):

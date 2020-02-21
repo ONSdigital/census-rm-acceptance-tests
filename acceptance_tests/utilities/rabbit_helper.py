@@ -54,14 +54,6 @@ def store_first_message_in_context(ch, method, _properties, body, context, type_
         ch.basic_nack(delivery_tag=method.delivery_tag)
 
 
-def add_test_queue(binding_key, exchange_name, queue_name, exchange_type='topic'):
-    with RabbitContext() as rabbit:
-        rabbit.channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
-        rabbit.channel.queue_declare(queue=queue_name, durable=True)
-        rabbit.channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=binding_key)
-        logger.info('Successfully add test queue to rabbitmq', exchange=exchange_name, binding=binding_key)
-
-
 def purge_queues(*queues):
     with RabbitContext() as rabbit:
         for queue in queues:
