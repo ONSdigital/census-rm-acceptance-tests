@@ -72,7 +72,7 @@ def check_linked_message_is_received(context):
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received(context):
     context.expected_message_received = False
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(_uac_callback, context=context))
 
     test_helper.assertTrue(context.expected_message_received)

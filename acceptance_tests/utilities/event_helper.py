@@ -15,7 +15,7 @@ get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 def check_individual_child_case_is_emitted(context, parent_case_id, individual_case_id):
     context.messages_received = []
 
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=1,
                                                       type_filter='CASE_CREATED'))
@@ -36,7 +36,7 @@ def _get_parent_case_estab_arid(parent_case_id):
 
 def get_qid_and_uac_from_emitted_child_uac(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,
@@ -69,7 +69,7 @@ def get_cases_and_uac_event_messages(context):
 
 def get_and_check_case_created_messages(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.sample_units),
                                                       type_filter='CASE_CREATED'))
@@ -83,7 +83,7 @@ def get_and_check_case_created_messages(context):
 
 
 def get_and_check_uac_updated_messages(context):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=get_expected_uac_count(context),
                                                       type_filter='UAC_UPDATED'))

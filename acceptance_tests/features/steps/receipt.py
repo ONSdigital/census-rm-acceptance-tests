@@ -44,7 +44,7 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,
@@ -60,7 +60,7 @@ def uac_updated_msg_emitted(context):
 @step('an ActionCancelled Invalid Address event is sent to field work management with addressType "{address_type}"')
 def action_cancelled_event_sent_to_fwm(context, address_type):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
         _field_work_receipt_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
@@ -77,7 +77,7 @@ def send_receipt_for_unaddressed(context):
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,
@@ -92,7 +92,7 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
 @step('a case_updated msg is emitted where ceActualResponse is "{actual_responses}" and receipted is "{receipted}"')
 def check_ce_actual_responses_and_receipted(context, actual_responses, receipted):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1,

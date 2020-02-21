@@ -30,7 +30,7 @@ def _check_emitted_action_instructions(context, filter_column, treatment_code, e
     context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
     context.expected_ce1_complete = expected_ce1_complete
 
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(fieldwork_message_callback, context=context))
 
     test_helper.assertFalse(context.expected_cases_for_action,
