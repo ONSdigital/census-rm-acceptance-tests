@@ -31,7 +31,7 @@ def undelivered_ppo_published_to_gcp_pubsub(context):
 @step("an ActionRequest event is sent to field work management")
 def action_request_event_sent_to_fwm(context):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE_TEST, functools.partial(
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
         _field_work_receipt_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
