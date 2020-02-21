@@ -14,7 +14,7 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
     get_and_check_case_created_messages(context)
 
     context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, questionnaire_types)
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=len(context.expected_uacs_cases),
                                                       type_filter='UAC_UPDATED'))
@@ -26,7 +26,7 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
 
 @step('UAC Updated events emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
 def gather_uac_updated_events(context, number_of_matching_cases):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=number_of_matching_cases,
                                                       type_filter='UAC_UPDATED'))
@@ -39,7 +39,7 @@ def gather_uac_updated_events(context, number_of_matching_cases):
 @step('2 UAC Updated events are emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
 def gather_welsh_reminder_uac_events(context, number_of_matching_cases):
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_msgs_in_context, context=context,
                                                       expected_msg_count=number_of_matching_cases * 2,
                                                       type_filter='UAC_UPDATED'))

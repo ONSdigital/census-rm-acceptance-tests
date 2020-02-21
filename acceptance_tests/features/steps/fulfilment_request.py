@@ -235,7 +235,7 @@ def fulfilment_child_case_is_emitted(context):
 
 @step('a supplementary materials fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
 def send_supplementary_materials_fulfilment_requested_event(context, fulfilment_code):
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE_TEST,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_first_message_in_context, context=context,
                                                       type_filter='CASE_CREATED'))
     context.case_created_events = [context.first_message]
