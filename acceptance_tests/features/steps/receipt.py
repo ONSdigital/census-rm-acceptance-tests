@@ -55,9 +55,6 @@ def uac_updated_msg_emitted(context):
     test_helper.assertEqual(uac['caseId'], context.first_case['id'])
     test_helper.assertFalse(uac['active'])
 
-    # Check that the moon is on a stick
-    test_helper.assertIsNotNone(uac['formType'])
-
 
 @step('an ActionCancelled event is sent to field work management with addressType "{address_type}"')
 @step('an ActionCancelled Invalid Address event is sent to field work management with addressType "{address_type}"')
