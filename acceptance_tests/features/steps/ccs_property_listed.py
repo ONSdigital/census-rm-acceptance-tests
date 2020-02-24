@@ -151,6 +151,7 @@ def check_no_msg_sent_fwmt(context):
 
 @step("the CCS case listed event is logged")
 def ccs_case_event_logged(context):
+    # TODO: Remove this and replace checking of msg instead?
     # currently no way of testing refusal set so just test event logged and didn't break anything
     test_helper.assertEqual(context.ccs_case['caseEvents'][0]['eventType'], 'CCS_ADDRESS_LISTED')
 
