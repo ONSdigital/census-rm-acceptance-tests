@@ -1,0 +1,207 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: census-rm-acceptance-tests
+  labels:
+    app: census-rm-acceptance-tests
+    env: dev
+spec:
+  securityContext:
+    fsGroup: 1000
+  containers:
+  - name: census-rm-acceptance-tests
+    lifecycle:
+      postStart:
+        exec:
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp /home/acceptancetests/postgresql/* /home/acceptancetests/.postgresql &&
+              chmod 0600 /home/acceptancetests/.postgresql/postgresql.key
+              # the above is a workaround to get round the permissions as currently we cant mount it without doing this
+    image: eu.gcr.io/census-rm-ryangrundy/rm/census-rm-acceptance-tests:latest
+    tty: true
+    stdin: true
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "128Mi"
+      limits:
+        cpu: "250m"
+        memory: "256Mi"
+    volumeMounts:
+    - name: cloud-sql-certs
+      mountPath: "/home/acceptancetests/postgresql"
+      readOnly: true
+    - name: sftp-keys
+      mountPath: "/home/acceptancetests/.sftp-ssh"
+    - name: gcp-credentials
+      mountPath: "/home/acceptancetests/gcp-credentials"
+    env:
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: username
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-credentials
+          key: password
+    - name: DB_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: db-config
+          key: db-host
+    - name: DB_PORT
+      valueFrom:
+        configMapKeyRef:
+          name: db-config
+          key: db-port
+    - name: DB_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: db-config
+          key: db-name
+    - name: PROJECT_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: project-config
+          key: project-name
+    - name: SFTP_PPO_DIRECTORY
+      valueFrom:
+        configMapKeyRef:
+          key: sftp-ppo-supplier-directory
+          name: project-config
+    - name: SFTP_QM_DIRECTORY
+      valueFrom:
+        configMapKeyRef:
+          key: sftp-qm-supplier-directory
+          name: project-config
+    - name: SENT_PRINT_FILE_BUCKET
+      valueFrom:
+        configMapKeyRef:
+          key: sent-print-file-bucket
+          name: project-config
+    - name: SFTP_HOST
+      valueFrom:
+        secretKeyRef:
+          name: sftp-ssh-credentials
+          key: host
+    - name: SFTP_PORT
+      value: "22"
+    - name: SFTP_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: sftp-ssh-credentials
+          key: username
+    - name: SFTP_PASSPHRASE
+      valueFrom:
+        secretKeyRef:
+          name: sftp-ssh-credentials
+          key: passphrase
+    - name: SFTP_KEY
+      value: "/home/acceptancetests/dummy_keys/dummy_rsa"
+    - name: SFTP_KEY_FILENAME
+      value: "/home/acceptancetests/.sftp-ssh/id_rsa"
+    - name: EXCEPTIONMANAGER_CONNECTION_HOST
+      value: "exception-manager"
+    - name: EXCEPTIONMANAGER_CONNECTION_PORT
+      value: "80"
+    - name: NOTIFY_STUB_HOST
+      value: "notify-stub"
+    - name: NOTIFY_STUB_PORT
+      value: "80"
+    - name: GOOGLE_SERVICE_ACCOUNT_JSON
+      valueFrom:
+        secretKeyRef:
+          name: pubsub-credentials
+          key: service-account-key.json
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      value: "/home/acceptancetests/gcp-credentials/service-account-key.json"
+    - name: SENT_PRINT_FILE_BUCKET
+      valueFrom:
+        configMapKeyRef:
+          key: sent-print-file-bucket
+          name: project-config
+    - name: RABBITMQ_HTTP_PORT
+      value: "15672"
+    - name: RABBITMQ_USER
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq
+          key: rabbitmq-username
+    - name: RABBITMQ_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rabbitmq
+          key: rabbitmq-password
+    - name: RABBITMQ_SERVICE_HOST
+      value: "rabbitmq"
+    - name: RABBITMQ_SERVICE_PORT
+      value: "5672"
+    - name: ACTION_SERVICE_HOST
+      value: "action-scheduler"
+    - name: ACTION_SERVICE_PORT
+      value: "80"
+    - name: CASEAPI_SERVICE_HOST
+      value: "case-api"
+    - name: CASEAPI_SERVICE_PORT
+      value: "80"
+    - name: SFTP_PORT
+      value: "22"
+    - name: RECEIPT_TOPIC_ID
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: receipt-topic-name
+    - name: RECEIPT_TOPIC_PROJECT
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: receipt-topic-project-id
+    - name: OFFLINE_RECEIPT_TOPIC_ID
+      value: "offline-receipt-topic"
+    - name: OFFLINE_RECEIPT_TOPIC_PROJECT
+      valueFrom:
+        configMapKeyRef:
+          name: project-config
+          key: project-name
+    - name: PPO_UNDELIVERED_TOPIC_NAME
+      value: "ppo-undelivered-topic"
+    - name: PPO_UNDELIVERED_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: project-config
+          key: project-name
+    - name: QM_UNDELIVERED_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+            name: project-config
+            key: project-name
+    - name: QM_UNDELIVERED_TOPIC_NAME
+      value: "qm-undelivered-topic"
+  volumes:
+  - name: cloud-sql-certs
+    secret:
+      secretName: cloud-sql-certs
+      defaultMode: 0660
+      items:
+      - key: "root.crt"
+        path: "root.crt"
+      - key: "postgresql.crt"
+        path: "postgresql.crt"
+      - key: "postgresql.key"
+        path: "postgresql.key"
+  - name: gcp-credentials
+    secret:
+      secretName: pubsub-credentials
+  - name: sftp-keys
+    secret:
+      secretName: sftp-ssh-credentials
+      defaultMode: 0400
+      items:
+      - key: private-key
+        path: "id_rsa"

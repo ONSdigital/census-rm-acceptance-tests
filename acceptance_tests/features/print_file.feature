@@ -13,8 +13,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     Examples: Initial contact letter: <pack code>
       | pack code  | action type | questionnaire types | sample file                          |
       | P_IC_ICL1  | ICL1E       | [01]                | sample_input_england_census_spec.csv |
-      | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
-      | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
+#      | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
+#      | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
 
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
