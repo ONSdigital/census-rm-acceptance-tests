@@ -43,7 +43,7 @@ def fieldwork_message_callback(ch, method, _properties, body, context):
     if not action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
-                         f'Action Instruction was "{action_instruction["actionInstruction"]}" but expected "CREATE"')
+                         f'Got "{action_instruction["actionInstruction"]}", wanted "CREATE"')
 
     for index, case in enumerate(context.expected_cases_for_action):
         if _message_matches(case, action_instruction):

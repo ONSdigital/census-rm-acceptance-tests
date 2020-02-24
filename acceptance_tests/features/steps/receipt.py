@@ -111,7 +111,8 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     if not action_close['actionInstruction'] == 'CLOSE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue, wanted CLOSE')
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{action_close["actionInstruction"]}", wanted "CLOSE"')
 
     context.addressType = action_close['addressType']
     context.fwmt_emitted_case_id = action_close['caseId']

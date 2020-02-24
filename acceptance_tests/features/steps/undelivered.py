@@ -44,7 +44,8 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     if not action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue, wanted CREATE')
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{action_instruction["actionInstruction"]}", wanted "CREATE"')
 
     context.addressType = action_instruction['addressType']
     context.fwmt_emitted_case_id = action_instruction['caseId']
