@@ -231,14 +231,14 @@ def send_receipt(context):
     ' with action instruction')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE,
+        check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=0), timeout=3)
         return
 
     context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_RM_TO_FIELD_QUEUE,
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
                                         expected_msg_count=1))
