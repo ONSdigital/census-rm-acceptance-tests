@@ -15,7 +15,7 @@ from config import Config
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-def _send_refusal_msg_to_rabbit(refused_case_id):
+def _send_refusal_msg_to_rabbit(case_id):
     message = json.dumps(
         {
             "event": {
@@ -31,7 +31,7 @@ def _send_refusal_msg_to_rabbit(refused_case_id):
                     "report": "Test refusal",
                     "agentId": None,
                     "collectionCase": {
-                        "id": refused_case_id
+                        "id": case_id
                     },
                     "contact": {
                         "title": "Mr",
