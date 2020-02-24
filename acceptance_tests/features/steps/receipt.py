@@ -80,35 +80,6 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
     test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
 
 
-@step(
-    'if "{action_instruction}" not NONE a case updated event with actual responses is "{incremented}" and receipted '
-    '"{receipted}" for case type "{case_type}"')
-def check_ce_actual_responses_and_receipted(context, action_instruction, incremented, receipted, case_type):
-    if action_instruction == 'NONE':
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=0), timeout=3)
-        return
-
-    emitted_case = _get_emitted_case(context)
-    test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
-
-    # ceActualResponses is not set on HI cases
-    if case_type != "HI":
-        expected_actual_responses = context.receipting_case['ceActualResponses']
-
-        if incremented == 'True':
-            expected_actual_responses = expected_actual_responses + 1
-
-        test_helper.assertEqual(emitted_case['ceActualResponses'], expected_actual_responses)
-
-    if receipted == 'AR >= E':
-        receipted = emitted_case['ceActualResponses'] >= emitted_case['ceExpectedCapacity']
-
-    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
-
-
 def _field_work_receipt_callback(ch, method, _properties, body, context):
     action_close = json.loads(body)
 
@@ -227,7 +198,36 @@ def send_receipt(context):
 
 
 @step(
-    'if "{action_instruction_type}" not NONE a msg to field is emitted where ceActualResponse is "{incremented}"'
+    'if the "{action_instruction}" is not NONE, a case updated event with actual responses is "{incremented}" and '
+    'receipted "{receipted}" for case type "{case_type}"')
+def check_ce_actual_responses_and_receipted(context, action_instruction, incremented, receipted, case_type):
+    if action_instruction == 'NONE':
+        check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=0), timeout=3)
+        return
+
+    emitted_case = _get_emitted_case(context)
+    test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
+
+    # ceActualResponses is not set on HI cases
+    if case_type != "HI":
+        expected_actual_responses = context.receipting_case['ceActualResponses']
+
+        if incremented == 'True':
+            expected_actual_responses = expected_actual_responses + 1
+
+        test_helper.assertEqual(emitted_case['ceActualResponses'], expected_actual_responses)
+
+    if receipted == 'AR >= E':
+        receipted = emitted_case['ceActualResponses'] >= emitted_case['ceExpectedCapacity']
+
+    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
+
+
+@step(
+    'if the "{action_instruction_type}" is not NONE a msg to field is emitted where ceActualResponse is "{incremented}"'
     ' with action instruction')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':

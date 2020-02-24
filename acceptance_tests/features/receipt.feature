@@ -6,8 +6,8 @@ Feature: Case processor handles receipt message from pubsub service
     When the receipt msg is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
-    Then if "<instruction>" not NONE a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
-    And if "<instruction>" not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+    And if the "<instruction>" is not NONE, a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
+    And if the "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
 
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
