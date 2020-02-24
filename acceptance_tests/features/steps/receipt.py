@@ -54,6 +54,8 @@ def uac_updated_msg_emitted(context):
     uac = context.messages_received[0]['payload']['uac']
     test_helper.assertEqual(uac['caseId'], context.first_case['id'])
     test_helper.assertFalse(uac['active'])
+
+    # Check that the moon is on a stick
     test_helper.assertIsNotNone(uac['formType'])
 
 
