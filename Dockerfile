@@ -11,7 +11,6 @@ USER acceptancetests
 
 RUN mkdir /home/acceptancetests/.postgresql
 
-
 COPY --chown=acceptancetests . /home/acceptancetests
 
 

@@ -28,18 +28,17 @@ def poll_until_sample_is_ingested_to_action(context):
     conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST}' "
                             f"password={Config.DB_PASSWORD} port='{Config.DB_PORT}'{Config.DB_USESSL}")
     timeout = time.time() + 60
-
     cur = conn.cursor()
     while True:
         cur.execute(sql_query, (context.action_plan_id,))
         db_result = cur.fetchall()
-        print(db_result)
-        print(context.sample_count)
         if db_result[0][0] == context.sample_count:
             return
         elif time.time() > timeout:
-            test_helper.fail("Number of sample units in the DB is different.", context.action_plan_id)
-        time.sleep(0.5)
+            test_helper.fail(
+                f'For Action-plan {context.action_plan_id}, DB didn\'t have the expected number of sample units. '
+                f'Expected: {context.sample_count}, actual: {db_result[0][0]}')
+        time.sleep(1)
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
