@@ -1,10 +1,8 @@
-import base64
-import json
 import time
 import uuid
-import requests
-
 from datetime import datetime
+
+import requests
 
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config

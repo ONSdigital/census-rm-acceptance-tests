@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: census-rm-acceptance-tests
+  name: acceptance-tests
   labels:
-    app: census-rm-acceptance-tests
+    app: acceptance-tests
     env: dev
 spec:
   securityContext:
     fsGroup: 1000
   containers:
-  - name: census-rm-acceptance-tests
+  - name: acceptance-tests
     lifecycle:
       postStart:
         exec:
