@@ -20,7 +20,7 @@ spec:
               cp /home/acceptancetests/postgresql/* /home/acceptancetests/.postgresql &&
               chmod 0600 /home/acceptancetests/.postgresql/postgresql.key
               # the above is a workaround to get round the permissions as currently we cant mount it without doing this
-    image: eu.gcr.io/census-rm-ryangrundy/rm/census-rm-acceptance-tests:latest
+    image: eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest
     tty: true
     stdin: true
     imagePullPolicy: Always

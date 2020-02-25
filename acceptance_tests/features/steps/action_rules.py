@@ -72,13 +72,7 @@ def setup_treatment_code_classified_action_rule(context, action_type):
 
 @step('a FIELD action rule for address type "{address_type}" is set when loading queues are drained')
 def create_field_action_plan(context, address_type):
-    # _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
-    # _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
     poll_until_sample_is_ingested_to_action(context)
-    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
-    # the sleep is a temporary work around until this is fixed proper
-    # (by checking for all the cases in the action scheduler DB)
-    time.sleep(2)
     build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD')
 
 
