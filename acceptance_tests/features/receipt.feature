@@ -17,6 +17,16 @@ Feature: Case processor handles receipt message from pubsub service
     And an ActionCancelled event is sent to field work management with addressType "HH"
     And the events logged for the receipted case are [RESPONSE_RECEIVED,SAMPLE_LOADED]
 
+  Scenario: eq receipt for CCS case results in UAC updated event sent to RH
+    Given a CCS Property Listed event is sent
+    And the CCS Property Listed case is created with case_type "HH"
+    And the correct ActionInstruction is sent to FWMT
+    When the receipt msg for the created CCS case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And an ActionCancelled event is sent to field work management with addressType "HH"
+    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
+
   Scenario: PQRS receipt results in UAC updated event sent to RH
     Given sample file "sample_for_receipting.csv" is loaded successfully
     When the offline receipt msg for the created case is put on the GCP pubsub

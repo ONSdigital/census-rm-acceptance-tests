@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import requests
 from behave import then, given, step
+from retrying import retry
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -75,13 +76,18 @@ def find_case_by_case_ref(context):
 
 
 @step('the case API returns the CCS QID for the new case')
-def get_ccs_qid_for_case_id(context):
-    response = requests.get(f'{case_api_url}ccs/{context.ccs_case["id"]}/qid')
-    test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
-    response_json = response.json()
+def validate_ccs_qid_for_case_id(context):
+    response_json = get_ccs_qid_for_case_id(context.ccs_case['id'])
     test_helper.assertEqual(response_json['questionnaireId'][0:3],
                             '712', 'CCS QID has incorrect questionnaire type or tranche ID')
     test_helper.assertTrue(response_json['active'])
+
+
+def get_ccs_qid_for_case_id(case_id):
+    response = requests.get(f'{case_api_url}ccs/{case_id}/qid')
+    test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
+    response_json = response.json()
+    return response_json
 
 
 @step('the case API returns the new CCS case by postcode search')

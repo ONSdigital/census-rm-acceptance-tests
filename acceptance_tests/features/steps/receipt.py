@@ -6,6 +6,7 @@ from behave import when, then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
+from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -38,6 +39,15 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.requested_qid
     _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
+@when("the receipt msg for the created CCS case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsub(context):
+    context.first_case = context.ccs_case
+    response = get_ccs_qid_for_case_id(context.ccs_case['id'])
+    questionnaire_id = response['questionnaireId']
+    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
