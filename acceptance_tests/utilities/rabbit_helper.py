@@ -33,7 +33,7 @@ def _timeout_callback(rabbit):
 def store_all_msgs_in_context(ch, method, _properties, body, context, expected_msg_count, type_filter=None):
     parsed_body = json.loads(body)
 
-    if parsed_body['event']['type'] == type_filter or type_filter is None:
+    if type_filter is None or parsed_body['event']['type'] == type_filter:
         context.messages_received.append(parsed_body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
     else:
