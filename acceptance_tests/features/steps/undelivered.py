@@ -28,6 +28,13 @@ def undelivered_ppo_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
+@when("an undelivered mail PPO message is put on GCP pubsub for the CCS case")
+def undelivered_ppo_published_to_gcp_pubsub_for_ccs(context):
+    context.first_case = context.emitted_action_instruction
+    _publish_ppo_undelivered_mail(context, case_ref=context.first_case['caseRef'])
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
 @step("an ActionRequest event is sent to field work management")
 def action_request_event_sent_to_fwm(context):
     context.messages_received = []

@@ -62,14 +62,13 @@ def _send_refusal_msg_to_rabbit(case_id):
 
 @step("a refusal message for the created case is received")
 def create_refusal(context):
-    context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    context.refused_case_id = context.first_case['id']
+    context.refused_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
     _send_refusal_msg_to_rabbit(context.refused_case_id)
 
 
 @step("a refusal message for the created CCS case is received")
-def create_refusal(context):
+def create_ccs_refusal(context):
     context.refused_case_id = context.emitted_action_instruction['caseId']
 
     _send_refusal_msg_to_rabbit(context.refused_case_id)
