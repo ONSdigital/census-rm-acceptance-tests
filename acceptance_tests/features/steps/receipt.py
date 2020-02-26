@@ -7,6 +7,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message
+from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
