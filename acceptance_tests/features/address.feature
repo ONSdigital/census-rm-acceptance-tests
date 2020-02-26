@@ -32,5 +32,5 @@ Feature: Address updates
     And the correct ActionInstruction is sent to FWMT
     When an invalid address message for the CCS case is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And an ActionCancelled Invalid Address event is sent to field work management with addressType "HH"
+    And a CLOSE action instruction is sent to field work management with addressType "HH"
     And the case event log records invalid address
