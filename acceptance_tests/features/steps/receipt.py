@@ -247,6 +247,7 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     msg_to_field = context.messages_received[0]
     test_helper.assertEquals(msg_to_field['caseId'], context.receipting_case['id'])
     test_helper.assertEquals(msg_to_field['actionInstruction'], action_instruction_type)
+    test_helper.assertEqual(msg_to_field['surveyName'], context.receipting_case['survey'])
 
 
 @step('the correct events are logged for "{loaded_case_events}" and "{individual_case_events}"')
