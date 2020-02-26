@@ -15,5 +15,5 @@ Feature: Handle refusal message
     And the correct ActionInstruction is sent to FWMT
     When a refusal message for the created CCS case is received
     Then the case is marked as refused
-    And an action instruction cancel message is emitted to FWMT
+    And a CLOSE action instruction is emitted to FWMT
     And the events logged for the refusal case are [CCS_ADDRESS_LISTED,REFUSAL_RECEIVED]
