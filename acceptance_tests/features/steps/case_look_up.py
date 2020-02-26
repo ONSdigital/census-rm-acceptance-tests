@@ -82,6 +82,8 @@ def get_ccs_qid_for_case_id(context):
     test_helper.assertEqual(response_json['questionnaireId'][0:3],
                             '712', 'CCS QID has incorrect questionnaire type or tranche ID')
     test_helper.assertTrue(response_json['active'])
+    test_helper.assertEqual(response_json['formType'], "H",
+                            f'Expected FormType is "H" but got "{response_json["formType"]}"')
 
 
 @step('the case API returns the new CCS case by postcode search')
