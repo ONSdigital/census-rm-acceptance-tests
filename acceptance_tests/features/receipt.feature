@@ -1,6 +1,6 @@
 Feature: Case processor handles receipt message from pubsub service
 
-  Scenario Outline: Reciepted Cases increment ceActualResponses
+  Scenario Outline: Receipted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for "<case type>" "<address level>" "<qid type>" "<country>"
     When the receipt msg is put on the GCP pubsub

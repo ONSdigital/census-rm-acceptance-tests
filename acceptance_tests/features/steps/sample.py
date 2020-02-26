@@ -12,6 +12,7 @@ from config import Config
 @step('sample file "{sample_file_name}" is loaded')
 def load_sample_file_step(context, sample_file_name):
     sample_units_raw = _load_sample(context, sample_file_name)
+    context.sample_count = len(sample_units_raw)
 
     context.sample_units = [
         json.loads(sample_unit)
@@ -22,6 +23,7 @@ def load_sample_file_step(context, sample_file_name):
 @step('sample file "{sample_file_name}" is loaded successfully')
 def load_sample_file_successfully_step(context, sample_file_name):
     sample_units_raw = _load_sample(context, sample_file_name)
+    context.sample_count = len(sample_units_raw)
 
     context.sample_units = [
         json.loads(sample_unit)

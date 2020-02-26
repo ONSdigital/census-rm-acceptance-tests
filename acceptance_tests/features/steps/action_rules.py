@@ -3,6 +3,7 @@ import time
 import uuid
 from datetime import datetime
 
+import psycopg2
 import requests
 from behave import step
 from retrying import retry
@@ -15,13 +16,29 @@ from config import Config
 
 @step('set action rule of type "{action_type}" when the case loading queues are drained')
 def setup_print_action_rule_once_case_action_is_drained(context, action_type):
-    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
-    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
+    poll_until_sample_is_ingested_to_action(context)
     # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
     # the sleep is a temporary work around until this is fixed proper
     # (by checking for all the cases in the action scheduler DB)
-    time.sleep(1)
     setup_treatment_code_classified_action_rule(context, action_type)
+
+
+def poll_until_sample_is_ingested_to_action(context):
+    sql_query = """SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s"""
+    conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST}' "
+                            f"password={Config.DB_PASSWORD} port='{Config.DB_PORT}'{Config.DB_USESSL}")
+    timeout = time.time() + 60
+    cur = conn.cursor()
+    while True:
+        cur.execute(sql_query, (context.action_plan_id,))
+        db_result = cur.fetchall()
+        if db_result[0][0] == context.sample_count:
+            return
+        elif time.time() > timeout:
+            test_helper.fail(
+                f'For Action-plan {context.action_plan_id}, DB didn\'t have the expected number of sample units. '
+                f'Expected: {context.sample_count}, actual: {db_result[0][0]}')
+        time.sleep(1)
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
@@ -54,12 +71,7 @@ def setup_treatment_code_classified_action_rule(context, action_type):
 
 @step('a FIELD action rule for address type "{address_type}" is set when loading queues are drained')
 def create_field_action_plan(context, address_type):
-    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
-    _wait_for_queue_to_be_drained(Config.RABBITMQ_SAMPLE_TO_ACTION_QUEUE)
-    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
-    # the sleep is a temporary work around until this is fixed proper
-    # (by checking for all the cases in the action scheduler DB)
-    time.sleep(2)
+    poll_until_sample_is_ingested_to_action(context)
     build_and_create_action_rule(context, {'address_type': [address_type]}, 'FIELD')
 
 
