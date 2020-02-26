@@ -17,6 +17,7 @@ paramiko = "*"
 census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v1.3.0"}
 pgpy = "*"
 google-cloud-storage = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.6"
