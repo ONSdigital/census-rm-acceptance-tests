@@ -20,7 +20,6 @@ Feature: Case processor handles receipt message from pubsub service
   Scenario: eq receipt for CCS case results in UAC updated event sent to RH
     Given a CCS Property Listed event is sent
     And the CCS Property Listed case is created with case_type "HH"
-    And the correct ActionInstruction is sent to FWMT
     When the receipt msg for the created CCS case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
