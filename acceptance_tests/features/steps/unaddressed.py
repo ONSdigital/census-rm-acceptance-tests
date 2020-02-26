@@ -44,7 +44,7 @@ def send_individual_linked_message(context):
 
 @step("a Questionnaire Linked message is sent for the CCS case")
 def send_ccs_linked_message(context):
-    context.linked_case_id = context.emitted_action_instruction['caseId']
+    context.linked_case_id = context.case_id
     context.linked_uac = context.expected_uac
 
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)

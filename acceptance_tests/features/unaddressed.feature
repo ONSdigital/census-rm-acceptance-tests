@@ -14,7 +14,6 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
   Scenario: Questionnaire linked to unaddressed CCS case
     Given a CCS Property Listed event is sent
     And the CCS Property Listed case is created with case_type "HH"
-    And the correct ActionInstruction is sent to FWMT
     When an unaddressed message of questionnaire type 01 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     Then a Questionnaire Linked message is sent for the CCS case
