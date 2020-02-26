@@ -4,7 +4,7 @@ Feature: Address updates
     Given sample file "<sample file>" is loaded successfully
     When an invalid address message is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And an ActionCancelled Invalid Address event is sent to field work management with addressType "<address type>"
+    And a CLOSE action instruction is sent to field work management with addressType "<address type>"
     And the case event log records invalid address
 
     Examples:
@@ -18,7 +18,7 @@ Feature: Address updates
     Given sample file "<sample file>" is loaded successfully
     When an invalid address message is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And an ActionCancelled Invalid Address event is sent to field work management with addressType "<address type>"
+    And a CLOSE action instruction is sent to field work management with addressType "<address type>"
     And the case event log records invalid address
 
     Examples:

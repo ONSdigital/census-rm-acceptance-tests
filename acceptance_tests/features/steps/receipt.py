@@ -54,15 +54,15 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(emitted_uac['active'])
 
 
-@step('an ActionCancelled event is sent to field work management with addressType "{address_type}"')
-@step('an ActionCancelled Invalid Address event is sent to field work management with addressType "{address_type}"')
+@step('a CLOSE action instruction is sent to field work management with addressType "{address_type}"')
 def action_cancelled_event_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
-        _field_work_receipt_callback, context=context))
+        _field_work_close_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, address_type)
+    test_helper.assertEqual(context.field_action_close_message['surveyName'], context.first_case['survey'])
 
 
 @step("the offline receipt msg for a continuation form from the case is received")
@@ -80,7 +80,7 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
     test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
 
 
-def _field_work_receipt_callback(ch, method, _properties, body, context):
+def _field_work_close_callback(ch, method, _properties, body, context):
     action_close = json.loads(body)
 
     if not action_close['actionInstruction'] == 'CLOSE':
@@ -90,6 +90,7 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     context.addressType = action_close['addressType']
     context.fwmt_emitted_case_id = action_close['caseId']
+    context.field_action_close_message = action_close
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 

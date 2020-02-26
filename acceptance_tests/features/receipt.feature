@@ -45,7 +45,7 @@ Feature: Case processor handles receipt message from pubsub service
     When the offline receipt msg for the created case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    And an ActionCancelled event is sent to field work management with addressType "HH"
+    And a CLOSE action instruction is sent to field work management with addressType "HH"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
 
