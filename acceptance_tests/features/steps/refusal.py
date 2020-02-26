@@ -87,7 +87,6 @@ def check_case_events(context):
 
 @step('an action instruction cancel message is emitted to FWMT')
 def refusal_received(context):
-    context.seen_expected_fwmt_message = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(_field_work_receipt_callback, context=context))
 

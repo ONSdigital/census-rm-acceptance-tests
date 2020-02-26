@@ -1,8 +1,5 @@
 from config import Config
 
-QM_SUPPLIER = 'QM'
-PPO_SUPPLIER = 'PPO'
-
 QM3_2_DATASET = 'QM3.2'
 QM3_3_DATASET = 'QM3.3'
 QM3_4_DATASET = 'QM3.4'
@@ -31,6 +28,7 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_TB_TBARA1": Config.SFTP_PPO_DIRECTORY,
     "P_TB_TBPOL4": Config.SFTP_PPO_DIRECTORY,
     "P_TB_TBYSH1": Config.SFTP_PPO_DIRECTORY,
+    "P_TB_TBLIT4": Config.SFTP_PPO_DIRECTORY,
     "P_OR_I1": Config.SFTP_QM_DIRECTORY,
     "P_OR_I2": Config.SFTP_QM_DIRECTORY,
     "P_OR_I2W": Config.SFTP_QM_DIRECTORY,
@@ -70,6 +68,7 @@ PACK_CODE_TO_DATASET = {
     "P_TB_TBARA1": PPD1_3_DATASET,
     "P_TB_TBPOL4": PPD1_3_DATASET,
     "P_TB_TBYSH1": PPD1_3_DATASET,
+    "P_TB_TBLIT4": PPD1_3_DATASET,
     "P_OR_I1": QM3_4_DATASET,
     "P_OR_I2": QM3_4_DATASET,
     "P_OR_I2W": QM3_4_DATASET,
@@ -108,6 +107,7 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_TB_TBARA1": 'Translation Booklet for England & Wales - Arabic',
     "P_TB_TBPOL4": 'Translation Booklet for Northern Ireland - Polish',
     "P_TB_TBYSH1": 'Translation Booklet for England & Wales - Yiddish',
+    "P_TB_TBLIT4": 'Translation Booklet for Northern Ireland - Lithuanian',
     "P_OR_I1": 'Individual Questionnaire for England',
     "P_OR_I2": 'Individual Questionnaire for Wales (English)',
     "P_OR_I2W": 'Individual Questionnaire for Wales (Welsh)',

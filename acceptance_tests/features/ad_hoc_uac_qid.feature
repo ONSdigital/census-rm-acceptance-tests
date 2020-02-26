@@ -10,5 +10,5 @@ Feature: A UAC/QID pair can be requested for a case
       | 01                 |
       | 02                 |
       | 04                 |
-      | 37                 |
-      | 99                 |
+      | 34                 |
+      | 83                 |

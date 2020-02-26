@@ -1,17 +1,11 @@
-import base64
-import json
 import time
 import uuid
-import requests
-
 from datetime import datetime
+
+import requests
 
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
-
-
-def before_all(_context):
-    _setup_google_auth()
 
 
 def after_all(_context):
@@ -51,11 +45,3 @@ def _clear_queues_for_bad_messages_and_reset_exception_manager():
         time.sleep(1)
     time.sleep(5)
     requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
-
-
-def _setup_google_auth():
-    if Config.GOOGLE_SERVICE_ACCOUNT_JSON and Config.GOOGLE_APPLICATION_CREDENTIALS:
-        sa_json = json.loads(base64.b64decode(Config.GOOGLE_SERVICE_ACCOUNT_JSON))
-        with open(Config.GOOGLE_APPLICATION_CREDENTIALS, 'w') as credentials_file:
-            json.dump(sa_json, credentials_file)
-        print(f'Created GOOGLE_APPLICATION_CREDENTIALS: {Config.GOOGLE_APPLICATION_CREDENTIALS}')

@@ -52,7 +52,6 @@ def send_ccs_linked_message(context):
 
 def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
-    context.linked_uac = context.uac_created_events[0]['payload']['uac']
 
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
@@ -101,21 +100,6 @@ def _uac_callback(ch, method, _properties, body, context):
     context.expected_questionnaire_id = parsed_body['payload']['uac']['questionnaireId']
     test_helper.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
     context.expected_uac = parsed_body['payload']['uac']['uac']
-    context.expected_message_received = True
-    ch.basic_ack(delivery_tag=method.delivery_tag)
-    ch.stop_consuming()
-
-
-def _questionnaire_linked_callback(ch, method, _properties, body, context):
-    parsed_body = json.loads(body)
-
-    if not parsed_body['event']['type'] == 'UAC_UPDATED':
-        ch.basic_nack(delivery_tag=method.delivery_tag)
-        return
-
-    test_helper.assertEqual(context.linked_uac['questionnaireId'][:2],
-                            parsed_body['payload']['uac']['questionnaireId'][:2])
-    test_helper.assertEqual(context.linked_case['id'], parsed_body['payload']['uac']['caseId'])
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
