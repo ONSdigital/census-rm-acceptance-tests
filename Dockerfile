@@ -9,6 +9,8 @@ COPY Pipfile* /home/acceptancetests/
 RUN pipenv install --system --deploy --dev
 USER acceptancetests
 
+RUN mkdir /home/acceptancetests/.postgresql
+
 COPY --chown=acceptancetests . /home/acceptancetests
 
 

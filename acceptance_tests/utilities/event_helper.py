@@ -62,11 +62,6 @@ def _validate_case(parsed_body):
     test_helper.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
 
 
-def get_cases_and_uac_event_messages(context):
-    get_and_check_case_created_messages(context)
-    get_and_check_uac_updated_messages(context)
-
-
 def get_and_check_case_created_messages(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,

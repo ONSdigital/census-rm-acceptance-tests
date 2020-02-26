@@ -135,7 +135,8 @@ def field_callback(ch, method, _properties, body, context):
 
     if not context.emitted_action_instruction['actionInstruction'] == 'CREATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
-        test_helper.fail('Unexpected message on Action.Field case queue')
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{context.emitted_action_instruction["actionInstruction"]}", wanted "CREATE"')
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
