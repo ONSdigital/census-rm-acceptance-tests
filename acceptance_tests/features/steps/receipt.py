@@ -55,7 +55,7 @@ def uac_updated_msg_emitted(context):
 
 
 @step('a CLOSE action instruction is sent to field work management with addressType "{address_type}"')
-def action_cancelled_event_sent_to_fwm(context, address_type):
+def action_close_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
         _field_work_close_callback, context=context))
