@@ -63,6 +63,7 @@ Feature: Handle fulfilment request events
       | P_TB_TBARA1     |
       | P_TB_TBPOL4     |
       | P_TB_TBYSH1     |
+      | P_TB_TBLIT4     |
 
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
