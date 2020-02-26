@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "066a096dc2b797ba4871c08daa280e47098604173ffe5ce52c0c593a90cd3e21"
+            "sha256": "a9b648c304cbda7c1b4f3e26d0724c4f3ddf8eff9a06218ceff83d1dcdec68cd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -58,7 +58,7 @@
         "census-rm-sample-loader": {
             "editable": true,
             "git": "https://github.com/ONSdigital/census-rm-sample-loader",
-            "ref": "d8eb40655499f3ac81a9724a49d0751ecf611fe6"
+            "ref": "27e84fb96a660e325ded278c9a20b4814298945c"
         },
         "certifi": {
             "hashes": [
