@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import requests
 from behave import then, given, step
-from retrying import retry
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.test_case_helper import test_helper

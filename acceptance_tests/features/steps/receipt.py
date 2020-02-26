@@ -48,8 +48,8 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@when("the receipt msg for the created CCS case is put on the GCP pubsub")
-def receipt_offline_msg_published_to_gcp_pubsub(context):
+@step("the receipt msg for the created CCS case is put on the GCP pubsub")
+def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.ccs_case
     response = get_ccs_qid_for_case_id(context.ccs_case['id'])
     questionnaire_id = response['questionnaireId']
