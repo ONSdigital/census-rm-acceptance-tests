@@ -11,6 +11,14 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     Then a Questionnaire Linked message is sent
     And a Questionnaire Linked event is logged
 
+  Scenario: Questionnaire linked to unaddressed CCS case
+    Given a CCS Property Listed event is sent
+    And the CCS Property Listed case is created with case_type "HH"
+    When an unaddressed message of questionnaire type 01 is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    Then a Questionnaire Linked message is sent for the CCS case
+    And a Questionnaire Linked event is logged
+
   Scenario: Individual Questionnaire linked to unaddressed
     Given sample file "sample_for_questionnaire_linked.csv" is loaded successfully
     When an unaddressed message of questionnaire type 21 is sent
