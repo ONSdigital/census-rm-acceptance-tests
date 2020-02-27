@@ -51,6 +51,9 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 @step("the receipt msg for the created CCS case is put on the GCP pubsub")
 def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.ccs_case
+
+    # TODO: Shouldn't have mutate here but case-api needs to be aligned to its API
+    context.first_case['survey'] = context.ccs_case['surveyType']
     response = get_ccs_qid_for_case_id(context.ccs_case['id'])
     questionnaire_id = response['questionnaireId']
     _publish_object_finalize(context, questionnaire_id=questionnaire_id)

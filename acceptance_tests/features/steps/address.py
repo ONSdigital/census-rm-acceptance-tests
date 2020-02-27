@@ -21,6 +21,9 @@ def invalid_address_message(context, sender):
 def create_ccs_refusal(context, sender):
     context.first_case = context.ccs_case
 
+    # TODO: Shouldn't have mutate here but case-api needs to be aligned to its API
+    context.first_case['survey'] = context.ccs_case['surveyType']
+
     _send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
 
 
