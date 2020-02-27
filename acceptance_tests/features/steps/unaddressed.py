@@ -42,30 +42,18 @@ def send_individual_linked_message(context):
     context.linked_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
 
 
+@step("a Questionnaire Linked message is sent for the CCS case")
+def send_ccs_linked_message(context):
+    context.linked_case_id = context.case_id
+    context.linked_uac = context.expected_uac
+
+    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
+
+
 def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
 
-    questionnaire_linked_message = {
-        'event': {
-            'type': 'QUESTIONNAIRE_LINKED',
-            'source': 'FIELDWORK_GATEWAY',
-            'channel': 'FIELD',
-            "dateTime": "2011-08-12T20:17:46.384Z",
-            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-        },
-        'payload': {
-            'uac': {
-                "caseId": context.linked_case['id'],
-                'questionnaireId': context.expected_questionnaire_id
-            }
-        }
-    }
-
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=json.dumps(questionnaire_linked_message),
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
+    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
 
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
@@ -111,6 +99,7 @@ def _uac_callback(ch, method, _properties, body, context):
     test_helper.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
     context.expected_questionnaire_id = parsed_body['payload']['uac']['questionnaireId']
     test_helper.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
+    context.expected_uac = parsed_body['payload']['uac']['uac']
     context.expected_message_received = True
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
@@ -162,3 +151,26 @@ def check_message_redelivery_rate(context):
     redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
 
     test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
+
+
+def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
+    questionnaire_linked_message = {
+        'event': {
+            'type': 'QUESTIONNAIRE_LINKED',
+            'source': 'FIELDWORK_GATEWAY',
+            'channel': 'FIELD',
+            "dateTime": "2011-08-12T20:17:46.384Z",
+            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        'payload': {
+            'uac': {
+                "caseId": case_id,
+                'questionnaireId': questionnaire_id
+            }
+        }
+    }
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=json.dumps(questionnaire_linked_message),
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)

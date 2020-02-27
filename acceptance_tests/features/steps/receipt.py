@@ -7,6 +7,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message
+from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
@@ -47,6 +48,19 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
+@step("the receipt msg for the created CCS case is put on the GCP pubsub")
+def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
+    context.first_case = context.ccs_case
+
+    # TODO: Other tests match on this key structure. Remove when we've settled on case API fields
+    context.first_case['survey'] = context.ccs_case['surveyType']
+
+    response = get_ccs_qid_for_case_id(context.ccs_case['id'])
+    questionnaire_id = response['questionnaireId']
+    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
 @then("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     emitted_uac = _get_emitted_uac(context)
@@ -54,15 +68,15 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(emitted_uac['active'])
 
 
-@step('an ActionCancelled event is sent to field work management with addressType "{address_type}"')
-@step('an ActionCancelled Invalid Address event is sent to field work management with addressType "{address_type}"')
-def action_cancelled_event_sent_to_fwm(context, address_type):
+@step('a CLOSE action instruction is sent to field work management with addressType "{address_type}"')
+def action_close_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
-        _field_work_receipt_callback, context=context))
+        _field_work_close_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, address_type)
+    test_helper.assertEqual(context.field_action_close_message['surveyName'], context.first_case['survey'])
 
 
 @step("the offline receipt msg for a continuation form from the case is received")
@@ -80,7 +94,7 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value)
     test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
 
 
-def _field_work_receipt_callback(ch, method, _properties, body, context):
+def _field_work_close_callback(ch, method, _properties, body, context):
     action_close = json.loads(body)
 
     if not action_close['actionInstruction'] == 'CLOSE':
@@ -90,6 +104,7 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 
     context.addressType = action_close['addressType']
     context.fwmt_emitted_case_id = action_close['caseId']
+    context.field_action_close_message = action_close
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
@@ -246,6 +261,7 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     msg_to_field = context.messages_received[0]
     test_helper.assertEquals(msg_to_field['caseId'], context.receipting_case['id'])
     test_helper.assertEquals(msg_to_field['actionInstruction'], action_instruction_type)
+    test_helper.assertEqual(msg_to_field['surveyName'], context.receipting_case['survey'])
 
 
 @step('the correct events are logged for "{loaded_case_events}" and "{individual_case_events}"')

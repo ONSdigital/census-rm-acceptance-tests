@@ -3,9 +3,10 @@ import json
 
 import requests
 from behave import step
+from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.receipt import _field_work_receipt_callback
+from acceptance_tests.features.steps.receipt import _field_work_close_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -14,11 +15,7 @@ from config import Config
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@step("a refusal message for a created case is received")
-def create_refusal(context):
-    context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    context.refused_case_id = context.first_case['id']
-
+def _send_refusal_msg_to_rabbit(case_id):
     message = json.dumps(
         {
             "event": {
@@ -34,7 +31,7 @@ def create_refusal(context):
                     "report": "Test refusal",
                     "agentId": None,
                     "collectionCase": {
-                        "id": context.refused_case_id
+                        "id": case_id
                     },
                     "contact": {
                         "title": "Mr",
@@ -63,7 +60,22 @@ def create_refusal(context):
             routing_key=Config.RABBITMQ_REFUSAL_ROUTING_KEY)
 
 
+@step("a refusal message for the created case is received")
+def create_refusal(context):
+    context.refused_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
+
+    _send_refusal_msg_to_rabbit(context.refused_case_id)
+
+
+@step("a refusal message for the created CCS case is received")
+def create_ccs_refusal(context):
+    context.refused_case_id = context.case_id
+
+    _send_refusal_msg_to_rabbit(context.refused_case_id)
+
+
 @step("the case is marked as refused")
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_events(context):
     response = requests.get(f'{caseapi_url}{context.refused_case_id}', params={'caseEvents': True})
     response_json = response.json()
@@ -73,10 +85,10 @@ def check_case_events(context):
     test_helper.fail('Did not find "Refusal Received" event')
 
 
-@step('an action instruction cancel message is emitted to FWMT')
+@step('a CLOSE action instruction is emitted to FWMT')
 def refusal_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(_field_work_receipt_callback, context=context))
+                                    functools.partial(_field_work_close_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.refused_case_id)
     test_helper.assertEqual(context.addressType, 'HH')
