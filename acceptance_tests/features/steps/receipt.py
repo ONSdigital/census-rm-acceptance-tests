@@ -198,11 +198,11 @@ def send_receipt(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@step(
-    'if the "{action_instruction}" is not NONE, a case updated event with actual responses is "{incremented}" and '
-    'receipted "{receipted}" for case type "{case_type}"')
-def check_ce_actual_responses_and_receipted(context, action_instruction, incremented, receipted, case_type):
-    if action_instruction == 'NONE':
+@step('if the case is updated by an "{incremented}" or by a "{receipted}" '
+      'then there should be a case updated message of "{case_type}"')
+def check_ce_actual_responses_and_receipted(context, incremented, receipted, case_type):
+    if receipted == 'False' and incremented == 'False':
+        # The case has not changed, so there's nothing to see here
         check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
@@ -227,9 +227,8 @@ def check_ce_actual_responses_and_receipted(context, action_instruction, increme
     test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
 
 
-@step(
-    'if the "{action_instruction_type}" is not NONE a msg to field is emitted where ceActualResponse is "{incremented}"'
-    ' with action instruction')
+@step('if the "{action_instruction_type}" is not NONE a msg to field is emitted '
+      'where ceActualResponse is "{incremented}" with action instruction')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,

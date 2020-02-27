@@ -6,7 +6,7 @@ Feature: Case processor handles receipt message from pubsub service
     When the receipt msg is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
-    And if the "<instruction>" is not NONE, a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
+    And if the case is updated by an "<increment>" or by a "<receipt>" then there should be a case updated message of "<case type>"
     And if the "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
 
     Examples:
@@ -19,7 +19,7 @@ Feature: Case processor handles receipt message from pubsub service
       | CE        | U             | Ind      | True      | AR >= E | UPDATE      | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | E             | HH       | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | E             | Ind      | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
-      | SPG       | U             | HH       | False     | True    | CLOSE       | sample_1_english_SPG_unit.csv | E       | [SAMPLE_LOADED,RESPONSE_RECEIVED ]                                                      |                                  |
+      | SPG       | U             | HH       | False     | True    | CLOSE       | sample_1_english_SPG_unit.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | U             | Ind      | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
