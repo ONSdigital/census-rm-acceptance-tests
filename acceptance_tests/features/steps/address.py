@@ -18,10 +18,10 @@ def invalid_address_message(context, sender):
 
 
 @step('an invalid address message for the CCS case is sent from "{sender}"')
-def create_ccs_refusal(context, sender):
+def invalid_ccs_address_message(context, sender):
     context.first_case = context.ccs_case
 
-    # TODO: Shouldn't have mutate here but case-api needs to be aligned to its API
+    # TODO: Other tests match on this key structure. Remove when we've settled on case API fields
     context.first_case['survey'] = context.ccs_case['surveyType']
 
     _send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
