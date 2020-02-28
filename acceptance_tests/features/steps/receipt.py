@@ -170,7 +170,6 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
 
     context.sent_to_gcp = True
 
-
 @step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
