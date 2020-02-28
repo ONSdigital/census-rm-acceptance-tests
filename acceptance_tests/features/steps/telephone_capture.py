@@ -6,7 +6,8 @@ from behave import step
 
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted
 from acceptance_tests.utilities.mappings import QUESTIONNAIRE_TYPE_TO_FORM_TYPE
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    store_all_uac_updated_msgs_by_collection_exercise_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -79,9 +80,10 @@ def check_telephone_capture_uac_and_qid_type(context, questionnaire_type):
 def check_correct_uac_updated_message_is_emitted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=1,
-                                                      type_filter='UAC_UPDATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
 
     uac_updated_payload = context.messages_received[0]['payload']['uac']
     test_helper.assertEqual(uac_updated_payload['caseId'], context.first_case['id'],
@@ -97,9 +99,10 @@ def check_correct_uac_updated_message_is_emitted(context):
 def check_correct_individual_uac_updated_message_is_emitted(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=1,
-                                                      type_filter='UAC_UPDATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
 
     uac_updated_payload = context.messages_received[0]['payload']['uac']
     test_helper.assertEqual(uac_updated_payload['caseId'], context.individual_case_id,

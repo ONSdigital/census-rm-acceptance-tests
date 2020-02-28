@@ -4,7 +4,8 @@ import logging
 import requests
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    store_all_case_created_msgs_by_collection_exercise_id, store_all_uac_updated_msgs_by_collection_exercise_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -16,9 +17,10 @@ def check_individual_child_case_is_emitted(context, parent_case_id, individual_c
     context.messages_received = []
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_case_created_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=1,
-                                                      type_filter='CASE_CREATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEqual(len(context.messages_received), 1)
     child_case_arid = context.messages_received[0]['payload']['collectionCase']['address']['estabArid']
     parent_case_arid = _get_parent_case_estab_arid(parent_case_id)
@@ -38,9 +40,9 @@ def get_qid_and_uac_from_emitted_child_uac(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(
-                                        store_all_msgs_in_context, context=context,
+                                        store_all_uac_updated_msgs_by_collection_exercise_id, context=context,
                                         expected_msg_count=1,
-                                        type_filter='UAC_UPDATED'))
+                                        collection_exercise_id=context.collection_exercise_id))
 
     return context.messages_received[0]['payload']['uac']['uac'], context.messages_received[0]['payload']['uac'][
         'questionnaireId']
@@ -65,9 +67,10 @@ def _validate_case(parsed_body):
 def get_and_check_case_created_messages(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_case_created_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=len(context.sample_units),
-                                                      type_filter='CASE_CREATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
     context.case_created_events = context.messages_received.copy()
     _test_cases_correct(context)
     context.messages_received = []
@@ -79,9 +82,10 @@ def get_and_check_case_created_messages(context):
 
 def get_and_check_uac_updated_messages(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=get_expected_uac_count(context),
-                                                      type_filter='UAC_UPDATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
     context.uac_created_events = context.messages_received.copy()
     _test_uacs_updated_correct(context)
     context.messages_received = []
