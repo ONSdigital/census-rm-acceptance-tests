@@ -4,7 +4,8 @@ import json
 import requests
 from behave import then, when, step
 
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    store_all_uac_updated_msgs_by_collection_exercise_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -43,9 +44,10 @@ def generate_uacqid_pair(context):
 def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=1,
-                                                      type_filter='UAC_UPDATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
     uac_updated_event = context.messages_received[0]
     test_helper.assertEqual(uac_updated_event['payload']['uac']['caseId'], context.first_case['id'],
                             'Fulfilment request UAC updated event found with wrong case ID')
@@ -69,9 +71,10 @@ def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
 def listen_for_two_ad_hoc_uac_updated_messages(context, questionnaire_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                                    functools.partial(store_all_msgs_in_context, context=context,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
                                                       expected_msg_count=2,
-                                                      type_filter='UAC_UPDATED'))
+                                                      collection_exercise_id=context.collection_exercise_id))
     uac_updated_events = context.messages_received
 
     test_helper.assertEqual(len(uac_updated_events), len(context.print_cases),

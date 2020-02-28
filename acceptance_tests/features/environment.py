@@ -18,7 +18,6 @@ def before_scenario(context, _):
     context.test_start_local_datetime = datetime.now()
     context.collection_exercise_id = str(uuid.uuid4())
     context.action_plan_id = str(uuid.uuid4())
-    context.collection_exercise_id = str(uuid.uuid4())
     purge_queues(Config.RABBITMQ_INBOUND_REFUSAL_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
