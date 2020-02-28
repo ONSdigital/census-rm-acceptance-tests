@@ -2,12 +2,12 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario Outline: Receipted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for "<case type>" "<address level>" "<qid type>" "<country>"
+    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     When the receipt msg is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
-    And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
-    And if the case is updated by an "<increment>" or by a "<receipt>" then there should be a case updated message of "<case type>"
-    And if the "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+    And the correct events are logged for loaded case events "[<loaded case events>]" and individual case events "[<individual case events>]"
+    And if the actual response count is incremented "<increment>" or the case is marked receipted "<receipt>" then there should be a case updated message of case type "<case type>"
+    And if the field instruction "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is incremented "<increment>"
 
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
@@ -31,6 +31,7 @@ Feature: Case processor handles receipt message from pubsub service
     Then only unreceipted cases appear in "P_IC_ICL1" print files
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
+
   Scenario: Receipt of unaddressed continuation questionnaire does not send to Field
     Given an unaddressed message of questionnaire type 63 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
@@ -39,23 +40,15 @@ Feature: Case processor handles receipt message from pubsub service
     When the offline receipt msg for a continuation form from the case is received
     Then no ActionInstruction is sent to FWMT
 
-  Scenario: eq receipt for CCS case results in UAC updated event sent to RH
-    Given a CCS Property Listed event is sent
-    And the CCS Property Listed case is created with case_type "HH"
-    And the correct ActionInstruction is sent to FWMT
-    When the receipt msg for the created CCS case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "True"
-    And a CLOSE action instruction is sent to field work management with addressType "HH"
-    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
 
   Scenario: PQRS receipt results in UAC updated event sent to RH
     Given sample file "sample_for_receipting.csv" is loaded successfully
     When the offline receipt msg for the created case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    And a CLOSE action instruction is sent to field work management with addressType "HH"
+    And an ActionCancelled event is sent to field work management with addressType "HH"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
+
 
   Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
     Given sample file "sample_for_receipting.csv" is loaded successfully

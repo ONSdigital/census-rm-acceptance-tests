@@ -171,7 +171,8 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
     context.sent_to_gcp = True
 
 
-@step('if required a new qid and case are created for "{case_type}" "{address_level}" "{qid_type}" "{country_code}"')
+@step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+      ' qid type "{qid_type}" and country "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
@@ -213,8 +214,8 @@ def send_receipt(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@step('if the case is updated by an "{incremented}" or by a "{receipted}" '
-      'then there should be a case updated message of "{case_type}"')
+@step('if the actual response count is incremented "{incremented}" or the case is marked receipted "{receipted}" '
+      'then there should be a case updated message of case type "{case_type}"')
 def check_ce_actual_responses_and_receipted(context, incremented, receipted, case_type):
     if receipted == 'False' and incremented == 'False':
         # The case has not changed, so there's nothing to see here
@@ -242,8 +243,8 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
     test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
 
 
-@step('if the "{action_instruction_type}" is not NONE a msg to field is emitted '
-      'where ceActualResponse is "{incremented}" with action instruction')
+@step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted'
+      ' where ceActualResponse is incremented "{incremented}"')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
@@ -264,7 +265,8 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     test_helper.assertEqual(msg_to_field['surveyName'], context.receipting_case['survey'])
 
 
-@step('the correct events are logged for "{loaded_case_events}" and "{individual_case_events}"')
+@step('the correct events are logged for loaded case events "{loaded_case_events}" '
+      'and individual case events "{individual_case_events}"')
 def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
 
