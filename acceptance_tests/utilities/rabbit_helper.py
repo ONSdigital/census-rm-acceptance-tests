@@ -44,6 +44,39 @@ def store_all_msgs_in_context(ch, method, _properties, body, context, expected_m
         ch.stop_consuming()
 
 
+def store_all_case_created_msgs_by_collection_exercise_id(ch, method, _properties, body, context, expected_msg_count,
+                                                          collection_exercise_id):
+    parsed_body = json.loads(body)
+
+    if (parsed_body['event']['type'] == 'CASE_CREATED' and
+            parsed_body['payload']['collectionCase']['collectionExerciseId'] == collection_exercise_id):
+        context.messages_received.append(parsed_body)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+    else:
+        # take it, ignore it?
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+
+    if len(context.messages_received) == expected_msg_count:
+        ch.stop_consuming()
+
+
+def store_all_uac_updated_msgs_by_collection_exercise_id(ch, method, _properties, body, context, expected_msg_count,
+                                                         collection_exercise_id):
+    parsed_body = json.loads(body)
+
+    if (parsed_body['event']['type'] == 'UAC_UPDATED' and
+            parsed_body['payload']['uac']['collectionExerciseId'] == collection_exercise_id):
+        context.messages_received.append(parsed_body)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+    else:
+        # take it, ignore it?
+
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+
+    if len(context.messages_received) == expected_msg_count:
+        ch.stop_consuming()
+
+
 def store_first_message_in_context(ch, method, _properties, body, context, type_filter=None):
     parsed_body = json.loads(body)
     if parsed_body['event']['type'] == type_filter or type_filter is None:
