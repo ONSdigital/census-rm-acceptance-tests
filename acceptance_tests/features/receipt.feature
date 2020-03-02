@@ -2,23 +2,24 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario Outline: Receipted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for "<case type>" "<address level>" "<qid type>" "<country>"
+    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     When the receipt msg is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
-    And the correct events are logged for "[<loaded case events>]" and "[<individual case events>]"
-    And if the "<instruction>" is not NONE, a case updated event with actual responses is "<increment>" and receipted "<receipt>" for case type "<case type>"
-    And if the "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is "<increment>" with action instruction
+    And the correct events are logged for loaded case events "[<loaded case events>]" and individual case events "[<individual case events>]"
+    And if the actual response count is incremented "<increment>" or the case is marked receipted "<receipt>" then there should be a case updated message of case type "<case type>"
+    And if the field instruction "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is incremented "<increment>"
 
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
       | HH        | U             | HH       | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
-      | HI        | U             | Ind      | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
-      | CE        | E             | Ind      | True      | False   | CLOSE       | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
-      | CE        | E             | CE1      | False     | True    | CLOSE       | sample_1_english_CE_estab.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
-      | CE        | U             | Ind      | True      | AR >= E | CLOSE       | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | HI        | U             | Ind      | False     | True    | NONE        | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
+      | CE        | E             | Ind      | True      | False   | UPDATE      | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | CE        | E             | CE1      | False     | True    | UPDATE      | sample_1_english_CE_estab.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | CE        | U             | Ind      | True      | AR >= E | UPDATE      | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | E             | HH       | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | E             | Ind      | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | SPG       | U             | HH       | False     | True    | CLOSE       | sample_1_english_SPG_unit.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | U             | Ind      | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
