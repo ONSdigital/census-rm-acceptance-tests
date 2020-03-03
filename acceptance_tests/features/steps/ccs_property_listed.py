@@ -103,14 +103,14 @@ def _send_ccs_case_list_msg_to_rabbit(message):
             routing_key=Config.RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY)
 
 
-@step('the CCS Property Listed case is created with case_type "{case_type}"')
+@step('the CCS Property Listed case is created with address_type "{address_type}"')
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_case_created(context, case_type):
+def check_case_created(context, address_type):
     response = requests.get(f'{caseapi_url}{context.case_id}', params={'caseEvents': True})
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
     context.ccs_case = response.json()
-    test_helper.assertEqual(context.ccs_case['caseType'], case_type)
+    test_helper.assertEqual(context.ccs_case['addressType'], address_type)
 
 
 @step("the correct ActionInstruction is sent to FWMT")

@@ -13,11 +13,11 @@ from config import Config
 
 
 @step('there is a request for telephone capture for an address level "{address_level}" case '
-      'with case type "{case_type}" and country "{country_code}"')
-def request_telephone_capture_qid_uac(context, address_level, case_type, country_code):
+      'with address type "{address_type}" and country "{country_code}"')
+def request_telephone_capture_qid_uac(context, address_level, address_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    _check_case_type_country_address_level(context.first_case, case_type, country_code, address_level=address_level)
+    _check_address_type_country_address_level(context.first_case, address_type, country_code, address_level=address_level)
     response = requests.get(f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid")
     test_helper.assertEqual(response.status_code, 200)
 
@@ -25,11 +25,11 @@ def request_telephone_capture_qid_uac(context, address_level, case_type, country
 
 
 @step('there is a request for individual telephone capture for the case '
-      'with case type "{case_type}" and country "{country_code}"')
-def request_individual_telephone_capture(context, case_type, country_code):
+      'with address type "{address_type}" and country "{country_code}"')
+def request_individual_telephone_capture(context, address_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    _check_case_type_country(context.first_case, case_type, country_code)
+    _check_address_type_country(context.first_case, address_type, country_code)
 
     response = requests.get(
         f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid?individual=true")
@@ -39,7 +39,7 @@ def request_individual_telephone_capture(context, case_type, country_code):
 
 
 @step('there is a request for a new HI case for telephone capture for the parent case '
-      'with case type "{case_type}" and country "{country_code}"')
+      'with address type "{address_type}" and country "{country_code}"')
 def request_hi_individual_telephone_capture(context, case_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.telephone_capture_parent_case_id = context.first_case['id']

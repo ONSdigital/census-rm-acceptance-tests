@@ -133,7 +133,7 @@ def check_census_case_fields(context):
     test_helper.assertTrue(context.case_details['msoa'])
     test_helper.assertTrue(context.case_details['lad'])
     test_helper.assertTrue(context.case_details['id'])
-    test_helper.assertTrue(context.case_details['caseType'])
+    test_helper.assertTrue(context.case_details['addressType'])
     test_helper.assertEqual(context.case_details['surveyType'], "CENSUS")
     test_helper.assertFalse(context.case_details['handDelivery'])
 
@@ -164,7 +164,7 @@ def check_ccs_case_fields(context):
     test_helper.assertFalse(context.ccs_case['msoa'])
     test_helper.assertFalse(context.ccs_case['lad'])
     test_helper.assertTrue(context.ccs_case['id'])
-    test_helper.assertTrue(context.ccs_case['caseType'])
+    test_helper.assertTrue(context.ccs_case['addressType'])
     test_helper.assertFalse(context.ccs_case['handDelivery'])
 
 
