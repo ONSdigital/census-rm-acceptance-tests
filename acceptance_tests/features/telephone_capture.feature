@@ -25,11 +25,11 @@ Feature: Telephone capture
 
   Scenario Outline: Generate and link new HI case and correct QID type for HI individual telephone capture requests
     Given sample file "<sample file>" is loaded successfully
-    When there is a request for a new HI case for telephone capture for the parent case with address type "<ad type>" and country "<country code>"
+    When there is a request for a new HI case for telephone capture for the parent case with address type "<address type>" and country "<country code>"
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
     And a new individual child case for telephone capture is emitted to RH and Action Scheduler
     And a UAC updated event is emitted linking the new UAC and QID to the individual case
-
+sss
     Examples:
       | sample file                  | address type | country code | questionnaire type |
       | sample_1_english_HH_unit.csv | HH           | E            | 21                 |
