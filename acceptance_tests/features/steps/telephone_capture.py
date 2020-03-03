@@ -17,7 +17,8 @@ from config import Config
 def request_telephone_capture_qid_uac(context, address_level, address_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.fulfilment_requested_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    _check_address_type_country_address_level(context.first_case, address_type, country_code, address_level=address_level)
+    _check_address_type_country_address_level(context.first_case, address_type, country_code,
+                                              address_level=address_level)
     response = requests.get(f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid")
     test_helper.assertEqual(response.status_code, 200)
 
@@ -40,11 +41,11 @@ def request_individual_telephone_capture(context, address_type, country_code):
 
 @step('there is a request for a new HI case for telephone capture for the parent case '
       'with address type "{address_type}" and country "{country_code}"')
-def request_hi_individual_telephone_capture(context, case_type, country_code):
+def request_hi_individual_telephone_capture(context, address_type, country_code):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.telephone_capture_parent_case_id = context.first_case['id']
     context.individual_case_id = str(uuid.uuid4())
-    _check_case_type_country_address_level(context.first_case, case_type, country_code)
+    _check_address_type_country_address_level(context.first_case, address_type, country_code)
     response = requests.get(
         f"{Config.CASEAPI_SERVICE}/cases/{context.first_case['id']}/qid"
         f"?individual=true"
@@ -54,17 +55,17 @@ def request_hi_individual_telephone_capture(context, case_type, country_code):
     context.telephone_capture_qid_uac = response.json()
 
 
-def _check_case_type_country_address_level(case, case_type, country_code, address_level='U'):
-    _check_case_type_country(case, case_type, country_code)
+def _check_address_type_country_address_level(case, address_type, country_code, address_level='U'):
+    _check_address_type_country(case, address_type, country_code)
     test_helper.assertEqual(address_level, case['address']['addressLevel'],
                             'Loaded case does does not have unit address level')
 
 
-def _check_case_type_country(case, case_type, country_code):
+def _check_address_type_country(case, address_type, country_code):
     test_helper.assertEqual(country_code, case['treatmentCode'][-1],
                             'Loaded case does not match expected nationality')
-    test_helper.assertEqual(case_type, case['treatmentCode'].split('_')[0],
-                            'Loaded case does not match expected case type')
+    test_helper.assertEqual(address_type, case['treatmentCode'].split('_')[0],
+                            'Loaded case does not match expected address type')
 
 
 @step('a UAC and QID with questionnaire type "{questionnaire_type}" type are generated and returned')

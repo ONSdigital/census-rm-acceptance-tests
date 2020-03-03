@@ -45,7 +45,7 @@ def send_ccs_property_listed_event_with_refusal(context):
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
-@step('a CCS Property Listed event is sent with an address invalid event and addressType "{address_type}"')
+@step('a CCS Property Listed event is sent with an address invalid event and address type "{address_type}"')
 def send_ccs_property_listed_event_with_invalid_address(context, address_type):
     message = _create_ccs_property_listed_event(context, address_type)
     message['payload']['CCSProperty']['invalidAddress'] = {
@@ -103,7 +103,7 @@ def _send_ccs_case_list_msg_to_rabbit(message):
             routing_key=Config.RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY)
 
 
-@step('the CCS Property Listed case is created with address_type "{address_type}"')
+@step('the CCS Property Listed case is created with address type "{address_type}"')
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_created(context, address_type):
     response = requests.get(f'{caseapi_url}{context.case_id}', params={'caseEvents': True})
