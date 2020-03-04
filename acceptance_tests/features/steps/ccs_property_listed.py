@@ -26,9 +26,9 @@ def send_ccs_property_listed_event(context):
 @step("a CCS Property Listed event is sent with a qid")
 def send_ccs_property_listed_event_with_qid(context):
     message = _create_ccs_property_listed_event(context)
-    message['payload']['CCSProperty']['uac'] = {
+    message['payload']['CCSProperty']['uac'] = [{
         "questionnaireId": context.expected_questionnaire_id
-    }
+    }]
 
     _send_ccs_case_list_msg_to_rabbit(message)
 
