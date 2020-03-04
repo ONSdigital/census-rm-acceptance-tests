@@ -68,7 +68,7 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(emitted_uac['active'])
 
 
-@step('a CLOSE action instruction is sent to field work management with addressType "{address_type}"')
+@step('a CLOSE action instruction is sent to field work management with address type "{address_type}"')
 def action_close_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(

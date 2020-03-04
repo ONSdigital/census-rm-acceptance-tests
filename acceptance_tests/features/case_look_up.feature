@@ -31,5 +31,5 @@ Feature: Case look up for the contact centre
 
   Scenario: Check case-api returns correct fields for a CCS case
     When a CCS Property Listed event is sent
-    Then the CCS Property Listed case is created with case_type "HH"
+    Then the CCS Property Listed case is created with address type "HH"
     And it contains the correct fields for a CCS case
