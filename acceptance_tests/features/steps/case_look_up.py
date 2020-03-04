@@ -1,10 +1,8 @@
 import json
 import logging
-from random import randint
-from uuid import uuid4
 
 import requests
-from behave import then, given, step
+from behave import then, step
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -20,34 +18,6 @@ def get_case_by_id(context):
     response = requests.get(f'{case_api_url}{case_id}')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.case_details = response.json()
-
-
-@given('a random caseId is generated')
-def generate_random_uuid(context):
-    dummy_case_id = uuid4()
-    context.test_endpoint_with_non_existent_value = dummy_case_id
-    logger.info(f'Dummy caseId = {dummy_case_id}')
-
-
-@given('a random uprn is generated')
-def generate_random_uprn(context):
-    random_uprn = randint(15000000000, 19999999999)
-    context.test_endpoint_with_non_existent_value = f'uprn/{random_uprn}'
-    logger.info(f'Dummy uprn = {random_uprn}')
-
-
-@given('a random caseRef is generated')
-def generate_random_case_ref(context):
-    random_case_ref = randint(15000000, 19999999)
-    context.test_endpoint_with_non_existent_value = f'ref/{random_case_ref}'
-    logger.info(f'Dummy caseRef = {random_case_ref}')
-
-
-@then('case API should return a 404 when queried')
-def get_non_existent_case_id(context):
-    response = requests.get(f'{case_api_url}{context.test_endpoint_with_non_existent_value}')
-
-    test_helper.assertEqual(response.status_code, 404, 'A case was returned when none were expected')
 
 
 @then('case API returns multiple cases for a UPRN')
