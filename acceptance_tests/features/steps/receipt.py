@@ -170,9 +170,9 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
 
     context.sent_to_gcp = True
 
-@step('if required a new qid and case are created for address type "{address_type}" address level "{address_level}"'
+@step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
-def get_new_qid_and_case_as_required(context, address_type, address_level, qid_type, country_code):
+def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
@@ -182,7 +182,7 @@ def get_new_qid_and_case_as_required(context, address_type, address_level, qid_t
         return
 
     if qid_type == 'Ind':
-        if address_type == 'HI':
+        if case_type == 'HI':
             request_hi_individual_telephone_capture(context, "HH", country_code)
             context.qid_to_receipt = context.telephone_capture_qid_uac['questionnaireId']
             context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
@@ -193,7 +193,7 @@ def get_new_qid_and_case_as_required(context, address_type, address_level, qid_t
 
             return
         else:
-            request_individual_telephone_capture(context, address_type, country_code)
+            request_individual_telephone_capture(context, case_type, country_code)
             context.qid_to_receipt = context.telephone_capture_qid_uac['questionnaireId']
             check_correct_uac_updated_message_is_emitted(context)
             return
@@ -214,8 +214,8 @@ def send_receipt(context):
 
 
 @step('if the actual response count is incremented "{incremented}" or the case is marked receipted "{receipted}" '
-      'then there should be a case updated message of address type "{address_type}"')
-def check_ce_actual_responses_and_receipted(context, incremented, receipted, address_type):
+      'then there should be a case updated message of case type "{case_type}"')
+def check_ce_actual_responses_and_receipted(context, incremented, receipted, case_type):
     if receipted == 'False' and incremented == 'False':
         # The case has not changed, so there's nothing to see here
         check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
@@ -228,7 +228,7 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, add
     test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
 
     # ceActualResponses is not set on HI cases
-    if address_type != "HI":
+    if case_type != "HI":
         expected_actual_responses = context.receipting_case['ceActualResponses']
 
         if incremented == 'True':
