@@ -13,6 +13,7 @@ install:
   - pipenv install --dev --deploy
 
 script:
+  - make package_vulnerability
   - make flake
   - make build
 
