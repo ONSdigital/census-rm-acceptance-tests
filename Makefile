@@ -2,7 +2,7 @@ install:
 	pipenv install --dev
 
 package_vulnerability:
-	pipenv check
+	pipenv check --ignore 37752
 
 flake:
 	pipenv run flake8 .
