@@ -1,6 +1,6 @@
 import functools
 import logging
-from luhn import verify
+import luhn
 
 import requests
 from structlog import wrap_logger
@@ -65,7 +65,7 @@ def _validate_case(parsed_body):
     actual_case_ref = parsed_body['payload']['collectionCase']['caseRef']
     test_helper.assertEqual(10, len(actual_case_ref))
 
-    test_helper.assertTrue(verify(actual_case_ref))
+    test_helper.assertTrue(luhn.verify(actual_case_ref))
 
 
 def get_and_check_case_created_messages(context):

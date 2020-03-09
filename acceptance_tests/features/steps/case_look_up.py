@@ -3,11 +3,11 @@ import logging
 
 import requests
 from behave import then, step
+import luhn
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-from luhn import verify
 
 logger = wrap_logger(logging.getLogger(__name__))
 case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
@@ -83,7 +83,7 @@ def get_ccs_case_by_postcode(context):
 def check_census_case_fields(context):
     test_helper.assertTrue(context.case_details['caseRef'])
     test_helper.assertEquals(len(context.case_details['caseRef']), 10)
-    test_helper.assertTrue(verify(context.case_details['caseRef']))
+    test_helper.assertTrue(luhn.verify(context.case_details['caseRef']))
 
     test_helper.assertTrue(context.case_details['arid'])
     test_helper.assertTrue(context.case_details['estabArid'])

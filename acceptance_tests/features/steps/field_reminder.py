@@ -6,7 +6,7 @@ from behave import step
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-from luhn import verify
+import luhn
 
 
 @step('the action instruction messages for only the HH case are emitted to FWMT where the case has a "{filter_column}" '
@@ -77,4 +77,4 @@ def _message_valid(case, action_instruction):
     test_helper.assertEquals(case['handDelivery'], action_instruction['handDeliver'])
     test_helper.assertEquals(case['caseRef'], action_instruction['caseRef'])
     test_helper.assertEquals(len(action_instruction['caseRef']), 10)
-    test_helper.assertTrue(verify(action_instruction['caseRef']))
+    test_helper.assertTrue(luhn.verify(action_instruction['caseRef']))
