@@ -2,6 +2,7 @@ install:
 	pipenv install --dev
 
 package_vulnerability:
+    # Temp disabled due to pipenv bug, being fixed on another ticket
 	#pipenv check
 
 flake:
