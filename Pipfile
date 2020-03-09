@@ -18,6 +18,7 @@ census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
+luhn = "*"
 
 [requires]
 python_version = "3.6"
