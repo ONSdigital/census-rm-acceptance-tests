@@ -19,6 +19,7 @@ pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
 str2bool = "*"
+luhn = "*"
 
 [requires]
 python_version = "3.6"

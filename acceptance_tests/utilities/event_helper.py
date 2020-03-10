@@ -1,5 +1,6 @@
 import functools
 import logging
+import luhn
 
 import requests
 from structlog import wrap_logger
@@ -61,7 +62,10 @@ def _sample_unit_matches_case_event(sample_unit, case_created_event):
 
 def _validate_case(parsed_body):
     test_helper.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
-    test_helper.assertEqual(8, len(parsed_body['payload']['collectionCase']['caseRef']))
+    actual_case_ref = parsed_body['payload']['collectionCase']['caseRef']
+    test_helper.assertEqual(10, len(actual_case_ref))
+
+    test_helper.assertTrue(luhn.verify(actual_case_ref))
 
 
 def get_and_check_case_created_messages(context):
