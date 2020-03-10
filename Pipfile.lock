@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a9b648c304cbda7c1b4f3e26d0724c4f3ddf8eff9a06218ceff83d1dcdec68cd"
+            "sha256": "efef0f0506fc528a9e31d0d728094476c5c02c6861f1b7cbdf43103c43b868cd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -58,7 +58,7 @@
         "census-rm-sample-loader": {
             "editable": true,
             "git": "https://github.com/ONSdigital/census-rm-sample-loader",
-            "ref": "27e84fb96a660e325ded278c9a20b4814298945c"
+            "ref": "2d5a99ec752889498b2e87a9f261e31897e44fd9"
         },
         "certifi": {
             "hashes": [
@@ -211,11 +211,11 @@
         },
         "google-cloud-pubsub": {
             "hashes": [
-                "sha256:19e1eb2976e33675bb7a55ce0bad4bd1b3cd1c591564141a228cdb5bbc4d052b",
-                "sha256:a67c4b1239bc2bfe28f67e147e3e94e486700bd5b2514c797ed008c619627c0c"
+                "sha256:274a7502a7b1ccfb94ad0a24be87a20683dd63152f8c23401a0a9424e8658af2",
+                "sha256:d462019f0139d33eaa0edbf72082ab4c60854d82016b66064d45db1dcfe06a02"
             ],
             "index": "pypi",
-            "version": "==1.3.0"
+            "version": "==1.3.1"
         },
         "google-cloud-storage": {
             "hashes": [
@@ -365,9 +365,9 @@
         },
         "parse": {
             "hashes": [
-                "sha256:95a4f4469e37c57b5e924629ac99926f28bee7da59515dc5b8078c4c3e779249"
+                "sha256:a6d4e2c2f1fbde6717d28084a191a052950f758c0cbd83805357e6575c2b95c0"
             ],
-            "version": "==1.14.0"
+            "version": "==1.15.0"
         },
         "parse-type": {
             "hashes": [
@@ -475,9 +475,10 @@
         },
         "pycparser": {
             "hashes": [
-                "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
+                "sha256:2d475327684562c3a96cc71adf7dc8c4f0565175cf86b6d7a404ff4c771f15f0",
+                "sha256:7582ad22678f0fcd81102833f60ef8d0e57288b6b5fb00323d101be910e35705"
             ],
-            "version": "==2.19"
+            "version": "==2.20"
         },
         "pyflakes": {
             "hashes": [
@@ -547,6 +548,13 @@
                 "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"
             ],
             "version": "==1.14.0"
+        },
+        "str2bool": {
+            "hashes": [
+                "sha256:dbc3c917dca831904bce8568f6fb1f91435fcffc2ec4a46d62c9aa08d7cf77c3"
+            ],
+            "index": "pypi",
+            "version": "==1.1"
         },
         "structlog": {
             "hashes": [
