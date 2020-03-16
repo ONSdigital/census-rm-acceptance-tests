@@ -49,7 +49,7 @@ def find_case_by_case_ref(context):
 def validate_ccs_qid_for_case_id(context):
     response_json = get_ccs_qid_for_case_id(context.ccs_case['id'])
     test_helper.assertEqual(response_json['questionnaireId'][0:3],
-                            '712', 'CCS QID has incorrect questionnaire type or tranche ID')
+                            '713', 'CCS QID has incorrect questionnaire type or tranche ID')
     test_helper.assertTrue(response_json['active'])
     test_helper.assertEqual(response_json['formType'], "H",
                             f'Expected FormType is "H" but got "{response_json["formType"]}"')
