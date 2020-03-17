@@ -19,7 +19,7 @@ def fwmt_messages_received(context, filter_column, expected_value):
 
 @step('the action instruction is emitted to FWMT where case has a "{filter_column}" of "{expected_value}" '
       'and CEComplete is "{expected_ce1_complete}"')
-def fwmt_message_recived_with_ce1_complete(context, filter_column, expected_value, expected_ce1_complete):
+def fwmt_message_received_with_ce1_complete(context, filter_column, expected_value, expected_ce1_complete):
     _check_emitted_action_instructions(context, filter_column, expected_value, expected_ce1_complete)
 
 
