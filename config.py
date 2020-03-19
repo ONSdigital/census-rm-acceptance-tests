@@ -85,7 +85,6 @@ class Config:
                        'FieldworkAdapter.caseUpdated',
                        'action.events',
                        'action.fulfilment',
-                       'action.undeliveredMailQueue',
                        'case.action',
                        'case.ccsPropertyListedQueue',
                        'case.fulfilments',
