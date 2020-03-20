@@ -37,7 +37,6 @@ def _send_refusal_msg_to_rabbit(case_id):
                         "title": "Mr",
                         "forename": "Test",
                         "surname": "Testing",
-                        "email": None,
                         "telNo": "01234123123"
                     },
                     "address": {
@@ -46,7 +45,8 @@ def _send_refusal_msg_to_rabbit(case_id):
                         "addressLine3": "",
                         "townName": "Test Town",
                         "postcode": "XX1 XX1",
-                        "region": "W"
+                        "region": "W",
+                        "uprn": "123456789143"
                     }
                 }
             }
