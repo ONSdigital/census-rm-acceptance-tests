@@ -2,7 +2,7 @@ import functools
 import json
 
 import requests
-from behave import then, when, step
+from behave import when, step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_uac_updated_msgs_by_collection_exercise_id
@@ -28,16 +28,8 @@ def generate_post_request_body(context, questionnaire_type):
                            "caseId": context.first_case['id']}
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     context.response = requests.post(url=caseapi_uacqid_pair_url, data=json.dumps(context.uacqid_json), headers=headers)
-
-
-@then('case API should return a  new UAC and QID with correct questionnaire type')
-def generate_uacqid_pair(context):
-    test_helper.assertEqual(context.response.status_code, 201)
-    response_data = json.loads(context.response.content)
-    test_helper.assertIn('uac', response_data, 'uac missing in response')
-    test_helper.assertIn('qid', response_data, 'qid missing in response')
-    test_helper.assertEqual(context.uacqid_json["questionnaireType"], response_data['qid'][:2],
-                            'Questionnaire type did not match')
+    uac_payload = json.loads(context.response.content)
+    assert uac_payload['uac'].isupper()
 
 
 @step('a UAC updated message with "{questionnaire_type}" questionnaire type is emitted')

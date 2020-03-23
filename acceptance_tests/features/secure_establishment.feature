@@ -11,10 +11,3 @@ Feature: Handle Secure Establishments
     When a FIELD action rule for address type "CE" is set when loading queues are drained
     Then the case can be retrieved from the case API service and has a secureEstablishment value of "false"
     And the action instruction is emitted to FWMT where case has a secureEstablishment value of "false"
-
-  Scenario: secureEstablishment is not present when address type is not CE
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-    When a FIELD action rule for address type "HH" is set when loading queues are drained
-    Then the case can be retrieved from the case API service and has a secureEstablishment value of "false"
-    And the action instruction is emitted to FWMT where case has a secureEstablishment value of "none"
-
