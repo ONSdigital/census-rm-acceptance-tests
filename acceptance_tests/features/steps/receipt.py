@@ -256,7 +256,7 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted'
       ' where ceActualResponse is incremented "{incremented}"')
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
-def check_receipt_to_field_msg(context, action_instruction_type, incremented):
+def check_receipt_to_field_msg(context, action_instruction_type, incremented=None):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
@@ -279,7 +279,7 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
 @step('the correct events are logged for loaded case events "{loaded_case_events}" for blank questionnaire')
-def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events):
+def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events=None):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
 
     if individual_case_events:
