@@ -36,7 +36,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-    _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
@@ -150,7 +150,7 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
-def _publish_offline_receipt(context, channel, unreceipt, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+def _publish_offline_receipt(context, channel='QM', unreceipt=False, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
@@ -181,9 +181,9 @@ def _publish_offline_receipt(context, channel, unreceipt, tx_id="3d14675d-a25d-4
 
 @step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
-@step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+@step('if this is required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}"')
-def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
+def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code=None):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
@@ -278,7 +278,7 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
 
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
-@step('the correct events are logged for loaded case events "{loaded_case_events}"')
+@step('the correct events are logged for loaded case events "{loaded_case_events}" for blank questionnaire')
 def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
 

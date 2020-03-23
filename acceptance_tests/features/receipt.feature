@@ -24,17 +24,17 @@ Feature: Case processor handles receipt message from pubsub service
       | SPG          | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
 
-  Scenario Outline:
+  Scenario Outline: Blank questionnaire
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>"
-    And the receipt msg is put on the GCP pubsub
+    And if this is required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>"
+    And the offline receipt msg for the created case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And a CLOSE action instruction is sent to field work management with address type "<case type>"
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "False"
-    And the correct events are logged for loaded case events "[<loaded case events>]"
+    And the correct events are logged for loaded case events "[<loaded case events>]" for blank questionnaire
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted
 
     Examples:

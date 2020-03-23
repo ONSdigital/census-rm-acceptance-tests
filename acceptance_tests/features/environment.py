@@ -8,10 +8,10 @@ from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
 
-def after_all(_context):
-    purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                 Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
-                 Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
+# def after_all(_context):
+#     purge_queues(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+#                  Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+#                  Config.RABBITMQ_OUTBOUND_FIELD_QUEUE)
 
 
 def before_scenario(context, _):
