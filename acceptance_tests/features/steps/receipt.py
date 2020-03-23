@@ -48,6 +48,14 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
+@step("the blank questionnaire msg for a case is put on the GCP pubsub")
+def receipt_offline_msg_published_to_gcp_pubsubs(context):
+    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
 @step("the receipt msg for the created CCS case is put on the GCP pubsub")
 def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.ccs_case
@@ -142,7 +150,7 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
-def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+def _publish_offline_receipt(context, channel, unreceipt, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
@@ -153,7 +161,8 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
         "dateTime": "2008-08-24T00:00:00",
         "transactionId": tx_id,
         "questionnaireId": questionnaire_id,
-        "channel": "PQRS"
+        "channel": channel,
+        "unreceipt": unreceipt
     })
 
     future = publisher.publish(topic_path,
@@ -172,6 +181,8 @@ def _publish_offline_receipt(context, tx_id="3d14675d-a25d-4672-a0fe-b960586653e
 
 @step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
+@step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+      ' qid type "{qid_type}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
@@ -207,7 +218,7 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     test_helper.assertFalse(f"Failed to get qid for {qid_type}")
 
 
-@when("the receipt msg is put on the GCP pubsub")
+@step("the receipt msg is put on the GCP pubsub")
 def send_receipt(context):
     _publish_object_finalize(context, questionnaire_id=context.qid_to_receipt)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -244,6 +255,7 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
 
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted'
       ' where ceActualResponse is incremented "{incremented}"')
+@step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
@@ -266,11 +278,13 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented):
 
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
+@step('the correct events are logged for loaded case events "{loaded_case_events}"')
 def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
 
-    if len(individual_case_events.replace('[', '').replace(']', '')) > 0:
-        check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])
+    if individual_case_events:
+        if len(individual_case_events.replace('[', '').replace(']', '')) > 0:
+            check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])
 
 
 @step("a uac_updated msg is emitted with active set to false for the receipted qid")

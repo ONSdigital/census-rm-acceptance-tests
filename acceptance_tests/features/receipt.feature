@@ -24,6 +24,24 @@ Feature: Case processor handles receipt message from pubsub service
       | SPG          | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
 
+  Scenario Outline:
+    Given sample file "<sample file>" is loaded successfully
+    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>"
+    And the receipt msg is put on the GCP pubsub
+    And a uac_updated msg is emitted with active set to false for the receipted qid
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And a CLOSE action instruction is sent to field work management with address type "<case type>"
+    When the blank questionnaire msg for a case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "False"
+    And the correct events are logged for loaded case events "[<loaded case events>]"
+    And if the field instruction "<instruction>" is not NONE a msg to field is emitted
+
+    Examples:
+      | case type    | address level | qid type | sample file                   | loaded case events              | instruction |
+      | HH           | U             | HH       | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED | UPDATE      |
+
+
   Scenario: Receipted Cases are excluded from print files
     Given sample file "sample_input_england_census_spec.csv" is loaded successfully
     When the receipt msg for the created case is put on the GCP pubsub
