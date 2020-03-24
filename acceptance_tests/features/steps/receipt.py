@@ -79,6 +79,9 @@ def uac_updated_msg_emitted(context):
 
 @step('a CLOSE action instruction is sent to field work management with address type "{address_type}"')
 def action_close_sent_to_fwm(context, address_type):
+    if address_type == "HI":
+        return
+
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
         _field_work_close_callback, context=context))
@@ -96,14 +99,18 @@ def send_receipt_for_unaddressed(context):
 
 
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
-@step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}" and qid is "{qid_needed}"')
-def case_updated_msg_sent_with_values(context, case_field, expected_field_value, qid_needed=None):
+@step('a case_updated msg of type "{case_type}" is emitted where "{case_field}" is "{expected_field_value}" and qid is "{qid_needed}"')
+def case_updated_msg_sent_with_values(context, case_field, expected_field_value, case_type=None, qid_needed=None):
     if qid_needed:
         return
     emitted_case = _get_emitted_case(context)
 
-    test_helper.assertEqual(emitted_case['id'], context.first_case['id'])
-    test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
+    if case_type != "HI":
+        test_helper.assertEqual(emitted_case['id'], context.first_case['id'])
+        test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
+    else:
+        test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
+        test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
 
 
 def _field_work_close_callback(ch, method, _properties, body, context):
@@ -187,9 +194,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
 
 @step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
-@step('if this is required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
-      ' qid type "{qid_type}"')
-def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code=None):
+def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
@@ -200,6 +205,7 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
 
     if qid_type == 'Ind':
         if case_type == 'HI':
+            context.case_type = "HI"
             request_hi_individual_telephone_capture(context, "HH", country_code)
             context.qid_to_receipt = context.telephone_capture_qid_uac['questionnaireId']
             context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
@@ -207,7 +213,6 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
             uac = _get_emitted_uac(context)
             test_helper.assertEqual(uac['caseId'], context.receipting_case['id'])
             test_helper.assertEquals(uac['questionnaireId'], context.qid_to_receipt)
-
             return
         else:
             request_individual_telephone_capture(context, case_type, country_code)
