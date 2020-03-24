@@ -27,7 +27,7 @@ Feature: Case processor handles receipt message from pubsub service
   Scenario Outline: Blank questionnaire
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
-    And if required, a new qid is created "<qid needed>"
+    And if required for "<form type>", a new qid is created "<qid needed>"
     And the offline receipt msg for the created case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
@@ -39,11 +39,15 @@ Feature: Case processor handles receipt message from pubsub service
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted
 
     Examples:
-      | case type | address level | qid type | sample file                   | loaded case events                                               | instruction | qid needed | country |
-      | HH        | U             | HH       | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE      | False      | E       |
-      | HH        | U             | HH       | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE        | True       | E       |
-      | SPG       | U             | HH       | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE      | False      | E       |
-      | HI        | U             | Ind      | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED             | NONE        | False      | E       |
+      | case type | address level | qid type | form type | sample file                   | loaded case events                                                                                   | instruction | qid needed | country |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                                                    | UPDATE      | False      | E       |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                                     | NONE        | True       | E       |
+      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                                                    | UPDATE      | False      | E       |
+      | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED                                                 | NONE        | False      | E       |
+      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                                     | NONE        | True       | E       |
+      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | NONE        | False      | E       |
+      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE        | True       | E       |
+      | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE      | False      | E       |
 
 
   Scenario: Receipted Cases are excluded from print files

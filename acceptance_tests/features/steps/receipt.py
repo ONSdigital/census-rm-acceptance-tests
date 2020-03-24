@@ -7,7 +7,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message, \
-    generate_post_request_body
+    generate_post_request_body, questionnaire_type_to_form_type_map
 from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
@@ -229,12 +229,11 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     test_helper.assertFalse(f"Failed to get qid for {qid_type}")
 
 
-@step('if required, a new qid is created "{qid_needed}"')
-def get_second_qid(context, qid_needed):
-
+@step('if required for "{questionnaire_type}", a new qid is created "{qid_needed}"')
+def get_second_qid(context, questionnaire_type, qid_needed):
     if qid_needed == 'True':
-        generate_post_request_body(context, "01")
-        listen_for_ad_hoc_uac_updated_message(context, "01")
+        generate_post_request_body(context, questionnaire_type)
+        listen_for_ad_hoc_uac_updated_message(context, questionnaire_type)
         context.qid_to_receipt = context.requested_qid
         return
 
