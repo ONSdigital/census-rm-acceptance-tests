@@ -2,11 +2,12 @@ import functools
 import json
 import time
 
-from behave import when, then, step
+from behave import then, step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
-from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message
+from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message, \
+    generate_post_request_body
 from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
@@ -35,7 +36,7 @@ def receipt_msg_published_to_gcp_pubsub(context):
 @step("the offline receipt msg for the created case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    questionnaire_id = context.qid_to_receipt
     _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
@@ -150,7 +151,8 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
     context.sent_to_gcp = True
 
 
-def _publish_offline_receipt(context, channel='QM', unreceipt=False, tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
+def _publish_offline_receipt(context, channel='QM', unreceipt=False,
+                             tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
     publisher = pubsub_v1.PublisherClient()
@@ -178,6 +180,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False, tx_id="3d14
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
+
 
 @step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
@@ -216,6 +219,16 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
         return
 
     test_helper.assertFalse(f"Failed to get qid for {qid_type}")
+
+
+@step('if required, a new qid is created "{qid_needed}"')
+def get_second_qid(context, qid_needed):
+
+    if qid_needed == 'True':
+        generate_post_request_body(context, "01")
+        listen_for_ad_hoc_uac_updated_message(context, "01")
+        context.qid_to_receipt = context.requested_qid
+        return
 
 
 @step("the receipt msg is put on the GCP pubsub")

@@ -27,6 +27,7 @@ Feature: Case processor handles receipt message from pubsub service
   Scenario Outline: Blank questionnaire
     Given sample file "<sample file>" is loaded successfully
     And if this is required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>"
+    And if required, a new qid is created "<qid needed>"
     And the offline receipt msg for the created case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg is emitted where "receiptReceived" is "True"
@@ -38,8 +39,9 @@ Feature: Case processor handles receipt message from pubsub service
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted
 
     Examples:
-      | case type | address level | qid type | sample file                  | loaded case events                                | instruction |
-      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE      |
+      | case type | address level | qid type | sample file                  | loaded case events                                | instruction | qid needed |
+      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE      | False      |
+      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE      | True       |
 
 
   Scenario: Receipted Cases are excluded from print files
