@@ -96,7 +96,10 @@ def send_receipt_for_unaddressed(context):
 
 
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
-def case_updated_msg_sent_with_values(context, case_field, expected_field_value):
+@step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}" and qid is "{qid_needed}"')
+def case_updated_msg_sent_with_values(context, case_field, expected_field_value, qid_needed=None):
+    if qid_needed:
+        return
     emitted_case = _get_emitted_case(context)
 
     test_helper.assertEqual(emitted_case['id'], context.first_case['id'])

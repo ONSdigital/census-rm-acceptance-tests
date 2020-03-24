@@ -34,14 +34,14 @@ Feature: Case processor handles receipt message from pubsub service
     And a CLOSE action instruction is sent to field work management with address type "<case type>"
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "False"
+    And a case_updated msg is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
     And the correct events are logged for loaded case events "[<loaded case events>]" for blank questionnaire
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted
 
     Examples:
-      | case type | address level | qid type | sample file                  | loaded case events                                | instruction | qid needed |
-      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE      | False      |
-      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE      | True       |
+      | case type | address level | qid type | sample file                  | loaded case events                                               | instruction | qid needed |
+      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE      | False      |
+      | HH        | U             | HH       | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE        | True       |
 
 
   Scenario: Receipted Cases are excluded from print files
