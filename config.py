@@ -35,8 +35,8 @@ class Config:
                                                      'event.response.authentication')
     RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY = os.getenv('RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY',
                                                           'event.fulfilment.request')
-    RABBITMQ_INVALID_ADDRESS_ROUTING_KEY = os.getenv('RABBITMQ_INVALID_ADDRESS_ROUTING_KEY',
-                                                     'event.case.address.update')
+    RABBITMQ_ADDRESS_ROUTING_KEY = os.getenv('RABBITMQ_ADDRESS_ROUTING_KEY',
+                                             'event.case.address.update')
     RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY = os.getenv('RABBITMQ_CCS_PROPERTY_LISTING_ROUTING_KEY',
                                                           'event.ccs.propertylisting')
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
@@ -86,9 +86,9 @@ class Config:
                        'action.events',
                        'action.fulfilment',
                        'case.action',
+                       'case.addressQueue',
                        'case.ccsPropertyListedQueue',
                        'case.fulfilments',
-                       'case.invalidAddressQueue',
                        'case.questionnairelinked',
                        'case.refusals',
                        'case.sample.inbound',

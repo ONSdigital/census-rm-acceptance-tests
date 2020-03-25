@@ -34,3 +34,11 @@ Feature: Address updates
     Then a case_updated msg is emitted where "addressInvalid" is "True"
     And a CLOSE action instruction is sent to field work management with address type "HH"
     And the case event log records invalid address
+
+
+  Scenario: New address event received
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD"
+    When the case has been created
+    Then the events logged for the case are [NEW_ADDRESS_REPORTED]
+    And a case created event is emitted
+
