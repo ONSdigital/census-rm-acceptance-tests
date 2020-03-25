@@ -1,6 +1,5 @@
 import json
 import uuid
-from time import sleep
 
 import requests
 from behave import step
