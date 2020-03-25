@@ -52,7 +52,7 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 @step("the blank questionnaire msg for a case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsubs(context):
     context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
-    questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    questionnaire_id = context.qid_to_receipt
     _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
 
