@@ -87,20 +87,11 @@ def new_address_reported_event(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('the case has been created')
+@step('the case can be retrieved')
 def retrieve_case(context):
-    retry = 0
-    while retry < 10:
-        response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
-        # test_helper.assertEqual(response.status_code, 200, 'Case not found')
-        if response.status_code != 200:
-            sleep(0.5)
-            retry += 1
-        else:
-            context.first_case = response.json()
-            return
-        if retry == 5:
-            test_helper.fail("Case not found")
+    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    context.first_case = response.json()
 
 
 @step('a case created event is emitted')

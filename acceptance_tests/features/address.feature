@@ -26,7 +26,7 @@ Feature: Address updates
       | sample_for_invalid_address_CE_E.csv  | CE           |
       | sample_for_invalid_address_SPG_E.csv | SPG          |
 
-    Scenario: Invalid address event for CCS unit level case
+  Scenario: Invalid address event for CCS unit level case
     Given a CCS Property Listed event is sent
     And the CCS Property Listed case is created with address type "HH"
     And the correct ActionInstruction is sent to FWMT
@@ -38,7 +38,7 @@ Feature: Address updates
 
   Scenario: New address event received
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD"
-    When the case has been created
-    Then the events logged for the case are [NEW_ADDRESS_REPORTED]
-    And a case created event is emitted
+    When a case created event is emitted
+    Then the case can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
