@@ -62,3 +62,49 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_INVALID_ADDRESS_ROUTING_KEY)
+
+
+@step("an Address Modified Event is sent")
+def send_address_modified_event(context):
+    context.address_modified_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
+
+    message = json.dumps(
+        {
+            "event": {
+                "type": "ADDRESS_MODIFIED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+            },
+            "payload": {
+                "addressModification": {
+                    "collectionCase": {
+                        "id": context.address_modified_case_id
+                    },
+                    "originalAddress": {
+                        "addressLine1": "1 main street",
+                        "addressLine2": "upper upperingham",
+                        "addressLine3": "",
+                        "townName": "upton",
+                        "postcode": "UP103UP",
+                        "region": "E"
+                    },
+                    "newAddress": {
+                        "addressLine1": "1a main street",
+                        "addressLine2": "upper upperingham",
+                        "addressLine3": "",
+                        "townName": "upton",
+                        "postcode": "UP103UP",
+                        "region": "E"
+                    }
+                }
+            }
+        }
+
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_INVALID_ADDRESS_ROUTING_KEY)
