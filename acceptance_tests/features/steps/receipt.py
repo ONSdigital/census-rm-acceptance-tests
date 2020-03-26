@@ -7,7 +7,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message, \
-    generate_post_request_body, questionnaire_type_to_form_type_map
+    generate_post_request_body
 from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
@@ -51,7 +51,8 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 
 @step("the blank questionnaire msg for a case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsubs(context):
-    context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    # context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.qid_to_receipt
     _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -99,9 +100,12 @@ def send_receipt_for_unaddressed(context):
 
 
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
-@step('a case_updated msg of type "{case_type}" is emitted where "{case_field}" is "{expected_field_value}" and qid is "{qid_needed}"')
-def case_updated_msg_sent_with_values(context, case_field, expected_field_value, case_type=None, qid_needed=None):
-    if qid_needed:
+@step(
+    'a case_updated msg of type "{case_type}" and address level "{address_level}" is emitted where "{case_field}" is '
+    '"{expected_field_value}" and qid is "{qid_needed}"')
+def case_updated_msg_sent_with_values(context, case_field, expected_field_value, address_level=None, case_type=None,
+                                      qid_needed=None):
+    if qid_needed == 'True' or address_level == 'E':
         return
     emitted_case = _get_emitted_case(context)
 
@@ -276,6 +280,7 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted'
       ' where ceActualResponse is incremented "{incremented}"')
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
+@step('the field instruction is "{action_instruction_type}"')
 def check_receipt_to_field_msg(context, action_instruction_type, incremented=None):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
