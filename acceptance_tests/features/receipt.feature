@@ -24,7 +24,7 @@ Feature: Case processor handles receipt message from pubsub service
       | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
 
-  Scenario Outline: Blank questionnairesdf for non CE case types
+  Scenario Outline: Blank questionnaire for non CE case types
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And if required for "<form type>", a new qid is created "<qid needed>"
@@ -47,7 +47,7 @@ Feature: Case processor handles receipt message from pubsub service
       | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                               | NONE        | False      | E       | NONE               | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
 
 
-  Scenario Outline: Blank questionnairez for CE case types
+  Scenario Outline: Blank questionnaire for CE case types
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And if required for "<form type>", a new qid is created "<qid needed>"
@@ -83,13 +83,13 @@ Feature: Case processor handles receipt message from pubsub service
 
     Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                               | qid needed | country | instruction | individual case events                             | output                           |
-#      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
-#      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
+      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      |                                                    | no action                        |
-#      | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                               | False      | E       | NONE        | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
+      | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                               | False      | E       | NONE        | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
 
 
-  Scenario Outline: Blank questionnairejjk for Individual qid types before actual receipt
+  Scenario Outline: Blank questionnaire for Individual qid types before actual receipt
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the blank questionnaire msg for a case is put on the GCP pubsub

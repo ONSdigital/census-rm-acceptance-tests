@@ -88,8 +88,6 @@ def uac_updated_msg_emitted(context):
 
 @step('a CLOSE action instruction is sent to field work management with address type "{address_type}"')
 def action_close_sent_to_fwm(context, address_type):
-    if address_type == "HI":
-        return
 
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
