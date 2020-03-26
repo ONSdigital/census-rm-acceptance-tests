@@ -66,8 +66,6 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
 
 @step("an Address Modified Event is sent")
 def send_address_modified_event(context):
-    context.address_modified_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
     message = json.dumps(
         {
             "event": {
@@ -80,7 +78,7 @@ def send_address_modified_event(context):
             "payload": {
                 "addressModification": {
                     "collectionCase": {
-                        "id": context.address_modified_case_id
+                        "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                     },
                     "originalAddress": {
                         "addressLine1": "1 main street",
