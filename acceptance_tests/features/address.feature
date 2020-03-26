@@ -34,3 +34,8 @@ Feature: Address updates
     Then a case_updated msg is emitted where "addressInvalid" is "True"
     And a CLOSE action instruction is sent to field work management with address type "HH"
     And the case event log records invalid address
+
+    Scenario:  Log AddressTypeChanged event
+      Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+      When an AddressTypeChanged event is sent
+      And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
