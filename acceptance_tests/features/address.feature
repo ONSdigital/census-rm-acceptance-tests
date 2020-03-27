@@ -36,9 +36,14 @@ Feature: Address updates
     And the case event log records invalid address
 
 
-  Scenario: New address event received
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD"
+  Scenario: New address event received with sourceCaseId
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     When a case created event is emitted
     Then the case can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
+  Scenario: New address event received without sourceCaseId
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    When a case created event is emitted
+    Then the case can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]

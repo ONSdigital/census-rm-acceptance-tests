@@ -39,7 +39,7 @@ def check_case_events(context):
     test_helper.fail('Did not find expected invalid address event')
 
 
-@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}"')
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
 def new_address_reported_event(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
@@ -79,6 +79,53 @@ def new_address_reported_event(context, sender):
             }
         }
     )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId')
+def new_address_reported_event(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "SPG",
+                        "survey": "CENSUS",
+                        "fieldcoordinatorId": "SO_23",
+                        "fieldofficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E",
+                            "addressType": "SPG",
+                            "addressLevel": "U",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    message['payload']['newAddress']['sourceCaseId'] = str(uuid.uuid4())
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
