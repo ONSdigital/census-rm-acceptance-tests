@@ -24,14 +24,14 @@ Feature: Case processor handles receipt message from pubsub service
       | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
 
-  Scenario Outline: Blank questionnaire for non CE case types
+  Scenario Outline: Blank questionnairee for non CE case types
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
-    And if required for "<form type>", a new qid is created "<qid needed>"
     And the offline receipt msg for the receipted case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
     And if the field instruction "<instruction change>" is not NONE a msg to field is emitted
+    And if required for "<form type>", a new qid is created "<qid needed>"
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
@@ -46,15 +46,20 @@ Feature: Case processor handles receipt message from pubsub service
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE        | True       | E       | CLOSE              |                                                    | no action                        |
       | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                               | NONE        | False      | E       | NONE               | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
 
+  # first passes
+  # second passes, test fails
+  # third passes
+  # fourth pass
+  # fifth passes
 
-  Scenario Outline: Blank questionnaire for CE case types
+  Scenario Outline: Blank questionnaired for CE case types
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
-    And if required for "<form type>", a new qid is created "<qid needed>"
     And the offline receipt msg for the receipted case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
     And if the field instruction "<instruction change>" is not NONE a msg to field is emitted
+    And if required for "<form type>", a new qid is created "<qid needed>"
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for loaded case events "[<loaded case events>]" for blank questionnaire
@@ -65,9 +70,11 @@ Feature: Case processor handles receipt message from pubsub service
       | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | NONE        | False      | E       | CLOSE              | no action |
       | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE        | True       | E       | CLOSE              | no action |
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | NONE        | False      | E       | UPDATE             | no action |
+   # first passes
+  # second passes
+  # third passes
 
-
-  Scenario Outline: Blank questionnaire before actual receipt
+  Scenario Outline: Blank questionnaired before actual receipt
     Given sample file "<sample file>" is loaded successfully
     And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the blank questionnaire msg for a case is put on the GCP pubsub
@@ -77,17 +84,20 @@ Feature: Case processor handles receipt message from pubsub service
     And if required for "<form type>", a new qid is created "<qid needed>"
     When the offline receipt msg for the receipted case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
-    And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
+    And a case_updated msg has not been emitted
     And the correct events are logged for loaded case events "[<loaded case events>]" and individual case events "[<individual case events>]"
     And the field instruction is "NONE"
 
     Examples:
-      | case type | address level | qid type | form type | sample file                   | loaded case events                                               | qid needed | country | instruction | individual case events                             | output                           |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
-      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      |                                                    | no action                        |
-      | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                               | False      | E       | NONE        | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
+      | case type | address level | qid type | form type | sample file                   | loaded case events                                | qid needed | country | instruction | individual case events                             | output                           |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
+      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False      | E       | UPDATE      |                                                    | unreceipt case and send to field |
+      | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                | False      | E       | NONE        | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | unreceipt case                   |
 
+  # first passes, test failed
+  # second passes, test failed
+  # third passes, moved to a new section
+  # fourth passes, test failed
 
   Scenario Outline: Blank questionnaire for Individual qid types before actual receipt
     Given sample file "<sample file>" is loaded successfully
@@ -105,7 +115,29 @@ Feature: Case processor handles receipt message from pubsub service
       | case type | address level | qid type | form type | sample file                   | loaded case events                                                                    | qid needed | country | instruction | output    |
       | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False      | E       | NONE        | no action |
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False      | E       | NONE        | no action |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                      | True       | E       | UPDATE      | no action |
 
+  Scenario Outline: Blank questionnaire for non-ce types before actual receipt and another qid needed
+    Given sample file "<sample file>" is loaded successfully
+    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And the blank questionnaire msg for a case is put on the GCP pubsub
+    And a uac_updated msg is emitted with active set to false for the receipted qid
+    And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
+    And if the field instruction "<instruction>" is not NONE a msg to field is emitted
+    And if required for "<form type>", a new qid is created "<qid needed>"
+    When the offline receipt msg for the receipted case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false for the receipted qid
+    And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
+    And the correct events are logged for loaded case events "[<loaded case events>]" for blank questionnaire
+    And if the field instruction "CLOSE" is not NONE a msg to field is emitted
+
+    Examples:
+      | case type | address level | qid type | form type | sample file                   | loaded case events                                               | qid needed | country | instruction | output    |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      | no action |
+      | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      | no action |
+
+  # first passes
+  # second passes
 
   Scenario: Receipted Cases are excluded from print files
     Given sample file "sample_input_england_census_spec.csv" is loaded successfully

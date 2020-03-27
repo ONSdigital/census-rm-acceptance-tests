@@ -60,7 +60,6 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 @step("the blank questionnaire msg for a case is put on the GCP pubsub")
 def receipt_offline_msg_published_to_gcp_pubsubs(context):
     context.first_case = context.receipting_case
-    # context.emitted_case = context.case_created_events[0]['payload']['collectionCase']
     questionnaire_id = context.qid_to_receipt
     _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -112,7 +111,6 @@ def send_receipt_for_unaddressed(context):
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value, address_level=None, case_type=None,
                                       qid_needed=None):
     if qid_needed == 'True' or address_level == 'E':
-        check_receipt_to_field_msg_is_none(context)
         return
     emitted_case = _get_emitted_case(context)
 
@@ -316,6 +314,7 @@ def check_receipt_to_field_msg_is_none(context):
                                     store_all_msgs_in_context, context=context,
                                     expected_msg_count=0), timeout=3)
 
+    assert len(context.messages_received) == 0
 
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
