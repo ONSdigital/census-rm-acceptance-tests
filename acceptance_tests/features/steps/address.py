@@ -125,7 +125,6 @@ def new_address_reported_event(context, sender):
             }
         }
     )
-    message['payload']['newAddress']['sourceCaseId'] = str(uuid.uuid4())
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
