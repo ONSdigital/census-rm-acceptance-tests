@@ -47,3 +47,11 @@ Feature: Address updates
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an Address Modified Event is sent
     Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
+
+
+  Scenario:  Log AddressTypeChanged event
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When an AddressTypeChanged event is sent
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
+
+
