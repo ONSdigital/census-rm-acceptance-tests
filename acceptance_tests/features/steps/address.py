@@ -42,6 +42,7 @@ def check_case_events(context):
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
 def new_address_reported_event(context, sender):
     context.case_id = str(uuid.uuid4())
+    context.source_case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     message = json.dumps(
         {
@@ -54,7 +55,7 @@ def new_address_reported_event(context, sender):
             },
             "payload": {
                 "newAddress": {
-                    "sourceCaseId": "16f587e9-9475-4653-a13e-501d1d2c694e",
+                    "sourceCaseId": context.source_case_id,
                     "collectionCase": {
                         "id": context.case_id,
                         "caseType": "SPG",
@@ -137,6 +138,18 @@ def retrieve_case(context):
     response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+    test_helper.assertEqual(context.first_case['addressLine1'], "123")
+    test_helper.assertEqual(context.first_case['addressLine2'], "Fake caravan park")
+    test_helper.assertEqual(context.first_case['addressLine3'], "The long road")
+    test_helper.assertEqual(context.first_case['townName'], "Trumpton")
+    test_helper.assertEqual(context.first_case['postcode'], "SO190PG")
+    test_helper.assertEqual(context.first_case['region'], "E")
+    test_helper.assertEqual(context.first_case['addressType'], "SPG")
+    test_helper.assertEqual(context.first_case['addressLevel'], "U")
+    test_helper.assertEqual(context.first_case['latitude'], "50.917428")
+    test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
 
 
 @step('a case created event is emitted')
