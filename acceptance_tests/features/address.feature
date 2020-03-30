@@ -26,7 +26,7 @@ Feature: Address updates
       | sample_for_invalid_address_CE_E.csv  | CE           |
       | sample_for_invalid_address_SPG_E.csv | SPG          |
 
-    Scenario: Invalid address event for CCS unit level case
+  Scenario: Invalid address event for CCS unit level case
     Given a CCS Property Listed event is sent
     And the CCS Property Listed case is created with address type "HH"
     And the correct ActionInstruction is sent to FWMT
@@ -35,7 +35,23 @@ Feature: Address updates
     And a CLOSE action instruction is sent to field work management with address type "HH"
     And the case event log records invalid address
 
-   Scenario: Log Address Modified Event
-     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-     When an Address Modified Event is sent
-     Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
+
+  Scenario: New address event received without sourceCaseId
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    When a case created event is emitted
+    Then the case can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+
+
+  Scenario: Log Address Modified Event
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When an Address Modified Event is sent
+    Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
+
+
+  Scenario:  Log AddressTypeChanged event
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When an AddressTypeChanged event is sent
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
+
+
