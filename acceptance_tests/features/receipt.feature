@@ -2,7 +2,7 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario Outline: Receipted Cases increment ceActualResponses
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     When the receipt msg is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for loaded case events "[<loaded case events>]" and individual case events "[<individual case events>]"

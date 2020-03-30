@@ -201,7 +201,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
     context.sent_to_gcp = True
 
 
-@step('if required a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+@step('if required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']

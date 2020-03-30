@@ -1,8 +1,8 @@
 Feature: Handling Blank Questionnaire Scenario
 
-Scenario Outline: Blank questionnairee for non CE case types
+  Scenario Outline: Blank questionnaire for non-CE case types
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the offline receipt msg for the receipted case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
@@ -25,7 +25,7 @@ Scenario Outline: Blank questionnairee for non CE case types
 
   Scenario Outline: Blank questionnaire for CE case types
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the offline receipt msg for the receipted case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "True" and qid is "<qid needed>"
@@ -45,7 +45,7 @@ Scenario Outline: Blank questionnairee for non CE case types
 
   Scenario Outline: Blank questionnaire before actual receipt
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the blank questionnaire msg for a case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
@@ -66,7 +66,7 @@ Scenario Outline: Blank questionnairee for non CE case types
 
   Scenario Outline: Blank questionnaire for Individual qid types before actual receipt
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the blank questionnaire msg for a case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted
@@ -82,9 +82,9 @@ Scenario Outline: Blank questionnairee for non CE case types
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False      | E       | NONE        |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                      | True       | E       | UPDATE      |
 
-  Scenario Outline: Blank questionnaire for non-ce types before actual receipt and another qid needed
+  Scenario Outline: Blank questionnaire for non-CE case types before actual receipt when another qid is needed
     Given sample file "<sample file>" is loaded successfully
-    And if required a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And the blank questionnaire msg for a case is put on the GCP pubsub
     And a uac_updated msg is emitted with active set to false for the receipted qid
     And a case_updated msg of type "<case type>" and address level "<address level>" is emitted where "receiptReceived" is "False" and qid is "<qid needed>"
