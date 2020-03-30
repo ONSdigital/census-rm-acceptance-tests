@@ -4,7 +4,7 @@ Feature: Address updates
     Given sample file "<sample file>" is loaded successfully
     When an invalid address message is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And a CLOSE action instruction is sent to field work management with address type "<address type>"
+    And a CANCEL action instruction is sent to field work management with address type "<address type>"
     And the case event log records invalid address
 
     Examples:
@@ -18,7 +18,7 @@ Feature: Address updates
     Given sample file "<sample file>" is loaded successfully
     When an invalid address message is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And a CLOSE action instruction is sent to field work management with address type "<address type>"
+    And a CANCEL action instruction is sent to field work management with address type "<address type>"
     And the case event log records invalid address
 
     Examples:
@@ -32,7 +32,7 @@ Feature: Address updates
     And the correct ActionInstruction is sent to FWMT
     When an invalid address message for the CCS case is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
-    And a CLOSE action instruction is sent to field work management with address type "HH"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
     And the case event log records invalid address
 
 
@@ -49,7 +49,7 @@ Feature: Address updates
     Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
-  Scenario:  Log AddressTypeChanged event
+  Scenario: Log AddressTypeChanged event
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an AddressTypeChanged event is sent
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
