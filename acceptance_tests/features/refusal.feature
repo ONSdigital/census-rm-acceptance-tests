@@ -6,7 +6,7 @@ Feature: Handle refusal message
     And set action rule of type "ICL1E" when case event "REFUSAL_RECEIVED" is logged
     Then only unrefused cases appear in "P_IC_ICL1" print files
     And the case is marked as refused
-    And a CLOSE action instruction is emitted to FWMT
+    And a CANCEL action instruction is emitted to FWMT
     And the events logged for the refusal case are [SAMPLE_LOADED,REFUSAL_RECEIVED]
 
   Scenario: Refusal message results in CCS case excluded from action plan
@@ -15,5 +15,5 @@ Feature: Handle refusal message
     And the correct ActionInstruction is sent to FWMT
     When a refusal message for the created CCS case is received
     Then the case is marked as refused
-    And a CLOSE action instruction is emitted to FWMT
+    And a CANCEL action instruction is emitted to FWMT
     And the events logged for the refusal case are [CCS_ADDRESS_LISTED,REFUSAL_RECEIVED]

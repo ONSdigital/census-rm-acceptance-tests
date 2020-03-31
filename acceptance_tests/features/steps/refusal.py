@@ -6,7 +6,7 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.receipt import _field_work_close_callback
+from acceptance_tests.features.steps.receipt import _field_work_cancel_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -85,10 +85,10 @@ def check_case_events(context):
     test_helper.fail('Did not find "Refusal Received" event')
 
 
-@step('a CLOSE action instruction is emitted to FWMT')
+@step('a CANCEL action instruction is emitted to FWMT')
 def refusal_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(_field_work_close_callback, context=context))
+                                    functools.partial(_field_work_cancel_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.refused_case_id)
     test_helper.assertEqual(context.addressType, 'HH')
