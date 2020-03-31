@@ -61,6 +61,7 @@ def check_linked_message_is_received(context):
 
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
+
 def check_blank_link_message_is_received(context):
     context.linked_case = context.case_created_events[0]['payload']['collectionCase']
 
