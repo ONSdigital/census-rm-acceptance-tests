@@ -243,7 +243,6 @@ def get_second_qid(context, questionnaire_type, qid_needed):
         generate_post_request_body(context, questionnaire_type)
         listen_for_ad_hoc_uac_updated_message(context, questionnaire_type)
         context.qid_to_receipt = context.requested_qid
-        return
 
 
 @step("the receipt msg is put on the GCP pubsub")
@@ -314,6 +313,7 @@ def check_receipt_to_field_msg_is_none(context):
                                     expected_msg_count=0), timeout=3)
 
     assert len(context.messages_received) == 0
+
 
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
