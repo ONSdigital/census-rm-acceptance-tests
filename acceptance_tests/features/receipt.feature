@@ -11,15 +11,15 @@ Feature: Case processor handles receipt message from pubsub service
 
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
-      | HH        | U             | HH       | False     | True    | CLOSE       | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | HH        | U             | HH       | False     | True    | CANCEL      | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
       | HI        | U             | Ind      | False     | True    | NONE        | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
       | CE        | E             | Ind      | True      | False   | UPDATE      | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | CE        | E             | CE1      | False     | True    | UPDATE      | sample_1_english_CE_estab.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
-      | CE        | U             | Ind      | True      | AR >= E | CLOSE       | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
+      | CE        | U             | Ind      | True      | AR >= E | CANCEL      | sample_1_english_CE_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | E             | HH       | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | E             | Ind      | False     | False   | NONE        | sample_1_ni_SPG_estab.csv     | N       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
-      | SPG       | U             | HH       | False     | True    | CLOSE       | sample_1_english_SPG_unit.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+      | SPG       | U             | HH       | False     | True    | CANCEL      | sample_1_english_SPG_unit.csv | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
       | SPG       | U             | Ind      | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
       | SPG       | U             | Cont     | False     | False   | NONE        | sample_1_english_SPG_unit.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
 
@@ -46,7 +46,7 @@ Feature: Case processor handles receipt message from pubsub service
     When the receipt msg for the created CCS case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    And a CLOSE action instruction is sent to field work management with address type "HH"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
     And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
 
   Scenario: PQRS receipt results in UAC updated event sent to RH
@@ -54,7 +54,7 @@ Feature: Case processor handles receipt message from pubsub service
     When the offline receipt msg for the created case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    And a CLOSE action instruction is sent to field work management with address type "HH"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
   Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field

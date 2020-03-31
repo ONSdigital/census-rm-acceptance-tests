@@ -85,16 +85,15 @@ def uac_updated_msg_emitted(context):
     test_helper.assertFalse(emitted_uac['active'])
 
 
-@step('a CLOSE action instruction is sent to field work management with address type "{address_type}"')
-def action_close_sent_to_fwm(context, address_type):
-
+@step('a CANCEL action instruction is sent to field work management with address type "{address_type}"')
+def action_cancel_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
-        _field_work_close_callback, context=context))
+        _field_work_cancel_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, address_type)
-    test_helper.assertEqual(context.field_action_close_message['surveyName'], context.first_case['survey'])
+    test_helper.assertEqual(context.field_action_cancel_message['surveyName'], context.first_case['survey'])
 
 
 @step("the offline receipt msg for a continuation form from the case is received")
@@ -122,17 +121,17 @@ def case_updated_msg_sent_with_values(context, case_field, expected_field_value,
         test_helper.assertEqual(str(emitted_case[case_field]), expected_field_value)
 
 
-def _field_work_close_callback(ch, method, _properties, body, context):
-    action_close = json.loads(body)
+def _field_work_cancel_callback(ch, method, _properties, body, context):
+    action_cancel = json.loads(body)
 
-    if not action_close['actionInstruction'] == 'CLOSE':
+    if not action_cancel['actionInstruction'] == 'CANCEL':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
-                         f'Got "{action_close["actionInstruction"]}", wanted "CLOSE"')
+                         f'Got "{action_cancel["actionInstruction"]}", wanted "CANCEL"')
 
-    context.addressType = action_close['addressType']
-    context.fwmt_emitted_case_id = action_close['caseId']
-    context.field_action_close_message = action_close
+    context.addressType = action_cancel['addressType']
+    context.fwmt_emitted_case_id = action_cancel['caseId']
+    context.field_action_cancel_message = action_cancel
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
