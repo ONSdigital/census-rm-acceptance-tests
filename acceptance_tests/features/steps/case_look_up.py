@@ -115,8 +115,7 @@ def check_census_case_fields(context):
 @step('it contains the correct fields for a CCS case')
 def check_ccs_case_fields(context):
     test_helper.assertTrue(context.ccs_case['caseRef'])
-    test_helper.assertFalse(context.ccs_case['arid'])
-    test_helper.assertFalse(context.ccs_case['estabArid'])
+    test_helper.assertFalse(context.ccs_case['estabUprn'])
     test_helper.assertTrue(context.ccs_case['estabType'])
     test_helper.assertFalse(context.ccs_case['uprn'])
     test_helper.assertTrue(context.ccs_case['collectionExerciseId'])
