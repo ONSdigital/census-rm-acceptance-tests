@@ -113,5 +113,5 @@ Feature: Handling Blank Questionnaire Scenario
     Then if the field instruction "<blank instruction>" is not NONE a msg to field is emitted
 
     Examples:
-      | case type | address level | qid type | form type | sample file                  | loaded case events                                | blank instruction | qid needed | country | offline receipt instruction | individual case events |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE            | False      | E       | CANCEL                      |                        |
+      | case type | address level | qid type | form type | sample file                  | blank instruction | country |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | UPDATE            | E       |
