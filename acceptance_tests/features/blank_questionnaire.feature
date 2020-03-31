@@ -101,3 +101,17 @@ Feature: Handling Blank Questionnaire Scenario
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      |
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True       | E       | UPDATE      |
 
+
+  Scenario Outline: Blank questionnaire against an unlinked qid
+    Given sample file "<sample file>" is loaded successfully
+    And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
+    And an unaddressed message of questionnaire type <form type> is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    And the offline receipt msg for the receipted case is put on the GCP pubsub for an unlinked qid
+    And a blank questionnaire receipts comes in for an unlinked qid
+    When a Questionnaire Linked message is sent for blank questionnaire
+    Then if the field instruction "<blank instruction>" is not NONE a msg to field is emitted
+
+    Examples:
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                | blank instruction | qid needed | country | offline receipt instruction | individual case events |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE            | False      | E       | CANCEL                      |                        |

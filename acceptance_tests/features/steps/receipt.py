@@ -48,6 +48,21 @@ def offline_msg_published_to_gcp_pubsub_for_receipted_cases(context):
     _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
+@step("the offline receipt msg for the receipted case is put on the GCP pubsub for an unlinked qid")
+def offline_msg_published_to_gcp_pubsub_for_receipted_cases(context):
+    context.first_case = context.receipting_case
+    questionnaire_id = context.expected_questionnaire_id
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
+@step("a blank questionnaire receipts comes in for an unlinked qid")
+def offline_receipt_for_an_unlinked_qid(context):
+    context.first_case = context.receipting_case
+    questionnaire_id = context.expected_questionnaire_id
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    test_helper.assertTrue(context.sent_to_gcp)
+
 
 @step("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
 def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
