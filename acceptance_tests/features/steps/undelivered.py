@@ -42,10 +42,10 @@ def action_request_event_sent_to_fwm(context):
 def _field_work_receipt_callback(ch, method, _properties, body, context):
     action_instruction = json.loads(body)
 
-    if not action_instruction['actionInstruction'] == 'CREATE':
+    if not action_instruction['actionInstruction'] == 'UPDATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
-                         f'Got "{action_instruction["actionInstruction"]}", wanted "CREATE"')
+                         f'Got "{action_instruction["actionInstruction"]}", wanted "UPDATE"')
 
     context.addressType = action_instruction['addressType']
     context.fwmt_emitted_case_id = action_instruction['caseId']
