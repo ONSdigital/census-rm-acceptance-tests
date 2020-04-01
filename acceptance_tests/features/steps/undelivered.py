@@ -66,7 +66,8 @@ def _publish_ppo_undelivered_mail(context, case_ref):
                        "caseRef": case_ref,
                        "productCode": "P_OR_H1",
                        "channel": "PPO",
-                       "type": "UNDELIVERED_MAIL_REPORTED"})
+                       "type": "UNDELIVERED_MAIL_REPORTED",
+                       "unreceipt": False})
 
     future = publisher.publish(topic_path,
                                data=data.encode('utf-8'))
@@ -93,7 +94,8 @@ def _publish_qm_undelivered_mail(context, questionnaire_id):
     data = json.dumps({
         "transactionId": str(uuid.uuid4()),
         "dateTime": "2008-08-24T00:00:00",
-        "questionnaireId": questionnaire_id
+        "questionnaireId": questionnaire_id,
+        "unreceipt": False
     })
 
     future = publisher.publish(topic_path,
