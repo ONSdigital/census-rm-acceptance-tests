@@ -122,10 +122,10 @@ def send_receipt_for_unaddressed(context):
 @step('a case_updated msg is emitted where "{case_field}" is "{expected_field_value}"')
 @step(
     'a case_updated msg of type "{case_type}" and address level "{address_level}" is emitted where "{case_field}" is '
-    '"{expected_field_value}" and qid is "{qid_needed}"')
+    '"{expected_field_value}" and qid is "{another_qid_needed}"')
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value, address_level=None, case_type=None,
-                                      qid_needed=None):
-    if qid_needed == 'True' or address_level == 'E':
+                                      another_qid_needed=None):
+    if another_qid_needed == 'True' or address_level == 'E':
         return
     emitted_case = _get_emitted_case(context)
 
