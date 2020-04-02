@@ -5,7 +5,7 @@ from behave import step
 
 from acceptance_tests.utilities.event_helper import get_and_check_case_created_messages
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
-    store_all_uac_updated_msgs_by_collection_exercise_id
+    store_all_uac_updated_msgs_by_collection_exercise_id, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -51,6 +51,14 @@ def gather_welsh_reminder_uac_events(context, number_of_matching_cases):
     context.reminder_uac_updated_events = context.messages_received.copy()
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
+
+
+@step('a case_updated msg is emitted where the metadata field "{field}" is "{expected_field_value}"')
+def case_updated_msg_with_metadata_field(context, field, expected_field_value):
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(store_first_message_in_context,
+                                                      context=context))
+    test_helper.assertEqual(context.first_message['payload']['metadata'][field], expected_field_value)
 
 
 def _get_extended_case_created_events_for_uacs(context, questionnaire_types):
