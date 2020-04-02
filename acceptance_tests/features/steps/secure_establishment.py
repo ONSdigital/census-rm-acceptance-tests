@@ -29,7 +29,7 @@ def get_case_by_id(context, expected_value):
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     case_details = response.json()
 
-    assert case_details['ceSecure'] == str2bool(expected_value), "Unexpected secureEstablishment value"
+    assert case_details['secureEstablishment'] == str2bool(expected_value), "Unexpected secureEstablishment value"
 
 
 def _check_emitted_action_instructions(context, expected_value):
