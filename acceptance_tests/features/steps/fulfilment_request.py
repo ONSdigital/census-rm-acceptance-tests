@@ -170,7 +170,6 @@ def create_individual_print_fulfilment_message(context, fulfilment_code):
                         "latitude": "50.863849",
                         "longitude": "-1.229710",
                         "uprn": "XXXXXXXXXXXXX",
-                        "arid": "XXXXX",
                         "addressType": "CE",
                         "estabType": "XXX"
                     },

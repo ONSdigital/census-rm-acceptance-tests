@@ -155,7 +155,6 @@ def address_type_changed_event_is_sent(context):
                         "address": {
                             "orgName": "bobs",
                             "uprn": "XXXXXXXXXXXXX",
-                            "arid": "XXXXX",
                             "addressType": "CE",
                             "estabType": "XXX"
                         }
