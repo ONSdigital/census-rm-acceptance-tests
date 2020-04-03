@@ -85,8 +85,7 @@ def check_census_case_fields(context):
     test_helper.assertEquals(len(context.case_details['caseRef']), 10)
     test_helper.assertTrue(luhn.verify(context.case_details['caseRef']))
 
-    test_helper.assertTrue(context.case_details['arid'])
-    test_helper.assertTrue(context.case_details['estabArid'])
+    test_helper.assertTrue(context.case_details['estabUprn'])
     test_helper.assertTrue(context.case_details['estabType'])
     test_helper.assertTrue(context.case_details['uprn'])
     test_helper.assertTrue(context.case_details['collectionExerciseId'])
@@ -116,8 +115,7 @@ def check_census_case_fields(context):
 @step('it contains the correct fields for a CCS case')
 def check_ccs_case_fields(context):
     test_helper.assertTrue(context.ccs_case['caseRef'])
-    test_helper.assertFalse(context.ccs_case['arid'])
-    test_helper.assertFalse(context.ccs_case['estabArid'])
+    test_helper.assertFalse(context.ccs_case['estabUprn'])
     test_helper.assertTrue(context.ccs_case['estabType'])
     test_helper.assertFalse(context.ccs_case['uprn'])
     test_helper.assertTrue(context.ccs_case['collectionExerciseId'])

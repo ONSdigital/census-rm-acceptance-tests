@@ -24,18 +24,18 @@ def check_individual_child_case_is_emitted(context, parent_case_id, individual_c
                                                       expected_msg_count=1,
                                                       collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEqual(len(context.messages_received), 1)
-    child_case_arid = context.messages_received[0]['payload']['collectionCase']['address']['estabArid']
-    parent_case_arid = _get_parent_case_estab_arid(parent_case_id)
+    child_case_uprn = context.messages_received[0]['payload']['collectionCase']['address']['estabUprn']
+    parent_case_uprn = _get_parent_case_estab_uprn(parent_case_id)
 
-    test_helper.assertEqual(child_case_arid, parent_case_arid, "Parent and child ARIDs must match to link cases")
+    test_helper.assertEqual(child_case_uprn, parent_case_uprn, "Parent and child UPRNs must match to link cases")
     context.case_created_events = context.messages_received.copy()
     test_helper.assertEqual(context.case_created_events[0]['payload']['collectionCase']['id'],
                             individual_case_id)
 
 
-def _get_parent_case_estab_arid(parent_case_id):
+def _get_parent_case_estab_uprn(parent_case_id):
     response = requests.get(f'{get_cases_url}{parent_case_id}')
-    return response.json()['estabArid']
+    return response.json()['estabUprn']
 
 
 def get_qid_and_uac_from_emitted_child_uac(context):
@@ -51,10 +51,8 @@ def get_qid_and_uac_from_emitted_child_uac(context):
 
 
 def _sample_unit_matches_case_event(sample_unit, case_created_event):
-    return (sample_unit['attributes']['ARID'] ==
-            case_created_event['payload']['collectionCase']['address']['arid']
-            and sample_unit['attributes']['ESTAB_ARID'] ==
-            case_created_event['payload']['collectionCase']['address']['estabArid']
+    return (sample_unit['attributes']['ESTAB_UPRN'] ==
+            case_created_event['payload']['collectionCase']['address']['estabUprn']
             and sample_unit['attributes']['UPRN'] ==
             case_created_event['payload']['collectionCase']['address']['uprn']
             and sample_unit['attributes']['ADDRESS_LEVEL'] ==

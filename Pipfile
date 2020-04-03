@@ -14,7 +14,7 @@ retrying = "*"
 pika = "*"
 paramiko = "*"
 "flake8" = "*"
-census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v1.4.0"}
+census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.0.0"}
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
@@ -22,4 +22,4 @@ str2bool = "*"
 luhn = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
