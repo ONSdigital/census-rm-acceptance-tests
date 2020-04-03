@@ -42,10 +42,10 @@ def action_request_event_sent_to_fwm(context):
 def _field_work_receipt_callback(ch, method, _properties, body, context):
     action_instruction = json.loads(body)
 
-    if not action_instruction['actionInstruction'] == 'CREATE':
+    if not action_instruction['actionInstruction'] == 'UPDATE':
         ch.basic_nack(delivery_tag=method.delivery_tag)
         test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
-                         f'Got "{action_instruction["actionInstruction"]}", wanted "CREATE"')
+                         f'Got "{action_instruction["actionInstruction"]}", wanted "UPDATE"')
 
     context.addressType = action_instruction['addressType']
     context.fwmt_emitted_case_id = action_instruction['caseId']
@@ -66,7 +66,8 @@ def _publish_ppo_undelivered_mail(context, case_ref):
                        "caseRef": case_ref,
                        "productCode": "P_OR_H1",
                        "channel": "PPO",
-                       "type": "UNDELIVERED_MAIL_REPORTED"})
+                       "type": "UNDELIVERED_MAIL_REPORTED",
+                       "unreceipt": False})
 
     future = publisher.publish(topic_path,
                                data=data.encode('utf-8'))
@@ -93,7 +94,8 @@ def _publish_qm_undelivered_mail(context, questionnaire_id):
     data = json.dumps({
         "transactionId": str(uuid.uuid4()),
         "dateTime": "2008-08-24T00:00:00",
-        "questionnaireId": questionnaire_id
+        "questionnaireId": questionnaire_id,
+        "unreceipt": False
     })
 
     future = publisher.publish(topic_path,
