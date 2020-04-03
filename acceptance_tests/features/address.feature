@@ -54,4 +54,10 @@ Feature: Address updates
     When an AddressTypeChanged event is sent
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
 
-
+  Scenario: Fulfilment request for new skeleton case
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    And a case created event is emitted
+    When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
+    Then a UAC updated message with "01" questionnaire type is emitted
+    And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
+    And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
