@@ -62,9 +62,9 @@ def _check_address_type_country_address_level(case, address_type, country_code, 
 
 
 def _check_address_type_country(case, address_type, country_code):
-    test_helper.assertEqual(country_code, case['treatmentCode'][-1],
-                            'Loaded case does not match expected nationality')
-    test_helper.assertEqual(address_type, case['treatmentCode'].split('_')[0],
+    test_helper.assertEqual(country_code, case['address']['region'][0],
+                            'Loaded case does not match expected region')
+    test_helper.assertEqual(address_type, case['address']['addressType'],
                             'Loaded case does not match expected address type')
 
 

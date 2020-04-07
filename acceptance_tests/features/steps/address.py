@@ -67,7 +67,7 @@ def new_address_reported_event(context, sender):
                             "addressLine3": "The long road",
                             "townName": "Trumpton",
                             "postcode": "SO190PG",
-                            "region": "E",
+                            "region": "E00001234",
                             "addressType": "SPG",
                             "addressLevel": "U",
                             "latitude": "50.917428",
