@@ -67,7 +67,7 @@ def new_address_reported_event(context, sender):
                             "addressLine3": "The long road",
                             "townName": "Trumpton",
                             "postcode": "SO190PG",
-                            "region": "E",
+                            "region": "E00001234",
                             "addressType": "SPG",
                             "addressLevel": "U",
                             "latitude": "50.917428",
@@ -96,7 +96,7 @@ def retrieve_case(context):
     test_helper.assertEqual(context.first_case['addressLine3'], "The long road")
     test_helper.assertEqual(context.first_case['townName'], "Trumpton")
     test_helper.assertEqual(context.first_case['postcode'], "SO190PG")
-    test_helper.assertEqual(context.first_case['region'], "E")
+    test_helper.assertEqual(context.first_case['region'], "E00001234")
     test_helper.assertEqual(context.first_case['addressType'], "SPG")
     test_helper.assertEqual(context.first_case['addressLevel'], "U")
     test_helper.assertEqual(context.first_case['latitude'], "50.917428")

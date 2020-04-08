@@ -58,12 +58,12 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'P_RL_2RL2B_3a': {'treatment_code': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',
                                              'HH_QFNR3AW']},
         'P_QU_H2': {'treatment_code': ['HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW']},
-        'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542']},
-        'P_RD_2RL2B_1': {'lsoa': ['E01014669']},
+        'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542', 'W01014540']},
+        'P_RD_2RL2B_1': {'lsoa': ['E01014669', 'W01014669']},
         'P_RD_2RL1_2': {'lsoa': ['E01014543', 'E01014544']},
-        'P_RD_2RL2B_2': {'lsoa': ['E01033361', 'E01015005']},
+        'P_RD_2RL2B_2': {'lsoa': ['E01033361', 'E01015005', 'W01033361', 'W01015005']},
         'P_RD_2RL1_3': {'lsoa': ['E01014545']},
-        'P_RD_2RL2B_3': {'lsoa': ['E01014897']}
+        'P_RD_2RL2B_3': {'lsoa': ['E01014897', 'W01014897']}
     }
 
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
