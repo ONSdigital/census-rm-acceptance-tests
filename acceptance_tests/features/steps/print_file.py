@@ -2,9 +2,8 @@ import hashlib
 import json
 import logging
 
-from google.cloud import storage
-
 from behave import then, step
+from google.cloud import storage
 from retrying import retry
 from structlog import wrap_logger
 
@@ -154,7 +153,8 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
         sizeBytes=str(expected_size),
         md5sum=md5_hash,
         relativePath='./',
-        name=csv_file.filename
+        name=csv_file.filename,
+        rows=len(actual_file_contents.splitlines())
     )
 
     manifest = dict(
