@@ -1,1 +1,2 @@
 checking the commit sign
+Adding to this text file.
