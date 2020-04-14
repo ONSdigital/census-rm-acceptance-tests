@@ -2,9 +2,8 @@ import hashlib
 import json
 import logging
 
-from google.cloud import storage
-
 from behave import then, step
+from google.cloud import storage
 from retrying import retry
 from structlog import wrap_logger
 
@@ -146,6 +145,7 @@ def _get_matching_manifest_file(filename, files):
 def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_code):
     actual_file_contents = sftp_utility.get_file_contents_as_string(f'{PACK_CODE_TO_SFTP_DIRECTORY[pack_code]}'
                                                                     f'/{csv_file.filename}')
+    decrypted_file_contents = sftp_utility.decrypt_message(actual_file_contents)
 
     md5_hash = hashlib.md5(actual_file_contents.encode('utf-8')).hexdigest()
     expected_size = sftp_utility.get_file_size(f'{PACK_CODE_TO_SFTP_DIRECTORY[pack_code]}/{csv_file.filename}')
@@ -154,7 +154,8 @@ def _create_expected_manifest(sftp_utility, csv_file, created_datetime, pack_cod
         sizeBytes=str(expected_size),
         md5sum=md5_hash,
         relativePath='./',
-        name=csv_file.filename
+        name=csv_file.filename,
+        rows=len(decrypted_file_contents.splitlines())
     )
 
     manifest = dict(
