@@ -153,7 +153,7 @@ def address_type_changed_event_is_sent(context):
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                         "ceExpectedCapacity": "20",
                         "address": {
-                            "orgName": "bobs",
+                            "organisationName": "bobs",
                             "uprn": "XXXXXXXXXXXXX",
                             "addressType": "CE",
                             "estabType": "XXX"
