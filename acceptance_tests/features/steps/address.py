@@ -151,7 +151,7 @@ def address_type_changed_event_is_sent(context):
                 "addressTypeChange": {
                     "collectionCase": {
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
-                        "ceExpectedResponses": "20",
+                        "ceExpectedCapacity": "20",
                         "address": {
                             "orgName": "bobs",
                             "uprn": "XXXXXXXXXXXXX",
