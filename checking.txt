@@ -1,5 +1,8 @@
 checking the commit sign
 Adding to this text file.
 
+Now I have added the ONS email address to my account and verified it.
+Hoping that will fix the gpg verification issue.
+
 Adding another line
 This time the gpg signing should be verified
