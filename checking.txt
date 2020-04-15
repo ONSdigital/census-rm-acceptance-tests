@@ -1,2 +1,5 @@
 checking the commit sign
 Adding to this text file.
+
+Adding another line
+This time the gpg signing should be verified
