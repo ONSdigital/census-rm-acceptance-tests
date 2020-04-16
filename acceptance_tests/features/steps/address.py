@@ -53,6 +53,7 @@ def new_address_reported_event(context, sender):
                 "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
             },
             "payload": {
+                "sourceCaseId": None,
                 "newAddress": {
                     "collectionCase": {
                         "id": context.case_id,
