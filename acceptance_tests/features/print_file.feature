@@ -76,3 +76,12 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
       | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
+
+
+  Scenario: CE1 print files
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
+    When set action rule of type "CE1_IC01" when the case loading queues are drained
+    Then correctly formatted "D_CE1A_ICLCR1" print files are created
+    And there is a correct "D_CE1A_ICLCR1" manifest file for each csv file written
+    And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the files have all been copied to the bucket

@@ -9,7 +9,8 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     for uac in context.uac_created_events:
         if ignore_case_id is None or uac['payload']['uac']['caseId'] != ignore_case_id:
             expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
-            expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] = uac['payload']['uac']['questionnaireId']
+            expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] \
+                = uac['payload']['uac']['questionnaireId']
 
     for case in context.case_created_events:
         if ignore_case_id is None or case['payload']['collectionCase']['id'] != ignore_case_id:

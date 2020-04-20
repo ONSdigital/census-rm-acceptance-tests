@@ -58,6 +58,7 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'P_RL_2RL2B_3a': {'treatment_code': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',
                                              'HH_QFNR3AW']},
         'P_QU_H2': {'treatment_code': ['HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW']},
+        'CE1_IC01': {'treatment_code': ['CE_LFNR1E']},
         'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542', 'W01014540']},
         'P_RD_2RL2B_1': {'lsoa': ['E01014669', 'W01014669']},
         'P_RD_2RL1_2': {'lsoa': ['E01014543', 'E01014544']},
