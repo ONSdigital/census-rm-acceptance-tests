@@ -32,6 +32,17 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     And a receipt for the unlinked UAC-QID pair is received
     And message redelivery does not go bananas
 
+  Scenario: Unlinked QID is relinked to new case
+    Given sample file "sample_for_questionnaire_linked.csv" is loaded successfully
+    When an unaddressed message of questionnaire type 01 is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    Then a Questionnaire Linked message is sent
+    And a Questionnaire Linked event is logged
+    And a Questionnaire Linked message is sent for alternative case
+    And a Questionnaire Linked event is logged
+    And a Questionnaire Unlinked event is logged
+
+
   @local-docker
   Scenario: Correct print files generated
     When the unaddressed batch is loaded, the print files are generated
