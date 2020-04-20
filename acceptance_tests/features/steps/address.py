@@ -87,7 +87,7 @@ def new_address_reported_event(context, sender):
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
-def new_address_reported_event(context, sender):
+def new_address_reported_event_with_source_case_id(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     context.sourceCaseId = str(context.case_created_events[0]['payload']['collectionCase']['id'])
@@ -172,7 +172,7 @@ def new_address_reported_event_with_minimal_fields(context, sender):
 
 
 @step('the case can be retrieved')
-def retrieve_case(context):
+def retrieve_skeleton_case(context):
     response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
@@ -191,7 +191,7 @@ def retrieve_case(context):
 
 
 @step('the case can be retrieved and contains the correct properties when the event had details')
-def retrieve_case(context):
+def retrieve_case_from_source_case_id_and_event_details(context):
     response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
@@ -218,7 +218,7 @@ def retrieve_case(context):
 
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
-def retrieve_case(context):
+def retrieve_case_from_source_case_id_and_no_event_details(context):
     response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
