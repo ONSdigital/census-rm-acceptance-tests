@@ -11,10 +11,20 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the files have all been copied to the bucket
 
     Examples: Initial contact letter: <pack code>
-      | pack code  | action type | questionnaire types | sample file                          |
-      | P_IC_ICL1  | ICL1E       | [01]                | sample_input_england_census_spec.csv |
-      | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
-      | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
+      | pack code      | action type | questionnaire types | sample file                          |
+      | P_IC_ICL1      | ICL1E       | [01]                | sample_input_england_census_spec.csv |
+      | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
+      | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
+      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_1_english_CE_estab.csv        |
+      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv          |
+
+  Scenario: CE1 print files
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
+    When set action rule of type "CE1_IC01" when the case loading queues are drained
+    Then correctly formatted "D_CE1A_ICLCR1" print files are created
+    And there is a correct "D_CE1A_ICLCR1" manifest file for each csv file written
+    And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the files have all been copied to the bucket
 
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
@@ -78,10 +88,4 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
 
 
-  Scenario: CE1 print files
-    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
-    When set action rule of type "CE1_IC01" when the case loading queues are drained
-    Then correctly formatted "D_CE1A_ICLCR1" print files are created
-    And there is a correct "D_CE1A_ICLCR1" manifest file for each csv file written
-    And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
-    And the files have all been copied to the bucket
+
