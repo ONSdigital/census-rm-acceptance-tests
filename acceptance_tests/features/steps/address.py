@@ -53,8 +53,8 @@ def new_address_reported_event(context, sender):
                 "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
             },
             "payload": {
-                "sourceCaseId": None,
                 "newAddress": {
+                    "sourceCaseId": None,
                     "collectionCase": {
                         "id": context.case_id,
                         "caseType": "SPG",
@@ -86,8 +86,93 @@ def new_address_reported_event(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
+def new_address_reported_event_with_source_case_id(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    context.sourceCaseId = str(context.case_created_events[0]['payload']['collectionCase']['id'])
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": context.sourceCaseId,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "SPG",
+                        "survey": "CENSUS",
+                        "fieldcoordinatorId": "SO_23",
+                        "fieldofficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "SPG",
+                            "addressLevel": "U",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and minimal event fields')
+def new_address_reported_event_with_minimal_fields(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    context.sourceCaseId = str(context.case_created_events[0]['payload']['collectionCase']['id'])
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": context.sourceCaseId,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "SPG",
+                        "address": {
+                            "region": "E00001234",
+                            "addressType": "SPG",
+                            "addressLevel": "U"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
 @step('the case can be retrieved')
-def retrieve_case(context):
+def retrieve_skeleton_case(context):
     response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
@@ -103,6 +188,61 @@ def retrieve_case(context):
     test_helper.assertEqual(context.first_case['latitude'], "50.917428")
     test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
     test_helper.assertEqual(context.first_case['id'], context.case_id)
+
+
+@step('the case can be retrieved and contains the correct properties when the event had details')
+def retrieve_case_from_source_case_id_and_event_details(context):
+    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    context.first_case = response.json()
+    source_case = context.case_created_events[0]['payload']['collectionCase']
+
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+    test_helper.assertEqual(context.first_case['addressLine1'], "123")
+    test_helper.assertEqual(context.first_case['addressLine2'], "Fake caravan park")
+    test_helper.assertEqual(context.first_case['addressLine3'], "The long road")
+    test_helper.assertEqual(context.first_case['townName'], "Trumpton")
+    test_helper.assertEqual(context.first_case['postcode'], "SO190PG")
+    test_helper.assertEqual(context.first_case['region'], "E00001234")
+    test_helper.assertEqual(context.first_case['addressType'], "SPG")
+    test_helper.assertEqual(context.first_case['addressLevel'], "U")
+    test_helper.assertEqual(context.first_case['latitude'], "50.917428")
+    test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
+    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
+    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
+    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
+    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
+    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+
+
+@step('the case can be retrieved and contains the correct properties when the event had minimal details')
+def retrieve_case_from_source_case_id_and_no_event_details(context):
+    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    context.first_case = response.json()
+    source_case = context.case_created_events[0]['payload']['collectionCase']
+
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
+    test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
+    test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
+    test_helper.assertEqual(context.first_case['addressLine3'], source_case['address']['addressLine3'])
+    test_helper.assertEqual(context.first_case['townName'], source_case['address']['townName'])
+    test_helper.assertEqual(context.first_case['postcode'], source_case['address']['postcode'])
+    test_helper.assertEqual(context.first_case['region'], "E00001234")
+    test_helper.assertEqual(context.first_case['addressType'], "SPG")
+    test_helper.assertEqual(context.first_case['addressLevel'], "U")
+    test_helper.assertEqual(context.first_case['latitude'], None)
+    test_helper.assertEqual(context.first_case['longitude'], None)
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
+    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
+    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
+    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
+    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
+    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+    test_helper.assertEqual(context.first_case['uprn'], None)
 
 
 @step('a case created event is emitted')
