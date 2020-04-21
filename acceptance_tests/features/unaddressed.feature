@@ -38,7 +38,7 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     Then a Questionnaire Linked message is sent
     And a Questionnaire Linked event is logged
-    And a Questionnaire Linked message is sent for alternative case
+    And a Questionnaire Linked message is sent to relink to a new case
     And a Questionnaire Linked event is logged
     And a Questionnaire Unlinked event is logged
 

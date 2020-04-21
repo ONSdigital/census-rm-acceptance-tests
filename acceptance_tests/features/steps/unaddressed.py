@@ -36,10 +36,9 @@ def send_linked_message(context):
     context.linked_case_id = context.linked_case['id']
 
 
-@step("a Questionnaire Linked message is sent for alternative case")
+@step("a Questionnaire Linked message is sent to relink to a new case")
 def send_linked_message_for_alternative_case(context):
     check_alternative_linked_message_is_received(context)
-    context.unlinked_case_id = context.unlinked_case['id']
 
 
 @step("a Questionnaire Linked message is sent for blank questionnaire")
@@ -69,9 +68,9 @@ def check_linked_message_is_received(context):
 
 
 def check_alternative_linked_message_is_received(context):
-    context.unlinked_case = context.case_created_events[0]['payload']['collectionCase']
+    alternative_case = context.case_created_events[0]['payload']['collectionCase']
 
-    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.unlinked_case['id'])
+    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, alternative_case['id'])
 
 
 def check_blank_link_message_is_received(context):
