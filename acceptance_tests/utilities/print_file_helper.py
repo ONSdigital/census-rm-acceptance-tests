@@ -45,6 +45,7 @@ def create_expected_reminder_letter_csv_lines(context, pack_code):
 
     for uac in context.reminder_uac_updated_events:
         expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+        expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] = uac['payload']['uac']['questionnaireId']
 
     for case in expected_reminder_case_created_events:
         expected_data = _add_expected_case_data(case, expected_data)
@@ -221,7 +222,7 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{fulfilment_code}'
+        f'{fulfilment_code}||||'
     )
 
 
