@@ -43,6 +43,22 @@ Feature: Address updates
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
+  Scenario: New address event received with sourceCaseId
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
+    And a case created event is emitted
+    Then the case can be retrieved and contains the correct properties when the event had details
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+
+
+  Scenario: New address event received with sourceCaseId and minimal event fields
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId and minimal event fields
+    And a case created event is emitted
+    Then the case can be retrieved and contains the correct properties when the event had minimal details
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+
+
   Scenario: Log Address Modified Event
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an Address Modified Event is sent
