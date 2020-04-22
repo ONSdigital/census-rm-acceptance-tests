@@ -17,7 +17,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
       | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_1_english_CE_estab.csv        |
       | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv          |
-
+      | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv         |
+      | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv           |
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded
