@@ -9,6 +9,8 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     for uac in context.uac_created_events:
         if ignore_case_id is None or uac['payload']['uac']['caseId'] != ignore_case_id:
             expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+            expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] \
+                = uac['payload']['uac']['questionnaireId']
 
     for case in context.case_created_events:
         if ignore_case_id is None or case['payload']['collectionCase']['id'] != ignore_case_id:
@@ -43,6 +45,7 @@ def create_expected_reminder_letter_csv_lines(context, pack_code):
 
     for uac in context.reminder_uac_updated_events:
         expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+        expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] = uac['payload']['uac']['questionnaireId']
 
     for case in expected_reminder_case_created_events:
         expected_data = _add_expected_case_data(case, expected_data)
@@ -97,7 +100,10 @@ def _add_expected_uac_data(message, expected_data):
 def _add_expected_case_data(message, expected_data):
     case_id = message['payload']['collectionCase']['id']
 
-    expected_data[case_id]['case_ref'] = message['payload']['collectionCase']['caseRef']
+    collection_case = message['payload']['collectionCase']
+    expected_data[case_id]['case_ref'] = collection_case['caseRef']
+    expected_data[case_id]['coordinator_id'] = collection_case['fieldCoordinatorId']
+    expected_data[case_id]['officer_id'] = collection_case['fieldOfficerId']
 
     _populate_expected_address(case_id, expected_data, message)
 
@@ -121,6 +127,7 @@ def _populate_expected_address(case_id, expected_data, message):
     expected_data[case_id]['address_line_3'] = address['addressLine3']
     expected_data[case_id]['town_name'] = address['townName']
     expected_data[case_id]['postcode'] = address['postcode']
+    expected_data[case_id]['organization_name'] = address['organisationName']
 
 
 def _create_expected_csv_line(case, prefix):
@@ -133,7 +140,11 @@ def _create_expected_csv_line(case, prefix):
         f'{case["address_line_3"]}|'
         f'{case["town_name"]}|'
         f'{case["postcode"]}|'
-        f'{prefix}'
+        f'{prefix}|'
+        f'{case["questionnaire_id"]}|'
+        f'{case["organization_name"]}|'
+        f'{case["coordinator_id"]}|'
+        f'{case["officer_id"]}'
     )
 
 
@@ -211,7 +222,7 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{fulfilment_code}'
+        f'{fulfilment_code}||||'
     )
 
 

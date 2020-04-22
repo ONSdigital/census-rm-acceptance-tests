@@ -11,10 +11,12 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the files have all been copied to the bucket
 
     Examples: Initial contact letter: <pack code>
-      | pack code  | action type | questionnaire types | sample file                          |
-      | P_IC_ICL1  | ICL1E       | [01]                | sample_input_england_census_spec.csv |
-      | P_IC_ICL2B | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
-      | P_IC_ICL4  | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
+      | pack code      | action type | questionnaire types | sample file                          |
+      | P_IC_ICL1      | ICL1E       | [01]                | sample_input_england_census_spec.csv |
+      | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
+      | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
+      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_1_english_CE_estab.csv        |
+      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv          |
 
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
@@ -76,3 +78,6 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
       | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
+
+
+

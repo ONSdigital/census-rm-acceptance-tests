@@ -43,8 +43,9 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_RD_2RL1_2": Config.SFTP_PPO_DIRECTORY,
     "P_RD_2RL2B_2": Config.SFTP_PPO_DIRECTORY,
     "P_RD_2RL1_3": Config.SFTP_PPO_DIRECTORY,
-    "P_RD_2RL2B_3": Config.SFTP_PPO_DIRECTORY
-
+    "P_RD_2RL2B_3": Config.SFTP_PPO_DIRECTORY,
+    "D_CE1A_ICLCR1": Config.SFTP_PPO_DIRECTORY,
+    "D_CE1A_ICLCR2B": Config.SFTP_PPO_DIRECTORY
 }
 
 PACK_CODE_TO_DATASET = {
@@ -83,7 +84,9 @@ PACK_CODE_TO_DATASET = {
     "P_RD_2RL1_2": PPD1_2_DATASET,
     "P_RD_2RL2B_2": PPD1_2_DATASET,
     "P_RD_2RL1_3": PPD1_2_DATASET,
-    "P_RD_2RL2B_3": PPD1_2_DATASET
+    "P_RD_2RL2B_3": PPD1_2_DATASET,
+    "D_CE1A_ICLCR1": PPD1_1_DATASET,
+    "D_CE1A_ICLCR2B": PPD1_1_DATASET,
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -122,7 +125,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RD_2RL1_2": "Response driven reminder group 2 English",
     "P_RD_2RL2B_2": "Response driven reminder group 2 Welsh",
     "P_RD_2RL1_3": "Response driven reminder group 3 English",
-    "P_RD_2RL2B_3": "Response driven reminder group 3 Welsh"
+    "P_RD_2RL2B_3": "Response driven reminder group 3 Welsh",
+    "D_CE1A_ICLCR1": "CE1 ICL with UAC for England (Hand Delivery) Addressed",
+    "D_CE1A_ICLCR2B": "CE1 ICL with UAC for Wales (Hand Delivery) Addressed",
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
