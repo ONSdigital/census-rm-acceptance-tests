@@ -91,4 +91,3 @@ Feature: Address updates
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     And a CREATE action instruction is sent to field
-    
