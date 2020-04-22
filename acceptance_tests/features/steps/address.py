@@ -1,3 +1,4 @@
+import functools
 import json
 import uuid
 
@@ -6,6 +7,7 @@ from behave import step
 
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -107,8 +109,8 @@ def new_address_reported_event_with_source_case_id(context, sender):
                         "id": context.case_id,
                         "caseType": "SPG",
                         "survey": "CENSUS",
-                        "fieldcoordinatorId": "SO_23",
-                        "fieldofficerId": "SO_23_123",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
                         "collectionExerciseId": context.collection_exercise_id,
                         "address": {
                             "addressLine1": "123",
@@ -354,3 +356,29 @@ def send_address_modified_event(context):
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step("a CREATE action instruction is sent to field")
+def create_msg_sent_to_field(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
+        _field_work_create_callback, context=context))
+
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.case_id)
+    test_helper.assertEqual(context.addressType, "SPG")
+    test_helper.assertEqual(context.field_action_cancel_message['surveyName'], "CENSUS")
+
+
+def _field_work_create_callback(ch, method, _properties, body, context):
+    action_create = json.loads(body)
+
+    if not action_create['actionInstruction'] == 'CREATE':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{action_create["actionInstruction"]}", wanted "CREATE"')
+
+    context.addressType = action_create['addressType']
+    context.fwmt_emitted_case_id = action_create['caseId']
+    context.field_action_cancel_message = action_create
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
