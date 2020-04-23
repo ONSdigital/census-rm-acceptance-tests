@@ -85,3 +85,9 @@ Feature: Address updates
     Then a UAC and QID with questionnaire type "01" type are generated and returned
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
     And a fulfilment request event is logged
+
+  Scenario: New address event received with sourceCaseId and sends Create to Field
+    Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
+    And a case created event is emitted
+    And a CREATE action instruction is sent to field
