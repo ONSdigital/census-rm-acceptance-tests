@@ -36,6 +36,12 @@ def send_linked_message(context):
     context.linked_case_id = context.linked_case['id']
 
 
+@step("a Questionnaire Linked message is sent to relink to a new case")
+def send_linked_message_for_alternative_case(context):
+    check_alternative_linked_message_is_received(context)
+    time.sleep(1)
+
+
 @step("a Questionnaire Linked message is sent for blank questionnaire")
 def send_linked_message_for_blank_questionnaire(context):
     check_blank_link_message_is_received(context)
@@ -62,6 +68,13 @@ def check_linked_message_is_received(context):
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
 
+def check_alternative_linked_message_is_received(context):
+    alternative_case = context.case_created_events[0]['payload']['collectionCase']
+
+    context.linked_case_id = alternative_case['id']
+    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, alternative_case['id'])
+
+
 def check_blank_link_message_is_received(context):
     context.linked_case = context.case_created_events[0]['payload']['collectionCase']
 
@@ -78,8 +91,14 @@ def check_uac_message_is_received(context):
 
 
 @step("a Questionnaire Linked event is logged")
-def check_questionaire_linked_logging(context):
+def check_questionnaire_linked_logging(context):
     check_question_linked_event_is_logged(context)
+
+
+@step("a Questionnaire Unlinked event is logged")
+def check_questionnaire_unlinked_logging(context):
+    context.linked_case_id = context.case_created_events[1]['payload']['collectionCase']['id']
+    check_question_unlinked_event_is_logged(context)
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
@@ -91,6 +110,18 @@ def check_question_linked_event_is_logged(context):
         if case_event['description'] == 'Questionnaire Linked':
             return
     test_helper.fail('Did not find questionnaire linked event')
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_question_unlinked_event_is_logged(context):
+    case_id = context.linked_case_id
+    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response_json = response.json()
+    for case_event in response_json['caseEvents']:
+        expected_desc = f'Questionnaire unlinked from case with QID {context.expected_questionnaire_id}'
+        if case_event['description'] == expected_desc:
+            return
+    test_helper.fail('Questionnaire unlinked event has not occurred')
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
