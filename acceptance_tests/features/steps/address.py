@@ -217,6 +217,7 @@ def retrieve_case_from_source_case_id_and_event_details(context):
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
     test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
     test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+    test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
 
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
@@ -245,6 +246,7 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
     test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
     test_helper.assertEqual(context.first_case['uprn'], None)
+    test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
 
 
 @step('a case created event is emitted')
