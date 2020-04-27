@@ -26,6 +26,23 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
+@step("new messages are emitted to RH and Action Scheduler with {questionnaire_types} questionnaire types")
+def gather_new_messages_emitted_with_qids(context, questionnaire_types):
+    expected_number_of_uac_messages = 0
+    for case in context.case_created_events:
+        expected_number_of_uac_messages += case['payload']['collectionCase']['ceExpectedCapacity']
+    context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, questionnaire_types)
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
+                                                      expected_msg_count=expected_number_of_uac_messages,
+                                                      collection_exercise_id=context.collection_exercise_id))
+    test_helper.assertEqual(len(context.messages_received), expected_number_of_uac_messages)
+    context.uac_created_events = context.messages_received.copy()
+    _test_uacs_correct_for_estab_units(context, expected_number_of_uac_messages)
+    context.messages_received = []
+
+
 @step('UAC Updated events emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
 def gather_uac_updated_events(context, number_of_matching_cases):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
@@ -94,6 +111,14 @@ def _test_uacs_correct(context):
                 break
         else:
             test_helper.fail('Could not find UAC Updated event')
+
+
+def _test_uacs_correct_for_estab_units(context, expected_uacs):
+    test_helper.assertEqual(len(context.messages_received), expected_uacs)
+
+    for msg in context.uac_created_events:
+        _validate_uac_message(msg)
+        test_helper.assertEqual(msg['payload']['uac']['questionnaireId'][:2], '21')
 
 
 def _validate_uac_message(parsed_body):

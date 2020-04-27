@@ -20,6 +20,16 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv         |
       | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv           |
 
+  Scenario: Generate print files and log events for initial contact letters CE Estabs
+    Given sample file "sample_3_english_CE_estab.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with 31 questionnaire types
+    When set action rule of type "CE_IC03" when the case loading queues are drained
+    And new messages are emitted to RH and Action Scheduler with 21 questionnaire types
+    Then correctly formatted "D_ICA_ICLR1" print files are created for CE Estab expected responses
+    And there is a correct "D_ICA_ICLR1" manifest file for each csv file written
+    And special events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the files have all been copied to the bucket
+
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
