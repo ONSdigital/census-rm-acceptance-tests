@@ -114,6 +114,7 @@ def _add_expected_questionnaire_case_data(message, expected_data):
     case_id = message['payload']['collectionCase']['id']
 
     expected_data[case_id]['coordinator_id'] = message['payload']['collectionCase']['fieldCoordinatorId']
+    expected_data[case_id]['officer_id'] = message['payload']['collectionCase']['fieldOfficerId']
 
     _populate_expected_address(case_id, expected_data, message)
 
@@ -161,7 +162,9 @@ def _create_expected_questionnaire_csv_line(case, prefix):
         f'{case["address_line_3"]}|'
         f'{case["town_name"]}|'
         f'{case["postcode"]}|'
-        f'{prefix}'
+        f'{prefix}|'
+        f'{case["organization_name"]}|'
+        f'{case["officer_id"]}'
     )
 
 
@@ -182,7 +185,7 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{pack_code}'
+        f'{pack_code}||'
     )
 
 
@@ -237,5 +240,5 @@ def create_expected_individual_response_csv(individual_case, uac, qid, fulfilmen
         f'{individual_case["addressLine3"]}|'
         f'{individual_case["townName"]}|'
         f'{individual_case["postcode"]}|'
-        f'{fulfilment_code}'
+        f'{fulfilment_code}||'
     )
