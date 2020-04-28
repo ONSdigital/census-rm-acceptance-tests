@@ -30,7 +30,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And expected number of uac events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
     And the files have all been copied to the bucket
 
-    Examples: Initial contact questionnaire: <pack code>
+    Examples: CE Estab initial contact Letters: <pack code>
       | pack code    | action type | questionnaire type | sample file                   | individual qid type |
       | D_ICA_ICLR1  | CE_IC03     | 31                 | sample_3_english_CE_estab.csv | 21                  |
       | D_ICA_ICLR2B | CE_IC04     | 32                 | sample_3_welsh_CE_estab.csv   | 22                  |
