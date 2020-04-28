@@ -208,7 +208,7 @@ def _create_expected_on_request_fulfilment_questionnaire_csv_line(case, pack_cod
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{pack_code}'
+        f'{pack_code}||'
     )
 
 
