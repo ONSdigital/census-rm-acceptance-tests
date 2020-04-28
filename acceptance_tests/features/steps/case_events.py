@@ -26,8 +26,8 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
-@step("new messages are emitted to RH and Action Scheduler with {questionnaire_types} questionnaire types")
-def gather_new_messages_emitted_with_qids(context, questionnaire_types):
+@step("CE Estab messages are emitted to RH and Action Scheduler with {questionnaire_types} questionnaire types")
+def gather_ce_estab_messages_emitted_with_qids(context, questionnaire_types):
     expected_number_of_uac_messages = 0
     for case in context.case_created_events:
         expected_number_of_uac_messages += case['payload']['collectionCase']['ceExpectedCapacity']
@@ -39,7 +39,7 @@ def gather_new_messages_emitted_with_qids(context, questionnaire_types):
                                                       collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEqual(len(context.messages_received), expected_number_of_uac_messages)
     context.uac_created_events = context.messages_received.copy()
-    _test_uacs_correct_for_estab_units(context, expected_number_of_uac_messages)
+    _test_uacs_correct_for_estab_units(context, expected_number_of_uac_messages, questionnaire_types)
     context.messages_received = []
 
 
@@ -113,12 +113,12 @@ def _test_uacs_correct(context):
             test_helper.fail('Could not find UAC Updated event')
 
 
-def _test_uacs_correct_for_estab_units(context, expected_uacs):
+def _test_uacs_correct_for_estab_units(context, expected_uacs, questionnaire_type):
     test_helper.assertEqual(len(context.messages_received), expected_uacs)
 
     for msg in context.uac_created_events:
         _validate_uac_message(msg)
-        test_helper.assertEqual(msg['payload']['uac']['questionnaireId'][:2], '21')
+        test_helper.assertEqual(msg['payload']['uac']['questionnaireId'][:2], questionnaire_type)
 
 
 def _validate_uac_message(parsed_body):

@@ -11,12 +11,11 @@ def correct_event_types_logged(context, event_type_list):
         check_if_event_list_is_exact_match(event_type_list, case['payload']['collectionCase']['id'])
 
 
-@step("special events logged against the case are {event_type_list}")
+@step("expected number of uac events logged against the case are {event_type_list}")
 def correct_event_types_logged_for_ce_estabs(context, event_type_list):
     expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
     for case in context.case_created_events:
         new_type_list = expected_logged_event_types.copy()
-
         for _ in range(case['payload']['collectionCase']['ceExpectedCapacity']):
             new_type_list.append('RM_UAC_CREATED')
         check_if_event_list_is_exact_match(','.join(new_type_list), case['payload']['collectionCase']['id'])
