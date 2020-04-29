@@ -11,6 +11,16 @@ def correct_event_types_logged(context, event_type_list):
         check_if_event_list_is_exact_match(event_type_list, case['payload']['collectionCase']['id'])
 
 
+@step('the expected number of "RM_UAC_CREATED" and {event_type_list} events are logged against the case')
+def correct_event_types_logged_for_ce_estabs(context, event_type_list):
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+    for case in context.case_created_events:
+        new_type_list = expected_logged_event_types.copy()
+        for _ in range(case['payload']['collectionCase']['ceExpectedCapacity']):
+            new_type_list.append('RM_UAC_CREATED')
+        check_if_event_list_is_exact_match(','.join(new_type_list), case['payload']['collectionCase']['id'])
+
+
 @step('"{event_type}" events are logged against the cases included in the reminder')
 def check_print_case_selected_event_is_logged_against_reminder_cases(context, event_type):
     for case_id in context.reminder_case_ids:

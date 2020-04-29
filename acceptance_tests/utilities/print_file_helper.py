@@ -22,6 +22,30 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     ]
 
 
+def create_expected_csv_lines_for_ce_estab_responses(context, prefix):
+    result = []
+    for event in context.case_created_events:
+        case = {}
+        collection_case = event['payload']['collectionCase']
+        address = collection_case['address']
+        case['address_line_1'] = address['addressLine1']
+        case['address_line_2'] = address['addressLine2']
+        case['address_line_3'] = address['addressLine3']
+        case['town_name'] = address['townName']
+        case['postcode'] = address['postcode']
+        case['organization_name'] = address['organisationName']
+        case['case_ref'] = collection_case['caseRef']
+        case['coordinator_id'] = collection_case['fieldCoordinatorId']
+        case['officer_id'] = collection_case['fieldOfficerId']
+        for uac in context.uac_created_events:
+            if uac['payload']['uac']['caseId'] == collection_case['id']:
+                case['uac'] = uac['payload']['uac']['uac']
+                case['questionnaire_id'] = uac['payload']['uac']['questionnaireId']
+                result.append(_create_expected_csv_line(case, prefix))
+
+    return result
+
+
 def create_expected_questionnaire_csv_lines(context, prefix):
     expected_data = defaultdict(dict)
 
