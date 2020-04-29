@@ -27,7 +27,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
     Then correctly formatted "<pack code>" print files are created for CE Estab expected responses
     And there is a correct "<pack code>" manifest file for each csv file written
-    And expected number of uac events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
+    And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
     And the files have all been copied to the bucket
 
     Examples: CE Estab initial contact Letters: <pack code>
