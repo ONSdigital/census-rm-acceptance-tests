@@ -47,7 +47,10 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_CE1A_ICLCR1": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR2B": Config.SFTP_PPO_DIRECTORY,
     "D_ICA_ICLR1": Config.SFTP_PPO_DIRECTORY,
-    "D_ICA_ICLR2B": Config.SFTP_PPO_DIRECTORY
+    "D_ICA_ICLR2B": Config.SFTP_PPO_DIRECTORY,
+    "D_CE4A_ICLR4": Config.SFTP_PPO_DIRECTORY,
+    "D_CE4A_ICLS4": Config.SFTP_PPO_DIRECTORY,
+    "D_FDCE_I4": Config.SFTP_QM_DIRECTORY
 }
 
 PACK_CODE_TO_DATASET = {
@@ -91,6 +94,9 @@ PACK_CODE_TO_DATASET = {
     "D_CE1A_ICLCR2B": PPD1_1_DATASET,
     "D_ICA_ICLR1": PPD1_1_DATASET,
     "D_ICA_ICLR2B": PPD1_1_DATASET,
+    "D_CE4A_ICLR4": PPD1_1_DATASET,
+    "D_CE4A_ICLS4": PPD1_1_DATASET,
+    "D_FDCE_I4": QM3_2_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -134,6 +140,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_CE1A_ICLCR2B": "CE1 ICL with UAC for Wales (Hand Delivery) Addressed",
     "D_ICA_ICLR1": "Individual ICL with UAC for England (Hand Delivery) Addressed",
     "D_ICA_ICLR2B": "Individual ICL with UAC for Wales (Hand Delivery) Addressed",
+    "D_CE4A_ICLR4": "CE resident letter",
+    "D_CE4A_ICLS4": "CE student letter",
+    "D_FDCE_I4": "Individual Questionnaire for NI (Hand delivery) Addressed"
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
