@@ -19,6 +19,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv          |
       | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv         |
       | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv           |
+      | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv        |
+      | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv          |
 
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
     Given sample file "<sample file>" is loaded
