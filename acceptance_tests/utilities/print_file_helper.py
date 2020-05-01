@@ -26,17 +26,7 @@ def create_expected_csv_lines_for_ce_estab_responses(context, prefix):
     result = []
     for event in context.case_created_events:
         case = {}
-        collection_case = event['payload']['collectionCase']
-        address = collection_case['address']
-        case['address_line_1'] = address['addressLine1']
-        case['address_line_2'] = address['addressLine2']
-        case['address_line_3'] = address['addressLine3']
-        case['town_name'] = address['townName']
-        case['postcode'] = address['postcode']
-        case['organization_name'] = address['organisationName']
-        case['case_ref'] = collection_case['caseRef']
-        case['coordinator_id'] = collection_case['fieldCoordinatorId']
-        case['officer_id'] = collection_case['fieldOfficerId']
+        collection_case = get_case_details_for_CE_Estab_responses(case, event)
         for uac in context.uac_created_events:
             if uac['payload']['uac']['caseId'] == collection_case['id']:
                 case['uac'] = uac['payload']['uac']['uac']
@@ -59,6 +49,35 @@ def create_expected_questionnaire_csv_lines(context, prefix):
         _create_expected_questionnaire_csv_line(case, prefix)
         for case in expected_data.values()
     ]
+
+
+def create_expected_CE_Estab_questionnaire_csv_lines(context, prefix):
+    result = []
+    for event in context.case_created_events:
+        case = {}
+        collection_case = get_case_details_for_CE_Estab_responses(case, event)
+        for uac in context.uac_created_events:
+            if uac['payload']['uac']['caseId'] == collection_case['id']:
+                case['uac'] = uac['payload']['uac']['uac']
+                case['qid'] = uac['payload']['uac']['questionnaireId']
+                result.append(_create_expected_questionnaire_csv_line(case, prefix))
+
+    return result
+
+
+def get_case_details_for_CE_Estab_responses(case, event):
+    collection_case = event['payload']['collectionCase']
+    address = collection_case['address']
+    case['address_line_1'] = address['addressLine1']
+    case['address_line_2'] = address['addressLine2']
+    case['address_line_3'] = address['addressLine3']
+    case['town_name'] = address['townName']
+    case['postcode'] = address['postcode']
+    case['organization_name'] = address['organisationName']
+    case['case_ref'] = collection_case['caseRef']
+    case['coordinator_id'] = collection_case['fieldCoordinatorId']
+    case['officer_id'] = collection_case['fieldOfficerId']
+    return collection_case
 
 
 def create_expected_reminder_letter_csv_lines(context, pack_code):
@@ -109,7 +128,7 @@ def _add_expected_uac_data(message, expected_data):
     case_id = message['payload']['uac']['caseId']
     uac_payload = message['payload']['uac']
 
-    if uac_payload['questionnaireId'][:2] in ('01', '02', '04'):
+    if uac_payload['questionnaireId'][:2] in ('01', '02', '04', '21', '22', '24'):
         expected_data[case_id]['uac'] = uac_payload['uac']
         expected_data[case_id]['qid'] = uac_payload['questionnaireId']
     elif uac_payload['questionnaireId'][:2] == '03':
@@ -138,6 +157,7 @@ def _add_expected_questionnaire_case_data(message, expected_data):
     case_id = message['payload']['collectionCase']['id']
 
     expected_data[case_id]['coordinator_id'] = message['payload']['collectionCase']['fieldCoordinatorId']
+    expected_data[case_id]['officer_id'] = message['payload']['collectionCase']['fieldOfficerId']
 
     _populate_expected_address(case_id, expected_data, message)
 
@@ -185,7 +205,9 @@ def _create_expected_questionnaire_csv_line(case, prefix):
         f'{case["address_line_3"]}|'
         f'{case["town_name"]}|'
         f'{case["postcode"]}|'
-        f'{prefix}'
+        f'{prefix}|'
+        f'{case["organization_name"]}|'
+        f'{case["officer_id"]}'
     )
 
 
@@ -206,7 +228,7 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{pack_code}'
+        f'{pack_code}||'
     )
 
 
@@ -229,7 +251,7 @@ def _create_expected_on_request_fulfilment_questionnaire_csv_line(case, pack_cod
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{pack_code}'
+        f'{pack_code}||'
     )
 
 
@@ -261,5 +283,5 @@ def create_expected_individual_response_csv(individual_case, uac, qid, fulfilmen
         f'{individual_case["addressLine3"]}|'
         f'{individual_case["townName"]}|'
         f'{individual_case["postcode"]}|'
-        f'{fulfilment_code}'
+        f'{fulfilment_code}||'
     )
