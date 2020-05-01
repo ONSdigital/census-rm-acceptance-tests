@@ -67,6 +67,8 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'CE_IC05': {'treatment_code': ['CE_2LNFN']},
         'CE_IC06': {'treatment_code': ['CE_3LSNFN']},
         'CE_IC08': {'treatment_code': ['CE_1QNFN']},
+        'SPG_IC11': {'treatment_code': ['SPG_LPHUE']},
+        'SPG_IC12': {'treatment_code': ['SPG_LPHUW']},
         'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542', 'W01014540']},
         'P_RD_2RL2B_1': {'lsoa': ['E01014669', 'W01014669']},
         'P_RD_2RL1_2': {'lsoa': ['E01014543', 'E01014544']},
