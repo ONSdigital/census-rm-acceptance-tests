@@ -42,7 +42,8 @@ def check_correct_Welsh_CE_Estab_questionnaire_files_on_sftp_server(context, pac
     for case_id, value in expected_case_data.items():
         expected_print_file_line_count += value['case_details']['ceExpectedCapacity']
 
-    actual_print_file_rows = check_ce_estab_welsh_questionnaire_is_correct(context, pack_code, expected_print_file_line_count)
+    actual_print_file_rows = check_ce_estab_welsh_questionnaire_is_correct(context, pack_code,
+                                                                           expected_print_file_line_count)
 
     for case_id, value in expected_case_data.items():
         matching_rows = []
@@ -54,29 +55,32 @@ def check_correct_Welsh_CE_Estab_questionnaire_files_on_sftp_server(context, pac
 
         for uac in context.uac_created_events:
             if uac['payload']['uac']['caseId'] == value['case_details']['id']:
-                if uac['payload']['uac']['questionnaireId'][:2] == '23':
-                    expected_welsh_line_ending = f"|{uac['payload']['uac']['uac']}|" \
-                                                 f"{uac['payload']['uac']['questionnaireId']}|{value['line_ending']}"
-                    matched = False
-                    for row in matching_rows:
-                        if row.endswith(expected_welsh_line_ending):
-                            matched = True
+                _check_if_welsh_qid_type_or_not(matching_rows, uac, value)
 
-                    test_helper.assertTrue(matched,
-                                           f'Could not find expected Welsh line ending {expected_welsh_line_ending}')
 
-                else:
-                    expected_english_line_start = f"{uac['payload']['uac']['uac']}|" \
-                                                 f"{uac['payload']['uac']['questionnaireId']}|"
-                    matched = False
-                    for row in matching_rows:
-                        if row.startswith(expected_english_line_start):
-                            matched = True
+def _check_if_welsh_qid_type_or_not(matching_rows, uac, value):
+    if uac['payload']['uac']['questionnaireId'][:2] == '23':
+        expected_welsh_line_ending = f"|{uac['payload']['uac']['uac']}|" \
+                                     f"{uac['payload']['uac']['questionnaireId']}|{value['line_ending']}"
+        matched = False
+        for row in matching_rows:
+            if row.endswith(expected_welsh_line_ending):
+                matched = True
 
-                    test_helper.assertTrue(matched,
-                                           f'Could not find expected English line starting '
-                                           f'{expected_english_line_start}')
+        test_helper.assertTrue(matched,
+                               f'Could not find expected Welsh line ending {expected_welsh_line_ending}')
 
+    else:
+        expected_english_line_start = f"{uac['payload']['uac']['uac']}|" \
+                                      f"{uac['payload']['uac']['questionnaireId']}|"
+        matched = False
+        for row in matching_rows:
+            if row.startswith(expected_english_line_start):
+                matched = True
+
+        test_helper.assertTrue(matched,
+                               f'Could not find expected English line starting '
+                               f'{expected_english_line_start}')
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
@@ -165,7 +169,8 @@ def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, p
 
 def _get_print_file_rows_as_list(context, pack_code):
     with SftpUtility() as sftp_utility:
-        context.expected_print_files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, pack_code, ".csv.gpg")
+        context.expected_print_files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime,
+                                                                             pack_code, ".csv.gpg")
         return sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
 
 

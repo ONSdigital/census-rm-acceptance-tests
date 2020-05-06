@@ -1,7 +1,6 @@
 Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Generate print files and log events for initial contact letters
-
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
     When set action rule of type "<action type>" when the case loading queues are drained
@@ -22,6 +21,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv        |
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv          |
 
+
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire type> questionnaire types
@@ -38,6 +38,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | D_ICA_ICLR2B | CE_IC04     | 32                 | sample_3_welsh_CE_estab.csv       | 22                  |
       | D_CE4A_ICLR4 | CE_IC05     | 34                 | sample_3_ni_CE_estab_resident.csv | 24                  |
       | D_CE4A_ICLS4 | CE_IC06     | 34                 | sample_3_ni_CE_estab_student.csv  | 24                  |
+
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded
@@ -127,6 +128,4 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
       | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
-
-
 
