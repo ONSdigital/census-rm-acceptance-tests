@@ -59,15 +59,17 @@ def create_expected_CE_Estab_questionnaire_csv_lines(context, prefix):
         case = {}
         collection_case = get_case_details_for_CE_Estab_responses(case, event)
         for uac in context.uac_created_events:
-            if uac['payload']['uac']['questionnaireId'].startswith('23'):
-                case['uac_wales'] = uac['payload']['uac']['uac']
-                case['qid_wales'] = uac['payload']['uac']['questionnaireId']
+            case_id = collection_case['id']
+            if uac['payload']['uac']['caseId'] == case_id:
+                if uac['payload']['uac']['questionnaireId'].startswith('23'):
+                    expected_data[case_id]['uac_wales'] = uac['payload']['uac']['uac']
+                    expected_data[case_id]['qid_wales'] = uac['payload']['uac']['questionnaireId']
 
-            elif uac['payload']['uac']['caseId'] == collection_case['id']:
-                case['uac'] = uac['payload']['uac']['uac']
-                case['qid'] = uac['payload']['uac']['questionnaireId']
+                else:
+                    expected_data[case_id]['uac'] = uac['payload']['uac']['uac']
+                    expected_data[case_id]['qid'] = uac['payload']['uac']['questionnaireId']
 
-            result.append(_create_expected_questionnaire_csv_line(case, prefix))
+        result.append(_create_expected_questionnaire_csv_line(case, prefix))
 
     return result
 
