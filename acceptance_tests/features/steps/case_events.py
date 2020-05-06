@@ -30,12 +30,13 @@ def gather_messages_emitted_with_qids(context, questionnaire_types):
 def gather_ce_estab_messages_emitted_with_qids(context, questionnaire_types):
     expected_number_of_uac_messages = 0
     for case in context.case_created_events:
+        # if case['payload']['collectionCase']['address']
         expected_number_of_uac_messages += case['payload']['collectionCase']['ceExpectedCapacity']
     context.expected_uacs_cases = _get_extended_case_created_events_for_uacs(context, questionnaire_types)
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
                                                       context=context,
-                                                      expected_msg_count=expected_number_of_uac_messages,
+                                                      expected_msg_count=expected_number_of_uac_messages*2,
                                                       collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEqual(len(context.messages_received), expected_number_of_uac_messages)
     context.uac_created_events = context.messages_received.copy()
@@ -114,11 +115,12 @@ def _test_uacs_correct(context):
 
 
 def _test_uacs_correct_for_estab_units(context, expected_uacs, questionnaire_type):
+    questionnaire_types_list = questionnaire_type.replace('[', '').replace(']', '').split(',')
     test_helper.assertEqual(len(context.messages_received), expected_uacs)
 
     for msg in context.uac_created_events:
         _validate_uac_message(msg)
-        test_helper.assertEqual(msg['payload']['uac']['questionnaireId'][:2], questionnaire_type)
+        test_helper.assertIn(msg['payload']['uac']['questionnaireId'][:2], questionnaire_types_list)
 
 
 def _validate_uac_message(parsed_body):

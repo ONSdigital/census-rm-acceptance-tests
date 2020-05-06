@@ -53,14 +53,21 @@ def create_expected_questionnaire_csv_lines(context, prefix):
 
 def create_expected_CE_Estab_questionnaire_csv_lines(context, prefix):
     result = []
+    expected_data = defaultdict(dict)
+
     for event in context.case_created_events:
         case = {}
         collection_case = get_case_details_for_CE_Estab_responses(case, event)
         for uac in context.uac_created_events:
-            if uac['payload']['uac']['caseId'] == collection_case['id']:
+            if uac['payload']['uac']['questionnaireId'].startswith('23'):
+                case['uac_wales'] = uac['payload']['uac']['uac']
+                case['qid_wales'] = uac['payload']['uac']['questionnaireId']
+
+            elif uac['payload']['uac']['caseId'] == collection_case['id']:
                 case['uac'] = uac['payload']['uac']['uac']
                 case['qid'] = uac['payload']['uac']['questionnaireId']
-                result.append(_create_expected_questionnaire_csv_line(case, prefix))
+
+            result.append(_create_expected_questionnaire_csv_line(case, prefix))
 
     return result
 
