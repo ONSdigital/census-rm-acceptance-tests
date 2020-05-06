@@ -14,7 +14,7 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines, \
     create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv, \
     create_expected_csv_lines_for_ce_estab_responses, create_expected_CE_Estab_questionnaire_csv_lines, \
-    create_expected_questionnaire_csv_lines
+    create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -32,6 +32,60 @@ def check_correct_questionnaire_files_on_sftp_server(context, pack_code):
 def check_correct_CE_Estab_questionnaire_files_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_CE_Estab_questionnaire_csv_lines(context, pack_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+
+
+@then('correctly formatted "{pack_code}" print files are created for CE Estab Welsh questionnaires')
+def check_correct_Welsh_CE_Estab_questionnaire_files_on_sftp_server(context, pack_code):
+    expected_case_data = create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings(context, pack_code)
+
+    expected_print_file_line_count = 0
+    for case_id, value in expected_case_data.items():
+        expected_print_file_line_count += value['case_details']['ceExpectedCapacity']
+
+    actual_print_file_rows = check_ce_estab_welsh_questionnaire_is_correct(context, pack_code, expected_print_file_line_count)
+
+    for case_id, value in expected_case_data.items():
+        matching_rows = []
+        for row in actual_print_file_rows:
+            if row.endswith(value['line_ending']):
+                matching_rows.append(row)
+
+        test_helper.assertEqual(len(matching_rows), value['case_details']['ceExpectedCapacity'])
+
+        for uac in context.uac_created_events:
+            if uac['payload']['uac']['caseId'] == value['case_details']['id']:
+                if uac['payload']['uac']['questionnaireId'][:2] == '23':
+                    expected_welsh_line_ending = f"|{uac['payload']['uac']['uac']}|" \
+                                                 f"{uac['payload']['uac']['questionnaireId']}|{value['line_ending']}"
+                    matched = False
+                    for row in matching_rows:
+                        if row.endswith(expected_welsh_line_ending):
+                            matched = True
+
+                    test_helper.assertTrue(matched,
+                                           f'Could not find expected Welsh line ending {expected_welsh_line_ending}')
+
+                else:
+                    expected_english_line_start = f"{uac['payload']['uac']['uac']}|" \
+                                                 f"{uac['payload']['uac']['questionnaireId']}|"
+                    matched = False
+                    for row in matching_rows:
+                        if row.startswith(expected_english_line_start):
+                            matched = True
+
+                    test_helper.assertTrue(matched,
+                                           f'Could not find expected English line starting '
+                                           f'{expected_english_line_start}')
+
+
+
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
+def check_ce_estab_welsh_questionnaire_is_correct(context, pack_code, expected_print_file_line_count):
+    actual_print_file_rows = _get_print_file_rows_as_list(context, pack_code)
+
+    if len(actual_print_file_rows) != expected_print_file_line_count:
+        raise FileNotFoundError
+    return actual_print_file_rows
 
 
 @then('correctly formatted "{pack_code}" print files are created')
@@ -107,6 +161,12 @@ def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, p
     with SftpUtility() as sftp_utility:
         _validate_print_file_content(context, sftp_utility, context.test_start_local_datetime, expected_csv_lines,
                                      pack_code)
+
+
+def _get_print_file_rows_as_list(context, pack_code):
+    with SftpUtility() as sftp_utility:
+        context.expected_print_files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime, pack_code, ".csv.gpg")
+        return sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)

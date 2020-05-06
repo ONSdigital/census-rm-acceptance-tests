@@ -18,6 +18,9 @@ def correct_event_types_logged_for_ce_estabs(context, event_type_list):
         new_type_list = expected_logged_event_types.copy()
         for _ in range(case['payload']['collectionCase']['ceExpectedCapacity']):
             new_type_list.append('RM_UAC_CREATED')
+            if (case['payload']['collectionCase']['treatmentCode']) == 'CE_QDIEW':
+                new_type_list.append('RM_UAC_CREATED')
+
         check_if_event_list_is_exact_match(','.join(new_type_list), case['payload']['collectionCase']['id'])
 
 

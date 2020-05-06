@@ -53,7 +53,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_H2   | ICHHQW      | [02,03]             | sample_input_census_spec_wales_questionnaire.csv   |
       | P_IC_H4   | ICHHQN      | [04]                | sample_input_census_spec_ni_questionnaire.csv      |
 
-  Scenario Outline: Generatendsn print files and log events for CE initial contact questionnaires
+
+  Scenario Outline: Generate print files and log events for CE initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
     When set action rule of type "<action type>" when the case loading queues are drained
@@ -63,10 +64,23 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
 
     Examples: CE Estab Initial contact questionnaire: <pack code>
+      | pack code | action type | questionnaire types | sample file                                 | individual qid type |
+      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv      | 24                  |
+      | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
+
+
+  Scenario Outline: Generate print files and log events for Welsh CE initial contact questionnaires
+    Given sample file "<sample file>" is loaded
+    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
+    When set action rule of type "<action type>" when the case loading queues are drained
+    And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
+    Then correctly formatted "<pack code>" print files are created for CE Estab Welsh questionnaires
+    And there is a correct "<pack code>" manifest file for each csv file written
+    And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
+
+    Examples: CE Estab Initial contact questionnaire: <pack code>
       | pack code | action type | questionnaire types | sample file                               | individual qid type |
-#      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv      | 24                  |
-#      | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
-      | D_FDCE_I2 | CE_IC10     | [32]             | sample_3_welsh_CE_estab_questionnaire.csv | [22,23]             |
+      | D_FDCE_I2 | CE_IC10     | [32]                | sample_3_welsh_CE_estab_questionnaire.csv | [22,23]             |
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters
