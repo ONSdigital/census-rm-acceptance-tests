@@ -65,6 +65,24 @@ def create_expected_CE_Estab_questionnaire_csv_lines(context, prefix):
     return result
 
 
+def create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings(context, prefix):
+    # creates dictionary of case details and expected 'line_ending'
+    # for use when we do not know the value of the UAC/QID pairs
+
+    case_expected_line_endings = {}
+
+    for event in context.case_created_events:
+        case = {}
+        collection_case = get_case_details_for_CE_Estab_responses(case, event)
+        case_expected_line_endings[collection_case['id']] = {}
+
+        case_expected_line_endings[collection_case['id']]['line_ending'] = \
+            _create_expected_questionnaire_csv_line_ending_for_welsh_ce_individual_estab_case(case, prefix)
+        case_expected_line_endings[collection_case['id']]['case_details'] = collection_case
+
+    return case_expected_line_endings
+
+
 def get_case_details_for_CE_Estab_responses(case, event):
     collection_case = event['payload']['collectionCase']
     address = collection_case['address']
@@ -198,6 +216,21 @@ def _create_expected_questionnaire_csv_line(case, prefix):
         f'{case["qid"]}|'
         f'{case.get("uac_wales", "")}|'
         f'{case.get("qid_wales", "")}|'
+        f'{case["coordinator_id"]}|'
+        f'|||'
+        f'{case["address_line_1"]}|'
+        f'{case["address_line_2"]}|'
+        f'{case["address_line_3"]}|'
+        f'{case["town_name"]}|'
+        f'{case["postcode"]}|'
+        f'{prefix}|'
+        f'{case["organization_name"]}|'
+        f'{case["officer_id"]}'
+    )
+
+
+def _create_expected_questionnaire_csv_line_ending_for_welsh_ce_individual_estab_case(case, prefix):
+    return (
         f'{case["coordinator_id"]}|'
         f'|||'
         f'{case["address_line_1"]}|'

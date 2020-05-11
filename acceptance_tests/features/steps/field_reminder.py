@@ -77,4 +77,6 @@ def _message_valid(case, action_instruction):
     test_helper.assertEquals(case['handDelivery'], action_instruction['handDeliver'])
     test_helper.assertEquals(case['caseRef'], action_instruction['caseRef'])
     test_helper.assertEquals(len(action_instruction['caseRef']), 10)
+    test_helper.assertEquals(case['address']['uprn'], action_instruction['uprn'])
+    test_helper.assertEquals(case['address']['estabUprn'], action_instruction['estabUprn'])
     test_helper.assertTrue(luhn.verify(action_instruction['caseRef']))
