@@ -66,6 +66,9 @@ def create_expected_CE_Estab_questionnaire_csv_lines(context, prefix):
 
 
 def create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings(context, prefix):
+    # creates dictionary of case details and expected 'line_ending'
+    # for use when we do not know the value of the UAC/QID pairs
+
     case_expected_line_endings = {}
 
     for event in context.case_created_events:

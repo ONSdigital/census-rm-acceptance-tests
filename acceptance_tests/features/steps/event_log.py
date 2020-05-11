@@ -18,6 +18,18 @@ def correct_event_types_logged_for_ce_estabs(context, event_type_list):
         new_type_list = expected_logged_event_types.copy()
         for _ in range(case['payload']['collectionCase']['ceExpectedCapacity']):
             new_type_list.append('RM_UAC_CREATED')
+
+        check_if_event_list_is_exact_match(','.join(new_type_list), case['payload']['collectionCase']['id'])
+
+
+@step('two "RM_UAC_CREATED" events {event_type_list} are logged per case')
+def correct_event_types_logged_for_ce_estabs_for_wales(context, event_type_list):
+    # need to create both an English and Welsh UAC/QID pair for Welsh PQ cases which are identified by Treatment ID
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+    for case in context.case_created_events:
+        new_type_list = expected_logged_event_types.copy()
+        for _ in range(case['payload']['collectionCase']['ceExpectedCapacity']):
+            new_type_list.append('RM_UAC_CREATED')
             if (case['payload']['collectionCase']['treatmentCode']) == 'CE_QDIEW':
                 new_type_list.append('RM_UAC_CREATED')
 

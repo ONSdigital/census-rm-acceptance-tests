@@ -70,18 +70,14 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
 
 
-  Scenario Outline: Generate print files and log events for Welsh CE initial contact questionnaires
-    Given sample file "<sample file>" is loaded
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
-    And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
-    Then correctly formatted "<pack code>" print files are created for CE Estab Welsh questionnaires
-    And there is a correct "<pack code>" manifest file for each csv file written
-    And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
-
-    Examples: CE Estab Initial contact questionnaire: <pack code>
-      | pack code | action type | questionnaire types | sample file                               | individual qid type |
-      | D_FDCE_I2 | CE_IC10     | [32]                | sample_3_welsh_CE_estab_questionnaire.csv | [22,23]             |
+  Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
+    Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [32] questionnaire types
+    When set action rule of type "CE_IC10" when the case loading queues are drained
+    And CE Estab messages are emitted to RH and Action Scheduler with [22,23] questionnaire types
+    Then correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
+    And there is a correct "D_FDCE_I2" manifest file for each csv file written
+    And two "RM_UAC_CREATED" events [PRINT_CASE_SELECTED,SAMPLE_LOADED] are logged per case
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters

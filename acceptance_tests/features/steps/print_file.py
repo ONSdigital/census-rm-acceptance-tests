@@ -36,6 +36,12 @@ def check_correct_CE_Estab_questionnaire_files_on_sftp_server(context, pack_code
 
 @then('correctly formatted "{pack_code}" print files are created for CE Estab Welsh questionnaires')
 def check_correct_Welsh_CE_Estab_questionnaire_files_on_sftp_server(context, pack_code):
+    # in the print file, there will be multiple rows with English/Welsh UAC/QID pairs for each case
+    # we do not know which English UAC/QID pair will be on which row as the Welsh UAC/QID pair is on
+    # so 'line_ending' matches the case details after UAC/QID values have been assigned
+    # we filter print file by 'line_ending' to get a list of rows for that case
+    # then we check that Ind English and Ind Welsh UAC/QID pairs are accounted for in the filtered rows
+
     expected_case_data = create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings(context, pack_code)
 
     expected_print_file_line_count = 0
@@ -55,10 +61,12 @@ def check_correct_Welsh_CE_Estab_questionnaire_files_on_sftp_server(context, pac
 
         for uac in context.uac_created_events:
             if uac['payload']['uac']['caseId'] == value['case_details']['id']:
-                _check_if_welsh_qid_type_or_not(matching_rows, uac, value)
+                _check_uac_qid_pair_located_in_welsh_ce_estab_cases(matching_rows, uac, value)
 
 
-def _check_if_welsh_qid_type_or_not(matching_rows, uac, value):
+def _check_uac_qid_pair_located_in_welsh_ce_estab_cases(matching_rows, uac, value):
+    # checks ind qid type for CE Estab Welsh in Welsh case and then tests against passed rows
+
     if uac['payload']['uac']['questionnaireId'][:2] == '23':
         expected_welsh_line_ending = f"|{uac['payload']['uac']['uac']}|" \
                                      f"{uac['payload']['uac']['questionnaireId']}|{value['line_ending']}"
