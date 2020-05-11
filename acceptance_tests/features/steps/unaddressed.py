@@ -4,6 +4,7 @@ import logging
 import subprocess
 import time
 import urllib
+import uuid
 
 import requests
 from behave import when, step, then
@@ -50,7 +51,7 @@ def send_linked_message_for_blank_questionnaire(context):
 
 @step("an Individual Questionnaire Linked message is sent")
 def send_individual_linked_message(context):
-    check_linked_message_is_received(context)
+    check_linked_message_is_received_for_individual_hh_case(context)
     context.linked_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
 
 
@@ -66,6 +67,13 @@ def check_linked_message_is_received(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
 
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
+
+
+def check_linked_message_is_received_for_individual_hh_case(context):
+    context.linked_case = context.case_created_events[1]['payload']['collectionCase']
+    context.individual_case_id = uuid.uuid4()
+    _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'],
+                                                           context.individual_case_id)
 
 
 def check_alternative_linked_message_is_received(context):
@@ -198,6 +206,12 @@ def check_message_redelivery_rate(context):
     test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
 
 
+@step("the HI individual case can be retrieved")
+def retrieve_hi_case(context):
+    response = requests.get(f'{caseapi_url}{context.individual_case_id}')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+
+
 def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
     questionnaire_linked_message = {
         'event': {
@@ -210,7 +224,31 @@ def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
         'payload': {
             'uac': {
                 "caseId": case_id,
-                'questionnaireId': questionnaire_id
+                'questionnaireId': questionnaire_id,
+            }
+        }
+    }
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=json.dumps(questionnaire_linked_message),
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
+
+
+def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id, individual_case_id):
+    questionnaire_linked_message = {
+        'event': {
+            'type': 'QUESTIONNAIRE_LINKED',
+            'source': 'FIELDWORK_GATEWAY',
+            'channel': 'FIELD',
+            "dateTime": "2011-08-12T20:17:46.384Z",
+            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        'payload': {
+            'uac': {
+                "caseId": case_id,
+                'questionnaireId': questionnaire_id,
+                'individualCaseId': str(individual_case_id)
             }
         }
     }
