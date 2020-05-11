@@ -1,7 +1,6 @@
 Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Generate print files and log events for initial contact letters
-
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
     When set action rule of type "<action type>" when the case loading queues are drained
@@ -22,6 +21,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv        |
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv          |
 
+
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire type> questionnaire types
@@ -39,6 +39,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | D_CE4A_ICLR4 | CE_IC05     | 34                 | sample_3_ni_CE_estab_resident.csv | 24                  |
       | D_CE4A_ICLS4 | CE_IC06     | 34                 | sample_3_ni_CE_estab_student.csv  | 24                  |
 
+
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
@@ -53,6 +54,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_H2   | ICHHQW      | [02,03]             | sample_input_census_spec_wales_questionnaire.csv   |
       | P_IC_H4   | ICHHQN      | [04]                | sample_input_census_spec_ni_questionnaire.csv      |
 
+
   Scenario Outline: Generate print files and log events for CE initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
@@ -63,8 +65,19 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
 
     Examples: CE Estab Initial contact questionnaire: <pack code>
-      | pack code | action type | questionnaire types | sample file                            | individual qid type |
-      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv | 24                  |
+      | pack code | action type | questionnaire types | sample file                                 | individual qid type |
+      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv      | 24                  |
+      | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
+
+
+  Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
+    Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [32] questionnaire types
+    When set action rule of type "CE_IC10" when the case loading queues are drained
+    And CE Estab messages are emitted to RH and Action Scheduler with [22,23] questionnaire types
+    Then correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
+    And there is a correct "D_FDCE_I2" manifest file for each csv file written
+    And two "RM_UAC_CREATED" events [PRINT_CASE_SELECTED,SAMPLE_LOADED] are logged per case
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters
@@ -111,6 +124,4 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
       | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
-
-
 

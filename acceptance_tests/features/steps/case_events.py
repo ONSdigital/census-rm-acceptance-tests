@@ -114,11 +114,12 @@ def _test_uacs_correct(context):
 
 
 def _test_uacs_correct_for_estab_units(context, expected_uacs, questionnaire_type):
+    questionnaire_types_list = questionnaire_type.replace('[', '').replace(']', '').split(',')
     test_helper.assertEqual(len(context.messages_received), expected_uacs)
 
     for msg in context.uac_created_events:
         _validate_uac_message(msg)
-        test_helper.assertEqual(msg['payload']['uac']['questionnaireId'][:2], questionnaire_type)
+        test_helper.assertIn(msg['payload']['uac']['questionnaireId'][:2], questionnaire_types_list)
 
 
 def _validate_uac_message(parsed_body):
