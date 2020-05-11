@@ -50,6 +50,10 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
     context.addressType = action_instruction['addressType']
     context.fwmt_emitted_case_id = action_instruction['caseId']
     context.fwmt_emitted_undelivered_flag = action_instruction['undeliveredAsAddress']
+
+    test_helper.assertEquals(context.first_case['address']['uprn'], action_instruction['uprn'], "uprn")
+    test_helper.assertEquals(context.first_case['address']['estabUprn'], action_instruction['estabUprn'], "estab Uprn")
+
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
