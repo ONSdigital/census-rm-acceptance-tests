@@ -9,13 +9,9 @@ Feature: Case processor handles receipt message from pubsub service
     And if the actual response count is incremented "<increment>" or the case is marked receipted "<receipt>" then there should be a case updated message of case type "<case type>"
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is incremented "<increment>"
 
-    @smoke
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
       | HH        | U             | HH       | False     | True    | CANCEL      | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
-
-    Examples:
-      | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
       | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
       | HI        | U             | Ind      | False     | True    | NONE        | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
       | CE        | E             | Ind      | True      | False   | UPDATE      | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |
@@ -53,6 +49,7 @@ Feature: Case processor handles receipt message from pubsub service
     And a CANCEL action instruction is sent to field work management with address type "HH"
     And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
 
+  @smoke
   Scenario: PQRS receipt results in UAC updated event sent to RH
     Given sample file "sample_for_receipting.csv" is loaded successfully
     When the offline receipt msg for the created case is put on the GCP pubsub

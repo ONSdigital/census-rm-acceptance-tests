@@ -70,7 +70,6 @@ Feature: Address updates
     When an AddressTypeChanged event is sent
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
 
-  @smoke
   Scenario: Fulfilment request for new skeleton case
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
     And a case created event is emitted
