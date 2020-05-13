@@ -137,8 +137,6 @@ spec:
       value: "case-api"
     - name: CASEAPI_SERVICE_PORT
       value: "80"
-    - name: SFTP_PORT
-      value: "22"
     - name: RECEIPT_TOPIC_ID
       valueFrom:
         configMapKeyRef:
