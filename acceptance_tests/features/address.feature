@@ -91,3 +91,11 @@ Feature: Address updates
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     And a CREATE action instruction is sent to field
+
+  Scenario: Skeleton cases are excluded from action rules
+    Given the action_plan_id is the census action_plan_id
+    And sample file "sample_1_english_SPG_unit.csv" is loaded successfully
+    And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
+    And a case created event is emitted
+    When set action rule of type "P_RD_2RL1_1"
+    Then skeleton cases do not appear in "P_RD_2RL1_1" print files
