@@ -9,9 +9,13 @@ Feature: Case processor handles receipt message from pubsub service
     And if the actual response count is incremented "<increment>" or the case is marked receipted "<receipt>" then there should be a case updated message of case type "<case type>"
     And if the field instruction "<instruction>" is not NONE a msg to field is emitted where ceActualResponse is incremented "<increment>"
 
+    @smoke
     Examples:
       | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
       | HH        | U             | HH       | False     | True    | CANCEL      | sample_1_english_HH_unit.csv  | E       | SAMPLE_LOADED,RESPONSE_RECEIVED                                                         |                                  |
+
+    Examples:
+      | case type | address level | qid type | increment | receipt | instruction | sample file                   | country | loaded case events                                                                      | individual case events           |
       | HH        | U             | Cont     | False     | False   | NONE        | sample_1_english_HH_unit.csv  | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_REQUESTED,SAMPLE_LOADED |                                  |
       | HI        | U             | Ind      | False     | True    | NONE        | sample_1_english_HH_unit.csv  | E       | FULFILMENT_REQUESTED,SAMPLE_LOADED                                                      | RESPONSE_RECEIVED,RM_UAC_CREATED |
       | CE        | E             | Ind      | True      | False   | UPDATE      | sample_1_english_CE_estab.csv | E       | RESPONSE_RECEIVED,RM_UAC_CREATED,FULFILMENT_REQUESTED,SAMPLE_LOADED                     |                                  |

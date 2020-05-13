@@ -1,5 +1,6 @@
 Feature: Handle Secure Establishments
 
+  @smoke
   Scenario: Marking a case as secureEstablishment is reflected in RM
     Given sample file "sample_1_english_CE_secure_estab.csv" is loaded successfully
     When a FIELD action rule for address type "CE" is set when loading queues are drained
