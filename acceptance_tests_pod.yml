@@ -6,6 +6,7 @@ metadata:
     app: acceptance-tests
     env: dev
 spec:
+  serviceAccountName: acceptance-tests
   securityContext:
     fsGroup: 1000
   containers:
@@ -37,8 +38,6 @@ spec:
       readOnly: true
     - name: sftp-keys
       mountPath: "/home/acceptancetests/.sftp-ssh"
-    - name: gcp-credentials
-      mountPath: "/home/acceptancetests/gcp-credentials"
     env:
     - name: DB_USERNAME
       valueFrom:
@@ -80,11 +79,6 @@ spec:
         configMapKeyRef:
           key: sftp-qm-supplier-directory
           name: project-config
-    - name: SENT_PRINT_FILE_BUCKET
-      valueFrom:
-        configMapKeyRef:
-          key: sent-print-file-bucket
-          name: project-config
     - name: SFTP_HOST
       valueFrom:
         secretKeyRef:
@@ -114,13 +108,6 @@ spec:
       value: "notify-stub"
     - name: NOTIFY_STUB_PORT
       value: "80"
-    - name: GOOGLE_SERVICE_ACCOUNT_JSON
-      valueFrom:
-        secretKeyRef:
-          name: pubsub-credentials
-          key: service-account-key.json
-    - name: GOOGLE_APPLICATION_CREDENTIALS
-      value: "/home/acceptancetests/gcp-credentials/service-account-key.json"
     - name: SENT_PRINT_FILE_BUCKET
       valueFrom:
         configMapKeyRef:
@@ -195,9 +182,6 @@ spec:
         path: "postgresql.crt"
       - key: "postgresql.key"
         path: "postgresql.key"
-  - name: gcp-credentials
-    secret:
-      secretName: pubsub-credentials
   - name: sftp-keys
     secret:
       secretName: sftp-ssh-credentials
