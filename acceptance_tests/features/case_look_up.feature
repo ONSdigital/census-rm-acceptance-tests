@@ -1,3 +1,4 @@
+@smoke
 Feature: Case look up for the contact centre
 
   Scenario: Find case by caseId

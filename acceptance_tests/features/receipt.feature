@@ -49,6 +49,7 @@ Feature: Case processor handles receipt message from pubsub service
     And a CANCEL action instruction is sent to field work management with address type "HH"
     And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
 
+  @smoke
   Scenario: PQRS receipt results in UAC updated event sent to RH
     Given sample file "sample_for_receipting.csv" is loaded successfully
     When the offline receipt msg for the created case is put on the GCP pubsub

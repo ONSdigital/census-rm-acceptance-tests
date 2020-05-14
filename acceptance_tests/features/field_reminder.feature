@@ -1,5 +1,6 @@
 Feature: Reminder messages are emitted to Field Work Management Tool
 
+  @smoke
   Scenario: Tranche 2 household case details to be sent to the Field Work Management Tool
     Given sample file "sample_for_print_stories.csv" is loaded successfully
     And set action rule of type "FIELD" when the case loading queues are drained

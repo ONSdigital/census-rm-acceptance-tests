@@ -1,5 +1,6 @@
 Feature: We want to deliver mail to the wrong addresses
 
+  @smoke
   Scenario: We deliver some mail to the wrong place and QM knows about it
     Given sample file "sample_for_receipting.csv" is loaded successfully
     When an undelivered mail QM message is put on GCP pubsub

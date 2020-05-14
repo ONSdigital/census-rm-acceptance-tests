@@ -86,6 +86,14 @@ Feature: Address updates
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
     And a fulfilment request event is logged
 
+  Scenario: Individual Telephone capture for new skeleton case
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    And a case created event is emitted
+    When there is a request for individual telephone capture for the case with address type "SPG" and country "E"
+    Then a UAC and QID with questionnaire type "21" type are generated and returned
+    And a UAC updated event is emitted linking the new UAC and QID to the requested case
+    And a fulfilment request event is logged
+
   Scenario: New address event received with sourceCaseId and sends Create to Field
     Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
