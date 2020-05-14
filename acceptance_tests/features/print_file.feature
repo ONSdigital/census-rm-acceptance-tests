@@ -57,6 +57,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_H1   | ICHHQE      | [01]                | sample_input_census_spec_england_questionnaire.csv |
       | P_IC_H2   | ICHHQW      | [02,03]             | sample_input_census_spec_wales_questionnaire.csv   |
       | P_IC_H4   | ICHHQN      | [04]                | sample_input_census_spec_ni_questionnaire.csv      |
+      | D_FDCE_H1 | SPG_IC13    | [01]                | sample_3_english_SPG_unit_questionnaire.csv        |
+      | D_FDCE_H2 | SPG_IC14    | [02,03]             | sample_3_welsh_SPG_unit_questionnaire.csv          |
 
 
   Scenario Outline: Generate print files and log events for CE initial contact questionnaires
