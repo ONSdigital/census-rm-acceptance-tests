@@ -83,8 +83,8 @@ def _create_ccs_property_listed_event(context, address_type="HH"):
                     "postcode": create_random_postcode(),
                     "latitude": "50.863849",
                     "longitude": "-1.229714",
-                    "fieldcoordinatorId": "XXXXXXXXXX",
-                    "fieldofficerId": "XXXXXXXXXXXXX"
+                    "fieldCoordinatorId": "XXXXXXXXXX",
+                    "fieldOfficerId": "XXXXXXXXXXXXX"
                 },
             }
         }
