@@ -53,6 +53,8 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_FDCE_I4": Config.SFTP_QM_DIRECTORY,
     "D_FDCE_I1": Config.SFTP_QM_DIRECTORY,
     "D_FDCE_I2": Config.SFTP_QM_DIRECTORY,
+    "D_FDCE_H1": Config.SFTP_QM_DIRECTORY,
+    "D_FDCE_H2": Config.SFTP_QM_DIRECTORY,
     "P_ICCE_ICL1": Config.SFTP_PPO_DIRECTORY,
     "P_ICCE_ICL2B": Config.SFTP_PPO_DIRECTORY,
 }
@@ -105,6 +107,8 @@ PACK_CODE_TO_DATASET = {
     "D_FDCE_I4": QM3_2_DATASET,
     "D_FDCE_I1": QM3_2_DATASET,
     "D_FDCE_I2": QM3_2_DATASET,
+    "D_FDCE_H1": QM3_2_DATASET,
+    "D_FDCE_H2": QM3_2_DATASET,
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -155,6 +159,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_FDCE_I4": "Individual Questionnaire for NI (Hand delivery) Addressed",
     "D_FDCE_I1": 'Individual Questionnaire for England (Hand delivery) Addressed',
     "D_FDCE_I2": 'Individual Questionnaire for Wales (Hand delivery) Addressed',
+    "D_FDCE_H1": 'Household Questionnaire for England (Hand delivery) Addressed',
+    "D_FDCE_H2": 'Household Questionnaire for Wales (Hand Delivery) Addressed',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
