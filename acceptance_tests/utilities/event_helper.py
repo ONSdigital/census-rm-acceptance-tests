@@ -79,7 +79,8 @@ def get_and_check_case_created_messages(context):
     context.messages_received = []
 
     context.welsh_cases = [case['payload']['collectionCase'] for case in context.case_created_events
-                           if case['payload']['collectionCase']['treatmentCode'].startswith('HH_Q')
+                           if (case['payload']['collectionCase']['treatmentCode'].startswith('HH_Q')
+                           or case['payload']['collectionCase']['treatmentCode'].startswith('SPG_Q'))
                            and case['payload']['collectionCase']['treatmentCode'].endswith('W')]
 
 
