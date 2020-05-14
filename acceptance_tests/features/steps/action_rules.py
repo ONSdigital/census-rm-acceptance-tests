@@ -131,3 +131,8 @@ def check_for_event(context, event_type):
             return
 
     test_helper.fail(f"Case {context.first_case['id']} event_type {event_type} not logged")
+
+
+@step('set action rule of type "{action_type}"')
+def set_action_rule(context, action_type):
+    setup_treatment_code_classified_action_rule(context, action_type)

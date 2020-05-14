@@ -9,17 +9,21 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
     And the files have all been copied to the bucket
 
+    @smoke
     Examples: Initial contact letter: <pack code>
-      | pack code      | action type | questionnaire types | sample file                          |
-      | P_IC_ICL1      | ICL1E       | [01]                | sample_input_england_census_spec.csv |
-      | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv   |
-      | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv      |
-      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_1_english_CE_estab.csv        |
-      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv          |
-      | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv         |
-      | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv           |
-      | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv        |
-      | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv          |
+      | pack code | action type | questionnaire types | sample file                          |
+      | P_IC_ICL1 | ICL1E       | [01]                | sample_input_england_census_spec.csv |
+
+    Examples: Initial contact letter: <pack code>
+      | pack code      | action type | questionnaire types | sample file                        |
+      | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv |
+      | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv    |
+      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_1_english_CE_estab.csv      |
+      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv        |
+      | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv       |
+      | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv         |
+      | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv      |
+      | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv        |
 
 
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs

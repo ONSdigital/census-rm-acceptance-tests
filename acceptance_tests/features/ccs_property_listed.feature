@@ -7,6 +7,7 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
     And the case API returns the CCS QID for the new case
     And the case API returns the new CCS case by postcode search
 
+  @smoke
   Scenario: Log event when a CCS Property Listed event is received with a qid
     When an unaddressed message of questionnaire type 71 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
