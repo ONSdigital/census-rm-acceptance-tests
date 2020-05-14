@@ -107,3 +107,5 @@ class Config:
     DB_PORT = os.getenv('DB_PORT', '6432')
     DB_NAME = os.getenv('DB_NAME', 'postgres')
     DB_USESSL = os.getenv('DB_USESSL', '')
+
+    CENSUS_ACTION_PLAN_ID = os.getenv('ACTION_PLAN_ID', 'c4415287-0e37-447b-9c3d-1a011c9fa3db')
