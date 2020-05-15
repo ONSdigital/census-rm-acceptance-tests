@@ -408,7 +408,8 @@ def create_msg_sent_to_field(context):
 
 @step('the action plan and collection exercises IDs are the hardcoded census values')
 def use_census_action_plan_id(context):
-    # For tests where the action plan id needs hardcoding - for example where skeleton cases are used
+    # For tests where the action plan and collection exercise ID need hardcoding
+    # e.g where skeleton cases are used
     context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
     context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
 
