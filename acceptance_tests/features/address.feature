@@ -87,12 +87,13 @@ Feature: Address updates
     And a fulfilment request event is logged
 
   Scenario: Individual Telephone capture for new skeleton case
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    Given the action plan and collection exercises IDs are the hardcoded census values
+    And a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD"
     And a case created event is emitted
-    When there is a request for individual telephone capture for the case with address type "SPG" and country "E"
+    When there is a request for a new HI case for telephone capture for the parent case with address type "HH" and country "E"
     Then a UAC and QID with questionnaire type "21" type are generated and returned
-    And a UAC updated event is emitted linking the new UAC and QID to the requested case
-    And a fulfilment request event is logged
+    And a new individual child case for telephone capture is emitted to RH and Action Scheduler
+    And a UAC updated event is emitted linking the new UAC and QID to the individual case
 
   Scenario: New address event received with sourceCaseId and sends Create to Field
     Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
@@ -101,7 +102,7 @@ Feature: Address updates
     And a CREATE action instruction is sent to field
 
   Scenario: Skeleton cases are excluded from action rules
-    Given the action_plan_id is the census action_plan_id
+    Given the action plan and collection exercises IDs are the hardcoded census values
     And sample file "sample_1_english_SPG_unit.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
