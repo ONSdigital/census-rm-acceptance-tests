@@ -66,7 +66,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
     Examples: CE Estab Initial contact questionnaire: <pack code>
       | pack code | action type | questionnaire types | sample file                                 | individual qid type |
-      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv      | 24                  |
+#      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv      | 24                  |
       | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
 
 

@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import json
 import logging
@@ -20,6 +21,14 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE = [
+    'D_CE1A_ICLCR1', 'D_CE1A_ICLCR2B', 'D_ICA_ICLR1', 'D_ICA_ICLR1',
+    'D_ICA_ICLR2B', 'D_ICA_ICLR2B', 'D_CE4A_ICLR4', 'D_CE4A_ICLS4'
+]
+
+QM_PACKCODES_SORTED_BY_PRODUCTION_CODE = ['D_FDCE_I1', 'D_FDCE_I2', 'D_FDCE_I4', 'D_FDCE_H1', 'D_FDCE_H2']
 
 
 @then('correctly formatted "{pack_code}" print files are created for questionnaire')
@@ -182,6 +191,35 @@ def _get_print_file_rows_as_list(context, pack_code):
         return sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
 
 
+def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code):
+    # If this was split over multiple files it could fail?
+    # So take the acutal_list from the files unsorted
+    list_of_lists = [
+        csvrow.split("|")
+        for csvrow in unsorted_actual_content_list
+    ]
+
+    # If called with an invalid packcode the test will fail, this is expected behaviour
+    sorted_list = []
+
+    # This will sort a list of lists based on template ICL or QM
+    if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE:
+        sorted_list = sorted(list_of_lists, key=lambda x: (x[14], x[12]))
+    elif pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
+        sorted_list = sorted(list_of_lists, key=lambda x: (x[15], x[14]))
+
+    # Turn back to a list of expected_csv rows
+    expected_csv_rows = [
+        '|'.join(row)
+        for row in sorted_list
+    ]
+
+    a = (list(set(unsorted_actual_content_list) - set(expected_csv_rows)))
+
+    test_helper.assertEquals(unsorted_actual_content_list, expected_csv_rows,
+                             'Sorted file contents did not match expected')
+
+
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
 def _validate_print_file_content(context, sftp_utility, start_of_test, expected_csv_lines, pack_code):
     logger.debug('Checking for files on SFTP server')
@@ -191,9 +229,17 @@ def _validate_print_file_content(context, sftp_utility, start_of_test, expected_
     actual_content_list = sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
     if not actual_content_list:
         raise FileNotFoundError
+
+    unsorted_actual_content_list = copy.deepcopy(actual_content_list)
     actual_content_list.sort()
     expected_csv_lines.sort()
+
     test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
+
+    # Preferably compare all the old way, then check the actual is sorted correctly.
+    # Pass in the actual_list with csv dict and sort it maybe?
+    if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE or pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
+        check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code)
 
 
 def _check_manifest_files_created(context, pack_code):
