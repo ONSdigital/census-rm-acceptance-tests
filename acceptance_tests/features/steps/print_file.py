@@ -198,9 +198,9 @@ def _get_print_file_rows_as_list(context, pack_code):
 
 
 def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code):
-    # If this was split over multiple files it could fail?
-    # So take the acutal_list from the files unsorted
-    list_of_lists = [
+    # If this was split over multiple files it could fail, not expected with current testing
+    # produce a list of split_csv rows to sort
+    split_csv_rows = [
         csvrow.split("|")
         for csvrow in unsorted_actual_content_list
     ]
@@ -210,17 +210,15 @@ def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content
 
     # This will sort a list of lists based on template ICL or QM
     if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE:
-        sorted_list = sorted(list_of_lists, key=lambda x: (x[14], x[12]))
+        sorted_list = sorted(split_csv_rows, key=lambda x: (x[14], x[12]))
     elif pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
-        sorted_list = sorted(list_of_lists, key=lambda x: (x[15], x[14]))
+        sorted_list = sorted(split_csv_rows, key=lambda x: (x[15], x[14]))
 
     # Turn back to a list of expected_csv rows
     expected_csv_rows = [
         '|'.join(row)
         for row in sorted_list
     ]
-
-    a = (list(set(unsorted_actual_content_list) - set(expected_csv_rows)))
 
     test_helper.assertEquals(unsorted_actual_content_list, expected_csv_rows,
                              'Sorted file contents did not match expected')
@@ -242,8 +240,6 @@ def _validate_print_file_content(context, sftp_utility, start_of_test, expected_
 
     test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
 
-    # Preferably compare all the old way, then check the actual is sorted correctly.
-    # Pass in the actual_list with csv dict and sort it maybe?
     if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE or pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
         check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code)
 
