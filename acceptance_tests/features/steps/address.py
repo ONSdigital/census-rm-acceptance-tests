@@ -61,8 +61,8 @@ def new_address_reported_event(context, sender):
                         "id": context.case_id,
                         "caseType": "SPG",
                         "survey": "CENSUS",
-                        "fieldcoordinatorId": "SO_23",
-                        "fieldofficerId": "SO_23_123",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
                         "collectionExerciseId": context.collection_exercise_id,
                         "address": {
                             "addressLine1": "123",
