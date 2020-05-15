@@ -173,8 +173,9 @@ def new_address_reported_event_with_minimal_fields(context, sender):
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
+
 @step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}"')
-def new_address_reported_event_with_minimal_fields(context, address_type, sender):
+def new_address_reported_event_for_address_type(context, address_type, sender):
     context.case_id = str(uuid.uuid4())
     message = json.dumps(
         {
@@ -205,6 +206,7 @@ def new_address_reported_event_with_minimal_fields(context, address_type, sender
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
 
 @step('the case can be retrieved')
 def retrieve_skeleton_case(context):
