@@ -71,6 +71,8 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'CE_IC10': {'treatment_code': ['CE_QDIEW']},
         'SPG_IC11': {'treatment_code': ['SPG_LPHUE']},
         'SPG_IC12': {'treatment_code': ['SPG_LPHUW']},
+        'SPG_IC13': {'treatment_code': ['SPG_QDHUE']},
+        'SPG_IC14': {'treatment_code': ['SPG_QDHUW']},
         'P_RD_2RL1_1': {'lsoa': ['E01014540', 'E01014541', 'E01014542', 'W01014540']},
         'P_RD_2RL2B_1': {'lsoa': ['E01014669', 'W01014669']},
         'P_RD_2RL1_2': {'lsoa': ['E01014543', 'E01014544']},
@@ -129,3 +131,8 @@ def check_for_event(context, event_type):
             return
 
     test_helper.fail(f"Case {context.first_case['id']} event_type {event_type} not logged")
+
+
+@step('set action rule of type "{action_type}"')
+def set_action_rule(context, action_type):
+    setup_treatment_code_classified_action_rule(context, action_type)

@@ -61,8 +61,8 @@ def new_address_reported_event(context, sender):
                         "id": context.case_id,
                         "caseType": "SPG",
                         "survey": "CENSUS",
-                        "fieldcoordinatorId": "SO_23",
-                        "fieldofficerId": "SO_23_123",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
                         "collectionExerciseId": context.collection_exercise_id,
                         "address": {
                             "addressLine1": "123",
@@ -92,7 +92,8 @@ def new_address_reported_event(context, sender):
 def new_address_reported_event_with_source_case_id(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
-    context.sourceCaseId = str(context.case_created_events[0]['payload']['collectionCase']['id'])
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.sourceCaseId = str(context.first_case['id'])
     message = json.dumps(
         {
             "event": {
@@ -369,6 +370,12 @@ def create_msg_sent_to_field(context):
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.case_id)
     test_helper.assertEqual(context.addressType, "SPG")
     test_helper.assertEqual(context.field_action_cancel_message['surveyName'], "CENSUS")
+
+
+@step('the action_plan_id is the census action_plan_id')
+def use_census_action_plan_id(context):
+    # For tests where the action plan id needs hardcoding - for example where skeleton cases are used
+    context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
 
 
 def _field_work_create_callback(ch, method, _properties, body, context):
