@@ -120,7 +120,7 @@ Feature: Handling Blank Questionnaire Scenario
       | case type | address level | qid type | form type | sample file                  | blank instruction | country |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | UPDATE            | E       |
 
-  Scenario: An eQ receipt for a QID which has had a blank questionnaire still cancels follow up
+  Scenario: An eQ receipt still cancels follow up for a QID which has had a blank questionnaire returned
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     And we have retrieved the case and QID to receipt
     And the blank questionnaire msg for a case is put on the GCP pubsub
