@@ -119,3 +119,24 @@ Feature: Handling Blank Questionnaire Scenario
     Examples:
       | case type | address level | qid type | form type | sample file                  | blank instruction | country |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | UPDATE            | E       |
+
+  Scenario: An eQ receipt after a blank questionnaire still cancels follow up
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    And we have retrieved the case and QID to receipt
+    And the blank questionnaire msg for a case is put on the GCP pubsub
+    And a uac_updated msg is emitted with active set to false for the receipted qid
+    And a case_updated msg is emitted where "receiptReceived" is "False"
+    And an "UPDATE" field instruction is emitted
+    When the eQ receipt msg is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
+
+  Scenario: A blank questionnaire received after an eQ receipt does not send the case for follow up
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    And we have retrieved the case and QID to receipt
+    And the eQ receipt msg is put on the GCP pubsub
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
+    When the blank questionnaire msg for a case is put on the GCP pubsub
+    Then no ActionInstruction is sent to FWMT
