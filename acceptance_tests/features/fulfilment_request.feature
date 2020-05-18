@@ -1,5 +1,6 @@
 Feature: Handle fulfilment request events
 
+  @smoke
   Scenario: Log event when a fulfilment request event is received
     Given sample file "sample_input_england_census_spec.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
@@ -23,6 +24,11 @@ Feature: Handle fulfilment request events
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
     And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+
+    @smoke
+    Examples: Questionnaire: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_OR_H1         | 01                 |
 
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |

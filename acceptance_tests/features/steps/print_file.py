@@ -138,6 +138,12 @@ def check_correct_unreceipted_files_on_sftp_server(context, pack_code):
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
+@step('skeleton cases do not appear in "{pack_code}" print files')
+def check_skeleton_case_not_in_print_file(context, pack_code):
+    with SftpUtility() as sftp_utility:
+        _check_print_file_does_not_contain_case_ref(context, context.test_start_local_datetime, sftp_utility, pack_code)
+
+
 @then('there is a correct "{pack_code}" manifest file for each csv file written')
 def check_manifest_files(context, pack_code):
     logger.debug("checking manifest files exist for csv files")
@@ -194,6 +200,17 @@ def _validate_print_file_content(context, sftp_utility, start_of_test, expected_
     actual_content_list.sort()
     expected_csv_lines.sort()
     test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
+
+
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
+def _check_print_file_does_not_contain_case_ref(context, start_of_test, sftp_utility, pack_code):
+    logger.debug('Checking for files on SFTP server')
+    context.expected_print_files = sftp_utility.get_all_files_after_time(start_of_test, pack_code, ".csv.gpg")
+    actual_content_list = sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
+    if not actual_content_list:
+        raise FileNotFoundError
+    test_helper.assertFalse(any(
+        context.case_created_events[0]['payload']['collectionCase']['caseRef'] in row for row in actual_content_list))
 
 
 def _check_manifest_files_created(context, pack_code):
