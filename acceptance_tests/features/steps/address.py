@@ -61,8 +61,8 @@ def new_address_reported_event(context, sender):
                         "id": context.case_id,
                         "caseType": "SPG",
                         "survey": "CENSUS",
-                        "fieldcoordinatorId": "SO_23",
-                        "fieldofficerId": "SO_23_123",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
                         "collectionExerciseId": context.collection_exercise_id,
                         "address": {
                             "addressLine1": "123",
@@ -160,6 +160,40 @@ def new_address_reported_event_with_minimal_fields(context, sender):
                         "address": {
                             "region": "E00001234",
                             "addressType": "SPG",
+                            "addressLevel": "U"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}"')
+def new_address_reported_event_for_address_type(context, address_type, sender):
+    context.case_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": address_type,
+                        "address": {
+                            "region": "E00001234",
+                            "addressType": address_type,
                             "addressLevel": "U"
                         }
                     }
@@ -372,10 +406,12 @@ def create_msg_sent_to_field(context):
     test_helper.assertEqual(context.field_action_cancel_message['surveyName'], "CENSUS")
 
 
-@step('the action_plan_id is the census action_plan_id')
+@step('the action plan and collection exercises IDs are the hardcoded census values')
 def use_census_action_plan_id(context):
-    # For tests where the action plan id needs hardcoding - for example where skeleton cases are used
+    # For tests where the action plan and collection exercise ID need hardcoding
+    # e.g where skeleton cases are used
     context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
+    context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
 
 
 def _field_work_create_callback(ch, method, _properties, body, context):
