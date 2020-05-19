@@ -60,6 +60,9 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_FDCE_H2": Config.SFTP_QM_DIRECTORY,
     "P_ICCE_ICL1": Config.SFTP_PPO_DIRECTORY,
     "P_ICCE_ICL2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP1": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP4": Config.SFTP_PPO_DIRECTORY
 }
 
 PACK_CODE_TO_DATASET = {
@@ -112,6 +115,9 @@ PACK_CODE_TO_DATASET = {
     "D_FDCE_I2": QM3_2_DATASET,
     "D_FDCE_H1": QM3_2_DATASET,
     "D_FDCE_H2": QM3_2_DATASET,
+    "P_UAC_UACIP1": PPD1_3_DATASET,
+    "P_UAC_UACIP2B": PPD1_3_DATASET,
+    "P_UAC_UACIP4": PPD1_3_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -164,6 +170,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_FDCE_I2": 'Individual Questionnaire for Wales (Hand delivery) Addressed',
     "D_FDCE_H1": 'Household Questionnaire for England (Hand delivery) Addressed',
     "D_FDCE_H2": 'Household Questionnaire for Wales (Hand Delivery) Addressed',
+    "P_UAC_UACIP1": 'Individual Unique Access Code for England via paper',
+    "P_UAC_UACIP2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper',
+    "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper'
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {

@@ -318,3 +318,16 @@ def create_expected_individual_response_csv(individual_case, uac, qid, fulfilmen
         f'{individual_case["postcode"]}|'
         f'{fulfilment_code}||'
     )
+
+
+def _create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code):
+    return (
+        f'{uac}|{individual_case["caseRef"]}|'
+        f'Ms|jo|smith|'
+        f'{individual_case["addressLine1"]}|'
+        f'{individual_case["addressLine2"]}|'
+        f'{individual_case["addressLine3"]}|'
+        f'{individual_case["townName"]}|'
+        f'{individual_case["postcode"]}|'
+        f'{fulfilment_code}|{qid}|||'
+    )

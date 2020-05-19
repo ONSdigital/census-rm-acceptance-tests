@@ -11,7 +11,8 @@ from acceptance_tests.features.steps.print_file import _check_print_files_have_a
     _check_manifest_files_created
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
     get_qid_and_uac_from_emitted_child_uac
-from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv
+from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
+    _create_uac_print_materials_csv_line
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -267,6 +268,16 @@ def check_individual_questionnaire_print_requests(context, fulfilment_code):
     individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
     expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
+
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
+
+
+@step('correctly formatted individual UAC print responses are created with "{fulfilment_code}"')
+def check_individual_uac_print_requests(context, fulfilment_code):
+    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
+    uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
+    expected_csv_lines = [_create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code)]
 
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
