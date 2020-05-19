@@ -16,15 +16,6 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
         if ignore_case_id is None or case['payload']['collectionCase']['id'] != ignore_case_id:
             expected_data = _add_expected_case_data(case, expected_data)
 
-    # # If sort the dict of dicts, or stick them all in the list?
-    # list_of_expected = [
-    #     case
-    #     for case in expected_data.values()
-    # ]
-    #
-    # if prefix in PACKCODES_SORTED_BY_PRODUCTION_CODE:
-    #     list_of_expected = sorted(list_of_expected, key=lambda row: (row["officer_id"], row["organization_name"]))
-
     return [
         _create_expected_csv_line(case, prefix)
         for case in expected_data.values()

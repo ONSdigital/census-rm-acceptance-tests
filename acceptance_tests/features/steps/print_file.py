@@ -209,8 +209,9 @@ def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content
     sorted_list = []
 
     # This will sort a list of lists based on template ICL or QM
+    # in both cases we're sorting by field_officer_id and org_name
     if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE:
-        sorted_list = sorted(split_csv_rows, key=lambda x: (x[14], x[12]))
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[14], row[12]))
     elif pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
         sorted_list = sorted(split_csv_rows, key=lambda x: (x[15], x[14]))
 
