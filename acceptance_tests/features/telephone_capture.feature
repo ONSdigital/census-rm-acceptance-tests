@@ -10,9 +10,13 @@ Feature: Telephone capture
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
     And a fulfilment request event is logged
 
+    @smoke
     Examples:
       | sample file                    | address level | address type | country code | questionnaire type |
       | sample_1_english_HH_unit.csv   | U             | HH           | E            | 01                 |
+
+    Examples:
+      | sample file                    | address level | address type | country code | questionnaire type |
       | sample_1_welsh_HH_unit.csv     | U             | HH           | W            | 02                 |
       | sample_1_ni_HH_unit.csv        | U             | HH           | N            | 04                 |
       | sample_1_english_CE_estab.csv  | E             | CE           | E            | 31                 |

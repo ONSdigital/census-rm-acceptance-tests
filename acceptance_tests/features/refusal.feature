@@ -9,6 +9,7 @@ Feature: Handle refusal message
     And a CANCEL action instruction is emitted to FWMT
     And the events logged for the refusal case are [SAMPLE_LOADED,REFUSAL_RECEIVED]
 
+  @smoke
   Scenario: Refusal message results in CCS case excluded from action plan
     Given a CCS Property Listed event is sent
     And the CCS Property Listed case is created with address type "HH"

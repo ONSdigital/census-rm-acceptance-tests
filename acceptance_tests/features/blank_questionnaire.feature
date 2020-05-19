@@ -14,9 +14,13 @@ Feature: Handling Blank Questionnaire Scenario
     And the correct events are logged for loaded case events "[<loaded case events>]" and individual case events "[<individual case events>]"
     And if the field instruction "<blank instruction>" is not NONE a msg to field is emitted
 
+    @smoke
     Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                               | blank instruction | another qid receipted | country | offline receipt instruction | individual case events                             |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE            | False                 | E       | CANCEL                      |                                                    |
+
+    Examples:
+      | case type | address level | qid type | form type | sample file                   | loaded case events                                               | blank instruction | another qid receipted | country | offline receipt instruction | individual case events                             |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE              | True                  | E       | CANCEL                      |                                                    |
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE            | False                 | E       | CANCEL                      |                                                    |
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE              | True                  | E       | CANCEL                      |                                                    |
