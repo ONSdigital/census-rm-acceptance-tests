@@ -279,10 +279,9 @@ def send_receipt(context):
 def check_ce_actual_responses_and_receipted(context, incremented, receipted, case_type):
     if receipted == 'False' and incremented == 'False':
         # The case has not changed, so there's nothing to see here
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=0), timeout=3)
+        check_no_msgs_sent_to_queue(context, Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE, functools.partial(
+            store_all_msgs_in_context, context=context,
+            expected_msg_count=0), timeout=3)
         return
 
     emitted_case = _get_emitted_case(context)
@@ -308,10 +307,9 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
 @step('an "{action_instruction_type}" field instruction is emitted')
 def check_receipt_to_field_msg(context, action_instruction_type):
     if action_instruction_type == 'NONE':
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=0), timeout=1)
+        check_no_msgs_sent_to_queue(context, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
+            store_all_msgs_in_context, context=context,
+            expected_msg_count=0), timeout=1)
         return
 
     context.messages_received = []
@@ -329,10 +327,9 @@ def check_receipt_to_field_msg(context, action_instruction_type):
 @step('a case_updated msg has not been emitted')
 def check_receipt_to_field_msg_is_none(context):
     context.messages_received = []
-    check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                functools.partial(
-                                    store_all_msgs_in_context, context=context,
-                                    expected_msg_count=0), timeout=3)
+    check_no_msgs_sent_to_queue(context, Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE, functools.partial(
+        store_all_msgs_in_context, context=context,
+        expected_msg_count=0), timeout=3)
 
     assert len(context.messages_received) == 0
 

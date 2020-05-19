@@ -131,6 +131,7 @@ Feature: Handling Blank Questionnaire Scenario
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
     And a CANCEL action instruction is sent to field work management with address type "HH"
+    And the events logged for the case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
 
   Scenario: A blank questionnaire event received after an eQ receipt does not send the case for follow up
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
@@ -140,3 +141,4 @@ Feature: Handling Blank Questionnaire Scenario
     And a CANCEL action instruction is sent to field work management with address type "HH"
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then no ActionInstruction is sent to FWMT
+    And the events logged for the case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
