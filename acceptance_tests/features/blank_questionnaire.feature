@@ -78,7 +78,7 @@ Feature: Handling Blank Questionnaire Scenario
     When the offline receipt msg for the receipted case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false for the receipted qid
     And the correct events are logged for loaded case events "[<loaded case events>]" for blank questionnaire
-    And the field instruction is "NONE"
+    And no ActionInstruction is sent to FWMT
 
     Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                                                    | another qid receipted | country | instruction |
