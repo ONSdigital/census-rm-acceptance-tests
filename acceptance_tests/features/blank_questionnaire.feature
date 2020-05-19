@@ -84,7 +84,6 @@ Feature: Handling Blank Questionnaire Scenario
       | case type | address level | qid type | form type | sample file                   | loaded case events                                                                    | another qid receipted | country | instruction |
       | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | NONE        |
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | NONE        |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                      | True                  | E       | UPDATE      |
 
   Scenario Outline: Blank questionnaire for non-CE case types before actual receipt when another qid is needed
     Given sample file "<sample file>" is loaded successfully
