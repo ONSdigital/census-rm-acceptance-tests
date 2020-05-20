@@ -11,7 +11,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
     Examples: Initial contact letter: <pack code>
       | pack code      | action type | questionnaire types | sample file                        |
-      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_10_english_CE_estab.csv      |
+      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_10_english_CE_estab.csv     |
 
     @smoke
     Examples: Initial contact letter: <pack code>
