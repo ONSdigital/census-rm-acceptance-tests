@@ -30,6 +30,7 @@ Feature: Handle fulfilment request events
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
 
+    @regression
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
@@ -48,6 +49,10 @@ Feature: Handle fulfilment request events
     Examples: Continuation Questionnaires
       | fulfilment code | questionnaire type |
       | P_OR_HC1        | 11                 |
+
+    @regression
+    Examples: Continuation Questionnaires
+      | fulfilment code | questionnaire type |
       | P_OR_HC2        | 12                 |
       | P_OR_HC2W       | 13                 |
       | P_OR_HC4        | 14                 |
@@ -61,12 +66,20 @@ Feature: Handle fulfilment request events
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
       | P_LP_HL1        |
+
+    @regression
+    Examples: Large print questionnaire: <fulfilment code>
+      | fulfilment code |
       | P_LP_HL2W       |
       | P_LP_HL4        |
 
     Examples: Translation Booklet: <fulfilment code>
       | fulfilment code |
       | P_TB_TBARA1     |
+
+    @regression
+    Examples: Translation Booklet: <fulfilment code>
+      | fulfilment code |
       | P_TB_TBPOL4     |
       | P_TB_TBYSH1     |
       | P_TB_TBLIT4     |
@@ -83,6 +96,10 @@ Feature: Handle fulfilment request events
     Examples: Individual Response Questionnaires fulfilment codes
       | fulfilment code |
       | P_OR_I1         |
+
+    @regression
+    Examples: Individual Response Questionnaires fulfilment codes
+      | fulfilment code |
       | P_OR_I2         |
       | P_OR_I2W        |
       | P_OR_I4         |

@@ -1,9 +1,9 @@
 import json
 import logging
 
+import luhn
 import requests
 from behave import then, step
-import luhn
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.test_case_helper import test_helper
