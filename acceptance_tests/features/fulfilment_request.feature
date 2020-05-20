@@ -1,62 +1,67 @@
 Feature: Handle fulfilment request events
-
-  @smoke
-  Scenario: Log event when a fulfilment request event is received
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a UAC fulfilment request "UACHHT1" message for a created case is sent
-    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
-    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
-
-  Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a UAC fulfilment request "UACIT1" message for a created case is sent
-    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
-    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
-    And the individual case has these events logged [RM_UAC_CREATED]
-
-  Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
-    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
-    And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
-
-    @smoke
-    Examples: Questionnaire: <fulfilment code>
-      | fulfilment code | questionnaire type |
-      | P_OR_H1         | 01                 |
-
-    Examples: Questionnaire: <fulfilment code>
-      | fulfilment code | questionnaire type |
-      | P_OR_H1         | 01                 |
-      | P_OR_H2         | 02                 |
-      | P_OR_H2W        | 03                 |
-      | P_OR_H4         | 04                 |
-
-  Scenario Outline: Generate print files and log events for continuation questionnaire fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
-    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
-    And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
-
-    Examples: Continuation Questionnaires
-      | fulfilment code | questionnaire type |
-      | P_OR_HC1        | 11                 |
-      | P_OR_HC2        | 12                 |
-      | P_OR_HC2W       | 13                 |
-      | P_OR_HC4        | 14                 |
+#
+#  @smoke
+#  Scenario: Log event when a fulfilment request event is received
+#    Given sample file "sample_input_england_census_spec.csv" is loaded
+#    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+#    When a UAC fulfilment request "UACHHT1" message for a created case is sent
+#    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
+#    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+#
+#  Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
+#    Given sample file "sample_input_england_census_spec.csv" is loaded
+#    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+#    When a UAC fulfilment request "UACIT1" message for a created case is sent
+#    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+#    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
+#    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
+#    And the individual case has these events logged [RM_UAC_CREATED]
+#
+#  Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
+#    Given sample file "sample_1_english_HH_unit.csv" is loaded
+#    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+#    When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
+#    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+#    And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
+#    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+#
+#    @smoke
+#    Examples: Questionnaire: <fulfilment code>
+#      | fulfilment code | questionnaire type |
+#      | P_OR_H1         | 01                 |
+#
+#    Examples: Questionnaire: <fulfilment code>
+#      | fulfilment code | questionnaire type |
+#      | P_OR_H1         | 01                 |
+#      | P_OR_H2         | 02                 |
+#      | P_OR_H2W        | 03                 |
+#      | P_OR_H4         | 04                 |
+#
+#  Scenario Outline: Generate print files and log events for continuation questionnaire fulfilment requests
+#    Given sample file "sample_1_english_HH_unit.csv" is loaded
+#    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+#    When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
+#    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+#    And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
+#    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+#
+#    Examples: Continuation Questionnaires
+#      | fulfilment code | questionnaire type |
+#      | P_OR_HC1        | 11                 |
+#      | P_OR_HC2        | 12                 |
+#      | P_OR_HC2W       | 13                 |
+#      | P_OR_HC4        | 14                 |
 
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
     When a supplementary materials fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
+
+    @smoke
+    Examples: Translation Booklet: <fulfilment code>
+      | fulfilment code |
+      | P_TB_TBARA1     |
 
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
@@ -66,10 +71,91 @@ Feature: Handle fulfilment request events
 
     Examples: Translation Booklet: <fulfilment code>
       | fulfilment code |
+      | P_TB_TBALB1     |
+      | P_TB_TBAMH1     |
       | P_TB_TBARA1     |
-      | P_TB_TBPOL4     |
-      | P_TB_TBYSH1     |
+      | P_TB_TBARA2     |
+      | P_TB_TBARA4     |
+      | P_TB_TBARM1     |
+      | P_TB_TBBEN1     |
+      | P_TB_TBBEN2     |
+      | P_TB_TBBOS1     |
+      | P_TB_TBBUL1     |
+      | P_TB_TBBUL2     |
+      | P_TB_TBBUL4     |
+      | P_TB_TBBUR1     |
+      | P_TB_TBCAN1     |
+      | P_TB_TBCAN2     |
+      | P_TB_TBCAN4     |
+      | P_TB_TBCZE1     |
+      | P_TB_TBCZE4     |
+      | P_TB_TBFAR1     |
+      | P_TB_TBFAR2     |
+      | P_TB_TBFRE1     |
+      | P_TB_TBGER1     |
+      | P_TB_TBGRE1     |
+      | P_TB_TBGRE2     |
+      | P_TB_TBGUJ1     |
+      | P_TB_TBPAN1     |
+      | P_TB_TBPAN2     |
+      | P_TB_TBHEB1     |
+      | P_TB_TBHIN1     |
+      | P_TB_TBHUN1     |
+      | P_TB_TBHUN4     |
+      | P_TB_TBIRI4     |
+      | P_TB_TBITA1     |
+      | P_TB_TBITA2     |
+      | P_TB_TBJAP1     |
+      | P_TB_TBKOR1     |
+      | P_TB_TBKUR1     |
+      | P_TB_TBKUR2     |
+      | P_TB_TBLAT1     |
+      | P_TB_TBLAT2     |
+      | P_TB_TBLAT4     |
+      | P_TB_TBLIN1     |
+      | P_TB_TBLIT1     |
       | P_TB_TBLIT4     |
+      | P_TB_TBMAL1     |
+      | P_TB_TBMAL2     |
+      | P_TB_TBMAN1     |
+      | P_TB_TBMAN2     |
+      | P_TB_TBMAN4     |
+      | P_TB_TBNEP1     |
+      | P_TB_TBPAS1     |
+      | P_TB_TBPAS2     |
+      | P_TB_TBPOL1     |
+      | P_TB_TBPOL2     |
+      | P_TB_TBPOL4     |
+      | P_TB_TBPOR1     |
+      | P_TB_TBPOR2     |
+      | P_TB_TBPOR4     |
+      | P_TB_TBPOT1     |
+      | P_TB_TBROM1     |
+      | P_TB_TBROM4     |
+      | P_TB_TBRUS1     |
+      | P_TB_TBRUS2     |
+      | P_TB_TBRUS4     |
+      | P_TB_TBSLE1     |
+      | P_TB_TBSLO1     |
+      | P_TB_TBSLO4     |
+      | P_TB_TBSOM1     |
+      | P_TB_TBSOM4     |
+      | P_TB_TBSPA1     |
+      | P_TB_TBSPA2     |
+      | P_TB_TBSWA1     |
+      | P_TB_TBSWA2     |
+      | P_TB_TBTAG1     |
+      | P_TB_TBTAM1     |
+      | P_TB_TBTHA1     |
+      | P_TB_TBTHA2     |
+      | P_TB_TBTET4     |
+      | P_TB_TBTIG1     |
+      | P_TB_TBTUR1     |
+      | P_TB_TBUKR1     |
+      | P_TB_TBULS4     |
+      | P_TB_TBURD1     |
+      | P_TB_TBVIE1     |
+      | P_TB_TBYSH1     |
 
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
