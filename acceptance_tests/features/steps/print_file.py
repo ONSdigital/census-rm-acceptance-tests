@@ -22,13 +22,16 @@ from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
-ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE = [
+ICL_PACKCODES_WHICH_ARE_SORTED = [
     'D_CE1A_ICLCR1', 'D_CE1A_ICLCR2B', 'D_ICA_ICLR1', 'D_ICA_ICLR1',
     'D_ICA_ICLR2B', 'D_ICA_ICLR2B', 'D_CE4A_ICLR4', 'D_CE4A_ICLS4'
 ]
+ICL_TEMPLATE_FIELD_OFFICER_COLUMN = 14
+ICL_TEMPLATE_ORGANISATION_COLUMN = 12
 
-QM_PACKCODES_SORTED_BY_PRODUCTION_CODE = ['D_FDCE_I1', 'D_FDCE_I2', 'D_FDCE_I4', 'D_FDCE_H1', 'D_FDCE_H2']
+QM_PACKCODES_WHICH_ARE_SORTED = ['D_FDCE_I1', 'D_FDCE_I2', 'D_FDCE_I4', 'D_FDCE_H1', 'D_FDCE_H2']
+QM_TEMPLATE_FIELD_OFFICER_COLUMN = 15
+QM_TEMPLATE_ORGANISATION_COLUMN = 14
 
 
 @then('correctly formatted "{pack_code}" print files are created for questionnaire')
@@ -210,10 +213,12 @@ def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content
 
     # This will sort a list of lists based on template ICL or QM
     # in both cases we're sorting by field_officer_id and org_name
-    if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE:
-        sorted_list = sorted(split_csv_rows, key=lambda row: (row[14], row[12]))
-    elif pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
-        sorted_list = sorted(split_csv_rows, key=lambda x: (x[15], x[14]))
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[ICL_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[ICL_TEMPLATE_ORGANISATION_COLUMN]))
+    elif pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[QM_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[QM_TEMPLATE_ORGANISATION_COLUMN]))
 
     # Turn back to a list of expected_csv rows
     expected_csv_rows = [
@@ -241,7 +246,7 @@ def _validate_print_file_content(context, sftp_utility, start_of_test, expected_
 
     test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
 
-    if pack_code in ICL_PACKCODES_SORTED_BY_PRODUCTION_CODE or pack_code in QM_PACKCODES_SORTED_BY_PRODUCTION_CODE:
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED or pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
         check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code)
 
 
