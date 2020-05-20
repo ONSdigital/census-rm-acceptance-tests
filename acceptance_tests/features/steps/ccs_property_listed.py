@@ -144,10 +144,9 @@ def field_callback(ch, method, _properties, body, context):
 
 @step("no ActionInstruction is sent to FWMT")
 def check_no_msg_sent_fwmt(context):
-    check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                functools.partial(
-                                    store_all_msgs_in_context, context=context,
-                                    expected_msg_count=0))
+    check_no_msgs_sent_to_queue(context, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
+        store_all_msgs_in_context, context=context,
+        expected_msg_count=0))
 
 
 @step("the CCS case listed event is logged")
