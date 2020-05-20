@@ -14,6 +14,12 @@ smoke_test: package_vulnerability flake run_smoke_tests
 at_tests:
 	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run python run.py --log_level WARN
 
+regression_tests:
+	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run python run.py --log_level WARN --tags="@regression"
+
+full_tests:
+	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run python run.py --log_level WARN --tags="~@regression,@regression"
+
 run_smoke_tests:
 	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run behave acceptance_tests/features --logging-level WARN --tags=@smoke --format=progress2
 
