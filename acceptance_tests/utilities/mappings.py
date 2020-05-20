@@ -60,6 +60,8 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_FDCE_H2": Config.SFTP_QM_DIRECTORY,
     "P_ICCE_ICL1": Config.SFTP_PPO_DIRECTORY,
     "P_ICCE_ICL2B": Config.SFTP_PPO_DIRECTORY,
+    "P_ER_ILER1": Config.SFTP_PPO_DIRECTORY,
+    "P_ER_ILER2B": Config.SFTP_PPO_DIRECTORY,
 }
 
 PACK_CODE_TO_DATASET = {
@@ -84,6 +86,8 @@ PACK_CODE_TO_DATASET = {
     "P_TB_TBPOL4": PPD1_3_DATASET,
     "P_TB_TBYSH1": PPD1_3_DATASET,
     "P_TB_TBLIT4": PPD1_3_DATASET,
+    "P_ER_ILER1": PPD1_3_DATASET,
+    "P_ER_ILER2B": PPD1_3_DATASET,
     "P_OR_I1": QM3_4_DATASET,
     "P_OR_I2": QM3_4_DATASET,
     "P_OR_I2W": QM3_4_DATASET,
@@ -164,6 +168,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_FDCE_I2": 'Individual Questionnaire for Wales (Hand delivery) Addressed',
     "D_FDCE_H1": 'Household Questionnaire for England (Hand delivery) Addressed',
     "D_FDCE_H2": 'Household Questionnaire for Wales (Hand Delivery) Addressed',
+    "P_ER_ILER1": 'Information leaflet (Easy Read) for England',
+    "P_ER_ILER2B": 'Information leaflet (Easy Read) for Wales (English/Welsh - Bilingual)',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
