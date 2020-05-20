@@ -1,9 +1,12 @@
 import functools
 import json
+import time
 import uuid
 
 import requests
 from behave import step
+from google.api_core.exceptions import GoogleAPIError
+from google.cloud import pubsub_v1
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
@@ -275,3 +278,52 @@ def check_individual_questionnaire_print_requests(context, fulfilment_code):
 @step("the individual case has these events logged {expected_event_list}")
 def check_individual_case_events_logged(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
+
+
+@step("QM sends a fulfilment confirmed message via pubsub")
+def qm_sends_fulfilment_confirmed(context):
+    uac_created_message = context.messages_received[0]
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
+
+    data = json.dumps({"transactionId": str(uuid.uuid4()),
+                       "dateTime": "2019-08-03T14:30:01",
+                       "questionnaireId": uac_created_message['payload']['uac']['questionnaireId'],
+                       "productCode": "P_OR_H1",
+                       "channel": "QM",
+                       "type": "FULFILMENT_CONFIRMED"})
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    if not future.done():
+        time.sleep(1)
+
+    future.result(timeout=30)
+
+    print(f'Message published to {topic_path}')
+
+
+@step("PPO sends a fulfilment confirmed message via pubsub")
+def qm_sends_fulfilment_confirmed(context):
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
+
+    data = json.dumps({"transactionId": str(uuid.uuid4()),
+                       "dateTime": "2019-08-03T14:30:01",
+                       "caseRef": context.first_case['caseRef'],
+                       "productCode": "P_OR_H1",
+                       "channel": "PPO",
+                       "type": "FULFILMENT_CONFIRMED"})
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    if not future.done():
+        time.sleep(1)
+
+    future.result(timeout=30)
+
+    print(f'Message published to {topic_path}')
