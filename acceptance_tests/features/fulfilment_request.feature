@@ -69,6 +69,10 @@ Feature: Handle fulfilment request events
     Examples: UAC Questionnaires
       | fulfilment code | questionnaire type |
       | P_UAC_UACHHP1   | 01                 |
+
+    @regression
+    Examples: UAC Questionnaires
+      | fulfilment code | questionnaire type |
       | P_UAC_UACHHP2B  | 02                 |
       | P_UAC_UACHHP4   | 04                 |
 
