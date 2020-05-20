@@ -16,9 +16,10 @@ Feature: Handling Blank Questionnaire Scenario
 
     @smoke
     Examples:
-      | case type | address level | qid type | form type | sample file                   | loaded case events                                               | blank instruction | another qid receipted | country | offline receipt instruction | individual case events                             |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | UPDATE            | False                 | E       | CANCEL                      |                                                    |
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                | blank instruction | another qid receipted | country | offline receipt instruction | individual case events |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | UPDATE            | False                 | E       | CANCEL                      |                        |
 
+    @regression
     Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                               | blank instruction | another qid receipted | country | offline receipt instruction | individual case events                             |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE              | True                  | E       | CANCEL                      |                                                    |
@@ -41,8 +42,12 @@ Feature: Handling Blank Questionnaire Scenario
     And if the field instruction "<blank instruction>" is not NONE a msg to field is emitted
 
     Examples:
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                                                    | blank instruction | another qid receipted | country | offline receipt instruction |
+      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE              | False                 | E       | CANCEL                      |
+
+    @regression
+    Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                                                                   | blank instruction | another qid receipted | country | offline receipt instruction |
-      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | NONE              | False                 | E       | CANCEL                      |
       | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | NONE              | True                  | E       | CANCEL                      |
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                | NONE              | False                 | E       | UPDATE                      |
 
@@ -62,8 +67,12 @@ Feature: Handling Blank Questionnaire Scenario
     And the field instruction is "NONE"
 
     Examples:
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                | another qid receipted | country | instruction | individual case events |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | UPDATE      |                        |
+
+    @regression
+    Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                | another qid receipted | country | instruction | individual case events                             |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | UPDATE      |                                                    |
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | UPDATE      |                                                    |
       | HI        | U             | Ind      | 21        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,FULFILMENT_REQUESTED                | False                 | E       | NONE        | RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED |
 
@@ -81,8 +90,12 @@ Feature: Handling Blank Questionnaire Scenario
     And the field instruction is "NONE"
 
     Examples:
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                                                    | another qid receipted | country | instruction |
+      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | NONE        |
+
+    @regression
+    Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                                                    | another qid receipted | country | instruction |
-      | CE        | U             | Ind      | 21        | sample_1_english_CE_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | NONE        |
       | CE        | E             | Ind      | 21        | sample_1_english_CE_estab.csv | SAMPLE_LOADED,RM_UAC_CREATED,FULFILMENT_REQUESTED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | False                 | E       | NONE        |
       | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED                      | True                  | E       | UPDATE      |
 
@@ -101,8 +114,12 @@ Feature: Handling Blank Questionnaire Scenario
     And if the field instruction "CANCEL" is not NONE a msg to field is emitted
 
     Examples:
+      | case type | address level | qid type | form type | sample file                  | loaded case events                                               | another qid receipted | country | instruction |
+      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True                  | E       | UPDATE      |
+
+    @regression
+    Examples:
       | case type | address level | qid type | form type | sample file                   | loaded case events                                               | another qid receipted | country | instruction |
-      | HH        | U             | HH       | 01        | sample_1_english_HH_unit.csv  | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True                  | E       | UPDATE      |
       | SPG       | U             | HH       | 01        | sample_1_english_SPG_unit.csv | SAMPLE_LOADED,RM_UAC_CREATED,RESPONSE_RECEIVED,RESPONSE_RECEIVED | True                  | E       | UPDATE      |
 
 
