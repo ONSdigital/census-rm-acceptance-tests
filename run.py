@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument('--log_level', '-l', help='Logging level', default=DEFAULT_LOG_LEVEL)
     parser.add_argument('--format', '-f', help='Behave format', default=DEFAULT_BEHAVE_FORMAT)
     parser.add_argument('--feature_directory', '-fd', help='Feature directory', default=DEFAULT_FEATURE_DIRECTORY)
-    parser.add_argument('--tags', '-t', help='Tags', default=argparse.SUPPRESS)
+    parser.add_argument('--tags', '-t', help='Tags')
 
     return parser.parse_args()
 
