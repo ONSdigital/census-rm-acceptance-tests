@@ -18,6 +18,12 @@ if [ "$SMOKE" = "true" ]; then
     BEHAVE_TAGS+=' --tags=@smoke'
 fi
 
+if ! [ "$REGRESSION" = "true" ]; then
+    BEHAVE_TAGS+=' --tags=~@regression'
+else
+    echo "Running with the regression tests"
+fi
+
 if [ "$NAMESPACE" ]; then
     kubectl config set-context $(kubectl config current-context) --namespace=$NAMESPACE
     echo "NAMESPACE = [$NAMESPACE] Set kubectl namespace for subsequent commands [$NAMESPACE]."

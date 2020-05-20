@@ -12,9 +12,10 @@ Feature: Telephone capture
 
     @smoke
     Examples:
-      | sample file                    | address level | address type | country code | questionnaire type |
-      | sample_1_english_HH_unit.csv   | U             | HH           | E            | 01                 |
+      | sample file                  | address level | address type | country code | questionnaire type |
+      | sample_1_english_HH_unit.csv | U             | HH           | E            | 01                 |
 
+    @regression
     Examples:
       | sample file                    | address level | address type | country code | questionnaire type |
       | sample_1_welsh_HH_unit.csv     | U             | HH           | W            | 02                 |
@@ -37,8 +38,12 @@ Feature: Telephone capture
     Examples:
       | sample file                  | address type | country code | questionnaire type |
       | sample_1_english_HH_unit.csv | HH           | E            | 21                 |
-      | sample_1_welsh_HH_unit.csv   | HH           | W            | 22                 |
-      | sample_1_ni_HH_unit.csv      | HH           | N            | 24                 |
+
+    @regression
+    Examples:
+      | sample file                | address type | country code | questionnaire type |
+      | sample_1_welsh_HH_unit.csv | HH           | W            | 22                 |
+      | sample_1_ni_HH_unit.csv    | HH           | N            | 24                 |
 
 
   Scenario Outline: Generate and link correct individual QID type for individual telephone capture requests
@@ -49,8 +54,12 @@ Feature: Telephone capture
     And a fulfilment request event is logged
 
     Examples:
+      | sample file                   | address type | country code | questionnaire type |
+      | sample_1_english_SPG_unit.csv | SPG          | E            | 21                 |
+
+    @regression
+    Examples:
       | sample file                    | address type | country code | questionnaire type |
-      | sample_1_english_SPG_unit.csv  | SPG          | E            | 21                 |
       | sample_1_welsh_SPG_unit.csv    | SPG          | W            | 22                 |
       | sample_1_ni_SPG_unit.csv       | SPG          | N            | 24                 |
       | sample_1_english_SPG_estab.csv | SPG          | E            | 21                 |
