@@ -5,7 +5,6 @@ import uuid
 
 import requests
 from behave import step
-from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 from retrying import retry
 
@@ -306,7 +305,7 @@ def qm_sends_fulfilment_confirmed(context):
 
 
 @step("PPO sends a fulfilment confirmed message via pubsub")
-def qm_sends_fulfilment_confirmed(context):
+def ppo_sends_fulfilment_confirmed(context):
     publisher = pubsub_v1.PublisherClient()
 
     topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
