@@ -58,7 +58,7 @@ Feature: Handle fulfilment request events
       | P_OR_HC4        | 14                 |
 
 
-  Scenario Outline: Generate sprint files and log events for Household UAC print fulfilment letter requests
+  Scenario Outline: Generate print files and log events for Household UAC print fulfilment letter requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
     When a HH print UAC fulfilment request "<fulfilment code>" message for a created case is sent
