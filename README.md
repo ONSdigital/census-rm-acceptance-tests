@@ -22,6 +22,14 @@ Python Behave BDD tests for RM Census.
     make test
     ```
    
+### Regression Tests
+A subset of the tests are tagged with `@regression` to prevent them running in order to speed up testing.
+Run the full set of tests with
+
+```shell script
+make regression_test
+````
+
 ### Smoke tests
 A subset of the tests have been tagged with `@smoke` to quickly test most domains of RM.
 
