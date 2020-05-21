@@ -141,14 +141,13 @@ Feature: Handle fulfilment request events
     And correctly formatted individual UAC print responses are created with "<fulfilment code>"
     And the fulfilment request event is logged
 
-    Examples: Individual Response Questionnaires fulfilment codes
+    Examples: Individual UAC Response fulfilment codes
       | fulfilment code |
       | P_UAC_UACIP1    |
 
     @regression
-    Examples: Individual Response Questionnaires fulfilment codes
+    Examples: Individual UAC Response fulfilment codes
       | fulfilment code |
-      | P_UAC_UACIP1    |
       | P_UAC_UACIP2B   |
       | P_UAC_UACIP4    |
 
