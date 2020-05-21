@@ -141,10 +141,8 @@ def create_uac_fulfilment_message(context, fulfilment_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@step('a HH UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
+@step('a HH print UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
 def create_HH_uac_fulfilment_message(context, fulfilment_code):
-    requests.get(f'{notify_stub_url}/reset')
-
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     message = json.dumps(
