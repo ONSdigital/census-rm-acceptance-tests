@@ -348,6 +348,7 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_TB_TBPAS2": 'Translation Booklet for Wales - Pashto',
     "P_TB_TBPOL1": 'Translation Booklet for England  - Polish',
     "P_TB_TBPOL2": 'Translation Booklet for Wales - Polish',
+    "P_TB_TBPOL4": 'Translation Booklet for Northern Ireland - Polish',
     "P_TB_TBPOR1": 'Translation Booklet for England  - Portuguese',
     "P_TB_TBPOR2": 'Translation Booklet for Wales - Portuguese',
     "P_TB_TBPOR4": 'Translation Booklet for Northern Ireland - Portuguese',
