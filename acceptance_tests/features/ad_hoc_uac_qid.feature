@@ -10,6 +10,7 @@ Feature: A UAC/QID pair can be requested for a case
       | questionnaire type |
       | 01                 |
 
+    @regression
     Examples: Questionnaire type: <questionnaire type>
       | questionnaire type |
       | 02                 |
