@@ -104,6 +104,14 @@ Feature: Handle fulfilment request events
       | P_TB_TBYSH1     |
       | P_TB_TBLIT4     |
 
+    Examples: Information leaflet: <fulfilment code>
+      | fulfilment code |
+      | P_ER_ILER1      |
+
+    @regression
+    Examples: Information leaflet: <fulfilment code>
+      | fulfilment code |
+      | P_ER_ILER2B     |
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
