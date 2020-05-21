@@ -57,6 +57,26 @@ Feature: Handle fulfilment request events
       | P_OR_HC2W       | 13                 |
       | P_OR_HC4        | 14                 |
 
+
+  Scenario Outline: Generate print files and log events for Household UAC print fulfilment letter requests
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When a HH print UAC fulfilment request "<fulfilment code>" message for a created case is sent
+    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+    And correctly formatted on request HH UAC supplementary material print and manifest files for "<fulfilment code>" are created
+    And the fulfilment request event is logged
+
+    Examples: UAC Questionnaires
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACHHP1   | 01                 |
+
+    @regression
+    Examples: UAC Questionnaires
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACHHP2B  | 02                 |
+      | P_UAC_UACHHP4   | 04                 |
+
+
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
     When a supplementary materials fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
