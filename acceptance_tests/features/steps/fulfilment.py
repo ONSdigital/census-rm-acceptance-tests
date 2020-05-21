@@ -281,7 +281,8 @@ def check_individual_case_events_logged(context, expected_event_list):
 
 @step("QM sends a fulfilment confirmed message via pubsub")
 def qm_sends_fulfilment_confirmed(context):
-    uac_created_message = context.messages_received[0]
+    context.first_case = get_first_case(context)
+    uac_created_message = context.uac_created_events[0]
     publisher = pubsub_v1.PublisherClient()
 
     topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
@@ -296,9 +297,6 @@ def qm_sends_fulfilment_confirmed(context):
     future = publisher.publish(topic_path,
                                data=data.encode('utf-8'))
 
-    if not future.done():
-        time.sleep(1)
-
     future.result(timeout=30)
 
     print(f'Message published to {topic_path}')
@@ -306,6 +304,7 @@ def qm_sends_fulfilment_confirmed(context):
 
 @step("PPO sends a fulfilment confirmed message via pubsub")
 def ppo_sends_fulfilment_confirmed(context):
+    context.first_case = get_first_case(context)
     publisher = pubsub_v1.PublisherClient()
 
     topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
@@ -319,9 +318,6 @@ def ppo_sends_fulfilment_confirmed(context):
 
     future = publisher.publish(topic_path,
                                data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
 
     future.result(timeout=30)
 

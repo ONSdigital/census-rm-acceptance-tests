@@ -127,17 +127,11 @@ Feature: Handle fulfilment request events
   Scenario: Fulfilment is confirmed by QM
     Given sample file "sample_1_english_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
-    Then a UAC updated message with "01" questionnaire type is emitted
-    And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
-    And QM sends a fulfilment confirmed message via pubsub
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_CONFIRMED]
+    When QM sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
 
   Scenario: Fulfilment is confirmed by PPO
     Given sample file "sample_1_english_HH_unit.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
-    Then a UAC updated message with "01" questionnaire type is emitted
-    And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
-    And PPO sends a fulfilment confirmed message via pubsub
-    And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED,FULFILMENT_CONFIRMED]
+    When PPO sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
