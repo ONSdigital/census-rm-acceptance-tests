@@ -169,3 +169,15 @@ Feature: Handle fulfilment request events
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
+
+  Scenario: Fulfilment is confirmed by QM
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When QM sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
+
+  Scenario: Fulfilment is confirmed by PPO
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When PPO sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]

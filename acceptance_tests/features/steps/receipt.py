@@ -10,7 +10,7 @@ from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac
     generate_post_request_body
 from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
+from acceptance_tests.features.steps.fulfilment import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
     check_correct_uac_updated_message_is_emitted, request_hi_individual_telephone_capture
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
