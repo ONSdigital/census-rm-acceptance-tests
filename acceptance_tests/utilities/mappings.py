@@ -141,6 +141,9 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_FDCE_H2": Config.SFTP_QM_DIRECTORY,
     "P_ICCE_ICL1": Config.SFTP_PPO_DIRECTORY,
     "P_ICCE_ICL2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP1": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIP4": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP1": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP2B": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP4": Config.SFTP_PPO_DIRECTORY,
@@ -284,6 +287,9 @@ PACK_CODE_TO_DATASET = {
     "D_FDCE_I2": QM3_2_DATASET,
     "D_FDCE_H1": QM3_2_DATASET,
     "D_FDCE_H2": QM3_2_DATASET,
+    "P_UAC_UACIP1": PPD1_3_DATASET,
+    "P_UAC_UACIP2B": PPD1_3_DATASET,
+    "P_UAC_UACIP4": PPD1_3_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -390,9 +396,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_TB_TBVIE1": 'Translation Booklet for England - Vietnamese',
     "P_TB_TBYSH1": 'Translation Booklet for England - Yiddish',
     "P_OR_I1": 'Individual Questionnaire for England',
-    "P_OR_I2": 'Individual Questionnaire for Wales (English)',
-    "P_OR_I2W": 'Individual Questionnaire for Wales (Welsh)',
-    "P_OR_I4": 'Individual Questionnaire for Northern Ireland (English)',
+    "P_OR_I2": 'Individual Questionnaire for Wales (in English)',
+    "P_OR_I2W": 'Individual Questionnaire for Wales (in Welsh)',
+    "P_OR_I4": 'Individual Questionnaire for Northern Ireland (in English)',
     "P_RL_1RL1_1": '1st Reminder, Letter - for England addresses',
     "P_RL_2RL2B_3a": '3rd Reminder, Letter - for Wales addresses',
     "P_QU_H1": '3rd Reminder, Questionnaire - for England addresses',
@@ -422,6 +428,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_FDCE_H2": 'Household Questionnaire for Wales (Hand Delivery) Addressed',
     "P_ER_ILER1": 'Information leaflet (Easy Read) for England',
     "P_ER_ILER2B": 'Information leaflet (Easy Read) for Wales (English/Welsh - Bilingual)',
+    "P_UAC_UACIP1": 'Individual Unique Access Code for England via paper',
+    "P_UAC_UACIP2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper',
+    "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper'
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {

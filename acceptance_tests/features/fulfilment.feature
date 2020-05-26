@@ -215,6 +215,24 @@ Feature: Handle fulfilment request events
       | P_OR_I4         |
 
 
+  Scenario Outline: Generate print files and log events for individual UAC print fulfilment letter requests
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When an individual print fulfilment request "<fulfilment code>" is received by RM
+    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+    And correctly formatted individual UAC print responses are created with "<fulfilment code>"
+    And the fulfilment request event is logged
+
+    Examples: Individual UAC Response fulfilment codes
+      | fulfilment code |
+      | P_UAC_UACIP1    |
+
+    @regression
+    Examples: Individual UAC Response fulfilment codes
+      | fulfilment code |
+      | P_UAC_UACIP2B   |
+      | P_UAC_UACIP4    |
+
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
     When a UAC fulfilment request "UACIT1" message for a created case is sent
@@ -233,3 +251,15 @@ Feature: Handle fulfilment request events
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
+
+  Scenario: Fulfilment is confirmed by QM
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When QM sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
+
+  Scenario: Fulfilment is confirmed by PPO
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When PPO sends a fulfilment confirmed message via pubsub
+    Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]

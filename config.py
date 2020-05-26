@@ -62,6 +62,10 @@ class Config:
                                           "qm-undelivered-project")
     PPO_UNDELIVERED_TOPIC_NAME = "ppo-undelivered-topic"
     QM_UNDELIVERED_TOPIC_NAME = "qm-undelivered-topic"
+    FULFILMENT_CONFIRMED_PROJECT_ID = os.getenv("FULFILMENT_CONFIRMED_PROJECT_ID",
+                                                "fulfilment-confirmed-project")
+    FULFILMENT_CONFIRMED_TOPIC_ID = os.getenv("FULFILMENT_CONFIRMED_TOPIC",
+                                              "fulfilment-topic")
 
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')

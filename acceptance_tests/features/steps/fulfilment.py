@@ -4,6 +4,7 @@ import uuid
 
 import requests
 from behave import step
+from google.cloud import pubsub_v1
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
@@ -11,7 +12,8 @@ from acceptance_tests.features.steps.print_file import _check_print_files_have_a
     _check_manifest_files_created
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
     get_qid_and_uac_from_emitted_child_uac
-from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv
+from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
+    _create_uac_print_materials_csv_line
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -305,6 +307,61 @@ def check_individual_questionnaire_print_requests(context, fulfilment_code):
     _check_manifest_files_created(context, fulfilment_code)
 
 
+@step('correctly formatted individual UAC print responses are created with "{fulfilment_code}"')
+def check_individual_uac_print_requests(context, fulfilment_code):
+    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
+    uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
+    expected_csv_lines = [_create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code)]
+
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
+
+
 @step("the individual case has these events logged {expected_event_list}")
 def check_individual_case_events_logged(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.individual_case_id)
+
+
+@step("QM sends a fulfilment confirmed message via pubsub")
+def qm_sends_fulfilment_confirmed(context):
+    context.first_case = get_first_case(context)
+    uac_created_message = context.uac_created_events[0]
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
+
+    data = json.dumps({"transactionId": str(uuid.uuid4()),
+                       "dateTime": "2019-08-03T14:30:01",
+                       "questionnaireId": uac_created_message['payload']['uac']['questionnaireId'],
+                       "productCode": "P_OR_H1",
+                       "channel": "QM",
+                       "type": "FULFILMENT_CONFIRMED"})
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    future.result(timeout=30)
+
+    print(f'Message published to {topic_path}')
+
+
+@step("PPO sends a fulfilment confirmed message via pubsub")
+def ppo_sends_fulfilment_confirmed(context):
+    context.first_case = get_first_case(context)
+    publisher = pubsub_v1.PublisherClient()
+
+    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
+
+    data = json.dumps({"transactionId": str(uuid.uuid4()),
+                       "dateTime": "2019-08-03T14:30:01",
+                       "caseRef": context.first_case['caseRef'],
+                       "productCode": "P_OR_H1",
+                       "channel": "PPO",
+                       "type": "FULFILMENT_CONFIRMED"})
+
+    future = publisher.publish(topic_path,
+                               data=data.encode('utf-8'))
+
+    future.result(timeout=30)
+
+    print(f'Message published to {topic_path}')
