@@ -141,6 +141,11 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "D_FDCE_H2": Config.SFTP_QM_DIRECTORY,
     "P_ICCE_ICL1": Config.SFTP_PPO_DIRECTORY,
     "P_ICCE_ICL2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACHHP1": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACHHP2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACHHP4": Config.SFTP_PPO_DIRECTORY,
+    "P_ER_ILER1": Config.SFTP_PPO_DIRECTORY,
+    "P_ER_ILER2B": Config.SFTP_PPO_DIRECTORY,
 }
 
 PACK_CODE_TO_DATASET = {
@@ -246,6 +251,11 @@ PACK_CODE_TO_DATASET = {
     "P_TB_TBURD1": PPD1_3_DATASET,
     "P_TB_TBVIE1": PPD1_3_DATASET,
     "P_TB_TBYSH1": PPD1_3_DATASET,
+    "P_UAC_UACHHP1": PPD1_3_DATASET,
+    "P_UAC_UACHHP2B": PPD1_3_DATASET,
+    "P_UAC_UACHHP4": PPD1_3_DATASET,
+    "P_ER_ILER1": PPD1_3_DATASET,
+    "P_ER_ILER2B": PPD1_3_DATASET,
     "P_OR_I1": QM3_4_DATASET,
     "P_OR_I2": QM3_4_DATASET,
     "P_OR_I2W": QM3_4_DATASET,
@@ -394,6 +404,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RD_2RL2B_2": "Response driven reminder group 2 Welsh",
     "P_RD_2RL1_3": "Response driven reminder group 3 English",
     "P_RD_2RL2B_3": "Response driven reminder group 3 Welsh",
+    'P_UAC_UACHHP1': 'Household Unique Access Code for England via paper',
+    'P_UAC_UACHHP2B': 'Household Unique Access Code for Wales (English/Welsh - Bilingual) via paper',
+    'P_UAC_UACHHP4': 'Household Unique Access Code for Northern Ireland via paper',
     "D_CE1A_ICLCR1": "CE1 ICL with UAC for England (Hand Delivery) Addressed",
     "D_CE1A_ICLCR2B": "CE1 ICL with UAC for Wales (Hand Delivery) Addressed",
     "D_ICA_ICLR1": "Individual ICL with UAC for England (Hand Delivery) Addressed",
@@ -407,6 +420,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_FDCE_I2": 'Individual Questionnaire for Wales (Hand delivery) Addressed',
     "D_FDCE_H1": 'Household Questionnaire for England (Hand delivery) Addressed',
     "D_FDCE_H2": 'Household Questionnaire for Wales (Hand Delivery) Addressed',
+    "P_ER_ILER1": 'Information leaflet (Easy Read) for England',
+    "P_ER_ILER2B": 'Information leaflet (Easy Read) for Wales (English/Welsh - Bilingual)',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {

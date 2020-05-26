@@ -30,6 +30,7 @@ Feature: Handle fulfilment request events
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
 
+    @regression
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_H1         | 01                 |
@@ -48,9 +49,33 @@ Feature: Handle fulfilment request events
     Examples: Continuation Questionnaires
       | fulfilment code | questionnaire type |
       | P_OR_HC1        | 11                 |
+
+    @regression
+    Examples: Continuation Questionnaires
+      | fulfilment code | questionnaire type |
       | P_OR_HC2        | 12                 |
       | P_OR_HC2W       | 13                 |
       | P_OR_HC4        | 14                 |
+
+
+  Scenario Outline: Generate print files and log events for Household UAC print fulfilment letter requests
+    Given sample file "sample_1_english_HH_unit.csv" is loaded
+    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    When a HH print UAC fulfilment request "<fulfilment code>" message for a created case is sent
+    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+    And correctly formatted on request HH UAC supplementary material print and manifest files for "<fulfilment code>" are created
+    And the fulfilment request event is logged
+
+    Examples: UAC Questionnaires
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACHHP1   | 01                 |
+
+    @regression
+    Examples: UAC Questionnaires
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACHHP2B  | 02                 |
+      | P_UAC_UACHHP4   | 04                 |
+
 
   Scenario Outline: Generate print files and log events for supplementary printed material fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
@@ -66,6 +91,10 @@ Feature: Handle fulfilment request events
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
       | P_LP_HL1        |
+
+    @regression
+    Examples: Large print questionnaire: <fulfilment code>
+      | fulfilment code |
       | P_LP_HL2W       |
       | P_LP_HL4        |
 
@@ -157,6 +186,14 @@ Feature: Handle fulfilment request events
       | P_TB_TBVIE1     |
       | P_TB_TBYSH1     |
 
+    Examples: Information leaflet: <fulfilment code>
+      | fulfilment code |
+      | P_ER_ILER1      |
+
+    @regression
+    Examples: Information leaflet: <fulfilment code>
+      | fulfilment code |
+      | P_ER_ILER2B     |
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded
@@ -169,6 +206,10 @@ Feature: Handle fulfilment request events
     Examples: Individual Response Questionnaires fulfilment codes
       | fulfilment code |
       | P_OR_I1         |
+
+    @regression
+    Examples: Individual Response Questionnaires fulfilment codes
+      | fulfilment code |
       | P_OR_I2         |
       | P_OR_I2W        |
       | P_OR_I4         |
