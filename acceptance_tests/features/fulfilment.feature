@@ -83,6 +83,11 @@ Feature: Handle fulfilment request events
     Then correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
 
+    @smoke
+    Examples: Translation Booklet: <fulfilment code>
+      | fulfilment code |
+      | P_TB_TBARA1     |
+
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
       | P_LP_HL1        |
@@ -93,16 +98,93 @@ Feature: Handle fulfilment request events
       | P_LP_HL2W       |
       | P_LP_HL4        |
 
-    Examples: Translation Booklet: <fulfilment code>
-      | fulfilment code |
-      | P_TB_TBARA1     |
-
     @regression
     Examples: Translation Booklet: <fulfilment code>
       | fulfilment code |
-      | P_TB_TBPOL4     |
-      | P_TB_TBYSH1     |
+      | P_TB_TBALB1     |
+      | P_TB_TBAMH1     |
+      | P_TB_TBARA2     |
+      | P_TB_TBARA4     |
+      | P_TB_TBARM1     |
+      | P_TB_TBBEN1     |
+      | P_TB_TBBEN2     |
+      | P_TB_TBBOS1     |
+      | P_TB_TBBUL1     |
+      | P_TB_TBBUL2     |
+      | P_TB_TBBUL4     |
+      | P_TB_TBBUR1     |
+      | P_TB_TBCAN1     |
+      | P_TB_TBCAN2     |
+      | P_TB_TBCAN4     |
+      | P_TB_TBCZE1     |
+      | P_TB_TBCZE4     |
+      | P_TB_TBFAR1     |
+      | P_TB_TBFAR2     |
+      | P_TB_TBFRE1     |
+      | P_TB_TBGER1     |
+      | P_TB_TBGRE1     |
+      | P_TB_TBGRE2     |
+      | P_TB_TBGUJ1     |
+      | P_TB_TBPAN1     |
+      | P_TB_TBPAN2     |
+      | P_TB_TBHEB1     |
+      | P_TB_TBHIN1     |
+      | P_TB_TBHUN1     |
+      | P_TB_TBHUN4     |
+      | P_TB_TBIRI4     |
+      | P_TB_TBITA1     |
+      | P_TB_TBITA2     |
+      | P_TB_TBJAP1     |
+      | P_TB_TBKOR1     |
+      | P_TB_TBKUR1     |
+      | P_TB_TBKUR2     |
+      | P_TB_TBLAT1     |
+      | P_TB_TBLAT2     |
+      | P_TB_TBLAT4     |
+      | P_TB_TBLIN1     |
+      | P_TB_TBLIT1     |
       | P_TB_TBLIT4     |
+      | P_TB_TBMAL1     |
+      | P_TB_TBMAL2     |
+      | P_TB_TBMAN1     |
+      | P_TB_TBMAN2     |
+      | P_TB_TBMAN4     |
+      | P_TB_TBNEP1     |
+      | P_TB_TBPAS1     |
+      | P_TB_TBPAS2     |
+      | P_TB_TBPOL1     |
+      | P_TB_TBPOL2     |
+      | P_TB_TBPOL4     |
+      | P_TB_TBPOR1     |
+      | P_TB_TBPOR2     |
+      | P_TB_TBPOR4     |
+      | P_TB_TBPOT1     |
+      | P_TB_TBROM1     |
+      | P_TB_TBROM4     |
+      | P_TB_TBRUS1     |
+      | P_TB_TBRUS2     |
+      | P_TB_TBRUS4     |
+      | P_TB_TBSLE1     |
+      | P_TB_TBSLO1     |
+      | P_TB_TBSLO4     |
+      | P_TB_TBSOM1     |
+      | P_TB_TBSOM4     |
+      | P_TB_TBSPA1     |
+      | P_TB_TBSPA2     |
+      | P_TB_TBSWA1     |
+      | P_TB_TBSWA2     |
+      | P_TB_TBTAG1     |
+      | P_TB_TBTAM1     |
+      | P_TB_TBTHA1     |
+      | P_TB_TBTHA2     |
+      | P_TB_TBTET4     |
+      | P_TB_TBTIG1     |
+      | P_TB_TBTUR1     |
+      | P_TB_TBUKR1     |
+      | P_TB_TBULS4     |
+      | P_TB_TBURD1     |
+      | P_TB_TBVIE1     |
+      | P_TB_TBYSH1     |
 
     Examples: Information leaflet: <fulfilment code>
       | fulfilment code |
