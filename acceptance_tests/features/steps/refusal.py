@@ -15,7 +15,7 @@ from config import Config
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-def _send_refusal_msg_to_rabbit(case_id):
+def _send_refusal_msg_to_rabbit(case_id, refusal_type):
     message = json.dumps(
         {
             "event": {
@@ -27,7 +27,7 @@ def _send_refusal_msg_to_rabbit(case_id):
             },
             "payload": {
                 "refusal": {
-                    "type": "HARD_REFUSAL",
+                    "type": refusal_type,
                     "report": "Test refusal",
                     "agentId": None,
                     "collectionCase": {
@@ -60,11 +60,11 @@ def _send_refusal_msg_to_rabbit(case_id):
             routing_key=Config.RABBITMQ_REFUSAL_ROUTING_KEY)
 
 
-@step("a refusal message for the created case is received")
-def create_refusal(context):
+@step('a refusal message for the created case is received of type "{refusal_type}"')
+def create_refusal(context, refusal_type):
     context.refused_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
-    _send_refusal_msg_to_rabbit(context.refused_case_id)
+    _send_refusal_msg_to_rabbit(context.refused_case_id, refusal_type)
 
 
 @step("a refusal message for the created CCS case is received")
