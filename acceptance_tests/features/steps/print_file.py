@@ -362,4 +362,3 @@ def compare_sftp_with_gcp_files(context, bucket, filename):
 
     test_helper.assertEquals(actual_file_content, expected_file_content,
                              f'file contents {filename} did not match gcp file contents')
-
