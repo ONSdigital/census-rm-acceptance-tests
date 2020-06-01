@@ -1,18 +1,33 @@
 Feature: Handle refusal message
 
   Scenario Outline: Refusal message results in case excluded from refusal print file
-    Given sample file "sample_for_refusals.csv" is loaded successfully
+    Given sample file "sample_for_refusals_print.csv" is loaded successfully
     When a refusal message for the created case is received of type "<refusal type>"
     Then a CANCEL action instruction is emitted to FWMT
     And set action rule of type "<action type>" when case event "REFUSAL_RECEIVED" is logged
     And only unrefused or HARD_REFUSAL cases appear in "P_IC_ICL1" print files of refusal type "<refusal type>"
     And the case is marked as refused
-    And the events logged for the refusal case are [SAMPLE_LOADED,REFUSAL_RECEIVED]
+    And the events logged for the refusal case are <events expected>
 
     Examples: Refusal types to print file
-      | action type | refusal type          |
-      | ICL1E       | HARD_REFUSAL          |
-      | ICL1E       | EXTRAORDINARY_REFUSAL |
+      | action type | refusal type          | events expected                                      |
+      | ICL1E       | HARD_REFUSAL          | [SAMPLE_LOADED,REFUSAL_RECEIVED,PRINT_CASE_SELECTED] |
+      | ICL1E       | EXTRAORDINARY_REFUSAL | [SAMPLE_LOADED,REFUSAL_RECEIVED]                     |
+
+
+  Scenario Outline: All Refusal type result in case excluded from Fieldwork followu[
+    Given sample file "sample_for_refusals_field.csv" is loaded successfully
+    When a refusal message for the created case is received of type "<refusal type>"
+    Then a CANCEL action instruction is emitted to FWMT
+    And set action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
+    And Only unrefused cases are sent to field
+    And the case is marked as refused
+    And the events logged for the refusal case are <events expected>
+
+    Examples: Refusal types to print file
+      | refusal type          | events expected                  |
+      | HARD_REFUSAL          | [SAMPLE_LOADED,REFUSAL_RECEIVED] |
+      | EXTRAORDINARY_REFUSAL | [SAMPLE_LOADED,REFUSAL_RECEIVED] |
 
 
   @smoke

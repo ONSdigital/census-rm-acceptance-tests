@@ -6,6 +6,7 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
+from acceptance_tests.features.steps.field_reminder import fieldwork_message_callback
 from acceptance_tests.features.steps.receipt import _field_work_cancel_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
@@ -63,7 +64,6 @@ def _send_refusal_msg_to_rabbit(case_id, refusal_type):
 @step('a refusal message for the created case is received of type "{refusal_type}"')
 def create_refusal(context, refusal_type):
     context.refused_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-
     _send_refusal_msg_to_rabbit(context.refused_case_id, refusal_type)
 
 
@@ -97,3 +97,20 @@ def refusal_received(context):
 @step("the events logged for the refusal case are {expected_event_list}")
 def check_refusal_event_logging(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.refused_case_id)
+
+
+@step("Only unrefused cases are sent to field")
+def only_unrefused_cases_are_sent_to_field(context):
+
+    a = context.case_created_events
+    context.expected_cases_for_action = [
+        case_created['payload']['collectionCase'] for case_created in context.case_created_events
+        if case_created['payload']['collectionCase']['id'] != context.refused_case_id
+    ]
+    context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
+
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(fieldwork_message_callback, context=context))
+
+    test_helper.assertFalse(context.expected_cases_for_action,
+                            msg="Didn't find all expected fieldwork action instruction messages")
