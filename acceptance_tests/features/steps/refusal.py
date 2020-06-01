@@ -70,8 +70,7 @@ def create_refusal(context, refusal_type):
 @step("a refusal message for the created CCS case is received")
 def create_ccs_refusal(context):
     context.refused_case_id = context.case_id
-
-    _send_refusal_msg_to_rabbit(context.refused_case_id)
+    _send_refusal_msg_to_rabbit(context.refused_case_id, 'HARD_REFUSAL')
 
 
 @step("the case is marked as refused")
