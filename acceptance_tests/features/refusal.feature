@@ -15,7 +15,7 @@ Feature: Handle refusal message
       | ICL1E       | EXTRAORDINARY_REFUSAL | [SAMPLE_LOADED,REFUSAL_RECEIVED]                     |
 
 
-  Scenario Outline: All Refusal type result in case excluded from Fieldwork followu[
+  Scenario Outline: All refusal types result in case excluded from Fieldwork followup
     Given sample file "sample_for_refusals_field.csv" is loaded successfully
     When a refusal message for the created case is received of type "<refusal type>"
     Then a CANCEL action instruction is emitted to FWMT
