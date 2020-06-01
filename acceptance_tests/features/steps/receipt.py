@@ -10,7 +10,7 @@ from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac
     generate_post_request_body
 from acceptance_tests.features.steps.case_look_up import get_ccs_qid_for_case_id
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.fulfilment_request import send_print_fulfilment_request
+from acceptance_tests.features.steps.fulfilment import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
     check_correct_uac_updated_message_is_emitted, request_hi_individual_telephone_capture
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
@@ -201,8 +201,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
         "unreceipt": unreceipt
     })
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
+    future = publisher.publish(topic_path, data=data.encode('utf-8'))
 
     if not future.done():
         time.sleep(1)
@@ -214,6 +213,13 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
     print(f'Message published to {topic_path}')
 
     context.sent_to_gcp = True
+
+
+@step('we have retrieved the case and QID to receipt')
+def get_first_case_and_linked_qid_to_receipt(context):
+    context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
+    context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
+    context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
 
 @step('if required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
@@ -262,6 +268,7 @@ def get_second_qid(context, questionnaire_type, qid_needed):
 
 
 @step("the receipt msg is put on the GCP pubsub")
+@step("the eQ receipt msg is put on the GCP pubsub")
 def send_receipt(context):
     _publish_object_finalize(context, questionnaire_id=context.qid_to_receipt)
     test_helper.assertTrue(context.sent_to_gcp)
@@ -272,10 +279,9 @@ def send_receipt(context):
 def check_ce_actual_responses_and_receipted(context, incremented, receipted, case_type):
     if receipted == 'False' and incremented == 'False':
         # The case has not changed, so there's nothing to see here
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=0), timeout=3)
+        check_no_msgs_sent_to_queue(context, Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE, functools.partial(
+            store_all_msgs_in_context, context=context,
+            expected_msg_count=0), timeout=3)
         return
 
     emitted_case = _get_emitted_case(context)
@@ -296,16 +302,14 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
     test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
 
 
-@step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted'
-      ' where ceActualResponse is incremented "{incremented}"')
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
 @step('the field instruction is "{action_instruction_type}"')
-def check_receipt_to_field_msg(context, action_instruction_type, incremented=None):
+@step('an "{action_instruction_type}" field instruction is emitted')
+def check_receipt_to_field_msg(context, action_instruction_type):
     if action_instruction_type == 'NONE':
-        check_no_msgs_sent_to_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(
-                                        store_all_msgs_in_context, context=context,
-                                        expected_msg_count=0), timeout=1)
+        check_no_msgs_sent_to_queue(context, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
+            store_all_msgs_in_context, context=context,
+            expected_msg_count=0), timeout=1)
         return
 
     context.messages_received = []
@@ -323,10 +327,9 @@ def check_receipt_to_field_msg(context, action_instruction_type, incremented=Non
 @step('a case_updated msg has not been emitted')
 def check_receipt_to_field_msg_is_none(context):
     context.messages_received = []
-    check_no_msgs_sent_to_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                functools.partial(
-                                    store_all_msgs_in_context, context=context,
-                                    expected_msg_count=0), timeout=3)
+    check_no_msgs_sent_to_queue(context, Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE, functools.partial(
+        store_all_msgs_in_context, context=context,
+        expected_msg_count=0), timeout=3)
 
     assert len(context.messages_received) == 0
 
@@ -337,9 +340,8 @@ def check_receipt_to_field_msg_is_none(context):
 def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events=None):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
 
-    if individual_case_events:
-        if len(individual_case_events.replace('[', '').replace(']', '')) > 0:
-            check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])
+    if individual_case_events and len(individual_case_events.replace('[', '').replace(']', '')) > 0:
+        check_if_event_list_is_exact_match(individual_case_events, context.receipting_case['id'])
 
 
 @step("a uac_updated msg is emitted with active set to false for the receipted qid")

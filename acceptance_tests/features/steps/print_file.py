@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import json
 import logging
@@ -14,12 +15,24 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_supplementary_materials_csv, create_expected_reminder_letter_csv_lines, \
     create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv, \
     create_expected_csv_lines_for_ce_estab_responses, create_expected_CE_Estab_questionnaire_csv_lines, \
-    create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings
+    create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings, \
+    create_expected_HH_UAC_supplementary_materials_csv
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+ICL_PACKCODES_WHICH_ARE_SORTED = [
+    'D_CE1A_ICLCR1', 'D_CE1A_ICLCR2B', 'D_ICA_ICLR1', 'D_ICA_ICLR1',
+    'D_ICA_ICLR2B', 'D_ICA_ICLR2B', 'D_CE4A_ICLR4', 'D_CE4A_ICLS4'
+]
+ICL_TEMPLATE_FIELD_OFFICER_COLUMN = 14
+ICL_TEMPLATE_ORGANISATION_COLUMN = 12
+
+QM_PACKCODES_WHICH_ARE_SORTED = ['D_FDCE_I1', 'D_FDCE_I2', 'D_FDCE_I4', 'D_FDCE_H1', 'D_FDCE_H2']
+QM_TEMPLATE_FIELD_OFFICER_COLUMN = 15
+QM_TEMPLATE_ORGANISATION_COLUMN = 14
 
 
 @then('correctly formatted "{pack_code}" print files are created for questionnaire')
@@ -152,6 +165,7 @@ def check_manifest_files(context, pack_code):
 
 @step('correctly formatted on request contn questionnaire print and manifest files for "{fulfilment_code}" are created')
 @step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
+@step('correctly formatted on request UAC questionnaire print and manifest files for "{fulfilment_code}" are created')
 def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
@@ -175,6 +189,14 @@ def correct_supplementary_material_print_files(context, fulfilment_code):
     _check_manifest_files_created(context, fulfilment_code)
 
 
+@step('correctly formatted on request HH UAC supplementary material print'
+      ' and manifest files for "{fulfilment_code}" are created')
+def correct_HH_UAC_supplementary_material_print_files(context, fulfilment_code):
+    expected_csv_lines = create_expected_HH_UAC_supplementary_materials_csv(context, fulfilment_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    _check_manifest_files_created(context, fulfilment_code)
+
+
 def _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
     with SftpUtility() as sftp_utility:
         _validate_print_file_content(context, sftp_utility, context.test_start_local_datetime, expected_csv_lines,
@@ -188,6 +210,36 @@ def _get_print_file_rows_as_list(context, pack_code):
         return sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
 
 
+def check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code):
+    # If this was split over multiple files it could fail, not expected with current testing
+    # produce a list of split_csv rows to sort
+    split_csv_rows = [
+        csvrow.split("|")
+        for csvrow in unsorted_actual_content_list
+    ]
+
+    # If called with an invalid packcode the test will fail, this is expected behaviour
+    sorted_list = []
+
+    # This will sort a list of lists based on template ICL or QM
+    # in both cases we're sorting by field_officer_id and org_name
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[ICL_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[ICL_TEMPLATE_ORGANISATION_COLUMN]))
+    elif pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[QM_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[QM_TEMPLATE_ORGANISATION_COLUMN]))
+
+    # Turn back to a list of expected_csv rows
+    expected_csv_rows = [
+        '|'.join(row)
+        for row in sorted_list
+    ]
+
+    test_helper.assertEquals(unsorted_actual_content_list, expected_csv_rows,
+                             'Sorted file contents did not match expected')
+
+
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
 def _validate_print_file_content(context, sftp_utility, start_of_test, expected_csv_lines, pack_code):
     logger.debug('Checking for files on SFTP server')
@@ -197,9 +249,15 @@ def _validate_print_file_content(context, sftp_utility, start_of_test, expected_
     actual_content_list = sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
     if not actual_content_list:
         raise FileNotFoundError
+
+    unsorted_actual_content_list = copy.deepcopy(actual_content_list)
     actual_content_list.sort()
     expected_csv_lines.sort()
+
     test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
+
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED or pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
+        check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code)
 
 
 @retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)

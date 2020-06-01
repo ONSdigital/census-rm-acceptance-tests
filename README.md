@@ -22,6 +22,14 @@ Python Behave BDD tests for RM Census.
     make test
     ```
    
+### Regression Tests
+A subset of the tests are tagged with `@regression` to prevent them running in order to speed up testing.
+Run the full set of tests with
+
+```shell script
+make regression_test
+````
+
 ### Smoke tests
 A subset of the tests have been tagged with `@smoke` to quickly test most domains of RM.
 
@@ -56,6 +64,13 @@ Run only the tagged smoke tests in a GCP environment with
 ENV=your-test-env SMOKE=true ./run_gke.sh
 ```
 
+### Regression tests
+A subset of the print file tests have been marked as `@regression` to prevent them to speed up the test run.
+To include them in a test run against a GCP environment use
+```bash
+ENV=your-test-env REGRESSION=true ./run_gke.sh
+```
+
 ### Script Environment variables
 
 | Name                  | Description                                                                                                                                                                                                  | Example                                  | Default              | Required |
@@ -63,6 +78,7 @@ ENV=your-test-env SMOKE=true ./run_gke.sh
 | `ENV`                 | The environment to run the tests in and against, it will try to use an existing project of the form `census-rm-<ENV>`. If not present, the script will use the current k8s context.                                                                                                  | `ENV=test-env`                           | None                 | no      |
 | `NAMESPACE`          | The k8s namespace to run the acceptance tests as a pod in.                |                                                                                                  | `NAMESPACE=default`                        | None              | no       |
 | `SMOKE`              | A boolean, set to `true` to only run the tagged smoke tests | `SMOKE=true` | `false` | no |
+| `REGRESSION`         | A boolean, set to `true` to enable the regression tests     | `REGRESSION=true` | 'false` | no | 
 
 ### Alternatively
 

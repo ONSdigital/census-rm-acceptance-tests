@@ -305,6 +305,24 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
     )
 
 
+def create_expected_HH_UAC_supplementary_materials_csv(context, fulfilment_code):
+    return [_create_expected_HH_UAC_supplementary_materials_csv_line(context.first_case, context.requested_uac,
+                                                                     context.requested_qid, fulfilment_code)]
+
+
+def _create_expected_HH_UAC_supplementary_materials_csv_line(case, uac, qid, fulfilment_code):
+    return (
+        f'{uac}|{case["caseRef"]}|'
+        f'|||'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{fulfilment_code}|{qid}|||'
+    )
+
+
 def create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code):
     return (
         f'{uac}|'
@@ -317,4 +335,17 @@ def create_expected_individual_response_csv(individual_case, uac, qid, fulfilmen
         f'{individual_case["townName"]}|'
         f'{individual_case["postcode"]}|'
         f'{fulfilment_code}||'
+    )
+
+
+def _create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code):
+    return (
+        f'{uac}|{individual_case["caseRef"]}|'
+        f'Ms|jo|smith|'
+        f'{individual_case["addressLine1"]}|'
+        f'{individual_case["addressLine2"]}|'
+        f'{individual_case["addressLine3"]}|'
+        f'{individual_case["townName"]}|'
+        f'{individual_case["postcode"]}|'
+        f'{fulfilment_code}|{qid}|||'
     )

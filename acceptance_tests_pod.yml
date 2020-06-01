@@ -168,6 +168,11 @@ spec:
             key: project-name
     - name: QM_UNDELIVERED_TOPIC_NAME
       value: "qm-undelivered-topic"
+    - name: FULFILMENT_CONFIRMED_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: project-config
+          key: project-name
   volumes:
   - name: cloud-sql-certs
     secret:
