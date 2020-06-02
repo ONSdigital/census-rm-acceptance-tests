@@ -5,7 +5,7 @@ Feature: Handle refusal message
     When a refusal message for the created case is received of type "<refusal type>"
     Then a CANCEL action instruction is emitted to FWMT
     And set action rule of type "ICL1E" when case event "REFUSAL_RECEIVED" is logged
-    And only unrefused or HARD_REFUSAL cases appear in "P_IC_ICL1" print files of refusal type "<refusal type>"
+    And the refused case of type "<refusal type>" only appears in the "P_IC_ICL1" print files if it is a HARD_REFUSAL
     And the case is marked as refused
     And the events logged for the refusal case are <events expected>
 
