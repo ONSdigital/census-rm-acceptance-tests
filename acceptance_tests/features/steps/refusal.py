@@ -112,9 +112,3 @@ def only_unrefused_cases_are_sent_to_field(context):
 
     test_helper.assertFalse(context.expected_cases_for_action,
                             msg="Didn't find all expected fieldwork action instruction messages")
-
-
-
-def step_impl(context, arg0):
-    raise NotImplementedError(
-        u'STEP: And the refused case of type "<refusal type>" only appears in the "P_IC_ICL1" print files if it is a HARD_REFUSAL')
