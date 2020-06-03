@@ -139,9 +139,13 @@ def check_correct_reminder_questionnaire_files_on_sftp_server(context, pack_code
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
-@then('only unrefused cases appear in "{pack_code}" print files')
-def check_correct_unrefused_files_on_sftp_server(context, pack_code):
-    expected_csv_lines = create_expected_csv_lines(context, pack_code, context.refused_case_id)
+@step('the refused case of type "{refusal_type}" only appears in the "{pack_code}" print files if it is a HARD_REFUSAL')
+def check_correct_unrefused_files_on_sftp_server(context, pack_code, refusal_type):
+    if refusal_type == 'EXTRAORDINARY_REFUSAL':
+        expected_csv_lines = create_expected_csv_lines(context, pack_code, context.refused_case_id)
+    else:
+        expected_csv_lines = create_expected_csv_lines(context, pack_code)
+
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
