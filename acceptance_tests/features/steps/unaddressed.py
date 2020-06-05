@@ -56,7 +56,7 @@ def send_individual_linked_message_and_verify_new_case(context):
 
 
 @step("an Individual Questionnaire Linked message with no individual case ID is sent and ingested")
-def send_individual_linked_message_and_verify_new_case(context):
+def send_individual_linked_message_without_individual_case_id_and_verify_new_case(context):
     send_questionnaire_link_for_individual_hh_case(context, include_individual_id=False)
     context.linked_case_id = context.individual_case_id = get_case_id_by_questionnaire_id(
         context.expected_questionnaire_id)
