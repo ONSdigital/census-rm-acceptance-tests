@@ -22,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
-@step('an unaddressed message of questionnaire type {questionnaire_type} is sent')
+@step('an unaddressed QID request message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
     context.expected_questionnaire_type = questionnaire_type
     with RabbitContext(queue_name=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE) as rabbit:
@@ -33,13 +33,13 @@ def send_unaddressed_message(context, questionnaire_type):
 
 @step("a Questionnaire Linked message is sent")
 def send_linked_message(context):
-    check_linked_message_is_received(context)
+    send_questionnaire_link(context)
     context.linked_case_id = context.linked_case['id']
 
 
 @step("a Questionnaire Linked message is sent to relink to a new case")
 def send_linked_message_for_alternative_case(context):
-    check_alternative_linked_message_is_received(context)
+    send_alternative_questionnaire_link(context)
     time.sleep(1)
 
 
@@ -49,10 +49,17 @@ def send_linked_message_for_blank_questionnaire(context):
     context.linked_case_id = context.linked_case['id']
 
 
-@step("an Individual Questionnaire Linked message is sent")
-def send_individual_linked_message(context):
-    check_linked_message_is_received_for_individual_hh_case(context)
-    context.linked_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+@step("an Individual Questionnaire Linked message is sent and ingested")
+def send_individual_linked_message_and_verify_new_case(context):
+    context.linked_case_id = send_questionnaire_link_for_individual_hh_case(context)
+    get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+
+
+@step("an Individual Questionnaire Linked message with no individual case ID is sent and ingested")
+def send_individual_linked_message_and_verify_new_case(context):
+    send_questionnaire_link_for_individual_hh_case(context, include_individual_id=False)
+    context.linked_case_id = context.individual_case_id = get_case_id_by_questionnaire_id(
+        context.expected_questionnaire_id)
 
 
 @step("a Questionnaire Linked message is sent for the CCS case")
@@ -63,20 +70,25 @@ def send_ccs_linked_message(context):
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
 
 
-def check_linked_message_is_received(context):
+def send_questionnaire_link(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
 
     _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
 
-def check_linked_message_is_received_for_individual_hh_case(context):
+def send_questionnaire_link_for_individual_hh_case(context, include_individual_id=True):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
-    context.individual_case_id = uuid.uuid4()
-    _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'],
-                                                           context.individual_case_id)
+    if include_individual_id:
+        context.individual_case_id = uuid.uuid4()
+        _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id,
+                                                               context.linked_case['id'],
+                                                               context.individual_case_id)
+        return context.individual_case_id
+    _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id,
+                                                           context.linked_case['id'])
 
 
-def check_alternative_linked_message_is_received(context):
+def send_alternative_questionnaire_link(context):
     alternative_case = context.case_created_events[0]['payload']['collectionCase']
 
     context.linked_case_id = alternative_case['id']
@@ -235,7 +247,7 @@ def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
             routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
 
 
-def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id, individual_case_id):
+def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id, individual_case_id=None):
     questionnaire_linked_message = {
         'event': {
             'type': 'QUESTIONNAIRE_LINKED',
@@ -248,10 +260,11 @@ def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, cas
             'uac': {
                 "caseId": case_id,
                 'questionnaireId': questionnaire_id,
-                'individualCaseId': str(individual_case_id)
             }
         }
     }
+    if individual_case_id:
+        questionnaire_linked_message['payload']['uac']['individualCaseId'] = str(individual_case_id)
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=json.dumps(questionnaire_linked_message),

@@ -32,7 +32,7 @@ Feature: Case processor handles receipt message from pubsub service
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 
   Scenario: Receipt of unaddressed continuation questionnaire does not send to Field
-    Given an unaddressed message of questionnaire type 63 is sent
+    Given an unaddressed QID request message of questionnaire type 63 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     And a CCS Property Listed event is sent with a qid
     And the CCS Property Listed case is created with address type "HH"
