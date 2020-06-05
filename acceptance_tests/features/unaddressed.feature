@@ -36,9 +36,9 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     And the HI individual case can be retrieved
 
   Scenario: Receipt of unlinked unaddressed
-    When an unaddressed QID request message of questionnaire type 01 is sent
+    Given an unaddressed QID request message of questionnaire type 01 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
-    And a receipt for the unlinked UAC-QID pair is received
+    When a receipt for the unlinked UAC-QID pair is received
     Then message redelivery does not go bananas
 
   Scenario: Unlinked QID is relinked to new case
