@@ -79,7 +79,7 @@ Feature: Address updates
     And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
 
-  Scenario: Individual Telephone capture for new HI skeleton case
+  Scenario: Individual Telephone capture for new skeleton case
     Given the action plan and collection exercises IDs are the hardcoded census values
     And a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD"
     And a case created event is emitted
@@ -113,6 +113,7 @@ Feature: Address updates
 
     Examples:
       | address level | address type | country code | questionnaire type |
+      | U             | HH           | E            | 01                 |
       | U             | SPG          | E            | 01                 |
       | E             | CE           | E            | 31                 |
       | E             | SPG          | E            | 01                 |
@@ -120,14 +121,16 @@ Feature: Address updates
     @regression
     Examples:
       | address level | address type | country code | questionnaire type |
+      | U             | HH           | W            | 02                 |
       | U             | SPG          | W            | 02                 |
       | E             | CE           | W            | 32                 |
       | E             | SPG          | W            | 02                 |
+      | U             | HH           | N            | 04                 |
       | U             | SPG          | N            | 04                 |
       | E             | CE           | N            | 34                 |
       | E             | SPG          | N            | 04                 |
 
-  Scenario Outline: Individual Telephone capture for new skeleton case
+  Scenario Outline: Individual Telephone capture for new skeleton case - CE & SPG cases
     Given the action plan and collection exercises IDs are the hardcoded census values
     And a NEW_ADDRESS_REPORTED event with region "<country code>", address type "<address type>" and address level "<address level>" is sent from "FIELD"
     And a case created event is emitted
