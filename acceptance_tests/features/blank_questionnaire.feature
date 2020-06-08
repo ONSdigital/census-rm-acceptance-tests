@@ -125,7 +125,7 @@ Feature: Handling Blank Questionnaire Scenario
   Scenario Outline: Blank questionnaire against an unlinked qid
     Given sample file "<sample file>" is loaded successfully
     And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
-    And an unaddressed message of questionnaire type <form type> is sent
+    And an unaddressed QID request message of questionnaire type <form type> is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     And the offline receipt msg for the receipted case is put on the GCP pubsub for an unlinked qid
     And a blank questionnaire receipts comes in for an unlinked qid
