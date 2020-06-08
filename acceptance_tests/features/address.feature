@@ -78,13 +78,6 @@ Feature: Address updates
     And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
     And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
-  Scenario: Telephone capture for new skeleton case
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
-    And a case created event is emitted
-    When there is a request for telephone capture for an address level "U" case with address type "SPG" and country "E"
-    Then a UAC and QID with questionnaire type "01" type are generated and returned
-    And a UAC updated event is emitted linking the new UAC and QID to the requested case
-    And a fulfilment request event is logged
 
   Scenario: Individual Telephone capture for new skeleton case
     Given the action plan and collection exercises IDs are the hardcoded census values
@@ -108,3 +101,57 @@ Feature: Address updates
     And a case created event is emitted
     When set action rule of type "P_RD_2RL1_1"
     Then skeleton cases do not appear in "P_RD_2RL1_1" print files
+
+
+  Scenario Outline: Telephone capture for new skeleton case
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId with region "<country code>", address type "<address type>" and address level "<address level>"
+    And a case created event is emitted
+    When there is a request for telephone capture for an address level "<address level>" case with address type "<address type>" and country "<country code>"
+    Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
+    And a UAC updated event is emitted linking the new UAC and QID to the requested case
+    And a fulfilment request event is logged
+
+    Examples:
+      | address level | address type | country code | questionnaire type |
+      | U             | HH           | E            | 01                 |
+      | U             | SPG          | E            | 01                 |
+      | E             | CE           | E            | 31                 |
+      | E             | SPG          | E            | 01                 |
+
+    @regression
+    Examples:
+      | address level | address type | country code | questionnaire type |
+      | U             | HH           | W            | 02                 |
+      | U             | SPG          | W            | 02                 |
+      | E             | CE           | W            | 32                 |
+      | E             | SPG          | W            | 02                 |
+      | U             | HH           | N            | 04                 |
+      | U             | SPG          | N            | 04                 |
+      | E             | CE           | N            | 34                 |
+      | E             | SPG          | N            | 04                 |
+
+  Scenario Outline: Individual Telephone capture for new skeleton case - CE & SPG cases
+    Given the action plan and collection exercises IDs are the hardcoded census values
+    And a NEW_ADDRESS_REPORTED event with region "<country code>", address type "<address type>" and address level "<address level>" is sent from "FIELD"
+    And a case created event is emitted
+    When there is a request for individual telephone capture for the case with address type "<address type>" and country "<country code>"
+    Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
+    And a UAC updated event is emitted linking the new UAC and QID to the requested case
+
+    Examples:
+      | address level | address type | country code | questionnaire type |
+      | U             | CE           | E            | 21                 |
+      | E             | CE           | E            | 21                 |
+      | E             | SPG          | E            | 21                 |
+      | U             | SPG          | E            | 21                 |
+
+    @regression
+    Examples:
+      | address level | address type | country code | questionnaire type |
+      | U             | SPG          | W            | 22                 |
+      | E             | CE           | W            | 22                 |
+      | E             | SPG          | W            | 22                 |
+      | U             | SPG          | N            | 24                 |
+      | E             | CE           | N            | 24                 |
+      | E             | SPG          | N            | 24                 |
+
