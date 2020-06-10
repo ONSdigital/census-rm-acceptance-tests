@@ -69,9 +69,6 @@ class Config:
     FULFILMENT_CONFIRMED_TOPIC_ID = os.getenv("FULFILMENT_CONFIRMED_TOPIC",
                                               "fulfilment-topic")
 
-    GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
-
     RABBITMQ_INBOUND_REFUSAL_QUEUE = 'case.refusals'
     RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE = 'case.fulfilments'
     RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE = 'notify.fulfilments'
