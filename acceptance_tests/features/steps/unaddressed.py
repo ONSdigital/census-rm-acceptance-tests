@@ -224,6 +224,12 @@ def retrieve_hi_case(context):
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
 
 
+@step('no case using the individual case id is created')
+def check_case_does_not_exist(context):
+    response = requests.get(f'{caseapi_url}{context.linked_case_id}')
+    test_helper.assertEqual(response.status_code, 404, 'Case should not have been created')
+
+
 def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
     questionnaire_linked_message = {
         'event': {
