@@ -1,10 +1,7 @@
 import functools
 import json
-import time
 
 from behave import step
-from google.api_core.exceptions import GoogleAPIError
-from google.cloud import pubsub_v1
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message, \
     generate_post_request_body
@@ -13,6 +10,7 @@ from acceptance_tests.features.steps.event_log import check_if_event_list_is_exa
 from acceptance_tests.features.steps.fulfilment import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
     check_correct_uac_updated_message_is_emitted, request_hi_individual_telephone_capture
+from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -155,10 +153,6 @@ def _field_work_cancel_callback(ch, method, _properties, body, context):
 def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
-
     data = json.dumps({
         "timeCreated": "2008-08-24T00:00:00Z",
         "metadata": {
@@ -168,19 +162,12 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
         }
     })
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'),
-                               eventType='OBJECT_FINALIZE',
-                               bucketId='eq-bucket',
-                               objectId=tx_id)
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data,
+                      Config.RECEIPT_TOPIC_PROJECT,
+                      Config.RECEIPT_TOPIC_ID,
+                      eventType='OBJECT_FINALIZE',
+                      bucketId='eq-bucket',
+                      objectId=tx_id)
 
     context.sent_to_gcp = True
 
@@ -189,10 +176,6 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
                              tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
-
     data = json.dumps({
         "dateTime": "2008-08-24T00:00:00",
         "transactionId": tx_id,
@@ -200,17 +183,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
         "channel": channel,
         "unreceipt": unreceipt
     })
-
-    future = publisher.publish(topic_path, data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
 
     context.sent_to_gcp = True
 
