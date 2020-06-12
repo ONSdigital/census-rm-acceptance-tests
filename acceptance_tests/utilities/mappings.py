@@ -128,6 +128,10 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_RD_2RL2B_2": Config.SFTP_PPO_DIRECTORY,
     "P_RD_2RL1_3": Config.SFTP_PPO_DIRECTORY,
     "P_RD_2RL2B_3": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1RL1A": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1RL2BA": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_2RL1A": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_2RL2BA": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR1": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR2B": Config.SFTP_PPO_DIRECTORY,
     "D_ICA_ICLR1": Config.SFTP_PPO_DIRECTORY,
@@ -274,6 +278,10 @@ PACK_CODE_TO_DATASET = {
     "P_RD_2RL2B_2": PPD1_2_DATASET,
     "P_RD_2RL1_3": PPD1_2_DATASET,
     "P_RD_2RL2B_3": PPD1_2_DATASET,
+    "P_RL_1RL1A": PPD1_2_DATASET,
+    "P_RL_1RL2BA": PPD1_2_DATASET,
+    "P_RL_2RL1A": PPD1_2_DATASET,
+    "P_RL_2RL2BA": PPD1_2_DATASET,
     "D_CE1A_ICLCR1": PPD1_7_DATASET,
     "D_CE1A_ICLCR2B": PPD1_7_DATASET,
     "D_ICA_ICLR1": PPD1_7_DATASET,
@@ -419,7 +427,7 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_ICA_ICLR2B": "Individual ICL with UAC for Wales (Hand Delivery) Addressed",
     "P_ICCE_ICL1": 'Household ICL with UAC for England (Post Out) Addressed',
     "P_ICCE_ICL2B": 'Household ICL with UAC for Wales (Post Out) Addressed',
-    "D_CE4A_ICLR4": "CE resident letter",
+    "D_CE4A_ICLR4": "CE residzent letter",
     "D_CE4A_ICLS4": "CE student letter",
     "D_FDCE_I4": "Individual Questionnaire for NI (Hand delivery) Addressed",
     "D_FDCE_I1": 'Individual Questionnaire for England (Hand delivery) Addressed',
@@ -430,7 +438,13 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_ER_ILER2B": 'Information leaflet (Easy Read) for Wales (English/Welsh - Bilingual)',
     "P_UAC_UACIP1": 'Individual Unique Access Code for England via paper',
     "P_UAC_UACIP2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper',
-    "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper'
+    "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper',
+    "P_RL_1RL1A": '1st Reminder, Letter - for England addresses for survey launched but not completed',
+    "P_RL_1RL2BA": '1st Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
+                   ' launched but not completed',
+    "P_RL_2RL1A": '2nd Reminder, Letter - for England addresses for survey launched but not completed',
+    "P_RL_2RL2BA": '2nd Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
+                   ' launched but not completed',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {

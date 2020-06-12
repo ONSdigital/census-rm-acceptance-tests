@@ -11,20 +11,28 @@ from config import Config
 def create_survey_launch_event(context):
     context.survey_launched_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
     questionnaire_id = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+    send_survey_launched_msg(context.survey_launched_case_id, questionnaire_id)
 
+
+@step("the events logged for the survey launched case are {expected_event_list}")
+def check_survey_launch_event_logging(context, expected_event_list):
+    check_if_event_list_is_exact_match(expected_event_list, context.survey_launched_case_id)
+
+
+def send_survey_launched_msg(case_id, qid, source="CONTACT_CENTRE_API", channel="CC"):
     message = json.dumps(
         {
             "event": {
                 "type": "SURVEY_LAUNCHED",
-                "source": "CONTACT_CENTRE_API",
-                "channel": "CC",
+                "source": source,
+                "channel": channel,
                 "dateTime": "2011-08-12T20:17:46.384Z",
                 "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
             },
             "payload": {
                 "response": {
-                    "questionnaireId": questionnaire_id,
-                    "caseId": context.survey_launched_case_id,
+                    "questionnaireId": qid,
+                    "caseId": case_id,
                     "agentId": "cc_000351"
                 }
             }
@@ -38,6 +46,17 @@ def create_survey_launch_event(context):
             routing_key=Config.RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY)
 
 
-@step("the events logged for the survey launched case are {expected_event_list}")
-def check_survey_launch_event_logging(context, expected_event_list):
-    check_if_event_list_is_exact_match(expected_event_list, context.survey_launched_case_id)
+@step("a survey launched for a created case is received for cases with lsoa {lsoa_list}")
+def send_survey_for_case_with_lsoa(context, lsoa_list):
+    lsoas_to_match = lsoa_list.replace('[', '').replace(']', '').split(',')
+
+    context.survey_started_case_ids = [
+        case['payload']['collectionCase']['id']
+        for case in context.case_created_events
+        if case['payload']['collectionCase']['lsoa'] in lsoas_to_match
+    ]
+
+    for uac_created_event in context.uac_created_events:
+        if uac_created_event['payload']['uac']['caseId'] in context.survey_started_case_ids:
+            send_survey_launched_msg(uac_created_event['payload']['uac']['caseId'],
+                                     uac_created_event['payload']['uac']['questionnaireId'], "RESPONDENT_HOME", "RH")
