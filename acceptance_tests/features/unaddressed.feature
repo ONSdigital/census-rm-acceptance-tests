@@ -40,7 +40,7 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     When an unaddressed QID request message of questionnaire type 21 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     And an Individual Questionnaire Linked message is sent and ingested
-    Then no case using the individual case id is created
+    Then a Questionnaire Linked event on the parent case is logged
 
   Scenario: Receipt of unlinked unaddressed
     Given an unaddressed QID request message of questionnaire type 01 is sent
