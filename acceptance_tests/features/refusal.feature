@@ -14,15 +14,6 @@ Feature: Handle refusal message
       | HARD_REFUSAL          | [SAMPLE_LOADED,REFUSAL_RECEIVED,PRINT_CASE_SELECTED] |
       | EXTRAORDINARY_REFUSAL | [SAMPLE_LOADED,REFUSAL_RECEIVED]                     |
 
-#    Demo Hack, shows File, loaded, refusal sent
-  Scenario: Demo Hack
-    Given sample file "sample_for_refusals_print.csv" is loaded successfully
-#    show
-    When a refusal message for the created case is received of type "HARD_REFUSAL"
-    And a refusal message for the created case is received of type "EXTRAORDINARY_REFUSAL"
-    And set action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
-    Then set action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
-
 
   Scenario Outline: All refusal types result in case excluded from Fieldwork followup
     Given sample file "sample_for_refusals_field.csv" is loaded successfully
@@ -35,7 +26,7 @@ Feature: Handle refusal message
 
     Examples: Refusal types
       | refusal type          |
-#      | HARD_REFUSAL          |
+      | HARD_REFUSAL          |
       | EXTRAORDINARY_REFUSAL |
 
 
