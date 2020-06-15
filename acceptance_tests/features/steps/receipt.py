@@ -2,7 +2,7 @@ import functools
 import json
 import time
 
-from behave import then, step
+from behave import step
 from google.api_core.exceptions import GoogleAPIError
 from google.cloud import pubsub_v1
 
@@ -94,7 +94,7 @@ def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@then("a uac_updated msg is emitted with active set to false")
+@step("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     emitted_uac = _get_emitted_uac(context)
     test_helper.assertEqual(emitted_uac['caseId'], context.first_case['id'])
@@ -224,6 +224,8 @@ def get_first_case_and_linked_qid_to_receipt(context):
 
 @step('if required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
+@step('a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+      ' qid type "{qid_type}" and country "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
@@ -299,12 +301,14 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
     if receipted == 'AR >= E':
         receipted = emitted_case['ceActualResponses'] >= emitted_case['ceExpectedCapacity']
 
-    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
+    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted),
+                            "Receipted status on case updated event does not match expected")
 
 
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
 @step('the field instruction is "{action_instruction_type}"')
 @step('an "{action_instruction_type}" field instruction is emitted')
+@step('a "{action_instruction_type}" field instruction is emitted')
 def check_receipt_to_field_msg(context, action_instruction_type):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(context, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
