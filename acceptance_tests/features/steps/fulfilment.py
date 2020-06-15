@@ -12,6 +12,7 @@ from acceptance_tests.features.steps.print_file import _check_print_files_have_a
     _check_manifest_files_created
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
     get_qid_and_uac_from_emitted_child_uac
+from acceptance_tests.utilities.mappings import NOTIFY_TEMPLATE
 from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
     _create_uac_print_materials_csv_line
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -237,9 +238,9 @@ def check_case_events_logged(context):
     test_helper.fail('Did not find fulfilment request event')
 
 
-@step('notify api was called with template id "{expected_template_id}"')
-def check_notify_api_call(context, expected_template_id):
-    check_notify_api_called_with_correct_template_id(expected_template_id)
+@step('notify api was called with SMS template "{expected_template}"')
+def check_notify_api_call(context, expected_template: str):
+    check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.lower().split())])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
