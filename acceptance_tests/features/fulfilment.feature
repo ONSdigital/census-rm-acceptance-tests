@@ -1,12 +1,43 @@
 Feature: Handle fulfilment request events
 
-  @smoke
-  Scenario: Log event when a fulfilment request event is received
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a UAC fulfilment request "UACHHT1" message for a created case is sent
-    And notify api was called with template id "21447bc2-e7c7-41ba-8c5e-7a5893068525"
+  Scenario Outline: Household UAC SMS requests
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
+    Then notify api was called with template id "<template ID>"
+    And a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+
+    @smoke
+    Examples: Household UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | template ID                          |
+      | UACHHT1         | 01                 | 21447bc2-e7c7-41ba-8c5e-7a5893068525 |
+
+    @regression
+    Examples: Household UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | template ID                          |
+      | UACHHT2         | 02                 | 23f96daf-9674-4087-acfc-ffe98a52cf16 |
+      | UACHHT2W        | 03                 | ef045f43-ffa8-4047-b8e2-65bfbce0f026 |
+      | UACHHT4         | 04                 | 1ccd02a4-9b90-4234-ab7a-9215cb498f14 |
+
+    Scenario Outline: Individual UAC SMS requests
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
+    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+    And notify api was called with template id "<template ID>"
+    And a UAC updated message with "<questionnaire type>" questionnaire type is emitted for the individual case
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
+    And the individual case has these events logged [RM_UAC_CREATED]
+
+    Examples: Household UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | template ID                          |
+      | UACIT1          | 21                 | 21447bc2-e7c7-41ba-8c5e-7a5893068525 |
+
+    @regression
+    Examples: Household UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | template ID                          |
+      | UACIT2          | 22                 | 23f96daf-9674-4087-acfc-ffe98a52cf16 |
+      | UACIT2W         | 23                 | ef045f43-ffa8-4047-b8e2-65bfbce0f026 |
+      | UACIT4          | 24                 | 1ccd02a4-9b90-4234-ab7a-9215cb498f14 |
 
   Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
     Given sample file "sample_input_england_census_spec.csv" is loaded
