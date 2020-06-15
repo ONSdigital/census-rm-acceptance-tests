@@ -4,22 +4,21 @@ Feature: Request individual response via EQ
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an individual SMS UAC fulfilment request "<fulfilment code>" message is sent by EQ
     Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And notify api was called with template id "<template ID>"
+    And notify api was called with SMS template "<SMS template>"
     And a UAC updated message with "<questionnaire type>" questionnaire type is emitted for the individual case
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
     And the individual case has these events logged [RM_UAC_CREATED]
 
-    Examples: Household UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | template ID                          |
-      | UACIT1          | 21                 | 21447bc2-e7c7-41ba-8c5e-7a5893068525 |
+    Examples: Individual UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | SMS template       |
+      | UACIT1          | 21                 | individual English |
 
     @regression
-    Examples: Household UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | template ID                          |
-      | UACIT2          | 22                 | 23f96daf-9674-4087-acfc-ffe98a52cf16 |
-      # TODO UACIT2W should be type 23
-      | UACIT2W         | 22                 | ef045f43-ffa8-4047-b8e2-65bfbce0f026 |
-      | UACIT4          | 24                 | 1ccd02a4-9b90-4234-ab7a-9215cb498f14 |
+    Examples: Individual UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | SMS template                 |
+      | UACIT2          | 22                 | individual Welsh and English |
+      | UACIT2W         | 23                 | individual Welsh             |
+      | UACIT4          | 24                 | individual Northern Ireland  |
 
   Scenario Outline: Individual UAC print requests via EQ
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
