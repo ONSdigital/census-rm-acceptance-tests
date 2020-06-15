@@ -66,3 +66,16 @@ Feature: Case processor handles receipt message from pubsub service
     Then a uac_updated msg is emitted with active set to false
     And the events logged for the receipted case are [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED,RESPONSE_RECEIVED]
     And no ActionInstruction is sent to FWMT
+
+  @regression
+  Scenario: CE Actual response count incrementation continues after the case is receipted
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
+    And a new qid and case are created for case type "CE" address level "E" qid type "CE1" and country "E"
+    And the receipt msg is put on the GCP pubsub
+    And a uac_updated msg is emitted with active set to false for the receipted qid
+    And an "UPDATE" field instruction is emitted
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    When a new qid and case are created for case type "CE" address level "E" qid type "Ind" and country "E"
+    And the receipt msg is put on the GCP pubsub
+    Then an "UPDATE" field instruction is emitted
+    And if the actual response count is incremented "True" or the case is marked receipted "True" then there should be a case updated message of case type "CE"
