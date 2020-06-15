@@ -35,6 +35,13 @@ Feature: Generating UAC/QID pairs for unaddressed letters & questionnaires
     Then a Questionnaire Linked event is logged
     And the HI individual case can be retrieved
 
+  Scenario: A Questionnaire linked event ignores the IndividualCaseId if linking to a CE case
+    Given sample file "sample_3_welsh_CE_estab.csv" is loaded successfully
+    When an unaddressed QID request message of questionnaire type 21 is sent
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    And an Individual Questionnaire Linked message is sent and ingested
+    Then a Questionnaire Linked event on the parent case is logged
+
   Scenario: Receipt of unlinked unaddressed
     Given an unaddressed QID request message of questionnaire type 01 is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
