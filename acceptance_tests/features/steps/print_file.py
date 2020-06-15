@@ -16,7 +16,8 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv, \
     create_expected_csv_lines_for_ce_estab_responses, create_expected_CE_Estab_questionnaire_csv_lines, \
     create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings, \
-    create_expected_HH_UAC_supplementary_materials_csv
+    create_expected_HH_UAC_supplementary_materials_csv, \
+    create_expected_csv_lines_for_reminder_survey_launched
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -129,6 +130,12 @@ def check_correct_ce_estab_files_on_sftp_server(context, pack_code):
 
 @then('correctly formatted "{pack_code}" reminder letter print files are created')
 def check_correct_reminder_letter_files_on_sftp_server(context, pack_code):
+    expected_csv_lines = create_expected_reminder_letter_csv_lines(context, pack_code)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+
+
+@then('correctly formatted "{}" reminder letter print files are created for the survey launched cases')
+def check_correct_reminder_letter_files_for_survey_launched_on_sftp_server(context, pack_code):
     expected_csv_lines = create_expected_reminder_letter_csv_lines(context, pack_code)
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
@@ -362,3 +369,10 @@ def compare_sftp_with_gcp_files(context, bucket, filename):
 
     test_helper.assertEquals(actual_file_content, expected_file_content,
                              f'file contents {filename} did not match gcp file contents')
+
+
+@then('correctly formatted "{pack_code}" print files are created for packcode and where survey was launched')
+def check_reminder_files_with_survey_launched(context, pack_code):
+    expected_csv_lines = create_expected_csv_lines_for_reminder_survey_launched(context, pack_code,
+                                                                                context.survey_started_case_ids)
+    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)

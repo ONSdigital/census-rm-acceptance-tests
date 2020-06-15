@@ -10,8 +10,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the files have all been copied to the bucket
 
     Examples: Initial contact letter: <pack code>
-      | pack code      | action type | questionnaire types | sample file                        |
-      | D_CE1A_ICLCR1  | CE1_IC01    | [31]                | sample_10_english_CE_estab.csv     |
+      | pack code     | action type | questionnaire types | sample file                    |
+      | D_CE1A_ICLCR1 | CE1_IC01    | [31]                | sample_10_english_CE_estab.csv |
 
     @smoke
     Examples: Initial contact letter: <pack code>
@@ -137,7 +137,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline:  Generate print files and log events for response driven reminders
     Given sample file "<sample file>" is loaded successfully
     When set action rule of type "<pack code>" when the case loading queues are drained
-    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
+    And UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
@@ -154,3 +154,18 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
       | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
       | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
+
+
+  Scenario Outline:  Generate print files and log events for response driven reminders with survey started
+    Given sample file "<sample file>" is loaded successfully
+    And a survey launched for a created case is received for cases with lsoa <lsoa list>
+    When set action rule of type "<pack code>" when the case loading queues are drained
+    Then correctly formatted "<pack code>" print files are created for packcode and where survey was launched
+    And there is a correct "<pack code>" manifest file for each csv file written
+
+    Examples: Reminder contact letter: <pack code>
+      | pack code   | lsoa list                                 | sample file                                        |
+      | P_RL_1RL1A  | [E01014540,E01014541]                     | sample_input_england_response_driven_reminders.csv |
+      | P_RL_1RL2BA | [E01014669,W01014669]                     | sample_input_wales_census_spec.csv                 |
+      | P_RL_2RL1A  | [E01014543,E01014544]                     | sample_input_england_response_driven_reminders.csv |
+      | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |
