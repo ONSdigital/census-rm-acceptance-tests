@@ -65,12 +65,12 @@ Feature: Handle fulfilment request events
     And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
     And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
-    Examples: Continuation Questionnaires
+    Examples: Continuation Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_HC1        | 11                 |
 
     @regression
-    Examples: Continuation Questionnaires
+    Examples: Continuation Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_HC2        | 12                 |
       | P_OR_HC2W       | 13                 |
@@ -84,12 +84,12 @@ Feature: Handle fulfilment request events
     And correctly formatted on request HH UAC supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
 
-    Examples: UAC Questionnaires
+    Examples: UAC Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACHHP1   | 01                 |
 
     @regression
-    Examples: UAC Questionnaires
+    Examples: UAC Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACHHP2B  | 02                 |
       | P_UAC_UACHHP4   | 04                 |
@@ -220,12 +220,12 @@ Feature: Handle fulfilment request events
     And correctly formatted individual response questionnaires are created for "<fulfilment code>" with questionnaire type "<questionnaire type>"
     And the fulfilment request event is logged
 
-    Examples: Individual Response Questionnaires fulfilment codes
+    Examples: Individual Response Questionnaires fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_I1         | 21                 |
 
     @regression
-    Examples: Individual Response Questionnaires fulfilment codes
+    Examples: Individual Response Questionnaires fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_I2         | 22                 |
       | P_OR_I2W        | 23                 |
@@ -239,12 +239,12 @@ Feature: Handle fulfilment request events
     And correctly formatted individual UAC print responses are created for "<fulfilment code>" with questionnaire type "<questionnaire type>"
     And the fulfilment request event is logged
 
-    Examples: Individual UAC Response fulfilment codes
+    Examples: Individual UAC Response fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACIP1    | 21                 |
 
     @regression
-    Examples: Individual UAC Response fulfilment codes
+    Examples: Individual UAC Response fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACIP2B   | 22                 |
       | P_UAC_UACIP4    | 24                 |
