@@ -427,7 +427,7 @@ PACK_CODE_TO_DESCRIPTION = {
     "D_ICA_ICLR2B": "Individual ICL with UAC for Wales (Hand Delivery) Addressed",
     "P_ICCE_ICL1": 'Household ICL with UAC for England (Post Out) Addressed',
     "P_ICCE_ICL2B": 'Household ICL with UAC for Wales (Post Out) Addressed',
-    "D_CE4A_ICLR4": "CE residzent letter",
+    "D_CE4A_ICLR4": "CE resident letter",
     "D_CE4A_ICLS4": "CE student letter",
     "D_FDCE_I4": "Individual Questionnaire for NI (Hand delivery) Addressed",
     "D_FDCE_I1": 'Individual Questionnaire for England (Hand delivery) Addressed',

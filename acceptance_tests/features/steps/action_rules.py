@@ -54,7 +54,7 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'FIELD': {'treatment_code': ['HH_QF2R1E']},
 
         'P_RL_1RL1_1': {'treatment_code': ['HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E',
-                                           'HH_QFNR1E'], 'survey_launched': ['n']},
+                                           'HH_QFNR1E'], 'survey_launched': ['f']},
         'P_RL_2RL2B_3a': {'treatment_code': ['HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',
                                              'HH_QFNR3AW']},
         'P_QU_H2': {'treatment_code': ['HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW']},
