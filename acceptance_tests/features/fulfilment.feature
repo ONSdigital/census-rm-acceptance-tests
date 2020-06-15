@@ -28,12 +28,12 @@ Feature: Handle fulfilment request events
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
     And the individual case has these events logged [RM_UAC_CREATED]
 
-    Examples: Household UAC fulfilment codes: <fulfilment code>
+    Examples: Individual UAC fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type | template ID                          |
       | UACIT1          | 21                 | 21447bc2-e7c7-41ba-8c5e-7a5893068525 |
 
     @regression
-    Examples: Household UAC fulfilment codes: <fulfilment code>
+    Examples: Individual UAC fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type | template ID                          |
       | UACIT2          | 22                 | 23f96daf-9674-4087-acfc-ffe98a52cf16 |
       | UACIT2W         | 23                 | ef045f43-ffa8-4047-b8e2-65bfbce0f026 |
