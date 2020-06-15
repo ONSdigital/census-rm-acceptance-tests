@@ -448,13 +448,13 @@ QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
 NOTIFY_TEMPLATE = {
     # Household
     "household_english": "21447bc2-e7c7-41ba-8c5e-7a5893068525",
-    "household_wales_in_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
-    "household_wales_in_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
+    "household_welsh_and_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
+    "household_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
     "household_northern_ireland": "1ccd02a4-9b90-4234-ab7a-9215cb498f14",
 
     # Individual (same as household?)
     "individual_english": "21447bc2-e7c7-41ba-8c5e-7a5893068525",
-    "individual_wales_in_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
-    "individual_wales_in_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
+    "individual_welsh_and_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
+    "individual_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
     "individual_northern_ireland": "1ccd02a4-9b90-4234-ab7a-9215cb498f14",
 }

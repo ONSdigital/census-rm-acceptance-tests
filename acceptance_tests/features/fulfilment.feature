@@ -14,10 +14,10 @@ Feature: Handle fulfilment request events
 
     @regression
     Examples: Household UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template               |
-      | UACHHT2         | 02                 | household Wales in English |
-      | UACHHT2W        | 03                 | household Wales in Welsh   |
-      | UACHHT4         | 04                 | household Northern Ireland |
+      | fulfilment code | questionnaire type | SMS template                |
+      | UACHHT2         | 02                 | household Welsh and English |
+      | UACHHT2W        | 03                 | household Welsh             |
+      | UACHHT4         | 04                 | household Northern Ireland  |
 
   Scenario Outline: Individual UAC SMS requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
@@ -34,10 +34,10 @@ Feature: Handle fulfilment request events
 
     @regression
     Examples: Individual UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template                |
-      | UACIT2          | 22                 | individual Wales in English |
-      | UACIT2W         | 23                 | individual Wales in Welsh   |
-      | UACIT4          | 24                 | individual Northern Ireland |
+      | fulfilment code | questionnaire type | SMS template                 |
+      | UACIT2          | 22                 | individual Welsh and English |
+      | UACIT2W         | 23                 | individual Welsh             |
+      | UACIT4          | 24                 | individual Northern Ireland  |
 
   Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
     Given sample file "sample_input_england_census_spec.csv" is loaded
