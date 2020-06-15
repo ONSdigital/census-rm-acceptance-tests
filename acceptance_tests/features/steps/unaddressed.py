@@ -52,13 +52,14 @@ def send_linked_message_for_blank_questionnaire(context):
 @step("an Individual Questionnaire Linked message is sent and ingested")
 def send_individual_linked_message_and_verify_new_case(context):
     context.linked_case_id = send_questionnaire_link_for_individual_hh_case(context)
-    get_case_id_by_questionnaire_id(context)
+    get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
 
 
 @step("an Individual Questionnaire Linked message with no individual case ID is sent and ingested")
 def send_individual_linked_message_without_individual_case_id_and_verify_new_case(context):
     send_questionnaire_link_for_individual_hh_case(context, include_individual_id=False)
-    context.linked_case_id = context.individual_case_id = get_case_id_by_questionnaire_id(context)
+    context.linked_case_id = context.individual_case_id = get_case_id_by_questionnaire_id(
+        context.expected_questionnaire_id)
 
 
 @step("a Questionnaire Linked message is sent for the CCS case")
@@ -116,7 +117,7 @@ def check_questionnaire_linked_logging(context):
 
 @step("a Questionnaire Linked event on the parent case is logged")
 def check_questionnaire_linked_logging_on_parent(context):
-    check_question_linked_event_is_logged(context.parent_case_id)
+    check_question_linked_event_is_logged(context.linked_case['id'])
 
 
 @step("a Questionnaire Unlinked event is logged")
@@ -148,11 +149,10 @@ def check_question_unlinked_event_is_logged(context):
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def get_case_id_by_questionnaire_id(context):
-    response = requests.get(f'{caseapi_url}/qid/{context.expected_questionnaire_id}')
+def get_case_id_by_questionnaire_id(questionnaire_id):
+    response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
     test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
     response_json = response.json()
-    context.parent_case_id = response_json['id']
     return response_json['id']
 
 
