@@ -67,7 +67,9 @@ class Config:
     FULFILMENT_CONFIRMED_PROJECT_ID = os.getenv("FULFILMENT_CONFIRMED_PROJECT_ID",
                                                 "fulfilment-confirmed-project")
     FULFILMENT_CONFIRMED_TOPIC_ID = os.getenv("FULFILMENT_CONFIRMED_TOPIC",
-                                              "fulfilment-topic")
+                                              "fulfilment-confirmed-topic")
+    EQ_FULFILMENT_PROJECT_ID = os.getenv("EQ_FULFILMENT_PROJECT", "eq-fulfilment-project")
+    EQ_FULFILMENT_TOPIC_ID = os.getenv("EQ_FULFILMENT_TOPIC", "eq-fulfilment-topic")
 
     GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
     GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')

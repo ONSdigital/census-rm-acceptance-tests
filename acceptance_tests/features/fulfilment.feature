@@ -39,18 +39,8 @@ Feature: Handle fulfilment request events
       | UACIT2W         | 23                 | individual Welsh             |
       | UACIT4          | 24                 | individual Northern Ireland  |
 
-  Scenario: Individual Response Fulfilment is received Log event without contact details, save new case, emit new case
-    Given sample file "sample_input_england_census_spec.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
-    When a UAC fulfilment request "UACIT1" message for a created case is sent
-    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And notify api was called with SMS template "individual English"
-    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
-    And the individual case has these events logged [RM_UAC_CREATED]
-
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
@@ -64,25 +54,23 @@ Feature: Handle fulfilment request events
     @regression
     Examples: Questionnaire: <fulfilment code>
       | fulfilment code | questionnaire type |
-      | P_OR_H1         | 01                 |
       | P_OR_H2         | 02                 |
       | P_OR_H2W        | 03                 |
       | P_OR_H4         | 04                 |
 
   Scenario Outline: Generate print files and log events for continuation questionnaire fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a PQ continuation fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request contn questionnaire print and manifest files for "<fulfilment code>" are created
     And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
-    Examples: Continuation Questionnaires
+    Examples: Continuation Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_HC1        | 11                 |
 
     @regression
-    Examples: Continuation Questionnaires
+    Examples: Continuation Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_OR_HC2        | 12                 |
       | P_OR_HC2W       | 13                 |
@@ -90,19 +78,18 @@ Feature: Handle fulfilment request events
 
 
   Scenario Outline: Generate print files and log events for Household UAC print fulfilment letter requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a HH print UAC fulfilment request "<fulfilment code>" message for a created case is sent
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And correctly formatted on request HH UAC supplementary material print and manifest files for "<fulfilment code>" are created
     And the fulfilment request event is logged
 
-    Examples: UAC Questionnaires
+    Examples: UAC Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACHHP1   | 01                 |
 
     @regression
-    Examples: UAC Questionnaires
+    Examples: UAC Questionnaires: <fulfilment code>
       | fulfilment code | questionnaire type |
       | P_UAC_UACHHP2B  | 02                 |
       | P_UAC_UACHHP4   | 04                 |
@@ -227,42 +214,40 @@ Feature: Handle fulfilment request events
       | P_ER_ILER2B     |
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an individual print fulfilment request "<fulfilment code>" is received by RM
     Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And correctly formatted individual response questionnaires are are created with "<fulfilment code>"
+    And correctly formatted individual response questionnaires are created for "<fulfilment code>" with questionnaire type "<questionnaire type>"
     And the fulfilment request event is logged
 
-    Examples: Individual Response Questionnaires fulfilment codes
-      | fulfilment code |
-      | P_OR_I1         |
+    Examples: Individual Response Questionnaires fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_OR_I1         | 21                 |
 
     @regression
-    Examples: Individual Response Questionnaires fulfilment codes
-      | fulfilment code |
-      | P_OR_I2         |
-      | P_OR_I2W        |
-      | P_OR_I4         |
+    Examples: Individual Response Questionnaires fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_OR_I2         | 22                 |
+      | P_OR_I2W        | 23                 |
+      | P_OR_I4         | 24                 |
 
 
   Scenario Outline: Generate print files and log events for individual UAC print fulfilment letter requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an individual print fulfilment request "<fulfilment code>" is received by RM
     Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And correctly formatted individual UAC print responses are created with "<fulfilment code>"
+    And correctly formatted individual UAC print responses are created for "<fulfilment code>" with questionnaire type "<questionnaire type>"
     And the fulfilment request event is logged
 
-    Examples: Individual UAC Response fulfilment codes
-      | fulfilment code |
-      | P_UAC_UACIP1    |
+    Examples: Individual UAC Response fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACIP1    | 21                 |
 
     @regression
-    Examples: Individual UAC Response fulfilment codes
-      | fulfilment code |
-      | P_UAC_UACIP2B   |
-      | P_UAC_UACIP4    |
+    Examples: Individual UAC Response fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACIP2B   | 22                 |
+      | P_UAC_UACIP4    | 24                 |
 
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
@@ -284,13 +269,11 @@ Feature: Handle fulfilment request events
       | P_OR_H1         | 01                 |
 
   Scenario: Fulfilment is confirmed by QM
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When QM sends a fulfilment confirmed message via pubsub
     Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
 
   Scenario: Fulfilment is confirmed by PPO
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [01] questionnaire types
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When PPO sends a fulfilment confirmed message via pubsub
     Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]

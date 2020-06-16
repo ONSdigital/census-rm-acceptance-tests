@@ -1,7 +1,7 @@
 import functools
 import logging
-import luhn
 
+import luhn
 import requests
 from structlog import wrap_logger
 
@@ -80,7 +80,7 @@ def get_and_check_case_created_messages(context):
 
     context.welsh_cases = [case['payload']['collectionCase'] for case in context.case_created_events
                            if (case['payload']['collectionCase']['treatmentCode'].startswith('HH_Q')
-                           or case['payload']['collectionCase']['treatmentCode'].startswith('SPG_Q'))
+                               or case['payload']['collectionCase']['treatmentCode'].startswith('SPG_Q'))
                            and case['payload']['collectionCase']['treatmentCode'].endswith('W')]
 
 
@@ -92,6 +92,17 @@ def get_and_check_uac_updated_messages(context):
                                                       collection_exercise_id=context.collection_exercise_id))
     context.uac_created_events = context.messages_received.copy()
     _test_uacs_updated_correct(context)
+    context.messages_received = []
+
+
+def get_last_uac_updated_event(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
+                                                      expected_msg_count=1,
+                                                      collection_exercise_id=context.collection_exercise_id))
+    context.last_uac_updated_event = context.messages_received[0]
     context.messages_received = []
 
 
