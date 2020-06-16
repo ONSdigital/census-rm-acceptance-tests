@@ -36,7 +36,7 @@ def send_eq_sms_fulfilment_message(context, fulfilment_code):
         }
     )
 
-    publish_to_pubsub(message, Config.EQ_FULFILMENT_PROJECT_ID, Config.EQ_FULFILMENT_TOPIC_ID)
+    publish_to_pubsub(message, Config.EQ_FULFILMENT_PROJECT_ID, Config.EQ_FULFILMENT_TOPIC_NAME)
 
 
 @step('an individual print UAC fulfilment request "{fulfilment_code}" message is sent by EQ')
@@ -69,4 +69,4 @@ def send_eq_print_fulfilment_message(context, fulfilment_code):
         }
     )
 
-    publish_to_pubsub(message, Config.EQ_FULFILMENT_PROJECT_ID, Config.EQ_FULFILMENT_TOPIC_ID)
+    publish_to_pubsub(message, Config.EQ_FULFILMENT_PROJECT_ID, Config.EQ_FULFILMENT_TOPIC_NAME)

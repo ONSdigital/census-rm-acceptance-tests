@@ -193,7 +193,7 @@ spec:
         configMapKeyRef:
           name: pubsub-config
           key: eq-fulfilment-project-id
-    - name: EQ_FULFILMENT_TOPIC_ID
+    - name: EQ_FULFILMENT_TOPIC_NAME
       valueFrom:
         configMapKeyRef:
           name: pubsub-config
