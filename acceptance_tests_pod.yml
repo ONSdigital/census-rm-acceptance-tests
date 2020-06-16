@@ -173,6 +173,16 @@ spec:
         configMapKeyRef:
           name: project-config
           key: project-name
+    - name: EQ_FULFILMENT_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: eq-fulfilment-project-id
+    - name: EQ_FULFILMENT_TOPIC_ID
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: eq-fulfilment-topic-name
   volumes:
   - name: cloud-sql-certs
     secret:
