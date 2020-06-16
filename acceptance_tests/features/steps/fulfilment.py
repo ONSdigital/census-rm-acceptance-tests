@@ -4,7 +4,6 @@ import uuid
 
 import requests
 from behave import step
-from google.cloud import pubsub_v1
 from retrying import retry
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
@@ -12,14 +11,15 @@ from acceptance_tests.features.steps.print_file import _check_print_files_have_a
     _check_manifest_files_created
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
     get_qid_and_uac_from_emitted_child_uac
+from acceptance_tests.utilities.mappings import NOTIFY_TEMPLATE
 from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
     _create_uac_print_materials_csv_line
+from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-notify_stub_url = f'{Config.NOTIFY_STUB_SERVICE}'
 get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
@@ -109,7 +109,7 @@ def send_print_fulfilment_request(context, fulfilment_code):
 
 @step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
 def create_uac_fulfilment_message(context, fulfilment_code):
-    requests.get(f'{notify_stub_url}/reset')
+    requests.get(f'{Config.NOTIFY_STUB_SERVICE}/reset')
 
     context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
     context.individual_case_id = str(uuid.uuid4())
@@ -237,14 +237,14 @@ def check_case_events_logged(context):
     test_helper.fail('Did not find fulfilment request event')
 
 
-@step('notify api was called with template id "{expected_template_id}"')
-def check_notify_api_call(context, expected_template_id):
-    check_notify_api_called_with_correct_template_id(expected_template_id)
+@step('notify api was called with SMS template "{expected_template}"')
+def check_notify_api_call(context, expected_template: str):
+    check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.lower().split())])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_notify_api_called_with_correct_template_id(expected_template_id):
-    response = requests.get(f'{notify_stub_url}/log')
+    response = requests.get(f'{Config.NOTIFY_STUB_SERVICE}/log')
     test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
     response_json = response.json()
     test_helper.assertEqual(len(response_json), 1, "Incorrect number of responses")
@@ -264,7 +264,8 @@ def check_case_events(context):
 
 @step("a new individual child case for the fulfilment is emitted to RH and Action Scheduler")
 def fulfilment_child_case_is_emitted(context):
-    check_individual_child_case_is_emitted(context, context.fulfilment_requested_case_id, context.individual_case_id)
+    check_individual_child_case_is_emitted(context, context.fulfilment_requested_case_id,
+                                           context.individual_case_id)
 
 
 @step('a supplementary materials fulfilment request event with fulfilment code "{fulfilment_code}" is received by RM')
@@ -297,20 +298,26 @@ def check_multiple_questionnaire_fulfilment_events(context, expected_event_list)
         check_if_event_list_is_exact_match(expected_event_list, caze['id'])
 
 
-@step('correctly formatted individual response questionnaires are are created with "{fulfilment_code}"')
-def check_individual_questionnaire_print_requests(context, fulfilment_code):
+@step(
+    'correctly formatted individual response questionnaires are created for "{fulfilment_code}" '
+    'with questionnaire type "{questionnaire_type}"')
+def check_individual_questionnaire_print_requests(context, fulfilment_code, questionnaire_type):
     individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
+    test_helper.assertEqual(qid[:2], questionnaire_type, "Incorrect questionnaire type")
     expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
 
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     _check_manifest_files_created(context, fulfilment_code)
 
 
-@step('correctly formatted individual UAC print responses are created with "{fulfilment_code}"')
-def check_individual_uac_print_requests(context, fulfilment_code):
+@step(
+    'correctly formatted individual UAC print responses are created for "{fulfilment_code}" '
+    'with questionnaire type "{questionnaire_type}"')
+def check_individual_uac_print_requests(context, fulfilment_code, questionnaire_type):
     individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
+    test_helper.assertEqual(qid[:2], questionnaire_type, "Incorrect questionnaire type")
     expected_csv_lines = [_create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code)]
 
     _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
@@ -326,9 +333,6 @@ def check_individual_case_events_logged(context, expected_event_list):
 def qm_sends_fulfilment_confirmed(context):
     context.first_case = get_first_case(context)
     uac_created_message = context.uac_created_events[0]
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
 
     data = json.dumps({"transactionId": str(uuid.uuid4()),
                        "dateTime": "2019-08-03T14:30:01",
@@ -337,20 +341,12 @@ def qm_sends_fulfilment_confirmed(context):
                        "channel": "QM",
                        "type": "FULFILMENT_CONFIRMED"})
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
-
-    future.result(timeout=30)
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
 
 
 @step("PPO sends a fulfilment confirmed message via pubsub")
 def ppo_sends_fulfilment_confirmed(context):
     context.first_case = get_first_case(context)
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)
 
     data = json.dumps({"transactionId": str(uuid.uuid4()),
                        "dateTime": "2019-08-03T14:30:01",
@@ -359,9 +355,4 @@ def ppo_sends_fulfilment_confirmed(context):
                        "channel": "PPO",
                        "type": "FULFILMENT_CONFIRMED"})
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
-
-    future.result(timeout=30)
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.FULFILMENT_CONFIRMED_PROJECT_ID, Config.FULFILMENT_CONFIRMED_TOPIC_ID)

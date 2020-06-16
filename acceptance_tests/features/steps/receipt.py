@@ -1,10 +1,7 @@
 import functools
 import json
-import time
 
-from behave import then, step
-from google.api_core.exceptions import GoogleAPIError
-from google.cloud import pubsub_v1
+from behave import step
 
 from acceptance_tests.features.steps.ad_hoc_uac_qid import listen_for_ad_hoc_uac_updated_message, \
     generate_post_request_body
@@ -13,6 +10,7 @@ from acceptance_tests.features.steps.event_log import check_if_event_list_is_exa
 from acceptance_tests.features.steps.fulfilment import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
     check_correct_uac_updated_message_is_emitted, request_hi_individual_telephone_capture
+from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -94,7 +92,7 @@ def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
-@then("a uac_updated msg is emitted with active set to false")
+@step("a uac_updated msg is emitted with active set to false")
 def uac_updated_msg_emitted(context):
     emitted_uac = _get_emitted_uac(context)
     test_helper.assertEqual(emitted_uac['caseId'], context.first_case['id'])
@@ -155,10 +153,6 @@ def _field_work_cancel_callback(ch, method, _properties, body, context):
 def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.RECEIPT_TOPIC_PROJECT, Config.RECEIPT_TOPIC_ID)
-
     data = json.dumps({
         "timeCreated": "2008-08-24T00:00:00Z",
         "metadata": {
@@ -168,19 +162,12 @@ def _publish_object_finalize(context, case_id="0", tx_id="3d14675d-a25d-4672-a0f
         }
     })
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'),
-                               eventType='OBJECT_FINALIZE',
-                               bucketId='eq-bucket',
-                               objectId=tx_id)
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data,
+                      Config.RECEIPT_TOPIC_PROJECT,
+                      Config.RECEIPT_TOPIC_ID,
+                      eventType='OBJECT_FINALIZE',
+                      bucketId='eq-bucket',
+                      objectId=tx_id)
 
     context.sent_to_gcp = True
 
@@ -189,10 +176,6 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
                              tx_id="3d14675d-a25d-4672-a0fe-b960586653e8", questionnaire_id="0"):
     context.sent_to_gcp = False
 
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
-
     data = json.dumps({
         "dateTime": "2008-08-24T00:00:00",
         "transactionId": tx_id,
@@ -200,17 +183,7 @@ def _publish_offline_receipt(context, channel='QM', unreceipt=False,
         "channel": channel,
         "unreceipt": unreceipt
     })
-
-    future = publisher.publish(topic_path, data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.OFFLINE_RECEIPT_TOPIC_PROJECT, Config.OFFLINE_RECEIPT_TOPIC_ID)
 
     context.sent_to_gcp = True
 
@@ -223,6 +196,8 @@ def get_first_case_and_linked_qid_to_receipt(context):
 
 
 @step('if required, a new qid and case are created for case type "{case_type}" address level "{address_level}"'
+      ' qid type "{qid_type}" and country "{country_code}"')
+@step('a new qid and case are created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
 def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
@@ -299,12 +274,14 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
     if receipted == 'AR >= E':
         receipted = emitted_case['ceActualResponses'] >= emitted_case['ceExpectedCapacity']
 
-    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted))
+    test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted),
+                            "Receipted status on case updated event does not match expected")
 
 
 @step('if the field instruction "{action_instruction_type}" is not NONE a msg to field is emitted')
 @step('the field instruction is "{action_instruction_type}"')
 @step('an "{action_instruction_type}" field instruction is emitted')
+@step('a "{action_instruction_type}" field instruction is emitted')
 def check_receipt_to_field_msg(context, action_instruction_type):
     if action_instruction_type == 'NONE':
         check_no_msgs_sent_to_queue(context, Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(

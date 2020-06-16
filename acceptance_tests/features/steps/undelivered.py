@@ -1,12 +1,10 @@
 import functools
 import json
-import time
 import uuid
 
 from behave import when, step
-from google.api_core.exceptions import GoogleAPIError
-from google.cloud import pubsub_v1
 
+from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -61,10 +59,6 @@ def _field_work_receipt_callback(ch, method, _properties, body, context):
 def _publish_ppo_undelivered_mail(context, case_ref):
     context.sent_to_gcp = False
 
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.PPO_UNDELIVERED_PROJECT_ID, Config.PPO_UNDELIVERED_TOPIC_NAME)
-
     data = json.dumps({"transactionId": str(uuid.uuid4()),
                        "dateTime": "2019-08-03T14:30:01",
                        "caseRef": case_ref,
@@ -73,27 +67,13 @@ def _publish_ppo_undelivered_mail(context, case_ref):
                        "type": "UNDELIVERED_MAIL_REPORTED",
                        "unreceipt": False})
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.PPO_UNDELIVERED_PROJECT_ID, Config.PPO_UNDELIVERED_TOPIC_NAME)
 
     context.sent_to_gcp = True
 
 
 def _publish_qm_undelivered_mail(context, questionnaire_id):
     context.sent_to_gcp = False
-
-    publisher = pubsub_v1.PublisherClient()
-
-    topic_path = publisher.topic_path(Config.QM_UNDELIVERED_PROJECT_ID, Config.QM_UNDELIVERED_TOPIC_NAME)
 
     data = json.dumps({
         "transactionId": str(uuid.uuid4()),
@@ -102,16 +82,6 @@ def _publish_qm_undelivered_mail(context, questionnaire_id):
         "unreceipt": False
     })
 
-    future = publisher.publish(topic_path,
-                               data=data.encode('utf-8'))
-
-    if not future.done():
-        time.sleep(1)
-    try:
-        future.result(timeout=30)
-    except GoogleAPIError:
-        return
-
-    print(f'Message published to {topic_path}')
+    publish_to_pubsub(data, Config.QM_UNDELIVERED_PROJECT_ID, Config.QM_UNDELIVERED_TOPIC_NAME)
 
     context.sent_to_gcp = True

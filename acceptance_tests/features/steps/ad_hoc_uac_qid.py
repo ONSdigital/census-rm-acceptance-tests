@@ -34,6 +34,15 @@ def generate_post_request_body(context, questionnaire_type):
 
 @step('a UAC updated message with "{questionnaire_type}" questionnaire type is emitted')
 def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
+    check_qid_emitted_for_case(context, questionnaire_type, context.first_case['id'])
+
+
+@step('a UAC updated message with "{questionnaire_type}" questionnaire type is emitted for the individual case')
+def listen_for_ad_hoc_individual_uac_updated_message(context, questionnaire_type):
+    check_qid_emitted_for_case(context, questionnaire_type, context.individual_case_id)
+
+
+def check_qid_emitted_for_case(context, questionnaire_type, case_id):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
@@ -41,10 +50,10 @@ def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
                                                       expected_msg_count=1,
                                                       collection_exercise_id=context.collection_exercise_id))
     uac_updated_event = context.messages_received[0]
-    test_helper.assertEqual(uac_updated_event['payload']['uac']['caseId'], context.first_case['id'],
+    test_helper.assertEqual(uac_updated_event['payload']['uac']['caseId'], case_id,
                             'Fulfilment request UAC updated event found with wrong case ID')
-    test_helper.assertTrue(uac_updated_event['payload']['uac']['questionnaireId'].startswith(questionnaire_type),
-                           'Fulfilment request UAC updated event found with wrong questionnaire type')
+    test_helper.assertEqual(uac_updated_event['payload']['uac']['questionnaireId'][:2], questionnaire_type,
+                            'Fulfilment request UAC updated event found with wrong questionnaire type')
     context.requested_uac = uac_updated_event['payload']['uac']['uac']
     context.requested_qid = uac_updated_event['payload']['uac']['questionnaireId']
 

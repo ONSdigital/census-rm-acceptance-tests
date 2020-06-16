@@ -112,7 +112,12 @@ def check_uac_message_is_received(context):
 
 @step("a Questionnaire Linked event is logged")
 def check_questionnaire_linked_logging(context):
-    check_question_linked_event_is_logged(context)
+    check_question_linked_event_is_logged(context.linked_case_id)
+
+
+@step("a Questionnaire Linked event on the parent case is logged")
+def check_questionnaire_linked_logging_on_parent(context):
+    check_question_linked_event_is_logged(context.linked_case['id'])
 
 
 @step("a Questionnaire Unlinked event is logged")
@@ -122,8 +127,7 @@ def check_questionnaire_unlinked_logging(context):
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_question_linked_event_is_logged(context):
-    case_id = context.linked_case_id
+def check_question_linked_event_is_logged(case_id):
     response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
