@@ -22,6 +22,25 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     ]
 
 
+def create_expected_csv_lines_for_reminder_survey_launched(context, prefix, expected_case_ids=None):
+    expected_data = defaultdict(dict)
+
+    for uac in context.uac_created_events:
+        if uac['payload']['uac']['caseId'] in expected_case_ids:
+            expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
+            expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] \
+                = uac['payload']['uac']['questionnaireId']
+
+    for case in context.case_created_events:
+        if case['payload']['collectionCase']['id'] in expected_case_ids:
+            expected_data = _add_expected_case_data(case, expected_data)
+
+    return [
+        _create_expected_csv_line(case, prefix)
+        for case in expected_data.values()
+    ]
+
+
 def create_expected_csv_lines_for_ce_estab_responses(context, prefix):
     result = []
     for event in context.case_created_events:
