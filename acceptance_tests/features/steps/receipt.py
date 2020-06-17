@@ -58,6 +58,8 @@ def offline_msg_published_to_gcp_pubsub_for_unlinked_qids(context):
 
 @step("a blank questionnaire receipts comes in for an unlinked qid")
 def offline_receipt_for_an_unlinked_qid(context):
+
+    # TODO this a temporary fix to ensure event ordering, should be replaced with more intelligent waits
     sleep(1)
 
     context.first_case = context.receipting_case
