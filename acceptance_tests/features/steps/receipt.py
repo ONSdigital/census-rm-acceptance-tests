@@ -1,5 +1,6 @@
 import functools
 import json
+from time import sleep
 
 from behave import step
 
@@ -57,6 +58,8 @@ def offline_msg_published_to_gcp_pubsub_for_unlinked_qids(context):
 
 @step("a blank questionnaire receipts comes in for an unlinked qid")
 def offline_receipt_for_an_unlinked_qid(context):
+    sleep(1)
+
     context.first_case = context.receipting_case
     questionnaire_id = context.expected_questionnaire_id
     _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)

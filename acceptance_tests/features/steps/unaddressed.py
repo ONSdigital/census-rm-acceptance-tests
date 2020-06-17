@@ -45,6 +45,7 @@ def send_linked_message_for_alternative_case(context):
 
 @step("a Questionnaire Linked message is sent for blank questionnaire")
 def send_linked_message_for_blank_questionnaire(context):
+    time.sleep(1)
     check_blank_link_message_is_received(context)
     context.linked_case_id = context.linked_case['id']
 
