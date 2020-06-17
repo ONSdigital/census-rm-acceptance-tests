@@ -1,6 +1,5 @@
 import functools
 import json
-from time import sleep
 
 from behave import step
 
