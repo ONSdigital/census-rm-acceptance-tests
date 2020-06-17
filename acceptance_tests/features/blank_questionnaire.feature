@@ -127,8 +127,10 @@ Feature: Handling Blank Questionnaire Scenario
     And if required, a new qid and case are created for case type "<case type>" address level "<address level>" qid type "<qid type>" and country "<country>"
     And an unaddressed QID request message of questionnaire type <form type> is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
-    And the offline receipt msg for the receipted case is put on the GCP pubsub for an unlinked qid
+    And the offline receipt msg for the unlinked is put on the GCP pubsub
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     And a blank questionnaire receipts comes in for an unlinked qid
+    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
     When a Questionnaire Linked message is sent for blank questionnaire
     Then if the field instruction "<blank instruction>" is not NONE a msg to field is emitted
 
