@@ -63,6 +63,8 @@ def _validate_case(parsed_body):
     test_helper.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
     actual_case_ref = parsed_body['payload']['collectionCase']['caseRef']
     test_helper.assertEqual(10, len(actual_case_ref))
+    test_helper.assertIsNotNone(parsed_body['payload']['collectionCase']['createdDateTime'])
+    test_helper.assertIsNotNone(parsed_body['payload']['collectionCase']['lastUpdated'])
 
     test_helper.assertTrue(luhn.verify(actual_case_ref))
 
