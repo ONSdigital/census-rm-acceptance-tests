@@ -245,6 +245,7 @@ def get_second_qid(context, questionnaire_type, qid_needed):
 
         listen_for_ad_hoc_uac_updated_message(context, questionnaire_type)
         send_questionnaire_linked_msg_to_rabbit(context.requested_qid, context.first_case['id'])
+        _get_emitted_uac(context) # Throw away the linked message - we don't need it and it breaks subsequent steps
         context.qid_to_receipt = context.requested_qid
 
 
@@ -330,9 +331,7 @@ def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, indi
 @step("a uac_updated msg is emitted with active set to false for the receipted qid")
 def check_uac_updated_msg_sets_receipted_qid_to_unactive(context):
     uac = _get_emitted_uac(context)
-    if uac['active']:
-        uac = _get_emitted_uac(context)
-
+    
     test_helper.assertEqual(uac['caseId'], context.receipting_case['id'])
     test_helper.assertEquals(uac['questionnaireId'], context.qid_to_receipt)
     test_helper.assertFalse(uac['active'])
