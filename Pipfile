@@ -20,6 +20,8 @@ google-cloud-storage = "*"
 psycopg2-binary = "*"
 str2bool = "*"
 luhn = "*"
+"tonyg-rfc3339" = "*"
 
 [requires]
 python_version = "3.7"
+
