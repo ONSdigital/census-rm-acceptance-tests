@@ -1,15 +1,11 @@
 import functools
-import json
-
-import requests
-from behave import when, step
+from behave import step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_uac_updated_msgs_by_collection_exercise_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-caseapi_uacqid_pair_url = f'{Config.CASEAPI_SERVICE}/uacqid/create'
 questionnaire_type_to_form_type_map = {"01": "H", "02": "H", "03": "H", "04": "H",
                                        "11": None, "12": None, "13": None, "14": None,
                                        "21": "I", "22": "I", "23": "I", "24": "I",
@@ -19,22 +15,6 @@ questionnaire_type_to_form_type_map = {"01": "H", "02": "H", "03": "H", "04": "H
                                        "61": None, "62": None, "63": None, "64": None,
                                        "71": "H", "72": "H", "73": "H", "74": "H",
                                        "81": "C", "82": "C", "83": "C", "84": "C"}
-
-
-@when('a UAC/QID pair is requested with questionnaire type "{questionnaire_type}"')
-def generate_post_request_body(context, questionnaire_type):
-    context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    context.uacqid_json = {"questionnaireType": questionnaire_type,
-                           "caseId": context.first_case['id']}
-    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-    context.response = requests.post(url=caseapi_uacqid_pair_url, data=json.dumps(context.uacqid_json), headers=headers)
-    uac_payload = json.loads(context.response.content)
-    assert uac_payload['uac'].isupper()
-
-
-@step('a UAC updated message with "{questionnaire_type}" questionnaire type is emitted')
-def listen_for_ad_hoc_uac_updated_message(context, questionnaire_type):
-    check_qid_emitted_for_case(context, questionnaire_type, context.first_case['id'])
 
 
 @step('a UAC updated message with "{questionnaire_type}" questionnaire type is emitted for the individual case')
