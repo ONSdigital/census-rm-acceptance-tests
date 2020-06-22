@@ -15,7 +15,7 @@ def poll_database_query_with_timeout(query, query_vars: tuple, result_success_ca
             callback checks the timeout but this lets it log the failure reason with access to the data for better
             failure reporting)
             expected signature: example(db_result, timeout_deadline) -> bool
-        :param timeout: Timeout period in second
+        :param timeout: Timeout period in seconds (default 60s)
         :return: None
     """
     conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST}' "
