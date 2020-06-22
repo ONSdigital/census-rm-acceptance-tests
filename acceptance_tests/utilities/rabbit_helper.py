@@ -107,7 +107,8 @@ def check_no_msgs_sent_to_queue(context, queue, on_message_callback, timeout=5):
         on_message_callback=on_message_callback)
     rabbit.channel.start_consuming()
     if len(context.messages_received) > 0:
-        test_helper.fail(f'Expected no messages on the queue {queue}, found {len(context.messages_received)}')
+        test_helper.fail(f'Expected no messages on the queue {queue}, found {len(context.messages_received)}'
+                         f', message(s): {context.messages_received}')
 
 
 def _timeout_callback_expected(rabbit):
