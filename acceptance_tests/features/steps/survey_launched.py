@@ -1,10 +1,13 @@
 import json
+import time
 
 from behave import step
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
+from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
 from acceptance_tests.utilities.event_helper import check_survey_launched_case_updated_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
@@ -47,6 +50,22 @@ def send_survey_launched_msg(case_id, qid, source="CONTACT_CENTRE_API", channel=
             routing_key=Config.RABBITMQ_SURVEY_LAUNCHED_ROUTING_KEY)
 
 
+def check_survey_launches_in_action_db(case_ids):
+    query = '''SELECT case_id, survey_launched FROM actionv2.cases WHERE case_id IN %s;'''
+    query_vars = (tuple(case_ids),)
+
+    def success_callback(db_result, timeout_deadline):
+        results = {row[0]: row[1] for row in db_result}
+        if all(results.values()) and len(results) == len(case_ids):
+            return True
+        elif time.time() > timeout_deadline:
+            test_helper.fail(f"The expected cases did not all show as survey_launched=True within the time limit, "
+                             f"found values: {results}")
+        return False
+
+    poll_database_query_with_timeout(query, query_vars, success_callback)
+
+
 @step("a survey launched for a created case is received for cases with lsoa {lsoa_list}")
 def send_survey_for_case_with_lsoa(context, lsoa_list):
     lsoas_to_match = lsoa_list.replace('[', '').replace(']', '').split(',')
@@ -63,3 +82,4 @@ def send_survey_for_case_with_lsoa(context, lsoa_list):
                                      uac_created_event['payload']['uac']['questionnaireId'], "RESPONDENT_HOME", "RH")
 
     check_survey_launched_case_updated_events(context, context.survey_started_case_ids)
+    check_survey_launches_in_action_db(context.survey_started_case_ids)
