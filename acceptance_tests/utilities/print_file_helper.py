@@ -25,15 +25,13 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
 def create_expected_csv_lines_for_reminder_survey_launched(context, prefix, expected_case_ids=None):
     expected_data = defaultdict(dict)
 
-    for uac in context.uac_created_events:
-        if uac['payload']['uac']['caseId'] in expected_case_ids:
-            expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
-            expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] \
-                = uac['payload']['uac']['questionnaireId']
-
     for case in context.case_created_events:
         if case['payload']['collectionCase']['id'] in expected_case_ids:
             expected_data = _add_expected_case_data(case, expected_data)
+            case_id = case['payload']['collectionCase']['id']
+            # We blank out the uac & qid rows because these are not sent on the reminder - respondent already has a UAC
+            expected_data[case_id]['uac'] = ''
+            expected_data[case_id]['questionnaire_id'] = ''
 
     return [
         _create_expected_csv_line(case, prefix)
