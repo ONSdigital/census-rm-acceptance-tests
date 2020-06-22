@@ -368,3 +368,18 @@ def _create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_c
         f'{individual_case["postcode"]}|'
         f'{fulfilment_code}|{qid}|||'
     )
+
+
+def create_individual_print_material_csv_line_for_spg_ce(case, uac, qid, fulfilment_code):
+    return (
+        f'{uac}|'
+        f'{qid}'
+        f'||||'
+        f'Ms|jo|smith|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{fulfilment_code}||'
+    )
