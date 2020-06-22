@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7b6939bceb93d481327c162e22dccd937f0502e1c5e33af9a1c729d89609a2ca"
+            "sha256": "3a086d180a04de8e4df5c7905ade7e9c54f92d55fa6baf2f978525ad825a225a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -62,10 +62,10 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:5ad7e9a056d25ffa5082862e36f119f7f7cec6457fa07ee2f8c339814b80c9b1",
-                "sha256:9cd41137dc19af6a5e03b630eefe7d1f458d964d406342dd3edf625839b944cc"
+                "sha256:5930595817496dd21bb8dc35dad090f1c2cd0adfaf21204bf6732ca5d8ee34d3",
+                "sha256:8fc0819f1f30ba15bdb34cceffb9ef04d99f420f68eb75d901e9560b8749fc41"
             ],
-            "version": "==2020.4.5.2"
+            "version": "==2020.6.20"
         },
         "cffi": {
             "hashes": [
@@ -523,6 +523,14 @@
             "index": "pypi",
             "version": "==1.3.3"
         },
+        "rfc3339": {
+            "hashes": [
+                "sha256:d53c3b5eefaef892b7240ba2a91fef012e86faa4d0a0ca782359c490e00ad4d0",
+                "sha256:f44316b21b21db90a625cde04ebb0d46268f153e6093021fa5893e92a96f58a3"
+            ],
+            "index": "pypi",
+            "version": "==6.2"
+        },
         "rsa": {
             "hashes": [
                 "sha256:109ea5a66744dd859bf16fe904b8d8b627adafb9408753161e766a92e7d681fa",
@@ -552,13 +560,6 @@
             ],
             "index": "pypi",
             "version": "==20.1.0"
-        },
-        "tonyg-rfc3339": {
-            "hashes": [
-                "sha256:e424e7b4ddf2a2f5c70d7317faecf9b69b7da099c9fc08d046c3ac679dd30d3d"
-            ],
-            "index": "pypi",
-            "version": "==0.1"
         },
         "urllib3": {
             "hashes": [
