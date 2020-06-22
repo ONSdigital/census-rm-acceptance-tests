@@ -3,6 +3,7 @@ import json
 from behave import step
 
 from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
+from acceptance_tests.utilities.event_helper import check_survey_launched_case_updated_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from config import Config
 
@@ -60,3 +61,5 @@ def send_survey_for_case_with_lsoa(context, lsoa_list):
         if uac_created_event['payload']['uac']['caseId'] in context.survey_started_case_ids:
             send_survey_launched_msg(uac_created_event['payload']['uac']['caseId'],
                                      uac_created_event['payload']['uac']['questionnaireId'], "RESPONDENT_HOME", "RH")
+
+    check_survey_launched_case_updated_events(context, context.survey_started_case_ids)
