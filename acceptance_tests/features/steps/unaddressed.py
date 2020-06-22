@@ -67,13 +67,13 @@ def send_ccs_linked_message(context):
     context.linked_case_id = context.case_id
     context.linked_uac = context.expected_uac
 
-    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
+    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
 
 
 def send_questionnaire_link(context):
     context.linked_case = context.case_created_events[1]['payload']['collectionCase']
 
-    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
+    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
 
 def send_questionnaire_link_for_individual_hh_case(context, include_individual_id=True):
@@ -92,13 +92,13 @@ def send_alternative_questionnaire_link(context):
     alternative_case = context.case_created_events[0]['payload']['collectionCase']
 
     context.linked_case_id = alternative_case['id']
-    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, alternative_case['id'])
+    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, alternative_case['id'])
 
 
 def check_blank_link_message_is_received(context):
     context.linked_case = context.case_created_events[0]['payload']['collectionCase']
 
-    _send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
+    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
 
 
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
@@ -228,7 +228,7 @@ def retrieve_hi_case(context):
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
 
 
-def _send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
+def send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
     questionnaire_linked_message = {
         'event': {
             'type': 'QUESTIONNAIRE_LINKED',
