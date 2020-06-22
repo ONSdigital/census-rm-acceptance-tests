@@ -20,9 +20,10 @@ Feature: Handle fulfilment request events
       | UACHHT4         | 04                 | household Northern Ireland  |
 
   Scenario Outline: Individual UAC SMS requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    Given sample file "sample_1_english_SPG_unit.csv" is loaded successfully
     When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
-    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+#    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And notify api was called with SMS template "<SMS template>"
     And a UAC updated message with "<questionnaire type>" questionnaire type is emitted for the individual case
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
