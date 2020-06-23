@@ -32,11 +32,11 @@ class SftpUtility:
         period = period_start_time.strftime('%Y-%m-%d')
 
         return [
-                _file for _file in files
-                if f'{prefix}_{period}' in _file.filename
-                and _file.filename.endswith(suffix)
-                and period_start_time <= datetime.fromtimestamp(_file.st_mtime)
-            ]
+            _file for _file in files
+            if f'{prefix}_{period}' in _file.filename
+               and _file.filename.endswith(suffix)
+               and period_start_time <= datetime.fromtimestamp(_file.st_mtime)
+        ]
 
     def get_files_content_as_list(self, files, prefix):
         actual_content = []

@@ -101,7 +101,6 @@ def check_refusal_event_logging(context, expected_event_list):
 
 @step("Only unrefused cases are sent to field")
 def only_unrefused_cases_are_sent_to_field(context):
-
     context.expected_cases_for_action = [
         case_created['payload']['collectionCase'] for case_created in context.case_created_events
         if case_created['payload']['collectionCase']['id'] != context.refused_case_id

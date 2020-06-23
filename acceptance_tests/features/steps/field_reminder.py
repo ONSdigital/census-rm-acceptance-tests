@@ -1,12 +1,12 @@
 import functools
 import json
 
+import luhn
 from behave import step
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-import luhn
 
 
 @step('the action instruction messages for only the HH case are emitted to FWMT where the case has a "{filter_column}" '

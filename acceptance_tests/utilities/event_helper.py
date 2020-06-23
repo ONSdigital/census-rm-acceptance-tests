@@ -8,7 +8,7 @@ from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_case_created_msgs_by_collection_exercise_id, store_all_uac_updated_msgs_by_collection_exercise_id, \
-    store_first_message_in_context
+    store_first_message_in_context, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -144,10 +144,24 @@ def get_expected_uac_count(context):
 
 
 def check_case_created_message_is_emitted(context):
-    # context.messages_received = []
+    context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_first_message_in_context,
                                                       context=context))
     test_helper.assertEqual(context.first_message['payload']['collectionCase']['id'],
                             context.case_id)
     context.case_created_events = [context.first_message]
+
+
+def check_survey_launched_case_updated_events(context, case_ids):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(store_all_msgs_in_context,
+                                                      context=context,
+                                                      expected_msg_count=len(case_ids),
+                                                      type_filter='CASE_UPDATED'))
+    for message in context.messages_received:
+        test_helper.assertTrue(message['payload']['collectionCase']['surveyLaunched'],
+                               (f'Expected to find {len(case_ids)} CASE_UPDATED events as a result of survey launches '
+                                f'found event with "surveyLaunched"=False, cases expected={case_ids}'))
+        test_helper.assertIn(message['payload']['collectionCase']['id'], case_ids, 'Found event for unexpected case')
