@@ -84,25 +84,25 @@ class Config:
     EXCEPTIONMANAGER_CONNECTION_PORT = os.getenv('EXCEPTIONMANAGER_CONNECTION_PORT', '8666')
     EXCEPTION_MANAGER_URL = f'http://{EXCEPTIONMANAGER_CONNECTION_HOST}:{EXCEPTIONMANAGER_CONNECTION_PORT}'
 
-    RABBITMQ_QUEUES = ['Action.Field',
-                       'Action.Printer',
-                       'Case.Responses',
-                       'FieldworkAdapter.caseUpdated',
-                       'action.events',
-                       'action.fulfilment',
-                       'case.action',
-                       'case.addressQueue',
-                       'case.ccsPropertyListedQueue',
-                       'case.fulfilments',
-                       'case.questionnairelinked',
-                       'case.refusals',
-                       'case.sample.inbound',
-                       'case.uac-qid-created',
-                       'case.undeliveredMailQueue',
-                       'notify.enriched.fulfilment',
-                       'notify.fulfilments',
-                       'survey.launched',
-                       'unaddressedRequestQueue']
+    RABBITMQ_QUEUES_WITH_DLQS = ['Action.Field',
+                                 'Action.Printer',
+                                 'Case.Responses',
+                                 'FieldworkAdapter.caseUpdated',
+                                 'action.events',
+                                 'action.fulfilment',
+                                 'case.action',
+                                 'case.addressQueue',
+                                 'case.ccsPropertyListedQueue',
+                                 'case.fulfilments',
+                                 'case.questionnairelinked',
+                                 'case.refusals',
+                                 'case.sample.inbound',
+                                 'case.uac-qid-created',
+                                 'case.undeliveredMailQueue',
+                                 'notify.enriched.fulfilment',
+                                 'notify.fulfilments',
+                                 'survey.launched',
+                                 'unaddressedRequestQueue']
 
     SENT_PRINT_FILE_BUCKET = os.getenv('SENT_PRINT_FILE_BUCKET', '')
 

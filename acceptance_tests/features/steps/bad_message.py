@@ -14,7 +14,7 @@ from config import Config
 @given('a bad message is placed on each of the queues')
 def publish_bad_message(context):
     message_hashes = []
-    for queue in Config.RABBITMQ_QUEUES:
+    for queue in Config.RABBITMQ_QUEUES_WITH_DLQS:
         message = json.dumps(
             {
                 "message": "This is a dodgy message",

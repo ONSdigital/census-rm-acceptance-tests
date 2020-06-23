@@ -2,10 +2,12 @@ import functools
 import json
 import logging
 
+import requests
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
+from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -87,9 +89,10 @@ def store_first_message_in_context(ch, method, _properties, body, context, type_
         ch.basic_nack(delivery_tag=method.delivery_tag)
 
 
-def purge_queues(*queues):
+def purge_queues():
+    all_queues = _get_all_queues()
     with RabbitContext() as rabbit:
-        for queue in queues:
+        for queue in all_queues:
             rabbit.channel.queue_purge(queue=queue)
 
 
@@ -113,3 +116,12 @@ def check_no_msgs_sent_to_queue(context, queue, on_message_callback, timeout=5):
 
 def _timeout_callback_expected(rabbit):
     rabbit.close_connection()
+
+
+def _get_all_queues():
+    uri = f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/%2f/'
+    response = requests.get(uri, auth=(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
+    response.raise_for_status()
+    response_data = json.loads(response.content)
+
+    return [queue['name'] for queue in response_data]
