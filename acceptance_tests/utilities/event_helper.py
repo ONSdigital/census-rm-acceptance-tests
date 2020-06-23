@@ -3,6 +3,7 @@ import logging
 
 import luhn
 import requests
+from rfc3339 import parse_datetime
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
@@ -63,6 +64,8 @@ def _validate_case(parsed_body):
     test_helper.assertEqual('CENSUS', parsed_body['payload']['collectionCase']['survey'])
     actual_case_ref = parsed_body['payload']['collectionCase']['caseRef']
     test_helper.assertEqual(10, len(actual_case_ref))
+    parse_datetime(parsed_body['payload']['collectionCase']['createdDateTime'])
+    parse_datetime(parsed_body['payload']['collectionCase']['lastUpdated'])
 
     test_helper.assertTrue(luhn.verify(actual_case_ref))
 
