@@ -35,25 +35,25 @@ Feature: Address updates
 
 
   Scenario: New address event received without sourceCaseId
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
-    When a case created event is emitted
-    Then the case can be retrieved
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+    Then a case created event is emitted
+    And the case can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
   Scenario: New address event received with sourceCaseId
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
-    And a case created event is emitted
-    Then the case can be retrieved and contains the correct properties when the event had details
+    Then a case created event is emitted
+    And the case can be retrieved and contains the correct properties when the event had details
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
   Scenario: New address event received with sourceCaseId and minimal event fields
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId and minimal event fields
-    And a case created event is emitted
-    Then the case can be retrieved and contains the correct properties when the event had minimal details
+    Then a case created event is emitted
+    And the case can be retrieved and contains the correct properties when the event had minimal details
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
@@ -69,18 +69,15 @@ Feature: Address updates
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
 
   Scenario: Fulfilment request for new skeleton case
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
-    And a case created event is emitted
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId and new case is emitted
     When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
     Then a UAC updated message with "01" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
     And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
-
+  @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Individual Telephone capture for new skeleton case
-    Given the action plan and collection exercises IDs are the hardcoded census values
-    And a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD"
-    And a case created event is emitted
+    Given a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD" and the case is created
     When there is a request for a new HI case for telephone capture for the parent case with address type "HH" and country "E"
     Then a UAC and QID with questionnaire type "21" type are generated and returned
     And a new individual child case for telephone capture is emitted to RH and Action Scheduler
@@ -92,9 +89,9 @@ Feature: Address updates
     And a case created event is emitted
     And a CREATE action instruction is sent to field
 
+  @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Skeleton cases are excluded from action rules
-    Given the action plan and collection exercises IDs are the hardcoded census values
-    And sample file "sample_1_english_SPG_unit.csv" is loaded successfully
+    Given sample file "sample_1_english_SPG_unit.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     When set action rule of type "P_RD_2RL1_1"
@@ -102,8 +99,7 @@ Feature: Address updates
 
 
   Scenario Outline: Telephone capture for new skeleton case
-    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId with region "<country code>", address type "<address type>" and address level "<address level>"
-    And a case created event is emitted
+    Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId with region "<country code>", address type "<address type>" and address level "<address level>" and case emitted
     When there is a request for telephone capture for an address level "<address level>" case with address type "<address type>" and country "<country code>"
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
     And a UAC updated event is emitted linking the new UAC and QID to the requested case
@@ -128,10 +124,10 @@ Feature: Address updates
       | E             | CE           | N            | 34                 |
       | E             | SPG          | N            | 04                 |
 
+
+  @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario Outline: Individual Telephone capture for new skeleton case - CE & SPG cases
-    Given the action plan and collection exercises IDs are the hardcoded census values
-    And a NEW_ADDRESS_REPORTED event with region "<country code>", address type "<address type>" and address level "<address level>" is sent from "FIELD"
-    And a case created event is emitted
+    Given a NEW_ADDRESS_REPORTED event with region "<country code>", address type "<address type>" and address level "<address level>" is sent from "FIELD" and case emitted
     When there is a request for individual telephone capture for the case with address type "<address type>" and country "<country code>"
     Then a UAC and QID with questionnaire type "<questionnaire type>" type are generated and returned
     And a UAC updated event is emitted linking the new UAC and QID to the requested case

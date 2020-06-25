@@ -91,7 +91,7 @@ def new_address_reported_event_without_source_case_id(context, sender):
 
 @step(
     'a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId with region "{region}", '
-    'address type "{address_type}" and address level "{address_level}"')
+    'address type "{address_type}" and address level "{address_level}" and case emitted')
 def new_address_reported_event_without_source_case_id_with_address_type(context, sender, address_type, address_level,
                                                                         region):
     context.case_id = str(uuid.uuid4())
@@ -137,6 +137,8 @@ def new_address_reported_event_without_source_case_id_with_address_type(context,
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+    check_case_created_message_is_emitted(context)
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
@@ -225,7 +227,7 @@ def new_address_reported_event_with_minimal_fields(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}"')
+@step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}" and the case is created')
 def new_address_reported_event_for_address_type(context, address_type, sender):
     context.case_id = str(uuid.uuid4())
     message = json.dumps(
@@ -258,9 +260,11 @@ def new_address_reported_event_for_address_type(context, address_type, sender):
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
+    check_case_created_message_is_emitted(context)
+
 
 @step('a NEW_ADDRESS_REPORTED event with region "{region}", address type "{address_type}" and address level '
-      '"{address_level}" is sent from "{sender}"')
+      '"{address_level}" is sent from "{sender}" and case emitted')
 def new_address_reported_event_for_address_type_and_region(context, address_type, sender, address_level, region):
     context.case_id = str(uuid.uuid4())
     message = json.dumps(
@@ -292,6 +296,8 @@ def new_address_reported_event_for_address_type_and_region(context, address_type
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+    check_case_created_message_is_emitted(context)
 
 
 @step('the case can be retrieved')
@@ -513,3 +519,9 @@ def _field_work_create_callback(ch, method, _properties, body, context):
     context.field_action_cancel_message = action_create
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
+
+
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId and new case is emitted')
+def new_address_without_source_id(context, sender):
+    new_address_reported_event_without_source_case_id(context, sender)
+    check_case_created_message_is_emitted(context)

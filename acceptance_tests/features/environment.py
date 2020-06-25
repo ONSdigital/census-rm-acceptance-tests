@@ -14,14 +14,24 @@ def after_all(_context):
 
 def before_scenario(context, _):
     context.test_start_local_datetime = datetime.now()
-    context.collection_exercise_id = str(uuid.uuid4())
-    context.action_plan_id = str(uuid.uuid4())
+
+    if not hasattr(context, 'collection_exercise_id'):
+        context.collection_exercise_id = str(uuid.uuid4())
+
+    if not hasattr(context, 'action_plan_id'):
+        context.action_plan_id = str(uuid.uuid4())
+
     purge_queues()
 
 
-def before_tag(_, tag):
+def before_tag(context, tag):
     if tag == "clear_for_bad_messages":
         _clear_queues_for_bad_messages_and_reset_exception_manager()
+    if tag == "hardcoded_census_values_for_collection_and_action_plan_ids":
+        # For tests where the action plan and collection exercise ID need hardcoding
+        # e.g where skeleton cases are used
+        context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
+        context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
 
 
 def after_tag(_, tag):
