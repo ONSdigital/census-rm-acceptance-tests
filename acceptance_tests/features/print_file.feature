@@ -3,7 +3,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline: Generate print files and log events for initial contact letters
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    When set action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -33,7 +33,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire type> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    When set action rule of type "<action type>"
     And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
     Then correctly formatted "<pack code>" print files are created for CE Estab expected responses
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -55,7 +55,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    When set action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created for questionnaire
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -76,7 +76,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline: Generate print files and log events for CE initial contact questionnaires
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    When set action rule of type "<action type>"
     And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
     Then correctly formatted "<pack code>" print files are created for CE Estab questionnaires
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -95,7 +95,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
     Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded
     And messages are emitted to RH and Action Scheduler with [32] questionnaire types
-    When set action rule of type "CE_IC10" when the case loading queues are drained
+    When set action rule of type "CE_IC10"
     And CE Estab messages are emitted to RH and Action Scheduler with [22,23] questionnaire types
     Then correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
     And there is a correct "D_FDCE_I2" manifest file for each csv file written
@@ -104,7 +104,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters
     Given sample file "<sample file>" is loaded
-    When set action rule of type "<pack code>" when the case loading queues are drained
+    When set action rule of type "<pack code>"
     And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
     When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
@@ -123,7 +123,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline:  Generate print files and log events for scheduled questionnaire letters
     Given sample file "<sample file>" is loaded successfully
-    And set action rule of type "<pack code>" when the case loading queues are drained
+    And set action rule of type "<pack code>"
     When 2 UAC Updated events are emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder questionnaire print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -136,7 +136,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline:  Generate print files and log events for response driven reminders
     Given sample file "<sample file>" is loaded successfully
-    When set action rule of type "<pack code>" when the case loading queues are drained
+    When set action rule of type "<pack code>"
     And UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -159,7 +159,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline:  Generate print files and log events for response driven reminders with survey started
     Given sample file "<sample file>" is loaded successfully
     And a survey launched for a created case is received for cases with lsoa <lsoa list>
-    When set action rule of type "<pack code>" when the case loading queues are drained
+    When set action rule of type "<pack code>"
     Then correctly formatted "<pack code>" print files are created for packcode and where survey was launched
     And there is a correct "<pack code>" manifest file for each csv file written
 

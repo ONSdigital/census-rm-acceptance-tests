@@ -9,10 +9,9 @@ Feature: Handle CCS (Census Coverage Survey) Property Listed events
 
   @smoke
   Scenario: Log event when a CCS Property Listed event is received with a qid
-    When an unaddressed QID request message of questionnaire type 71 is sent
-    And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
+    When an unaddressed QID request message of questionnaire type 71 is sent and an unlinked uac is emitted
     When a CCS Property Listed event is sent with a qid
-    And the CCS Property Listed case is created with address type "HH"
+    Then the CCS Property Listed case is created with address type "HH"
     And no ActionInstruction is sent to FWMT
     And the case API returns the new CCS case by postcode search
 
