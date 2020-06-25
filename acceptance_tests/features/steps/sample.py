@@ -33,6 +33,9 @@ def load_sample_file_successfully_step(context, sample_file_name):
     get_and_check_case_created_messages(context)
     get_and_check_uac_updated_messages(context)
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
+    context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
+    context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
 
 def _load_sample(context, sample_file_name):

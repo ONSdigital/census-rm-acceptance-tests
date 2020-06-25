@@ -8,7 +8,8 @@ from acceptance_tests.features.steps.event_log import check_if_event_list_is_exa
 from acceptance_tests.features.steps.fulfilment import send_print_fulfilment_request
 from acceptance_tests.features.steps.telephone_capture import request_individual_telephone_capture, \
     check_correct_uac_updated_message_is_emitted, request_hi_individual_telephone_capture
-from acceptance_tests.features.steps.unaddressed import send_questionnaire_linked_msg_to_rabbit
+from acceptance_tests.features.steps.unaddressed import send_questionnaire_linked_msg_to_rabbit, \
+    check_uac_message_is_received
 from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
@@ -71,7 +72,7 @@ def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
 
 
 @step("the blank questionnaire msg for a case is put on the GCP pubsub")
-def receipt_offline_msg_published_to_gcp_pubsubs(context):
+def blank_questionnaire_msg_published_to_gcp_pubsubs(context):
     context.first_case = context.receipting_case
     questionnaire_id = context.qid_to_receipt
     _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
@@ -379,3 +380,42 @@ def store_all_uac_updated_msgs(ch, method, _properties, body, context):
     context.messages_received.append(parsed_body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
+
+
+@step(
+    "the offline receipt msg for the receipted case is put on the GCP pubsub and expected uac inactive msg is emitted")
+def offline_msg_published_to_gcp_pubsub_for_receipted_cases_and_wait_for_inactive_uac_msg(context):
+    context.first_case = context.receipting_case
+    questionnaire_id = context.qid_to_receipt
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+    check_uac_updated_msg_sets_receipted_qid_to_unactive(context)
+
+
+@step("the blank questionnaire msg for a case is put on the GCP pubsub and expected uac inactive msg is emitted")
+def blank_questionnaire_published_to_gcp_pubsub_and_wait_for_inactive_uac_msg(context):
+    context.first_case = context.receipting_case
+    questionnaire_id = context.qid_to_receipt
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+    check_uac_updated_msg_sets_receipted_qid_to_unactive(context)
+
+
+@step("the offline receipt msg for the unlinked is put on the GCP pubsub and the unlinked uac is emitted as inactive")
+def offline_msg_published_to_gcp_pubsub_for_unlinked_qids_and_uac_emitted(context):
+    questionnaire_id = context.expected_questionnaire_id
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+    check_uac_message_is_received(context)
+
+
+@step("a blank questionnaire receipts comes in for an unlinked qid and the correct uac msg is emitted")
+def offline_receipt_for_an_unlinked_qid_and_uac_emitted(context):
+    context.first_case = context.receipting_case
+    questionnaire_id = context.expected_questionnaire_id
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    test_helper.assertTrue(context.sent_to_gcp)
+    check_uac_message_is_received(context)

@@ -274,3 +274,14 @@ def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, cas
             message=json.dumps(questionnaire_linked_message),
             content_type='application/json',
             routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
+
+
+@step('an unaddressed QID request message of questionnaire type {questionnaire_type} is sent and an UAC msg is emitted')
+def send_unaddressed_message_and_uac_emitted(context, questionnaire_type):
+    context.expected_questionnaire_type = questionnaire_type
+    with RabbitContext(queue_name=Config.RABBITMQ_UNADDRESSED_REQUEST_QUEUE) as rabbit:
+        rabbit.publish_message(
+            message=json.dumps({'questionnaireType': questionnaire_type}),
+            content_type='application/json')
+
+    check_uac_message_is_received(context)

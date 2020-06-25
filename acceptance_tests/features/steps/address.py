@@ -74,7 +74,8 @@ def new_address_reported_event_without_source_case_id(context, sender):
                             "addressType": "SPG",
                             "addressLevel": "U",
                             "latitude": "50.917428",
-                            "longitude": "-1.238193"
+                            "longitude": "-1.238193",
+                            "uprn": None
                         }
                     }
                 }
