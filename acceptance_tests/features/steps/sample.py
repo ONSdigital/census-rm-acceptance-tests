@@ -3,7 +3,7 @@ from behave import step
 
 from acceptance_tests.features.steps.action_rules import poll_until_sample_is_ingested_to_action
 from acceptance_tests.utilities.event_helper import get_and_check_case_created_messages, \
-    get_and_check_uac_updated_messages
+    get_and_check_uac_updated_messages, get_and_test_case_and_uac_msgs_are_correct
 from acceptance_tests.utilities.sample_load_helper import load_sample_file_helper
 
 
@@ -31,3 +31,9 @@ def load_sample_file_successfully_step(context, sample_file_name, check_loaded_i
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
     context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+
+
+@step('sample file "{sample_file_name}" is loaded and correct qids {questionnaire_types} set')
+def load_sample_file_and_check_qids(context, sample_file_name, questionnaire_types):
+    load_sample_file_helper(context, sample_file_name)
+    get_and_test_case_and_uac_msgs_are_correct(context, questionnaire_types)

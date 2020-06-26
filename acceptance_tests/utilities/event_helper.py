@@ -1,3 +1,4 @@
+import copy
 import functools
 import logging
 
@@ -165,3 +166,70 @@ def check_survey_launched_case_updated_events(context, case_ids):
                                (f'Expected to find {len(case_ids)} CASE_UPDATED events as a result of survey launches '
                                 f'found event with "surveyLaunched"=False, cases expected={case_ids}'))
         test_helper.assertIn(message['payload']['collectionCase']['id'], case_ids, 'Found event for unexpected case')
+
+
+def get_and_test_case_and_uac_msgs_are_correct(context, questionnaire_types):
+    get_and_check_case_created_messages(context)
+
+    context.expected_uacs_cases = get_extended_case_created_events_for_uacs(context, questionnaire_types)
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
+                                                      expected_msg_count=len(context.expected_uacs_cases),
+                                                      collection_exercise_id=context.collection_exercise_id))
+    test_helper.assertEqual(len(context.messages_received), len(context.expected_uacs_cases))
+    context.uac_created_events = context.messages_received.copy()
+    test_uacs_correct(context)
+    context.messages_received = []
+
+
+def get_extended_case_created_events_for_uacs(context, questionnaire_types):
+    questionnaire_types_list = questionnaire_types.replace('[', '').replace(']', '').split(',')
+    expected_uacs_cases = context.case_created_events.copy()
+
+    # 1st pass
+    for uac in expected_uacs_cases:
+        uac['expected_questionnaire_type'] = questionnaire_types_list[0]
+
+    # If there's 2, current scenario Welsh.  Could be a fancy loop, but not much point
+    if len(questionnaire_types_list) == 2:
+        second_expected_uacs = copy.deepcopy(context.case_created_events)
+        for uac in second_expected_uacs:
+            uac['expected_questionnaire_type'] = questionnaire_types_list[1]
+
+        expected_uacs_cases.extend(second_expected_uacs)
+
+    return expected_uacs_cases
+
+
+def test_uacs_correct(context):
+    test_helper.assertEqual(len(context.messages_received), len(context.expected_uacs_cases))
+
+    for msg in context.uac_created_events:
+        _validate_uac_message(msg)
+
+        for index, case_created_event in enumerate(context.expected_uacs_cases):
+            if (uac_message_matches_rh_message(case_created_event, msg)
+                    and (msg['payload']['uac']['questionnaireId'][:2]
+                         == case_created_event['expected_questionnaire_type'])):
+                del context.expected_uacs_cases[index]
+                break
+        else:
+            test_helper.fail('Could not find UAC Updated event')
+
+
+def _validate_uac_message(parsed_body):
+    test_helper.assertEqual(64, len(parsed_body['payload']['uac']['uacHash']))
+
+
+def test_uacs_correct_for_estab_units(context, expected_uacs, questionnaire_type):
+    questionnaire_types_list = questionnaire_type.replace('[', '').replace(']', '').split(',')
+    test_helper.assertEqual(len(context.messages_received), expected_uacs)
+
+    for msg in context.uac_created_events:
+        _validate_uac_message(msg)
+        test_helper.assertIn(msg['payload']['uac']['questionnaireId'][:2], questionnaire_types_list)
+
+
+def uac_message_matches_rh_message(case_created_event, rh_message):
+    return case_created_event['payload']['collectionCase']['id'] == rh_message['payload']['uac']['caseId']
