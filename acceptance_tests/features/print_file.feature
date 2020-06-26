@@ -28,7 +28,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv        |
 
 
-  Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
+  Scenario Outline: Generate print files and log events for initial contact letters CE cases
     Given sample file "<sample file>" is loaded
     And messages are emitted to RH and Action Scheduler with <questionnaire type> questionnaire types
     When set action rule of type "<action type>" when the case loading queues are drained
@@ -38,12 +38,12 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
     And the files have all been copied to the bucket
 
-    Examples: CE Estab initial contact Letters: <pack code>
+    Examples: CE initial contact Letters: <pack code>
       | pack code   | action type | questionnaire type | sample file                   | individual qid type |
       | D_ICA_ICLR1 | CE_IC03     | 31                 | sample_3_english_CE_estab.csv | 21                  |
 
     @regression
-    Examples: CE Estab initial contact Letters: <pack code>
+    Examples: CE initial contact Letters: <pack code>
       | pack code    | action type | questionnaire type | sample file                       | individual qid type |
       | D_ICA_ICLR1  | CE_IC03_1   | 21                 | sample_1_english_CE_unit.csv      | 21                  |
       | D_ICA_ICLR2B | CE_IC04     | 32                 | sample_3_welsh_CE_estab.csv       | 22                  |
