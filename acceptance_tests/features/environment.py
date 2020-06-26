@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 from datetime import datetime
@@ -6,6 +7,11 @@ import requests
 
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
+
+
+def before_all(_):
+    # reduce log level
+    logging.getLogger("pika").setLevel(logging.WARNING)
 
 
 def after_all(_context):

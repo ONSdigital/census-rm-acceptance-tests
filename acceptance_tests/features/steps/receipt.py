@@ -405,3 +405,9 @@ def offline_msg_published_to_gcp_pubsub_for_unlinked_qids_and_uac_emitted(contex
 def offline_receipt_for_an_unlinked_qid_and_uac_emitted(context):
     offline_receipt_for_an_unlinked_qid(context)
     check_uac_message_is_received(context)
+
+
+@step("the receipt msg is put on the GCP pubsub and a uac_updated msg is emitted")
+def send_receipt_and_check_inactive_uac_emitted(context):
+    send_receipt(context)
+    check_uac_updated_msg_sets_receipted_qid_to_unactive(context)

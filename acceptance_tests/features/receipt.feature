@@ -75,11 +75,10 @@ Feature: Case processor handles receipt message from pubsub service
   Scenario: CE Actual response count incrementation continues after the case is receipted
     Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
     And a new qid and case are created for case type "CE" address level "E" qid type "CE1" and country "E"
-    And the receipt msg is put on the GCP pubsub
-    And a uac_updated msg is emitted with active set to false for the receipted qid
+    And the receipt msg is put on the GCP pubsub and a uac_updated msg is emitted
     And an "UPDATE" field instruction is emitted
     And a case_updated msg is emitted where "receiptReceived" is "True"
-    When a new qid and case are created for case type "CE" address level "E" qid type "Ind" and country "E"
-    And the receipt msg is put on the GCP pubsub
+    And a new qid and case are created for case type "CE" address level "E" qid type "Ind" and country "E"
+    When the receipt msg is put on the GCP pubsub
     Then an "UPDATE" field instruction is emitted
     And if the actual response count is incremented "True" or the case is marked receipted "True" then there should be a case updated message of case type "CE"
