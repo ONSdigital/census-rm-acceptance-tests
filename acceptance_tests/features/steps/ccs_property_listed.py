@@ -162,7 +162,7 @@ def check_created_uacqid_link_has_new_ccs_against_it(context):
 
 
 @step('a CCS Protery List event is sent and associated "{address_type}" case is created and sent to FWMT')
-def step_impl(context, address_type):
+def css_property_list_and_events_emitted(context, address_type):
     message = _create_ccs_property_listed_event(context)
     _send_ccs_case_list_msg_to_rabbit(message)
 

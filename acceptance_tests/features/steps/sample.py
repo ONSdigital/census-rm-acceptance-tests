@@ -24,6 +24,10 @@ def load_sample_file_successfully_step(context, sample_file_name, check_loaded_i
     get_and_check_case_created_messages(context)
     get_and_check_uac_updated_messages(context)
 
+    # TODO: in a nice world this would be well nicer
+    # However when we set up the skeleton cases we need to use the census action-plan-id, which is fixed so the query
+    # returns old matching rows too.
+    # So we then add in > start_of_test_datetime, excellent, except db is on UTC. So doesn't work :(
     if check_loaded_into_db:
         poll_until_sample_is_ingested_to_action(context)
 

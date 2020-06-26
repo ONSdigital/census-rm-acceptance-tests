@@ -385,37 +385,23 @@ def store_all_uac_updated_msgs(ch, method, _properties, body, context):
 @step(
     "the offline receipt msg for the receipted case is put on the GCP pubsub and expected uac inactive msg is emitted")
 def offline_msg_published_to_gcp_pubsub_for_receipted_cases_and_wait_for_inactive_uac_msg(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.qid_to_receipt
-    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
-    test_helper.assertTrue(context.sent_to_gcp)
-
+    offline_msg_published_to_gcp_pubsub_for_receipted_cases(context)
     check_uac_updated_msg_sets_receipted_qid_to_unactive(context)
 
 
 @step("the blank questionnaire msg for a case is put on the GCP pubsub and expected uac inactive msg is emitted")
 def blank_questionnaire_published_to_gcp_pubsub_and_wait_for_inactive_uac_msg(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.qid_to_receipt
-    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
-    test_helper.assertTrue(context.sent_to_gcp)
-
+    blank_questionnaire_msg_published_to_gcp_pubsubs(context)
     check_uac_updated_msg_sets_receipted_qid_to_unactive(context)
 
 
 @step("the offline receipt msg for the unlinked is put on the GCP pubsub and the unlinked uac is emitted as inactive")
 def offline_msg_published_to_gcp_pubsub_for_unlinked_qids_and_uac_emitted(context):
-    questionnaire_id = context.expected_questionnaire_id
-    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
-    test_helper.assertTrue(context.sent_to_gcp)
-
+    offline_msg_published_to_gcp_pubsub_for_unlinked_qids(context)
     check_uac_message_is_received(context)
 
 
 @step("a blank questionnaire receipts comes in for an unlinked qid and the correct uac msg is emitted")
 def offline_receipt_for_an_unlinked_qid_and_uac_emitted(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.expected_questionnaire_id
-    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
-    test_helper.assertTrue(context.sent_to_gcp)
+    offline_receipt_for_an_unlinked_qid(context)
     check_uac_message_is_received(context)
