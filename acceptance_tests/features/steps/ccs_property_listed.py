@@ -155,10 +155,10 @@ def ccs_case_event_logged(context):
     test_helper.assertEqual(context.ccs_case['caseEvents'][0]['eventType'], 'CCS_ADDRESS_LISTED')
 
 
-@step("the CCS Case created is set against the correct qid")
-def check_created_uacqid_link_has_new_ccs_against_it(context):
-    linked_ccs_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
-    test_helper.assertEqual(linked_ccs_case_id, context.case_id)
+# @step("the CCS Case created is set against the correct qid")
+# def check_created_uacqid_link_has_new_ccs_against_it(context):
+#     linked_ccs_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
+#     test_helper.assertEqual(linked_ccs_case_id, context.case_id)
 
 
 @step('a CCS Protery List event is sent and associated "{address_type}" case is created and sent to FWMT')

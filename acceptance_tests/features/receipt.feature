@@ -64,7 +64,7 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
     Given sample file "sample_for_receipting.csv" is loaded successfully
-    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
+#    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
     And a UAC updated message with "11" questionnaire type is emitted
     When the offline receipt msg for a continuation form from the case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
@@ -74,7 +74,6 @@ Feature: Case processor handles receipt message from pubsub service
   @regression
   Scenario: CE Actual response count incrementation continues after the case is receipted
     Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
-    And a new qid and case are created for case type "CE" address level "E" qid type "CE1" and country "E"
     And the receipt msg is put on the GCP pubsub and a uac_updated msg is emitted
     And an "UPDATE" field instruction is emitted
     And a case_updated msg is emitted where "receiptReceived" is "True"
