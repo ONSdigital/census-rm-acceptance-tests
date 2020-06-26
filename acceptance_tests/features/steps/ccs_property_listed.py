@@ -6,7 +6,6 @@ import requests
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.unaddressed import get_case_id_by_questionnaire_id
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
@@ -155,13 +154,7 @@ def ccs_case_event_logged(context):
     test_helper.assertEqual(context.ccs_case['caseEvents'][0]['eventType'], 'CCS_ADDRESS_LISTED')
 
 
-# @step("the CCS Case created is set against the correct qid")
-# def check_created_uacqid_link_has_new_ccs_against_it(context):
-#     linked_ccs_case_id = get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
-#     test_helper.assertEqual(linked_ccs_case_id, context.case_id)
-
-
-@step('a CCS Protery List event is sent and associated "{address_type}" case is created and sent to FWMT')
+@step('a CCS Property List event is sent and associated "{address_type}" case is created and sent to FWMT')
 def css_property_list_and_events_emitted(context, address_type):
     message = _create_ccs_property_listed_event(context)
     _send_ccs_case_list_msg_to_rabbit(message)

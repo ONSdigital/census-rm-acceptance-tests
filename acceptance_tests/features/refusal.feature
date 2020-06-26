@@ -32,7 +32,7 @@ Feature: Handle refusal message
 
   @smoke
   Scenario: Refusal message results in CCS case excluded from action plan
-    Given a CCS Protery List event is sent and associated "HH" case is created and sent to FWMT
+    Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
     When a refusal message for the created CCS case is received
     Then the case is marked as refused
     And a CANCEL action instruction is emitted to FWMT

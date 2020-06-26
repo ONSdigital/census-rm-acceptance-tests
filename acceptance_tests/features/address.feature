@@ -27,7 +27,7 @@ Feature: Address updates
       | sample_for_invalid_address_SPG_E.csv | SPG          |
 
   Scenario: Invalid address event for CCS unit level case
-    Given a CCS Protery List event is sent and associated "HH" case is created and sent to FWMT
+    Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
     When an invalid address message for the CCS case is sent from "CC"
     Then a case_updated msg is emitted where "addressInvalid" is "True"
     And a CANCEL action instruction is sent to field work management with address type "HH"

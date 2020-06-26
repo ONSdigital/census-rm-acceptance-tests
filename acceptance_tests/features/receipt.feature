@@ -44,9 +44,7 @@ Feature: Case processor handles receipt message from pubsub service
     Then no ActionInstruction is sent to FWMT
 
   Scenario: eq receipt for CCS case results in UAC updated event sent to RH
-    Given a CCS Property Listed event is sent
-    And the CCS Property Listed case is created with address type "HH"
-    And the correct ActionInstruction is sent to FWMT
+    Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
     When the receipt msg for the created CCS case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
     And a case_updated msg is emitted where "receiptReceived" is "True"
@@ -64,7 +62,7 @@ Feature: Case processor handles receipt message from pubsub service
 
   Scenario: PQRS receipt for continuation questionnaire from fulfilment does not send to Field
     Given sample file "sample_for_receipting.csv" is loaded successfully
-#    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
+    And a PQ continuation fulfilment request event with fulfilment code "P_OR_HC1" is received by RM
     And a UAC updated message with "11" questionnaire type is emitted
     When the offline receipt msg for a continuation form from the case is put on the GCP pubsub
     Then a uac_updated msg is emitted with active set to false
