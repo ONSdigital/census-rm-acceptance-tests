@@ -24,8 +24,6 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv |
       | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv    |
       | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv        |
-      | D_ICA_ICLR1    | CE_IC03_1   | [21]                | sample_1_english_CE_unit.csv       |
-      | D_ICA_ICLR2B   | CE_IC04_1   | [22]                | sample_1_welsh_CE_unit.csv         |
       | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv      |
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv        |
 
@@ -47,7 +45,9 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     @regression
     Examples: CE Estab initial contact Letters: <pack code>
       | pack code    | action type | questionnaire type | sample file                       | individual qid type |
+      | D_ICA_ICLR1  | CE_IC03_1   | 21                 | sample_1_english_CE_unit.csv      | 21                  |
       | D_ICA_ICLR2B | CE_IC04     | 32                 | sample_3_welsh_CE_estab.csv       | 22                  |
+      | D_ICA_ICLR2B | CE_IC04_1   | 22                 | sample_1_welsh_CE_unit.csv        | 22                  |
       | D_CE4A_ICLR4 | CE_IC05     | 34                 | sample_3_ni_CE_estab_resident.csv | 24                  |
       | D_CE4A_ICLS4 | CE_IC06     | 34                 | sample_3_ni_CE_estab_student.csv  | 24                  |
 
