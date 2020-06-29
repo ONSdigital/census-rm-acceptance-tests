@@ -2,9 +2,9 @@
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action, \
     setup_treatment_code_classified_action_rule, build_and_create_action_rule
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 
 

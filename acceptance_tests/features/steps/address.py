@@ -92,8 +92,8 @@ def new_address_reported_event_without_source_case_id(context, sender):
 @step(
     'a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId with region "{region}", '
     'address type "{address_type}" and address level "{address_level}" and case emitted')
-def new_address_reported_event_without_source_case_id_with_address_type(context, sender, address_type, address_level,
-                                                                        region):
+def new_address_reported_event_without_source_case_id_with_address_type(context, sender, region,
+                                                                        address_type, address_level):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     message = json.dumps(

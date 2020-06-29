@@ -4,9 +4,11 @@ import logging
 
 import luhn
 import requests
+from retrying import retry
 from rfc3339 import parse_datetime
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_case_created_msgs_by_collection_exercise_id, store_all_uac_updated_msgs_by_collection_exercise_id, \
     store_first_message_in_context, store_all_msgs_in_context
@@ -233,3 +235,13 @@ def test_uacs_correct_for_estab_units(context, expected_uacs, questionnaire_type
 
 def uac_message_matches_rh_message(case_created_event, rh_message):
     return case_created_event['payload']['collectionCase']['id'] == rh_message['payload']['uac']['caseId']
+
+
+@retry(stop_max_attempt_number=10, wait_fixed=1000)
+def check_if_event_list_is_exact_match(event_type_list, case_id):
+    actual_logged_events = get_logged_events_for_case_by_id(case_id)
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+    actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
+
+    test_helper.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
+                                 msg="Actual logged event types did not match expected")

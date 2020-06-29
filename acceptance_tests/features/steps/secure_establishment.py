@@ -36,14 +36,14 @@ def _check_emitted_action_instructions(context, expected_value):
     context.expected_cases_for_action = context.case_created_events
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(fieldwork_message_callback, context=context,
+                                    functools.partial(_fieldwork_message_callback, context=context,
                                                       expected_value=expected_value))
 
     test_helper.assertFalse(context.expected_cases_for_action,
                             msg="Didn't find all expected fieldwork action instruction messages")
 
 
-def fieldwork_message_callback(ch, method, _properties, body, context, expected_value):
+def _fieldwork_message_callback(ch, method, _properties, body, context, expected_value):
     action_instruction = json.loads(body)
 
     if not action_instruction['actionInstruction'] == 'CREATE':
@@ -67,15 +67,4 @@ def fieldwork_message_callback(ch, method, _properties, body, context, expected_
 
 
 def _check_expected_secure_establishment_value(action_instruction, expected_value):
-    if expected_value is None:
-        try:
-            action_instruction['secureEstablishment']
-            assert False, "secureEstablishment value present in message when it shouldn't be there"
-        except KeyError:
-            pass
-
-    else:
-        if not action_instruction['secureEstablishment'] == expected_value:
-            assert False, "secureEstablishment was unexpected value"
-        else:
-            pass
+    test_helper.assertEqual(action_instruction['secureEstablishment'], expected_value)

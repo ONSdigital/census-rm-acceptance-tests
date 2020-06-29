@@ -1,7 +1,8 @@
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.case_look_up import get_logged_events_for_case_by_id
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
+from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.test_case_helper import test_helper
 
 
@@ -52,16 +53,6 @@ def events_logged_for_fieldwork_cases(context, event_type_list):
 @step("the events logged for the receipted case are {expected_event_list}")
 def check_logged_events_for_emitted_case(context, expected_event_list):
     check_if_event_list_is_exact_match(expected_event_list, context.first_case['id'])
-
-
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_if_event_list_is_exact_match(event_type_list, case_id):
-    actual_logged_events = get_logged_events_for_case_by_id(case_id)
-    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
-    actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
-
-    test_helper.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
-                                 msg="Actual logged event types did not match expected")
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)

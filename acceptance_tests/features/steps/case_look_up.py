@@ -6,29 +6,28 @@ import requests
 from behave import then, step
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.case_api_helper import get_ccs_qid_for_case_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
-case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
 @then("a case can be retrieved from the case API service")
 def get_case_by_id(context):
     case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    response = requests.get(f'{case_api_url}{case_id}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.case_details = response.json()
 
 
 @then('case API returns multiple cases for a UPRN')
 def find_multiple_cases_by_uprn(context):
-    response = requests.get(f'{case_api_url}uprn/10008677190')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}uprn/10008677190')
     response.raise_for_status()
-
     response_data = json.loads(response.content)
-
     test_helper.assertGreater(len(response_data), 1, 'Multiple cases not found')
+
     # Check some of the fields aren't blank
     for case in response_data:
         test_helper.assertTrue(case['id'], 'caseId missing')
@@ -39,9 +38,7 @@ def find_multiple_cases_by_uprn(context):
 @then('a case can be retrieved by its caseRef')
 def find_case_by_case_ref(context):
     case_ref = context.case_created_events[0]['payload']['collectionCase']['caseRef']
-
-    response = requests.get(f'{case_api_url}ref/{case_ref}')
-
+    response = requests.get(f'{Config.CASE_API_CASE_URL}ref/{case_ref}')
     test_helper.assertEqual(response.status_code, 200, 'Case ref not found')
 
 
@@ -55,16 +52,9 @@ def validate_ccs_qid_for_case_id(context):
                             f'Expected FormType is "H" but got "{response_json["formType"]}"')
 
 
-def get_ccs_qid_for_case_id(case_id):
-    response = requests.get(f'{case_api_url}ccs/{case_id}/qid')
-    test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
-    response_json = response.json()
-    return response_json
-
-
 @step('the case API returns the new CCS case by postcode search')
 def get_ccs_case_by_postcode(context):
-    response = requests.get(f'{case_api_url}ccs/postcode/{context.ccs_case["postcode"]}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}ccs/postcode/{context.ccs_case["postcode"]}')
     response.raise_for_status()
     found_cases = response.json()
 
@@ -140,9 +130,3 @@ def check_ccs_case_fields(context):
     test_helper.assertTrue(context.ccs_case['addressType'])
     test_helper.assertTrue(context.ccs_case['caseType'])
     test_helper.assertFalse(context.ccs_case['handDelivery'])
-
-
-def get_logged_events_for_case_by_id(case_id):
-    response = requests.get(f'{case_api_url}{case_id}?caseEvents=true').content.decode("utf-8")
-    response_json = json.loads(response)
-    return response_json['caseEvents']
