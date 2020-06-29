@@ -43,40 +43,32 @@ def receipt_offline_msg_published_to_gcp_pubsub(context):
 
 @step("the offline receipt msg for the receipted case is put on the GCP pubsub")
 def offline_msg_published_to_gcp_pubsub_for_receipted_cases(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.qid_to_receipt
-    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=context.qid_to_receipt)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
 @step("the offline receipt msg for the unlinked is put on the GCP pubsub")
 def offline_msg_published_to_gcp_pubsub_for_unlinked_qids(context):
-    questionnaire_id = context.expected_questionnaire_id
-    _publish_offline_receipt(context, channel='PQRS', unreceipt=False, questionnaire_id=questionnaire_id)
+    _publish_offline_receipt(context, channel='PQRS', unreceipt=False,
+                             questionnaire_id=context.expected_questionnaire_id)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
 @step("a blank questionnaire receipts comes in for an unlinked qid")
 def offline_receipt_for_an_unlinked_qid(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.expected_questionnaire_id
-    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=context.expected_questionnaire_id, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
 @step("the offline receipt msg for a continuation form from the case is put on the GCP pubsub")
 def continuation_receipt_offline_msg_published_to_gcp_pubsub(context):
-    context.first_case = context.case_created_events[0]['payload']['collectionCase']
-    questionnaire_id = context.requested_qid
-    _publish_offline_receipt(context, questionnaire_id=questionnaire_id)
+    _publish_offline_receipt(context, questionnaire_id=context.requested_qid)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
 @step("the blank questionnaire msg for a case is put on the GCP pubsub")
 def blank_questionnaire_msg_published_to_gcp_pubsubs(context):
-    context.first_case = context.receipting_case
-    questionnaire_id = context.qid_to_receipt
-    _publish_offline_receipt(context, channel="QM", questionnaire_id=questionnaire_id, unreceipt=True)
+    _publish_offline_receipt(context, channel="QM", questionnaire_id=context.qid_to_receipt, unreceipt=True)
     test_helper.assertTrue(context.sent_to_gcp)
 
 
@@ -88,8 +80,7 @@ def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
     context.first_case['survey'] = context.ccs_case['surveyType']
 
     response = get_ccs_qid_for_case_id(context.ccs_case['id'])
-    questionnaire_id = response['questionnaireId']
-    _publish_object_finalize(context, questionnaire_id=questionnaire_id)
+    _publish_object_finalize(context, questionnaire_id=response['questionnaireId'])
     test_helper.assertTrue(context.sent_to_gcp)
 
 
