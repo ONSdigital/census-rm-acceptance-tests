@@ -9,8 +9,6 @@ from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_q
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-case_api_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
 
 @step('the action instruction is emitted to FWMT where case has a secureEstablishment value of "{expected_value}"')
 def fwmt_message_received_with_ce1_complete(context, expected_value):
@@ -25,7 +23,7 @@ def fwmt_message_received_with_ce1_complete(context, expected_value):
 @step('the case can be retrieved from the case API service and has a secureEstablishment value of "{expected_value}"')
 def get_case_by_id(context, expected_value):
     case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    response = requests.get(f'{case_api_url}{case_id}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     case_details = response.json()
 

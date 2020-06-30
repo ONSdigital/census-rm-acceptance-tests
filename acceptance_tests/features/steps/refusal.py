@@ -12,8 +12,6 @@ from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_q
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
 
 def _send_refusal_msg_to_rabbit(case_id, refusal_type):
     message = json.dumps(
@@ -76,7 +74,7 @@ def create_ccs_refusal(context):
 @step("the case is marked as refused")
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_events(context):
-    response = requests.get(f'{caseapi_url}{context.refused_case_id}', params={'caseEvents': True})
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.refused_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Refusal Received':

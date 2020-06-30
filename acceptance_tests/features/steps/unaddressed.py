@@ -19,8 +19,6 @@ from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
 
 @step('an unaddressed QID request message of questionnaire type {questionnaire_type} is sent')
 def send_unaddressed_message(context, questionnaire_type):
@@ -132,7 +130,7 @@ def check_questionnaire_unlinked_logging(context):
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_question_linked_event_is_logged(case_id):
-    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Questionnaire Linked':
@@ -143,7 +141,7 @@ def check_question_linked_event_is_logged(case_id):
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_question_unlinked_event_is_logged(context):
     case_id = context.linked_case_id
-    response = requests.get(f'{caseapi_url}{case_id}', params={'caseEvents': True})
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         expected_desc = f'Questionnaire unlinked from case with QID {context.expected_questionnaire_id}'
@@ -154,7 +152,7 @@ def check_question_unlinked_event_is_logged(context):
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def get_case_id_by_questionnaire_id(questionnaire_id):
-    response = requests.get(f'{caseapi_url}/qid/{questionnaire_id}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}/qid/{questionnaire_id}')
     test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
     response_json = response.json()
     return response_json['id']
@@ -212,7 +210,7 @@ def check_message_redelivery_rate(context):
 
 @step("the HI individual case can be retrieved")
 def retrieve_hi_case(context):
-    response = requests.get(f'{caseapi_url}{context.individual_case_id}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.individual_case_id}')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
 
 

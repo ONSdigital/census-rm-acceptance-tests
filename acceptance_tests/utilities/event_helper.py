@@ -16,7 +16,6 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
-get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
 def check_individual_child_case_is_emitted(context, parent_case_id, individual_case_id):
@@ -38,7 +37,7 @@ def check_individual_child_case_is_emitted(context, parent_case_id, individual_c
 
 
 def _get_parent_case_estab_uprn(parent_case_id):
-    response = requests.get(f'{get_cases_url}{parent_case_id}')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{parent_case_id}')
     return response.json()['estabUprn']
 
 

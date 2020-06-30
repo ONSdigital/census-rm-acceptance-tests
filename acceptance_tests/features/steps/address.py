@@ -11,8 +11,6 @@ from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_q
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
 
 @step('an invalid address message is sent from "{sender}"')
 def invalid_address_message(context, sender):
@@ -33,7 +31,7 @@ def invalid_ccs_address_message(context, sender):
 
 @step("the case event log records invalid address")
 def check_case_events(context):
-    response = requests.get(f"{caseapi_url}{context.first_case['id']}", params={'caseEvents': True})
+    response = requests.get(f"{Config.CASE_API_CASE_URL}{context.first_case['id']}", params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Invalid address':
@@ -302,7 +300,7 @@ def new_address_reported_event_for_address_type_and_region(context, address_type
 
 @step('the case can be retrieved')
 def retrieve_skeleton_case(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
@@ -321,7 +319,7 @@ def retrieve_skeleton_case(context):
 
 @step('the case can be retrieved and contains the correct properties when the event had details')
 def retrieve_case_from_source_case_id_and_event_details(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     source_case = context.case_created_events[0]['payload']['collectionCase']
@@ -349,7 +347,7 @@ def retrieve_case_from_source_case_id_and_event_details(context):
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
 def retrieve_case_from_source_case_id_and_no_event_details(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     source_case = context.case_created_events[0]['payload']['collectionCase']
