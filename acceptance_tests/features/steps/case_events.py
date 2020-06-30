@@ -38,9 +38,9 @@ def gather_uac_updated_events(context, number_of_matching_cases):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
                                                       context=context,
-                                                      expected_msg_count=number_of_matching_cases,
+                                                      expected_msg_count=int(number_of_matching_cases),
                                                       collection_exercise_id=context.collection_exercise_id))
-    test_helper.assertEqual(len(context.messages_received), number_of_matching_cases)
+    test_helper.assertEqual(len(context.messages_received), int(number_of_matching_cases))
     context.reminder_uac_updated_events = context.messages_received.copy()
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
