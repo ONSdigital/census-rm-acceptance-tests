@@ -23,6 +23,15 @@ def setup_print_action_rule_once_case_action_is_drained(context, action_type):
     setup_treatment_code_classified_action_rule(context, action_type)
 
 
+@step('set SPG Military SFA action rule of type "{action_type}" when the case loading queues are drained')
+def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context, action_type):
+    poll_until_sample_is_ingested_to_action(context)
+    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
+    # the sleep is a temporary work around until this is fixed proper
+    # (by checking for all the cases in the action scheduler DB)
+    setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type)
+
+
 def poll_until_sample_is_ingested_to_action(context):
     sql_query = """SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s"""
 
@@ -81,6 +90,14 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'P_RL_1RL2BA': {'lsoa': ['E01014669', 'W01014669']},
         'P_RL_2RL1A': {'lsoa': ['E01014543', 'E01014544']},
         'P_RL_2RL2BA': {'lsoa': ['E01033361', 'E01015005', 'W01033361', 'W01015005']},
+    }
+
+    build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
+
+
+def setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type):
+    classifiers_for_action_type = {
+        'P_RL_1RL1_1': {'estab_type': ['Military SFA']},
     }
 
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)

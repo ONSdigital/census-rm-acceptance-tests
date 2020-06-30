@@ -169,3 +169,17 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RL_1RL2BA | [E01014669,W01014669]                     | sample_input_wales_census_spec.csv                 |
       | P_RL_2RL1A  | [E01014543,E01014544]                     | sample_input_england_response_driven_reminders.csv |
       | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |
+
+
+  Scenario Outline: Generate print files and log events for scheduled reminder letters checking for Military SFA
+    Given sample file "<sample file>" is loaded
+    When set SPG Military SFA action rule of type "<pack code>" when the case loading queues are drained
+    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
+    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
+    Then correctly formatted "<pack code>" reminder letter print files are created
+    And there is a correct "<pack code>" manifest file for each csv file written
+    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
+
+    Examples: Reminder letter: <pack code>
+      | pack code   | questionnaire types | number of matching cases | sample file                           |
+      | P_RL_1RL1_1 | [01]                | 1                        | sample_1_english_SPG_Military_SFA.csv |
