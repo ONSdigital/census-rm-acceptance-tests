@@ -128,7 +128,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     Given sample file "<sample file>" is loaded successfully
     When set action rule of type "<pack code>"
     Then UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
-    And correctly formatted "<pack code>" reminder letter print files are created
+    Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
 
@@ -156,10 +156,6 @@ Feature: Scheduled print and manifest files can be generated and uploaded
     Examples: Reminder contact letter: <pack code>
       | pack code   | lsoa list                                 | sample file                                        |
       | P_RL_1RL1A  | [E01014540,E01014541]                     | sample_input_england_response_driven_reminders.csv |
-
-    @regression
-    Examples: Reminder contact letter: <pack code>
-      | pack code   | lsoa list                                 | sample file                                        |
       | P_RL_1RL2BA | [E01014669,W01014669]                     | sample_input_wales_census_spec.csv                 |
       | P_RL_2RL1A  | [E01014543,E01014544]                     | sample_input_england_response_driven_reminders.csv |
       | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |

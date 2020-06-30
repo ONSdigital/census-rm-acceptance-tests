@@ -33,7 +33,7 @@ def gather_ce_estab_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
-@step('UAC Updated events emitted for the {number_of_matching_cases:d} cases with matching treatment codes')
+@step('UAC Updated events emitted for the {number_of_matching_cases} cases with matching treatment codes')
 def gather_uac_updated_events(context, number_of_matching_cases):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
