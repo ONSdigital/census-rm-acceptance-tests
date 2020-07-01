@@ -66,10 +66,10 @@ def setup_treatment_code_classified_action_rule(context, action_type):
         'P_RD_2RL1_3': "AND lsoa IN ('E01014545')",
         'P_RD_2RL2B_3': "AND lsoa IN ('E01014897', 'W01014897')",
 
-        'P_RL_1RL1A': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542') AND 'survey_launched': ('t')",
-        'P_RL_1RL2BA': "AND lsoa IN ('E01014669', 'W01014669')",
-        'P_RL_2RL1A':  "AND lsoa IN ('E01014543', 'E01014544')",
-        'P_RL_2RL2BA': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
+        'P_RL_1RL1A': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542') AND survey_launched = 't'",
+        'P_RL_1RL2BA': "AND lsoa IN ('E01014669', 'W01014669') AND survey_launched = 't'",
+        'P_RL_2RL1A':  "AND lsoa IN ('E01014543', 'E01014544') AND survey_launched = 't'",
+        'P_RL_2RL2BA': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005') AND survey_launched = 't'",
     }
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
 
