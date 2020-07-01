@@ -5,15 +5,12 @@ import requests
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.field_reminder import fieldwork_message_callback
-from acceptance_tests.features.steps.receipt import _field_work_cancel_callback
+from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match
+from acceptance_tests.utilities.fieldwork_helper import fieldwork_message_callback, field_work_cancel_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
 
 
 def _send_refusal_msg_to_rabbit(case_id, refusal_type):
@@ -77,7 +74,7 @@ def create_ccs_refusal(context):
 @step("the case is marked as refused")
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_events(context):
-    response = requests.get(f'{caseapi_url}{context.refused_case_id}', params={'caseEvents': True})
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.refused_case_id}', params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Refusal Received':
@@ -88,7 +85,7 @@ def check_case_events(context):
 @step('a CANCEL action instruction is emitted to FWMT')
 def refusal_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(_field_work_cancel_callback, context=context))
+                                    functools.partial(field_work_cancel_callback, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.refused_case_id)
     test_helper.assertEqual(context.addressType, 'HH')

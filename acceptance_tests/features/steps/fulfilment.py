@@ -6,25 +6,18 @@ import requests
 from behave import step
 from retrying import retry
 
-from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
-from acceptance_tests.features.steps.print_file import _check_print_files_have_all_the_expected_data, \
-    _check_manifest_files_created
 from acceptance_tests.utilities.event_helper import check_individual_child_case_is_emitted, \
-    get_qid_and_uac_from_emitted_child_uac
+    get_qid_and_uac_from_emitted_child_uac, check_if_event_list_is_exact_match
+from acceptance_tests.utilities.fulfilment_helper import send_print_fulfilment_request, get_first_case
+from acceptance_tests.utilities.manifest_file_helper import check_manifest_files_created
 from acceptance_tests.utilities.mappings import NOTIFY_TEMPLATE
 from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
-    _create_uac_print_materials_csv_line
+    create_uac_print_materials_csv_line, check_print_files_have_all_the_expected_data
 from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-
-get_cases_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
-
-def get_first_case(context):
-    return context.case_created_events[0]['payload']['collectionCase']
 
 
 @step('an individual questionnaire fulfilment request "{fulfilment_code}" message for a created case is sent')
@@ -72,39 +65,6 @@ def send_multiple_print_fulfilment_requests(context, fulfilment_code):
                 message=message,
                 content_type='application/json',
                 routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
-
-
-def send_print_fulfilment_request(context, fulfilment_code):
-    context.first_case = get_first_case(context)
-
-    message = json.dumps(
-        {
-            "event": {
-                "type": "FULFILMENT_REQUESTED",
-                "source": "CONTACT_CENTRE_API",
-                "channel": "CC",
-                "dateTime": "2019-07-07T22:37:11.988+0000",
-                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
-            },
-            "payload": {
-                "fulfilmentRequest": {
-                    "fulfilmentCode": fulfilment_code,
-                    "caseId": context.first_case['id'],
-                    "contact": {
-                        "title": "Mrs",
-                        "forename": "Test",
-                        "surname": "McTest"
-                    }
-                }
-            }
-        }
-    )
-
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
 @step('a UAC fulfilment request "{fulfilment_code}" message for a created case is sent')
@@ -229,7 +189,8 @@ def create_individual_print_fulfilment_message(context, fulfilment_code):
 
 @step("a fulfilment request event is logged")
 def check_case_events_logged(context):
-    response = requests.get(f"{get_cases_url}{context.fulfilment_requested_case_id}", params={'caseEvents': True})
+    response = requests.get(f"{Config.CASE_API_CASE_URL}{context.fulfilment_requested_case_id}",
+                            params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Fulfilment Request Received':
@@ -239,11 +200,11 @@ def check_case_events_logged(context):
 
 @step('notify api was called with SMS template "{expected_template}"')
 def check_notify_api_call(context, expected_template: str):
-    check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.lower().split())])
+    _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.lower().split())])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_notify_api_called_with_correct_template_id(expected_template_id):
+def _check_notify_api_called_with_correct_template_id(expected_template_id):
     response = requests.get(f'{Config.NOTIFY_STUB_SERVICE}/log')
     test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
     response_json = response.json()
@@ -255,7 +216,7 @@ def check_notify_api_called_with_correct_template_id(expected_template_id):
 @step("the continuation fulfilment request event is logged")
 @step("the fulfilment request event is logged")
 def check_case_events(context):
-    response = requests.get(f'{get_cases_url}{context.first_case["id"]}', params={'caseEvents': True})
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.first_case["id"]}', params={'caseEvents': True})
     test_helper.assertTrue(200 <= response.status_code <= 299, 'Get cases API call failed')
     cases = response.json()
     test_helper.assertTrue(any(case_event['description'] == 'Fulfilment Request Received'
@@ -302,26 +263,26 @@ def check_multiple_questionnaire_fulfilment_events(context, expected_event_list)
     'correctly formatted individual response questionnaires are created for "{fulfilment_code}" '
     'with questionnaire type "{questionnaire_type}"')
 def check_individual_questionnaire_print_requests(context, fulfilment_code, questionnaire_type):
-    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
+    individual_case = requests.get(f'{Config.CASE_API_CASE_URL}{context.individual_case_id}').json()
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
     test_helper.assertEqual(qid[:2], questionnaire_type, "Incorrect questionnaire type")
     expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
 
-    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
-    _check_manifest_files_created(context, fulfilment_code)
+    check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    check_manifest_files_created(context, fulfilment_code)
 
 
 @step(
     'correctly formatted individual UAC print responses are created for "{fulfilment_code}" '
     'with questionnaire type "{questionnaire_type}"')
 def check_individual_uac_print_requests(context, fulfilment_code, questionnaire_type):
-    individual_case = requests.get(f'{get_cases_url}{context.individual_case_id}').json()
+    individual_case = requests.get(f'{Config.CASE_API_CASE_URL}{context.individual_case_id}').json()
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
     test_helper.assertEqual(qid[:2], questionnaire_type, "Incorrect questionnaire type")
-    expected_csv_lines = [_create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code)]
+    expected_csv_lines = [create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code)]
 
-    _check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
-    _check_manifest_files_created(context, fulfilment_code)
+    check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    check_manifest_files_created(context, fulfilment_code)
 
 
 @step("the individual case has these events logged {expected_event_list}")
