@@ -26,49 +26,50 @@ def poll_until_sample_is_ingested_to_action(context):
 
 def setup_treatment_code_classified_action_rule(context, action_type):
     classifiers_for_action_type = {
+        'FIELD': "AND treatment_code IN ('HH_QF2R1E')",
+
         "ICL1E": "AND treatment_code IN ('HH_LFNR1E', 'HH_LFNR2E', 'HH_LFNR3AE', 'HH_LF2R1E', 'HH_LF2R2E', "
                  "'HH_LF2R3AE', 'HH_LF2R3BE', 'HH_LF3R1E', 'HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE')",
-        "ICL2W": " AND treatment_code IN ('HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', "
+        "ICL2W": "AND treatment_code IN ('HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', "
                  "'HH_LF2R3AW', 'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW')",
-        'ICL4N': " AND treatment_code IN ('HH_1LSFN', 'HH_2LEFN')",
-        'ICHHQE': " AND treatment_code IN ('HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', "
+        'ICL4N': "AND treatment_code IN ('HH_1LSFN', 'HH_2LEFN')",
+        'ICHHQE': "AND treatment_code IN ('HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', "
                   "'HH_QF3R3AE')",
-        'ICHHQW': " AND treatment_code IN ('HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', "
+        'ICHHQW': "AND treatment_code IN ('HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', "
                   "'HH_QF3R3AW')",
-        'ICHHQN': " AND treatment_code IN ('HH_3QSFN')",
-        'FIELD': " AND treatment_code IN ('HH_QF2R1E')",
+        'ICHHQN': "AND treatment_code IN ('HH_3QSFN')",
 
-        'P_RL_1RL1_1': " AND treatment_code IN ('HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E', "
+        'P_RL_1RL1_1': "AND treatment_code IN ('HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E', "
                        "'HH_QFNR1E') AND survey_launched = 'f'",
-        'P_RL_2RL2B_3a': " AND treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
+        'P_RL_2RL2B_3a': "AND treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
                          " 'HH_QFNR3AW')",
-        'P_QU_H2': " AND treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
-        'CE1_IC01': " AND treatment_code IN ('CE_LDCEE')",
-        'CE1_IC02': " AND treatment_code IN ('CE_LDCEW')",
-        'CE_IC03': " AND treatment_code IN ('CE_LDIEE')",
-        'CE_IC04': " AND treatment_code IN ('CE_LDIEW')",
-        'CE_IC03_1': " AND treatment_code IN ('CE_LDIUE')",
-        'CE_IC04_1': " AND treatment_code IN ('CE_LDIUW')",
-        'CE_IC05': " AND treatment_code IN ('CE_2LNFN')",
-        'CE_IC06': " AND treatment_code IN ('CE_3LSNFN')",
-        'CE_IC08': " AND treatment_code IN ('CE_1QNFN')",
-        'CE_IC09': " AND treatment_code IN ('CE_QDIEE')",
-        'CE_IC10': " AND treatment_code IN ('CE_QDIEW')",
-        'SPG_IC11': " AND treatment_code IN ('SPG_LPHUE')",
-        'SPG_IC12': " AND treatment_code IN ('SPG_LPHUW')",
-        'SPG_IC13': " AND treatment_code IN ('SPG_QDHUE')",
-        'SPG_IC14': " AND treatment_code IN ('SPG_QDHUW')",
-        'P_RD_2RL1_1': " AND lsoa IN ('E01014540', 'E01014541', 'E01014542', 'W01014540')",
-        'P_RD_2RL2B_1': " AND lsoa IN ('E01014669', 'W01014669')",
-        'P_RD_2RL1_2': " AND lsoa IN ('E01014543', 'E01014544')",
-        'P_RD_2RL2B_2': " AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
-        'P_RD_2RL1_3': " AND lsoa IN ('E01014545')",
-        'P_RD_2RL2B_3': " AND lsoa IN ('E01014897', 'W01014897')",
+        'P_QU_H2': "AND treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
+        'CE1_IC01': "AND treatment_code IN ('CE_LDCEE')",
+        'CE1_IC02': "AND treatment_code IN ('CE_LDCEW')",
+        'CE_IC03': "AND treatment_code IN ('CE_LDIEE')",
+        'CE_IC04': "AND treatment_code IN ('CE_LDIEW')",
+        'CE_IC03_1': "AND treatment_code IN ('CE_LDIUE')",
+        'CE_IC04_1': "AND treatment_code IN ('CE_LDIUW')",
+        'CE_IC05': "AND treatment_code IN ('CE_2LNFN')",
+        'CE_IC06': "AND treatment_code IN ('CE_3LSNFN')",
+        'CE_IC08': "AND treatment_code IN ('CE_1QNFN')",
+        'CE_IC09': "AND treatment_code IN ('CE_QDIEE')",
+        'CE_IC10': "AND treatment_code IN ('CE_QDIEW')",
+        'SPG_IC11': "AND treatment_code IN ('SPG_LPHUE')",
+        'SPG_IC12': "AND treatment_code IN ('SPG_LPHUW')",
+        'SPG_IC13': "AND treatment_code IN ('SPG_QDHUE')",
+        'SPG_IC14': "AND treatment_code IN ('SPG_QDHUW')",
+        'P_RD_2RL1_1': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542', 'W01014540')",
+        'P_RD_2RL2B_1': "AND lsoa IN ('E01014669', 'W01014669')",
+        'P_RD_2RL1_2': "AND lsoa IN ('E01014543', 'E01014544')",
+        'P_RD_2RL2B_2': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
+        'P_RD_2RL1_3': "AND lsoa IN ('E01014545')",
+        'P_RD_2RL2B_3': "AND lsoa IN ('E01014897', 'W01014897')",
 
-        'P_RL_1RL1A': " AND lsoa IN ('E01014540', 'E01014541', 'E01014542'), 'survey_launched': ('t')",
-        'P_RL_1RL2BA': " AND lsoa IN ('E01014669', 'W01014669')",
-        'P_RL_2RL1A': " AND lsoa IN ('E01014543', 'E01014544')",
-        'P_RL_2RL2BA': " AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
+        'P_RL_1RL1A': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542') AND 'survey_launched': ('t')",
+        'P_RL_1RL2BA': "AND lsoa IN ('E01014669', 'W01014669')",
+        'P_RL_2RL1A':  "AND lsoa IN ('E01014543', 'E01014544')",
+        'P_RL_2RL2BA': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
     }
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
 
