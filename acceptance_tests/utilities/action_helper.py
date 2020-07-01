@@ -94,7 +94,7 @@ def create_action_plan(action_plan_id):
 def create_action_rule(action_rule_id, trigger_date_time, classifiers, action_plan_url, action_type,
                        has_triggered=False):
     url = f'{Config.ACTION_SERVICE}/actionRules'
-    body = {'id': action_rule_id, 'triggerDateTime': trigger_date_time, 'classifiers': classifiers,
+    body = {'id': action_rule_id, 'triggerDateTime': trigger_date_time, 'userDefinedWhereClause': classifiers,
             'actionPlan': action_plan_url, 'actionType': action_type, 'hasTriggered': has_triggered}
 
     response = requests.post(url, auth=Config.BASIC_AUTH, json=body)
