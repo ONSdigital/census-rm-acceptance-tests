@@ -9,7 +9,7 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 
 @step('a FIELD action rule for address type "{address_type}" is set')
 def create_field_action_plan(context, address_type):
-    build_and_create_action_rule(context, f"AND address_type = '{address_type}'", 'FIELD')
+    build_and_create_action_rule(context, f"address_type = '{address_type}'", 'FIELD')
 
 
 @step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
