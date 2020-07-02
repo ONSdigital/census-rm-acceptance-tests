@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 
 from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
-from acceptance_tests.utilities.mappings import CLASSIFIERS_FOR_ACTION_TYPE
+from acceptance_tests.utilities.mappings import CLASSIFIERS_FOR_ACTION_TYPE, DEFAULT_CLASSIFIERS
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -29,11 +29,11 @@ def poll_until_sample_is_ingested_to_action(context, after_date_time=None):
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
-    build_and_create_action_rule(context, CLASSIFIERS_FOR_ACTION_TYPE[action_type], action_type)
+    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + CLASSIFIERS_FOR_ACTION_TYPE[action_type], action_type)
 
 
 def setup_address_frame_delta_action_rule(context, action_type):
-    classifiers = CLASSIFIERS_FOR_ACTION_TYPE[action_type]
+    classifiers = DEFAULT_CLASSIFIERS + CLASSIFIERS_FOR_ACTION_TYPE[action_type]
     classifiers += (f" AND created_date_time BETWEEN '{context.address_delta_load_time.isoformat()}'"
                     f" AND '{datetime.utcnow().isoformat()}'")
     build_and_create_action_rule(context, classifiers, action_type)
