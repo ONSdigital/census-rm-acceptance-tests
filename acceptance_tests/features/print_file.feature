@@ -162,7 +162,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Address frame delta initial contact print files
     Given sample file "sample_for_print_stories.csv" is loaded successfully
-    And 5 seconds later delta sample file "<sample file>" is loaded successfully
+    And 1 second later delta sample file "<sample file>" is loaded successfully
     When the address frame delta initial contact action rule of type "<action type>" is set
     Then correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written

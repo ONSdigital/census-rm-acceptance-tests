@@ -36,6 +36,7 @@ def load_sample_file_and_check_qids(context, sample_file_name, questionnaire_typ
 
 
 @step('{wait:d} seconds later delta sample file "{sample_file_name}" is loaded successfully')
+@step('{wait:d} second later delta sample file "{sample_file_name}" is loaded successfully')
 def load_sample_file_successfully_after(context, wait, sample_file_name):
     # Remove initial sample load cases/uacs from the context
     context.case_created_events = []
