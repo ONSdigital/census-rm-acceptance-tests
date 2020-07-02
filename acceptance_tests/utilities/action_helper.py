@@ -1,77 +1,47 @@
 import time
 import uuid
 from datetime import datetime
+from functools import partial
 
 import requests
 
 from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
+from acceptance_tests.utilities.mappings import CLASSIFIERS_FOR_ACTION_TYPE
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
+ACTION_CASE_COUNT_QUERY = "SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s AND created_date_time > %s"
+
+
+def sample_successfully_loadeded_into_action_table_callback(db_result, timeout_deadline, context):
+    if db_result[0][0] == context.sample_count:
+        return True
+    elif time.time() > timeout_deadline:
+        test_helper.fail(
+            f"For Action-plan {context.action_plan_id}, DB didn't have the expected number of sample units. "
+            f"Expected: {context.sample_count}, actual: {db_result[0][0]}")
+    return False
+
 
 def poll_until_sample_is_ingested_to_action(context):
-    sql_query = """SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s"""
+    poll_database_query_with_timeout(ACTION_CASE_COUNT_QUERY, (context.action_plan_id, context.test_start_utc),
+                                     partial(sample_successfully_loadeded_into_action_table_callback, context=context))
 
-    def success_callback(db_result, timeout_deadline):
-        if db_result[0][0] == context.sample_count:
-            return True
-        elif time.time() > timeout_deadline:
-            test_helper.fail(
-                f"For Action-plan {context.action_plan_id}, DB didn't have the expected number of sample units. "
-                f"Expected: {context.sample_count}, actual: {db_result[0][0]}")
-        return False
 
-    poll_database_query_with_timeout(sql_query, (context.action_plan_id,), success_callback)
+def poll_until_delta_sample_is_ingested_to_action(context):
+    poll_database_query_with_timeout(ACTION_CASE_COUNT_QUERY, (context.action_plan_id, context.address_delta_load_time),
+                                     partial(sample_successfully_loadeded_into_action_table_callback, context=context))
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
-    classifiers_for_action_type = {
-        'FIELD': "AND treatment_code IN ('HH_QF2R1E')",
+    build_and_create_action_rule(context, CLASSIFIERS_FOR_ACTION_TYPE[action_type], action_type)
 
-        "ICL1E": "AND treatment_code IN ('HH_LFNR1E', 'HH_LFNR2E', 'HH_LFNR3AE', 'HH_LF2R1E', 'HH_LF2R2E', "
-                 "'HH_LF2R3AE', 'HH_LF2R3BE', 'HH_LF3R1E', 'HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE')",
-        "ICL2W": "AND treatment_code IN ('HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', "
-                 "'HH_LF2R3AW', 'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW')",
-        'ICL4N': "AND treatment_code IN ('HH_1LSFN', 'HH_2LEFN')",
-        'ICHHQE': "AND treatment_code IN ('HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', "
-                  "'HH_QF3R3AE')",
-        'ICHHQW': "AND treatment_code IN ('HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', "
-                  "'HH_QF3R3AW')",
-        'ICHHQN': "AND treatment_code IN ('HH_3QSFN')",
 
-        'P_RL_1RL1_1': "AND treatment_code IN ('HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E', "
-                       "'HH_QFNR1E') AND survey_launched = 'f'",
-        'P_RL_2RL2B_3a': "AND treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
-                         " 'HH_QFNR3AW')",
-        'P_QU_H2': "AND treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
-        'CE1_IC01': "AND treatment_code IN ('CE_LDCEE')",
-        'CE1_IC02': "AND treatment_code IN ('CE_LDCEW')",
-        'CE_IC03': "AND treatment_code IN ('CE_LDIEE')",
-        'CE_IC04': "AND treatment_code IN ('CE_LDIEW')",
-        'CE_IC03_1': "AND treatment_code IN ('CE_LDIUE')",
-        'CE_IC04_1': "AND treatment_code IN ('CE_LDIUW')",
-        'CE_IC05': "AND treatment_code IN ('CE_2LNFN')",
-        'CE_IC06': "AND treatment_code IN ('CE_3LSNFN')",
-        'CE_IC08': "AND treatment_code IN ('CE_1QNFN')",
-        'CE_IC09': "AND treatment_code IN ('CE_QDIEE')",
-        'CE_IC10': "AND treatment_code IN ('CE_QDIEW')",
-        'SPG_IC11': "AND treatment_code IN ('SPG_LPHUE')",
-        'SPG_IC12': "AND treatment_code IN ('SPG_LPHUW')",
-        'SPG_IC13': "AND treatment_code IN ('SPG_QDHUE')",
-        'SPG_IC14': "AND treatment_code IN ('SPG_QDHUW')",
-        'P_RD_2RL1_1': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542', 'W01014540')",
-        'P_RD_2RL2B_1': "AND lsoa IN ('E01014669', 'W01014669')",
-        'P_RD_2RL1_2': "AND lsoa IN ('E01014543', 'E01014544')",
-        'P_RD_2RL2B_2': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
-        'P_RD_2RL1_3': "AND lsoa IN ('E01014545')",
-        'P_RD_2RL2B_3': "AND lsoa IN ('E01014897', 'W01014897')",
-
-        'P_RL_1RL1A': "AND lsoa IN ('E01014540', 'E01014541', 'E01014542') AND survey_launched = 't'",
-        'P_RL_1RL2BA': "AND lsoa IN ('E01014669', 'W01014669') AND survey_launched = 't'",
-        'P_RL_2RL1A':  "AND lsoa IN ('E01014543', 'E01014544') AND survey_launched = 't'",
-        'P_RL_2RL2BA': "AND lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005') AND survey_launched = 't'",
-    }
-    build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
+def setup_address_frame_delta_action_rule(context, action_type):
+    classifiers = CLASSIFIERS_FOR_ACTION_TYPE[action_type]
+    classifiers += (f" AND created_date_time BETWEEN '{context.address_delta_load_time.isoformat()}'"
+                    f" AND '{datetime.utcnow().isoformat()}'")
+    build_and_create_action_rule(context, classifiers, action_type)
 
 
 def build_and_create_action_rule(context, classifier, action_type):
