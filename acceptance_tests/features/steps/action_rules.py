@@ -1,15 +1,14 @@
 from behave import step
 from retrying import retry
 
-from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action, \
-    setup_treatment_code_classified_action_rule, build_and_create_action_rule, setup_address_frame_delta_action_rule
+from acceptance_tests.utilities.action_helper import setup_treatment_code_classified_action_rule, \
+    build_and_create_action_rule, setup_address_frame_delta_action_rule
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 
 
 @step('a FIELD action rule for address type "{address_type}" is set')
 def create_field_action_plan(context, address_type):
-    poll_until_sample_is_ingested_to_action(context)
     build_and_create_action_rule(context, f"AND address_type = '{address_type}'", 'FIELD')
 
 

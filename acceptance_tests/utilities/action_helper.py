@@ -1,7 +1,6 @@
 import time
 import uuid
 from datetime import datetime
-from functools import partial
 
 import requests
 
@@ -10,27 +9,23 @@ from acceptance_tests.utilities.mappings import CLASSIFIERS_FOR_ACTION_TYPE
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-ACTION_CASE_COUNT_QUERY = "SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s AND created_date_time > %s"
 
+def poll_until_sample_is_ingested_to_action(context, after_date_time=None):
+    if not after_date_time:
+        after_date_time = context.test_start_utc
+    query = "SELECT count(*) FROM actionv2.cases WHERE action_plan_id = %s AND created_date_time > %s"
 
-def sample_successfully_loadeded_into_action_table_callback(db_result, timeout_deadline, context):
-    if db_result[0][0] == context.sample_count:
-        return True
-    elif time.time() > timeout_deadline:
-        test_helper.fail(
-            f"For Action-plan {context.action_plan_id}, DB didn't have the expected number of sample units. "
-            f"Expected: {context.sample_count}, actual: {db_result[0][0]}")
-    return False
+    def success_callback(db_result, timeout_deadline):
+        if db_result[0][0] == context.sample_count:
+            return True
+        elif time.time() > timeout_deadline:
+            test_helper.fail(
+                f"For Action-plan {context.action_plan_id}, DB didn't have the expected number of sample units. "
+                f"Expected: {context.sample_count}, actual: {db_result[0][0]}")
+        return False
 
-
-def poll_until_sample_is_ingested_to_action(context):
-    poll_database_query_with_timeout(ACTION_CASE_COUNT_QUERY, (context.action_plan_id, context.test_start_utc),
-                                     partial(sample_successfully_loadeded_into_action_table_callback, context=context))
-
-
-def poll_until_delta_sample_is_ingested_to_action(context):
-    poll_database_query_with_timeout(ACTION_CASE_COUNT_QUERY, (context.action_plan_id, context.address_delta_load_time),
-                                     partial(sample_successfully_loadeded_into_action_table_callback, context=context))
+    poll_database_query_with_timeout(query, (context.action_plan_id, after_date_time),
+                                     success_callback)
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
