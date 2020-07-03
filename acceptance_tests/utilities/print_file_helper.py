@@ -1,6 +1,26 @@
+import copy
+import logging
 from collections import defaultdict
 
+from retrying import retry
+from structlog import wrap_logger
+
+from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
+
+logger = wrap_logger(logging.getLogger(__name__))
+
+ICL_PACKCODES_WHICH_ARE_SORTED = [
+    'D_CE1A_ICLCR1', 'D_CE1A_ICLCR2B', 'D_ICA_ICLR1', 'D_ICA_ICLR1',
+    'D_ICA_ICLR2B', 'D_ICA_ICLR2B', 'D_CE4A_ICLR4', 'D_CE4A_ICLS4'
+]
+
+ICL_TEMPLATE_FIELD_OFFICER_COLUMN = 14
+ICL_TEMPLATE_ORGANISATION_COLUMN = 12
+
+QM_PACKCODES_WHICH_ARE_SORTED = ['D_FDCE_I1', 'D_FDCE_I2', 'D_FDCE_I4', 'D_FDCE_H1', 'D_FDCE_H2']
+QM_TEMPLATE_FIELD_OFFICER_COLUMN = 15
+QM_TEMPLATE_ORGANISATION_COLUMN = 14
 
 
 def create_expected_csv_lines(context, prefix, ignore_case_id=None):
@@ -355,7 +375,7 @@ def create_expected_individual_response_csv(individual_case, uac, qid, fulfilmen
     )
 
 
-def _create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code):
+def create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_code):
     return (
         f'{uac}|{individual_case["caseRef"]}|'
         f'Ms|jo|smith|'
@@ -381,3 +401,59 @@ def create_individual_print_material_csv_line_for_spg_ce(case, uac, qid, fulfilm
         f'{case["address"]["postcode"]}|'
         f'{fulfilment_code}||'
     )
+
+
+def check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code):
+    with SftpUtility() as sftp_utility:
+        _validate_print_file_content(context, sftp_utility, context.test_start_local_datetime, expected_csv_lines,
+                                     pack_code)
+
+
+@retry(retry_on_exception=lambda e: isinstance(e, FileNotFoundError), wait_fixed=1000, stop_max_attempt_number=120)
+def _validate_print_file_content(context, sftp_utility, start_of_test, expected_csv_lines, pack_code):
+    logger.debug('Checking for files on SFTP server')
+
+    context.expected_print_files = sftp_utility.get_all_files_after_time(start_of_test, pack_code, ".csv.gpg")
+
+    actual_content_list = sftp_utility.get_files_content_as_list(context.expected_print_files, pack_code)
+    if not actual_content_list:
+        raise FileNotFoundError
+
+    unsorted_actual_content_list = copy.deepcopy(actual_content_list)
+    actual_content_list.sort()
+    expected_csv_lines.sort()
+
+    test_helper.assertEquals(actual_content_list, expected_csv_lines, 'Print file contents did not match expected')
+
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED or pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
+        _check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code)
+
+
+def _check_actual_file_contents_sorted_by_production_code(unsorted_actual_content_list, pack_code):
+    # If this was split over multiple files it could fail, not expected with current testing
+    # produce a list of split_csv rows to sort
+    split_csv_rows = [
+        csvrow.split("|")
+        for csvrow in unsorted_actual_content_list
+    ]
+
+    # If called with an invalid packcode the test will fail, this is expected behaviour
+    sorted_list = []
+
+    # This will sort a list of lists based on template ICL or QM
+    # in both cases we're sorting by field_officer_id and org_name
+    if pack_code in ICL_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[ICL_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[ICL_TEMPLATE_ORGANISATION_COLUMN]))
+    elif pack_code in QM_PACKCODES_WHICH_ARE_SORTED:
+        sorted_list = sorted(split_csv_rows, key=lambda row: (row[QM_TEMPLATE_FIELD_OFFICER_COLUMN],
+                                                              row[QM_TEMPLATE_ORGANISATION_COLUMN]))
+
+    # Turn back to a list of expected_csv rows
+    expected_csv_rows = [
+        '|'.join(row)
+        for row in sorted_list
+    ]
+
+    test_helper.assertEquals(unsorted_actual_content_list, expected_csv_rows,
+                             'Sorted file contents did not match expected')

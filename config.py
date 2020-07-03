@@ -15,6 +15,7 @@ class Config:
     CASEAPI_SERVICE_HOST = os.getenv('CASEAPI_SERVICE_HOST', 'localhost')
     CASEAPI_SERVICE_PORT = os.getenv('CASEAPI_SERVICE_PORT', '8161')
     CASEAPI_SERVICE = f'{PROTOCOL}://{CASEAPI_SERVICE_HOST}:{CASEAPI_SERVICE_PORT}'
+    CASE_API_CASE_URL = f'{CASEAPI_SERVICE}/cases/'
 
     RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
     RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
@@ -71,9 +72,6 @@ class Config:
     EQ_FULFILMENT_PROJECT_ID = os.getenv("EQ_FULFILMENT_PROJECT_ID", "eq-fulfilment-project")
     EQ_FULFILMENT_TOPIC_NAME = os.getenv("EQ_FULFILMENT_TOPIC_NAME", "eq-fulfilment-topic")
 
-    GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
-
     RABBITMQ_INBOUND_REFUSAL_QUEUE = 'case.refusals'
     RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE = 'case.fulfilments'
     RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE = 'notify.fulfilments'
@@ -87,25 +85,25 @@ class Config:
     EXCEPTIONMANAGER_CONNECTION_PORT = os.getenv('EXCEPTIONMANAGER_CONNECTION_PORT', '8666')
     EXCEPTION_MANAGER_URL = f'http://{EXCEPTIONMANAGER_CONNECTION_HOST}:{EXCEPTIONMANAGER_CONNECTION_PORT}'
 
-    RABBITMQ_QUEUES = ['Action.Field',
-                       'Action.Printer',
-                       'Case.Responses',
-                       'FieldworkAdapter.caseUpdated',
-                       'action.events',
-                       'action.fulfilment',
-                       'case.action',
-                       'case.addressQueue',
-                       'case.ccsPropertyListedQueue',
-                       'case.fulfilments',
-                       'case.questionnairelinked',
-                       'case.refusals',
-                       'case.sample.inbound',
-                       'case.uac-qid-created',
-                       'case.undeliveredMailQueue',
-                       'notify.enriched.fulfilment',
-                       'notify.fulfilments',
-                       'survey.launched',
-                       'unaddressedRequestQueue']
+    RABBITMQ_QUEUES_WITH_DLQS = ['Action.Field',
+                                 'Action.Printer',
+                                 'Case.Responses',
+                                 'FieldworkAdapter.caseUpdated',
+                                 'action.events',
+                                 'action.fulfilment',
+                                 'case.action',
+                                 'case.addressQueue',
+                                 'case.ccsPropertyListedQueue',
+                                 'case.fulfilments',
+                                 'case.questionnairelinked',
+                                 'case.refusals',
+                                 'case.sample.inbound',
+                                 'case.uac-qid-created',
+                                 'case.undeliveredMailQueue',
+                                 'notify.enriched.fulfilment',
+                                 'notify.fulfilments',
+                                 'survey.launched',
+                                 'unaddressedRequestQueue']
 
     SENT_PRINT_FILE_BUCKET = os.getenv('SENT_PRINT_FILE_BUCKET', '')
 

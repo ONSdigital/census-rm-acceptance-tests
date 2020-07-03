@@ -5,6 +5,19 @@ name = "pypi"
 
 [dev-packages]
 coverage = "*"
+"flake8" = "*"
+
+[requires]
+python_version = "3.7"
+
+[packages]
+census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.0.0"}
+pgpy = "*"
+google-cloud-storage = "*"
+psycopg2-binary = "*"
+str2bool = "*"
+luhn = "*"
+tonyg-rfc3339 = "*"
 google-cloud-pubsub = "*"
 behave = "*"
 requests = "*"
@@ -13,13 +26,3 @@ retrying = "*"
 "jinja2" = "*"
 pika = "*"
 paramiko = "*"
-"flake8" = "*"
-census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.0.0"}
-pgpy = "*"
-google-cloud-storage = "*"
-psycopg2-binary = "*"
-str2bool = "*"
-luhn = "*"
-
-[requires]
-python_version = "3.7"

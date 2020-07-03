@@ -1,45 +1,45 @@
-import json
-from pathlib import Path
-
 from behave import step
-from load_sample import load_sample_file
 
+from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action
 from acceptance_tests.utilities.event_helper import get_and_check_case_created_messages, \
-    get_and_check_uac_updated_messages
-from config import Config
+    get_and_check_uac_updated_messages, get_and_test_case_and_uac_msgs_are_correct
+from acceptance_tests.utilities.sample_load_helper import load_sample_file_helper
 
 
 @step('sample file "{sample_file_name}" is loaded')
 def load_sample_file_step(context, sample_file_name):
-    sample_units_raw = _load_sample(context, sample_file_name)
-    context.sample_count = len(sample_units_raw)
+    load_sample_file_helper(context, sample_file_name)
 
-    context.sample_units = [
-        json.loads(sample_unit)
-        for sample_unit in sample_units_raw.values()
-    ]
+
+@step('sample file "{sample_file_name}" is loaded successfully with census action plan collection ids')
+def load_sample_file_successfully_with_census_action_plan_collection_ids(context, sample_file_name):
+    # The actual values should be set with the annotation:  @hardcoded_census_values_for_collection_and_action_plan_ids
+    load_sample_file_successfully_step(context, sample_file_name, check_loaded_into_db=False)
 
 
 @step('sample file "{sample_file_name}" is loaded successfully')
-def load_sample_file_successfully_step(context, sample_file_name):
-    sample_units_raw = _load_sample(context, sample_file_name)
-    context.sample_count = len(sample_units_raw)
-
-    context.sample_units = [
-        json.loads(sample_unit)
-        for sample_unit in sample_units_raw.values()
-    ]
+def load_sample_file_successfully_step(context, sample_file_name, check_loaded_into_db=True):
+    load_sample_file_helper(context, sample_file_name)
 
     get_and_check_case_created_messages(context)
     get_and_check_uac_updated_messages(context)
+
+    # TODO: in a nice world this would be well nicer
+    # However when we set up the skeleton cases we need to use the census action-plan-id, which is fixed so the query
+    # returns old matching rows too.
+    # So we then add in > start_of_test_datetime, excellent, except db is on UTC,
+    # sometimes different on local machine. So doesn't work
+    # could possibly get the DB start time at the start of the test, but a bit OTT
+    if check_loaded_into_db:
+        poll_until_sample_is_ingested_to_action(context)
+
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
+    context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
+    context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
 
 
-def _load_sample(context, sample_file_name):
-    sample_file_path = Path(__file__).parents[3].joinpath('resources', 'sample_files', sample_file_name)
-    return load_sample_file(sample_file_path, context.collection_exercise_id, context.action_plan_id,
-                            store_loaded_sample_units=True,
-                            host=Config.RABBITMQ_HOST, port=Config.RABBITMQ_PORT,
-                            vhost=Config.RABBITMQ_VHOST, exchange=Config.RABBITMQ_EXCHANGE,
-                            user=Config.RABBITMQ_USER, password=Config.RABBITMQ_PASSWORD,
-                            queue_name=Config.RABBITMQ_SAMPLE_INBOUND_QUEUE)
+@step('sample file "{sample_file_name}" is loaded and correct qids {questionnaire_types} set')
+def load_sample_file_and_check_qids(context, sample_file_name, questionnaire_types):
+    load_sample_file_helper(context, sample_file_name)
+    get_and_test_case_and_uac_msgs_are_correct(context, questionnaire_types)
