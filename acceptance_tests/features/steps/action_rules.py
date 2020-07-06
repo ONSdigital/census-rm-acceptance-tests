@@ -26,9 +26,6 @@ def setup_print_action_rule_once_case_action_is_drained(context, action_type):
 @step('set SPG Military SFA action rule of type "{action_type}" when the case loading queues are drained')
 def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context, action_type):
     poll_until_sample_is_ingested_to_action(context)
-    # TODO these checks intermittently fail as the queue can occasionally be empty while being drained
-    # the sleep is a temporary work around until this is fixed proper
-    # (by checking for all the cases in the action scheduler DB)
     setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type)
 
 
