@@ -13,13 +13,13 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-def _send_refusal_msg_to_rabbit(case_id, refusal_type):
+def _send_refusal_msg_to_rabbit(case_id, refusal_type, channel):
     message = json.dumps(
         {
             "event": {
                 "type": "REFUSAL_RECEIVED",
                 "source": "CONTACT_CENTRE_API",
-                "channel": "CC",
+                "channel": channel,
                 "dateTime": "2019-07-07T22:37:11.988+0000",
                 "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
             },
@@ -59,16 +59,16 @@ def _send_refusal_msg_to_rabbit(case_id, refusal_type):
             routing_key=Config.RABBITMQ_REFUSAL_ROUTING_KEY)
 
 
-@step('a refusal message for the created case is received of type "{refusal_type}"')
-def create_refusal(context, refusal_type):
+@step('a refusal message of type "{refusal_type}" is sent from "{channel}" for the created case')
+def create_refusal(context, refusal_type, channel):
     context.refused_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
-    _send_refusal_msg_to_rabbit(context.refused_case_id, refusal_type)
+    _send_refusal_msg_to_rabbit(context.refused_case_id, refusal_type, channel)
 
 
 @step("a refusal message for the created CCS case is received")
 def create_ccs_refusal(context):
     context.refused_case_id = context.case_id
-    _send_refusal_msg_to_rabbit(context.refused_case_id, 'HARD_REFUSAL')
+    _send_refusal_msg_to_rabbit(context.refused_case_id, 'HARD_REFUSAL', "CC")
 
 
 @step("the case is marked as refused")
