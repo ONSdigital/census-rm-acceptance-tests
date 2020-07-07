@@ -73,7 +73,7 @@ def setup_treatment_code_classified_action_rule(context, action_type):
 
 
 def setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type):
-    build_and_create_action_rule(context, {'estab_type': ['Military SFA']}, action_type)
+    build_and_create_action_rule(context, {'estab_type': ['MILITARY SFA']}, action_type)
 
 
 def build_and_create_action_rule(context, classifier, action_type):

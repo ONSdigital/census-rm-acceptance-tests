@@ -161,9 +161,9 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |
 
 
-  Scenario Outline: Generate print files and log events for scheduled reminder letters checking for Military SFA
+  Scenario Outline: Generate print files and log events for scheduled reminder letters checking for MILITARY SFA
     Given sample file "<sample file>" is loaded successfully
-    When set SPG Military SFA action rule of type "<pack code>" when the case loading queues are drained
+    When set SPG MILITARY SFA action rule of type "<pack code>" when the case loading queues are drained
     And UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -171,4 +171,4 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
     Examples: Reminder letter: <pack code>
       | pack code   | number of matching cases | sample file                           |
-      | P_RL_1RL1_1 | 1                        | sample_1_english_SPG_Military_SFA.csv |
+      | P_RL_1RL1_1 | 1                        | sample_1_english_SPG_MILITARY_SFA.csv |
