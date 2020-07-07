@@ -13,8 +13,8 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv, \
     create_expected_csv_lines_for_ce_estab_responses, create_expected_CE_Estab_questionnaire_csv_lines, \
     create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings, \
-    create_expected_HH_UAC_supplementary_materials_csv, \
-    create_expected_csv_lines_for_reminder_survey_launched, check_print_files_have_all_the_expected_data
+    create_expected_HH_UAC_supplementary_materials_csv, create_expected_csv_lines_for_reminder_survey_launched, \
+    check_print_files_have_all_the_expected_data, create_individual_print_material_csv_line_for_spg_ce
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -243,3 +243,14 @@ def check_reminder_files_with_survey_launched(context, pack_code):
     expected_csv_lines = create_expected_csv_lines_for_reminder_survey_launched(context, pack_code,
                                                                                 context.survey_started_case_ids)
     check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+
+
+@step('print file and manifest files are created for pack code "{pack_code}" with individual contact details')
+def check_print_and_manifest_files_with_individual_contact_details(context, pack_code):
+    expected_csv_lines = [
+        create_individual_print_material_csv_line_for_spg_ce(context.first_case, context.requested_uac,
+                                                             context.requested_qid,
+                                                             pack_code)]
+
+    check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
+    check_manifest_files_created(context, pack_code)
