@@ -277,3 +277,10 @@ Feature: Handle fulfilment request events
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When PPO sends a fulfilment confirmed message via pubsub
     Then the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_CONFIRMED]
+
+  Scenario: CE and SPG Print Individual Fulfilments attach to parent case
+    Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
+    When an individual print fulfilment request "P_OR_I1" is received by RM
+    And a UAC updated message with "21" questionnaire type is emitted
+    And print file and manifest files are created for pack code "P_OR_I1" with individual contact details
+    Then the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]

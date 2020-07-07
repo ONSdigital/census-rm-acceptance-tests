@@ -11,8 +11,6 @@ from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_q
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
-caseapi_url = f'{Config.CASEAPI_SERVICE}/cases/'
-
 
 @step('an invalid address message is sent from "{sender}"')
 def invalid_address_message(context, sender):
@@ -33,7 +31,7 @@ def invalid_ccs_address_message(context, sender):
 
 @step("the case event log records invalid address")
 def check_case_events(context):
-    response = requests.get(f"{caseapi_url}{context.first_case['id']}", params={'caseEvents': True})
+    response = requests.get(f"{Config.CASE_API_CASE_URL}{context.first_case['id']}", params={'caseEvents': True})
     response_json = response.json()
     for case_event in response_json['caseEvents']:
         if case_event['description'] == 'Invalid address':
@@ -74,7 +72,8 @@ def new_address_reported_event_without_source_case_id(context, sender):
                             "addressType": "SPG",
                             "addressLevel": "U",
                             "latitude": "50.917428",
-                            "longitude": "-1.238193"
+                            "longitude": "-1.238193",
+                            "uprn": None
                         }
                     }
                 }
@@ -90,9 +89,9 @@ def new_address_reported_event_without_source_case_id(context, sender):
 
 @step(
     'a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId with region "{region}", '
-    'address type "{address_type}" and address level "{address_level}"')
-def new_address_reported_event_without_source_case_id_with_address_type(context, sender, address_type, address_level,
-                                                                        region):
+    'address type "{address_type}" and address level "{address_level}" and case emitted')
+def new_address_reported_event_without_source_case_id_with_address_type(context, sender, region,
+                                                                        address_type, address_level):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     message = json.dumps(
@@ -136,6 +135,8 @@ def new_address_reported_event_without_source_case_id_with_address_type(context,
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+    check_case_created_message_is_emitted(context)
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
@@ -224,7 +225,7 @@ def new_address_reported_event_with_minimal_fields(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}"')
+@step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}" and the case is created')
 def new_address_reported_event_for_address_type(context, address_type, sender):
     context.case_id = str(uuid.uuid4())
     message = json.dumps(
@@ -257,9 +258,11 @@ def new_address_reported_event_for_address_type(context, address_type, sender):
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
+    check_case_created_message_is_emitted(context)
+
 
 @step('a NEW_ADDRESS_REPORTED event with region "{region}", address type "{address_type}" and address level '
-      '"{address_level}" is sent from "{sender}"')
+      '"{address_level}" is sent from "{sender}" and case emitted')
 def new_address_reported_event_for_address_type_and_region(context, address_type, sender, address_level, region):
     context.case_id = str(uuid.uuid4())
     message = json.dumps(
@@ -292,10 +295,12 @@ def new_address_reported_event_for_address_type_and_region(context, address_type
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
+    check_case_created_message_is_emitted(context)
+
 
 @step('the case can be retrieved')
 def retrieve_skeleton_case(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
@@ -314,7 +319,7 @@ def retrieve_skeleton_case(context):
 
 @step('the case can be retrieved and contains the correct properties when the event had details')
 def retrieve_case_from_source_case_id_and_event_details(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     source_case = context.case_created_events[0]['payload']['collectionCase']
@@ -342,7 +347,7 @@ def retrieve_case_from_source_case_id_and_event_details(context):
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
 def retrieve_case_from_source_case_id_and_no_event_details(context):
-    response = requests.get(f'{caseapi_url}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     source_case = context.case_created_events[0]['payload']['collectionCase']
@@ -512,3 +517,9 @@ def _field_work_create_callback(ch, method, _properties, body, context):
     context.field_action_cancel_message = action_create
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
+
+
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId and new case is emitted')
+def new_address_without_source_id(context, sender):
+    new_address_reported_event_without_source_case_id(context, sender)
+    check_case_created_message_is_emitted(context)

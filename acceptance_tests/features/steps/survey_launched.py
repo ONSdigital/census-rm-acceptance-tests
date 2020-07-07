@@ -3,9 +3,9 @@ import time
 
 from behave import step
 
-from acceptance_tests.features.steps.event_log import check_if_event_list_is_exact_match
 from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
-from acceptance_tests.utilities.event_helper import check_survey_launched_case_updated_events
+from acceptance_tests.utilities.event_helper import check_survey_launched_case_updated_events, \
+    check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config

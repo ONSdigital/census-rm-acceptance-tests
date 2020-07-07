@@ -1,9 +1,8 @@
 Feature: Scheduled print and manifest files can be generated and uploaded
 
   Scenario Outline: Generate print files and log events for initial contact letters
-    Given sample file "<sample file>" is loaded
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
+    When set action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -28,12 +27,11 @@ Feature: Scheduled print and manifest files can be generated and uploaded
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv        |
 
 
-  Scenario Outline: Generate print files and log events for initial contact letters CE cases
-    Given sample file "<sample file>" is loaded
-    And messages are emitted to RH and Action Scheduler with <questionnaire type> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
-    And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
-    Then correctly formatted "<pack code>" print files are created for CE Estab expected responses
+  Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire type> set
+    When set action rule of type "<action type>"
+    Then CE Estab messages are emitted with <individual qid type> questionnaire types
+    And correctly formatted "<pack code>" print files are created for CE Estab expected responses
     And there is a correct "<pack code>" manifest file for each csv file written
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
     And the files have all been copied to the bucket
@@ -53,9 +51,8 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
-    Given sample file "<sample file>" is loaded
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
+    When set action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created for questionnaire
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -74,11 +71,10 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
 
   Scenario Outline: Generate print files and log events for CE initial contact questionnaires
-    Given sample file "<sample file>" is loaded
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When set action rule of type "<action type>" when the case loading queues are drained
-    And CE Estab messages are emitted to RH and Action Scheduler with <individual qid type> questionnaire types
-    Then correctly formatted "<pack code>" print files are created for CE Estab questionnaires
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
+    When set action rule of type "<action type>"
+    Then CE Estab messages are emitted with <individual qid type> questionnaire types
+    And correctly formatted "<pack code>" print files are created for CE Estab questionnaires
     And there is a correct "<pack code>" manifest file for each csv file written
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
 
@@ -93,51 +89,45 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
 
   Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
-    Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded
-    And messages are emitted to RH and Action Scheduler with [32] questionnaire types
-    When set action rule of type "CE_IC10" when the case loading queues are drained
-    And CE Estab messages are emitted to RH and Action Scheduler with [22,23] questionnaire types
-    Then correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
+    Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded and correct qids [32] set
+    When set action rule of type "CE_IC10"
+    Then CE Estab messages are emitted with [22,23] questionnaire types
+    And correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
     And there is a correct "D_FDCE_I2" manifest file for each csv file written
     And two "RM_UAC_CREATED" events [PRINT_CASE_SELECTED,SAMPLE_LOADED] are logged per case
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters
-    Given sample file "<sample file>" is loaded
-    When set action rule of type "<pack code>" when the case loading queues are drained
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
-    Then correctly formatted "<pack code>" reminder letter print files are created
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
+    When set action rule of type "<pack code>"
+    Then UAC Updated events emitted for the 2 cases with matching treatment codes
+    And correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
 
     Examples: Reminder letter: <pack code>
-      | pack code   | questionnaire types | number of matching cases | sample file                          |
-      | P_RL_1RL1_1 | [01]                | 2                        | sample_input_england_census_spec.csv |
+      | pack code   | questionnaire types | sample file                          |
+      | P_RL_1RL1_1 | [01]                | sample_input_england_census_spec.csv |
 
     @regression
     Examples: Reminder letter: <pack code>
-      | pack code     | questionnaire types | number of matching cases | sample file                        |
-      | P_RL_2RL2B_3a | [02]                | 2                        | sample_input_wales_census_spec.csv |
+      | pack code     | questionnaire types | sample file                        |
+      | P_RL_2RL2B_3a | [02]                | sample_input_wales_census_spec.csv |
 
 
-  Scenario Outline:  Generate print files and log events for scheduled questionnaire letters
-    Given sample file "<sample file>" is loaded successfully
-    And set action rule of type "<pack code>" when the case loading queues are drained
-    When 2 UAC Updated events are emitted for the <number of matching cases> cases with matching treatment codes
-    Then correctly formatted "<pack code>" reminder questionnaire print files are created
-    And there is a correct "<pack code>" manifest file for each csv file written
+  Scenario:  Generate print files and log events for scheduled questionnaire letters
+    Given sample file "sample_for_reminder_questionnaire.csv" is loaded successfully
+    When set action rule of type "P_QU_H2"
+    Then 2 UAC Updated events are emitted for the 3 cases with matching treatment codes
+    And correctly formatted "P_QU_H2" reminder questionnaire print files are created
+    And there is a correct "P_QU_H2" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
-
-    Examples: Initial contact questionnaire: <pack code>
-      | pack code | number of matching cases | sample file                           |
-      | P_QU_H2   | 3                        | sample_for_reminder_questionnaire.csv |
 
 
   Scenario Outline:  Generate print files and log events for response driven reminders
     Given sample file "<sample file>" is loaded successfully
-    When set action rule of type "<pack code>" when the case loading queues are drained
-    And UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
+    When set action rule of type "<pack code>"
+    Then UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
@@ -159,7 +149,7 @@ Feature: Scheduled print and manifest files can be generated and uploaded
   Scenario Outline:  Generate print files and log events for response driven reminders with survey started
     Given sample file "<sample file>" is loaded successfully
     And a survey launched for a created case is received for cases with lsoa <lsoa list>
-    When set action rule of type "<pack code>" when the case loading queues are drained
+    When set action rule of type "<pack code>"
     Then correctly formatted "<pack code>" print files are created for packcode and where survey was launched
     And there is a correct "<pack code>" manifest file for each csv file written
 
@@ -172,14 +162,13 @@ Feature: Scheduled print and manifest files can be generated and uploaded
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters checking for Military SFA
-    Given sample file "<sample file>" is loaded
+    Given sample file "<sample file>" is loaded successfully
     When set SPG Military SFA action rule of type "<pack code>" when the case loading queues are drained
-    And messages are emitted to RH and Action Scheduler with <questionnaire types> questionnaire types
-    When UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
+    And UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
     Then correctly formatted "<pack code>" reminder letter print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
 
     Examples: Reminder letter: <pack code>
-      | pack code   | questionnaire types | number of matching cases | sample file                           |
-      | P_RL_1RL1_1 | [01]                | 1                        | sample_1_english_SPG_Military_SFA.csv |
+      | pack code   | number of matching cases | sample file                           |
+      | P_RL_1RL1_1 | 1                        | sample_1_english_SPG_Military_SFA.csv |
