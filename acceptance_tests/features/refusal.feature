@@ -29,7 +29,7 @@ Feature: Handle refusal message
       | HARD_REFUSAL          |
       | EXTRAORDINARY_REFUSAL |
 
-
+  @regression
   Scenario: Refusal message from Field results in case excluded from refusal print file and a cancel message is not sent to field
     Given sample file "sample_for_refusals_field.csv" is loaded successfully
     When a refusal message of type "HARD_REFUSAL" is sent from "FIELD" for the created case
