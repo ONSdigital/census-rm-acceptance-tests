@@ -72,6 +72,10 @@ def setup_treatment_code_classified_action_rule(context, action_type):
     build_and_create_action_rule(context, classifiers_for_action_type[action_type], action_type)
 
 
+def setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type):
+    build_and_create_action_rule(context, {'estab_type': ['MILITARY SFA']}, action_type)
+
+
 def build_and_create_action_rule(context, classifier, action_type):
     action_plan_response_body = create_action_plan(context.action_plan_id)
     action_plan_url = action_plan_response_body['_links']['self']['href']
