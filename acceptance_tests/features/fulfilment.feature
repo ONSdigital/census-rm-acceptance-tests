@@ -113,6 +113,7 @@ Feature: Handle fulfilment request events
     @regression
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
+      | P_LP_HL2        |
       | P_LP_HL2W       |
       | P_LP_HL4        |
 
@@ -231,6 +232,25 @@ Feature: Handle fulfilment request events
       | P_OR_I2W        | 23                 |
       | P_OR_I4         | 24                 |
 
+
+#  Scenario Outline: Generate print files and log events for supplementary individual printed material fulfilment requests
+#    Given sample file "sample_1_english_HH_unit.csv" is loaded
+#    When an individual print fulfilment request "<fulfilment code>" is received by RM
+#    Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
+#    And correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
+#    And the fulfilment request event is logged
+#
+#    @smoke
+#    Examples: Large print questionnaire: <fulfilment code>
+#      | fulfilment code |
+#      | P_LP_ILP1       |
+#
+#    @regression
+#    Examples: Large print questionnaire: <fulfilment code>
+#      | fulfilment code |
+#      | P_LP_ILP2       |
+#      | P_LP_ILP2W      |
+#      | P_LP_IL4        |
 
   Scenario Outline: Generate print files and log events for individual UAC print fulfilment letter requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
