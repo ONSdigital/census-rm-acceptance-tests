@@ -497,8 +497,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RL_2RL1A": '2nd Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_2RL2BA": '2nd Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
                    ' launched but not completed',
-    "P_RL_1IRL1": 'Individual response reminder letter for England addresses',
-    "P_RL_1IRL2B": 'Individual response reminder letter for Wales addresses',
+    "P_RL_1IRL1": 'Individual reminder letter - England',
+    "P_RL_1IRL2B": 'Individual reminder letter - Bilingual',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
