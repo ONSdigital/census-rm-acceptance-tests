@@ -1,11 +1,16 @@
-
 from behave import step
 from retrying import retry
 
 from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action, \
-    setup_treatment_code_classified_action_rule, build_and_create_action_rule
+    setup_treatment_code_classified_action_rule, build_and_create_action_rule, \
+    setup_treatment_code_classified_spg_military_sfa_action_rule
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.test_case_helper import test_helper
+
+
+@step('set SPG MILITARY SFA action rule of type "{action_type}" when the case loading queues are drained')
+def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context, action_type):
+    setup_treatment_code_classified_spg_military_sfa_action_rule(context, action_type)
 
 
 @step('a FIELD action rule for address type "{address_type}" is set')
