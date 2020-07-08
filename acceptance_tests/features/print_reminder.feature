@@ -62,7 +62,7 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | P_RL_1RL2BA | [E01014669,W01014669]                     | sample_input_wales_census_spec.csv                 |
       | P_RL_2RL1A  | [E01014543,E01014544]                     | sample_input_england_response_driven_reminders.csv |
       | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |
-    
+
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters checking for MILITARY SFA
     Given sample file "<sample file>" is loaded successfully
@@ -77,6 +77,19 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | P_RL_1RL1_1 | 1                        | sample_1_english_SPG_MILITARY_SFA.csv |
 
 
-#  Scenario Outline: Individual response reminder print run
-#    Given sample file "<sample file>" is loaded successfully
-#    And an individual SMS UAC fulfilment request "UACIT1" message is sent by EQ
+  Scenario Outline: Individual response reminder print run
+    Given sample file "<sample file>" is loaded successfully
+    And an individual SMS UAC fulfilment request "UACIT1" message is sent by EQ
+    And an EQ individual response HI case created and uac updated event are emitted
+    When the individual response reminder action rule of type "<pack code>" is set
+    Then correctly formatted "<pack code>" individual reminder letter print files are created
+    And there is a correct "<pack code>" manifest file for each csv file written
+
+    Examples: Individual Response Reminder letter: <pack code>
+      | pack code   | sample file                  |
+      | P_RL_1IRL1  | sample_1_english_HH_unit.csv |
+
+    @regression
+    Examples: Individual Response Reminder letter: <pack code>
+      | pack code   | sample file                  |
+      | P_RL_1IRL2B | sample_1_welsh_HH_unit.csv   |

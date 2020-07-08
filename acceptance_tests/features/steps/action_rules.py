@@ -13,6 +13,15 @@ def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + "estab_type = 'MILITARY SFA'", action_type)
 
 
+@step('the individual response reminder action rule of type "{action_type}" is set')
+def setup_print_reminder_action_rule_for_hi_cases(context, action_type):
+    region_classifier = {
+        'P_RL_1IRL1': "substring(region, 1, 1) = 'E'",
+        'P_RL_1IRL2B': "substring(region, 1, 1) = 'W'",
+    }
+    build_and_create_action_rule(context, region_classifier[action_type] + " AND case_type = 'HI'", action_type)
+
+
 @step('a FIELD action rule for address type "{address_type}" is set')
 def create_field_action_plan(context, address_type):
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + f"address_type = '{address_type}'", 'FIELD')

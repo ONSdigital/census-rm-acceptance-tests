@@ -4,7 +4,7 @@ from datetime import datetime
 from behave import step
 
 from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action
-from acceptance_tests.utilities.event_helper import get_and_check_case_created_messages, \
+from acceptance_tests.utilities.event_helper import get_and_check_sample_load_case_created_messages, \
     get_and_check_uac_updated_messages, get_and_test_case_and_uac_msgs_are_correct
 from acceptance_tests.utilities.sample_load_helper import load_sample_file_helper
 
@@ -18,7 +18,7 @@ def load_sample_file_step(context, sample_file_name):
 def load_sample_file_successfully_step(context, sample_file_name):
     load_sample_file_helper(context, sample_file_name)
 
-    get_and_check_case_created_messages(context)
+    get_and_check_sample_load_case_created_messages(context)
     get_and_check_uac_updated_messages(context)
 
     poll_until_sample_is_ingested_to_action(context)
@@ -45,7 +45,7 @@ def load_sample_file_successfully_after(context, wait, sample_file_name):
     context.address_delta_load_time = datetime.utcnow()
 
     load_sample_file_helper(context, sample_file_name)
-    get_and_check_case_created_messages(context)
+    get_and_check_sample_load_case_created_messages(context)
     get_and_check_uac_updated_messages(context)
 
     poll_until_sample_is_ingested_to_action(context, after_date_time=context.address_delta_load_time)

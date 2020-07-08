@@ -180,6 +180,8 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_RL_1RL2BA": Config.SFTP_PPO_DIRECTORY,
     "P_RL_2RL1A": Config.SFTP_PPO_DIRECTORY,
     "P_RL_2RL2BA": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1IRL1": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1IRL2B": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR1": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR2B": Config.SFTP_PPO_DIRECTORY,
     "D_ICA_ICLR1": Config.SFTP_PPO_DIRECTORY,
@@ -330,6 +332,8 @@ PACK_CODE_TO_DATASET = {
     "P_RL_1RL2BA": PPD1_2_DATASET,
     "P_RL_2RL1A": PPD1_2_DATASET,
     "P_RL_2RL2BA": PPD1_2_DATASET,
+    "P_RL_1IRL1": PPD1_2_DATASET,
+    "P_RL_1IRL2B": PPD1_2_DATASET,
     "D_CE1A_ICLCR1": PPD1_7_DATASET,
     "D_CE1A_ICLCR2B": PPD1_7_DATASET,
     "D_ICA_ICLR1": PPD1_7_DATASET,
@@ -493,6 +497,8 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RL_2RL1A": '2nd Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_2RL2BA": '2nd Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
                    ' launched but not completed',
+    "P_RL_1IRL1": 'Individual response reminder letter for England addresses',
+    "P_RL_1IRL2B": 'Individual response reminder letter for Wales addresses',
 }
 
 QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
