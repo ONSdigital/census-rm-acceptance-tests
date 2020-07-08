@@ -8,6 +8,11 @@ from acceptance_tests.utilities.mappings import DEFAULT_CLASSIFIERS
 from acceptance_tests.utilities.test_case_helper import test_helper
 
 
+@step('set SPG MILITARY SFA action rule of type "{action_type}" when the case loading queues are drained')
+def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context, action_type):
+    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + "estab_type = 'MILITARY SFA'", action_type)
+
+
 @step('a FIELD action rule for address type "{address_type}" is set')
 def create_field_action_plan(context, address_type):
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + f"address_type = '{address_type}'", 'FIELD')
