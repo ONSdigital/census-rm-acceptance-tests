@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/ONSdigital/census-rm-acceptance-tests.svg?branch=master)](https://travis-ci.com/ONSdigital/census-rm-acceptance-tests)
 
 
-Pythonn Behave BDD tests for RM Census.
+Python Behave BDD tests for RM Census.
 
 ## Run the tests locally against census-rm-docker-dev
 1. Clone [census-rm-docker-dev](https://github.com/ONSdigital/census-rm-docker-dev) and run `make up` to start the required services
