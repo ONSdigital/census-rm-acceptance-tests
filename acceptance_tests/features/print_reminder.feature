@@ -77,19 +77,35 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | P_RL_1RL1_1 | 1                        | sample_1_english_SPG_MILITARY_SFA.csv |
 
 
-  Scenario Outline: Individual response reminder print run
+  Scenario Outline: Individual response reminder for HI cases created by EQ IR SMS request
     Given sample file "<sample file>" is loaded successfully
-    And an individual SMS UAC fulfilment request "UACIT1" message is sent by EQ
+    And an individual SMS UAC fulfilment request "<fulfilment code>" message is sent by EQ
     And an EQ individual response HI case created and uac updated event are emitted
-    When the individual response reminder action rule of type "<pack code>" is set
-    Then correctly formatted "<pack code>" individual reminder letter print files are created
-    And there is a correct "<pack code>" manifest file for each csv file written
+    When the individual response reminder action rule of type "<reminder pack code>" is set
+    Then correctly formatted "<reminder pack code>" individual reminder letter print files are created
+    And there is a correct "<reminder pack code>" manifest file for each csv file written
 
-    Examples: Individual Response Reminder letter: <pack code>
-      | pack code   | sample file                  |
-      | P_RL_1IRL1  | sample_1_english_HH_unit.csv |
+    Examples: Individual Response Reminder letter: <reminder pack code>
+      | reminder pack code | fulfilment code | sample file                  |
+      | P_RL_1IRL1         | UACIT1          | sample_1_english_HH_unit.csv |
 
     @regression
-    Examples: Individual Response Reminder letter: <pack code>
-      | pack code   | sample file                  |
-      | P_RL_1IRL2B | sample_1_welsh_HH_unit.csv   |
+    Examples: Individual Response Reminder letter: <reminder pack code>
+      | reminder pack code | fulfilment code | sample file                |
+      | P_RL_1IRL2B        | UACIT2          | sample_1_welsh_HH_unit.csv |
+      | P_RL_1IRL2B        | UACIT2W         | sample_1_welsh_HH_unit.csv |
+
+
+  Scenario Outline: Individual response reminder for HI cases created by EQ IR print request
+    Given sample file "<sample file>" is loaded successfully
+    And an individual print UAC fulfilment request "<fulfilment code>" message is sent by EQ
+    And an EQ individual response HI case created and uac updated event are emitted
+    When the individual response reminder action rule of type "<reminder pack code>" is set
+    Then correctly formatted "<reminder pack code>" individual reminder letter print files are created
+    And there is a correct "<reminder pack code>" manifest file for each csv file written
+
+    @regression
+    Examples: Individual Response Reminder letter: <reminder pack code>
+      | reminder pack code | fulfilment code | sample file                  |
+      | P_RL_1IRL1         | P_UAC_UACIP1    | sample_1_english_HH_unit.csv |
+      | P_RL_1IRL2B        | P_UAC_UACIP2B   | sample_1_welsh_HH_unit.csv   |

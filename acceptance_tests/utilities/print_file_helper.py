@@ -160,10 +160,6 @@ def create_expected_individual_reminder_letter_csv_lines(context, pack_code):
     expected_reminder_case_created_events = (case for case in context.case_created_events
                                              if case['payload']['collectionCase']['id'] in context.reminder_case_ids)
 
-    for uac in context.reminder_uac_updated_events:
-        expected_data[uac['payload']['uac']['caseId']]['uac'] = uac['payload']['uac']['uac']
-        expected_data[uac['payload']['uac']['caseId']]['questionnaire_id'] = uac['payload']['uac']['questionnaireId']
-
     for case in expected_reminder_case_created_events:
         expected_data = _add_expected_individual_case_data(case, expected_data)
 

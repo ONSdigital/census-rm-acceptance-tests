@@ -19,7 +19,8 @@ def setup_print_reminder_action_rule_for_hi_cases(context, action_type):
         'P_RL_1IRL1': "substring(region, 1, 1) = 'E'",
         'P_RL_1IRL2B': "substring(region, 1, 1) = 'W'",
     }
-    build_and_create_action_rule(context, region_classifier[action_type] + " AND case_type = 'HI'", action_type)
+    build_and_create_action_rule(context, region_classifier[action_type] +
+                                 " AND case_type = 'HI' AND metadata->>'channel' = 'EQ'", action_type)
 
 
 @step('a FIELD action rule for address type "{address_type}" is set')
