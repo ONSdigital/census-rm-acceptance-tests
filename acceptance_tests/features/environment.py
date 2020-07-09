@@ -20,6 +20,7 @@ def after_all(_context):
 
 def before_scenario(context, _):
     context.test_start_local_datetime = datetime.now()
+    context.test_start_utc = datetime.utcnow()
 
     if not hasattr(context, 'collection_exercise_id'):
         context.collection_exercise_id = str(uuid.uuid4())
