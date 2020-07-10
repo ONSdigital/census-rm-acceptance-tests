@@ -233,10 +233,10 @@ Feature: Handle fulfilment request events
       | P_OR_I4         | 24                 |
 
   Scenario Outline: Generate individual large print files and log events for supplementary printed material fulfilment requests
-    Given sample file "sample_1_english_HH_unit.csv" is loaded
-    When a supplementary materials fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When an individual print fulfilment request "<fulfilment code>" is received by RM
     And a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    Then correctly formatted on request supplementary material print and manifest files for "<fulfilment code>" are created
+    Then correctly formatted individual response large print questionnaires are created for "<fulfilment code>"
     And the fulfilment request event is logged
 
     @smoke
