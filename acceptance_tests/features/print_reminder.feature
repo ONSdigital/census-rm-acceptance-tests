@@ -17,8 +17,24 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | pack code     | questionnaire types | sample file                        |
       | P_RL_2RL2B_3a | [02]                | sample_input_wales_census_spec.csv |
 
+  Scenario Outline: Generate print files and log events for scheduled reminder letters
+    Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
+    When set action rule of type "<pack code>"
+    Then UAC Updated events emitted for the 2 cases with matching treatment codes
+    And correctly formatted "<pack code>" reminder letter print files are created
+    And there is a correct "<pack code>" manifest file for each csv file written
+    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
 
-  Scenario: Generate print files and log events for scheduled questionnaire letters
+    Examples: Reminder letter: <pack code>
+      | pack code   | questionnaire types | sample file                          |
+      | P_RL_1RL1_1 | [01]                | sample_input_england_census_spec.csv |
+
+    @regression
+    Examples: Reminder letter: <pack code>
+      | pack code     | questionnaire types | sample file                        |
+      | P_RL_2RL2B_3a | [02]                | sample_input_wales_census_spec.csv |
+
+  Scenario: Generate print files and log events for scheduled reminder questionnaire letters
     Given sample file "sample_for_reminder_questionnaire.csv" is loaded successfully
     When set action rule of type "P_QU_H2"
     Then 2 UAC Updated events are emitted for the 3 cases with matching treatment codes
@@ -59,6 +75,10 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
     Examples: Reminder contact letter: <pack code>
       | pack code   | lsoa list                                 | sample file                                        |
       | P_RL_1RL1A  | [E01014540,E01014541]                     | sample_input_england_response_driven_reminders.csv |
+
+    @regression
+    Examples: Reminder contact letter: <pack code>
+      | pack code   | lsoa list                                 | sample file                                        |
       | P_RL_1RL2BA | [E01014669,W01014669]                     | sample_input_wales_census_spec.csv                 |
       | P_RL_2RL1A  | [E01014543,E01014544]                     | sample_input_england_response_driven_reminders.csv |
       | P_RL_2RL2BA | [E01033361,E01015005,W01033361,W01015005] | sample_input_wales_census_spec.csv                 |
