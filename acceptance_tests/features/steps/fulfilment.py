@@ -12,8 +12,7 @@ from acceptance_tests.utilities.fulfilment_helper import send_print_fulfilment_r
 from acceptance_tests.utilities.manifest_file_helper import check_manifest_files_created
 from acceptance_tests.utilities.mappings import NOTIFY_TEMPLATE
 from acceptance_tests.utilities.print_file_helper import create_expected_individual_response_csv, \
-    create_uac_print_materials_csv_line, check_print_files_have_all_the_expected_data, \
-    create_expected_large_print_supplementary_materials_csv
+    create_uac_print_materials_csv_line, check_print_files_have_all_the_expected_data
 from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_first_message_in_context
@@ -268,16 +267,6 @@ def check_individual_questionnaire_print_requests(context, fulfilment_code, ques
     uac, qid = get_qid_and_uac_from_emitted_child_uac(context)
     test_helper.assertEqual(qid[:2], questionnaire_type, "Incorrect questionnaire type")
     expected_csv_lines = [create_expected_individual_response_csv(individual_case, uac, qid, fulfilment_code)]
-
-    check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
-    check_manifest_files_created(context, fulfilment_code)
-
-
-@step(
-    'correctly formatted individual response large print questionnaires are created for "{fulfilment_code}"')
-def check_individual_large_print_questionnaire_print_requests(context, fulfilment_code):
-    individual_case = requests.get(f'{Config.CASE_API_CASE_URL}{context.individual_case_id}').json()
-    expected_csv_lines = [create_expected_large_print_supplementary_materials_csv(individual_case, fulfilment_code)]
 
     check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     check_manifest_files_created(context, fulfilment_code)

@@ -342,19 +342,6 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
     )
 
 
-def create_expected_large_print_supplementary_materials_csv(individual_case, fulfilment_code):
-    return (
-        f'|{individual_case["caseRef"]}|'
-        f'Ms|jo|smith|'
-        f'{individual_case["addressLine1"]}|'
-        f'{individual_case["addressLine2"]}|'
-        f'{individual_case["addressLine3"]}|'
-        f'{individual_case["townName"]}|'
-        f'{individual_case["postcode"]}|'
-        f'{fulfilment_code}||||'
-    )
-
-
 def create_expected_HH_UAC_supplementary_materials_csv(context, fulfilment_code):
     return [_create_expected_HH_UAC_supplementary_materials_csv_line(context.first_case, context.requested_uac,
                                                                      context.requested_qid, fulfilment_code)]
