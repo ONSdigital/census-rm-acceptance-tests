@@ -20,7 +20,7 @@ run_regression_tests:
 	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run behave acceptance_tests/features --logging-level WARN --format=progress2
 
 run_smoke_tests:
-	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run behave acceptance_tests/features --logging-level WARN --tags=@smoke --format=progress2
+	SFTP_KEY_FILENAME=dummy_sftp_private_key PUBSUB_EMULATOR_HOST=localhost:8538 pipenv run behave acceptance_tests/features --logging-level WARN --tags=@smoke --no-skipped
 
 build:
 	docker build -t eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests .
