@@ -72,14 +72,8 @@ def _validate_case(parsed_body):
     test_helper.assertTrue(luhn.verify(actual_case_ref))
 
 
-def get_and_check_case_created_messages(context):
-    context.messages_received = []
-    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
-                                    functools.partial(store_all_case_created_msgs_by_collection_exercise_id,
-                                                      context=context,
-                                                      expected_msg_count=len(context.sample_units),
-                                                      collection_exercise_id=context.collection_exercise_id))
-    context.case_created_events = context.messages_received.copy()
+def get_and_check_sample_load_case_created_messages(context):
+    context.case_created_events = get_case_created_events(context, len(context.sample_units))
     _test_cases_correct(context)
     context.messages_received = []
 
@@ -87,6 +81,16 @@ def get_and_check_case_created_messages(context):
                            if (case['payload']['collectionCase']['treatmentCode'].startswith('HH_Q')
                                or case['payload']['collectionCase']['treatmentCode'].startswith('SPG_Q'))
                            and case['payload']['collectionCase']['treatmentCode'].endswith('W')]
+
+
+def get_case_created_events(context, expected_number):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(store_all_case_created_msgs_by_collection_exercise_id,
+                                                      context=context,
+                                                      expected_msg_count=expected_number,
+                                                      collection_exercise_id=context.collection_exercise_id))
+    return context.messages_received.copy()
 
 
 def get_and_check_uac_updated_messages(context):
@@ -170,7 +174,7 @@ def check_survey_launched_case_updated_events(context, case_ids):
 
 
 def get_and_test_case_and_uac_msgs_are_correct(context, questionnaire_types):
-    get_and_check_case_created_messages(context)
+    get_and_check_sample_load_case_created_messages(context)
 
     context.expected_uacs_cases = get_extended_case_created_events_for_uacs(context, questionnaire_types)
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,

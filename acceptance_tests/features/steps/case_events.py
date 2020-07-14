@@ -1,10 +1,10 @@
-
 import functools
 
 from behave import step
 
-from acceptance_tests.utilities.event_helper import get_extended_case_created_events_for_uacs,\
-    get_and_test_case_and_uac_msgs_are_correct, test_uacs_correct_for_estab_units
+from acceptance_tests.utilities.event_helper import get_extended_case_created_events_for_uacs, \
+    get_and_test_case_and_uac_msgs_are_correct, test_uacs_correct_for_estab_units, get_case_created_events, \
+    get_last_uac_updated_event
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_uac_updated_msgs_by_collection_exercise_id, store_first_message_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -66,3 +66,11 @@ def case_updated_msg_with_metadata_field(context, field, expected_field_value):
                                     functools.partial(store_first_message_in_context,
                                                       context=context))
     test_helper.assertEqual(context.first_message['payload']['metadata'][field], expected_field_value)
+
+
+@step('an EQ individual response HI case created and uac updated event are emitted')
+def gather_eq_ir_case_created_and_uac_updated_events(context):
+    context.case_created_events = get_case_created_events(context, 1)
+    context.reminder_case_ids = [context.case_created_events[0]['payload']['collectionCase']['id']]
+    get_last_uac_updated_event(context)
+    context.reminder_uac_updated_events = [context.last_uac_updated_event]
