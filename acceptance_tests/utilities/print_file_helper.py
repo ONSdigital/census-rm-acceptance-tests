@@ -154,6 +154,21 @@ def create_expected_reminder_letter_csv_lines(context, pack_code):
     ]
 
 
+def create_expected_individual_reminder_letter_csv_lines(context, pack_code):
+    expected_data = defaultdict(dict)
+
+    expected_reminder_case_created_events = (case for case in context.case_created_events
+                                             if case['payload']['collectionCase']['id'] in context.reminder_case_ids)
+
+    for case in expected_reminder_case_created_events:
+        expected_data = _add_expected_individual_case_data(case, expected_data)
+
+    return [
+        _create_expected_individual_reminder_csv_line(case, pack_code)
+        for case in expected_data.values()
+    ]
+
+
 def create_expected_reminder_questionnaire_csv_lines(context, pack_code):
     expected_data = defaultdict(dict)
 
@@ -219,6 +234,17 @@ def _add_expected_questionnaire_case_data(message, expected_data):
     return expected_data
 
 
+def _add_expected_individual_case_data(message, expected_data):
+    case_id = message['payload']['collectionCase']['id']
+
+    collection_case = message['payload']['collectionCase']
+    expected_data[case_id]['case_ref'] = collection_case['caseRef']
+
+    _populate_expected_address(case_id, expected_data, message)
+
+    return expected_data
+
+
 def _populate_expected_address(case_id, expected_data, message):
     address = message['payload']['collectionCase']['address']
     expected_data[case_id]['address_line_1'] = address['addressLine1']
@@ -244,6 +270,23 @@ def _create_expected_csv_line(case, prefix):
         f'{case["organization_name"]}|'
         f'{case["coordinator_id"]}|'
         f'{case["officer_id"]}'
+    )
+
+
+def _create_expected_individual_reminder_csv_line(case, prefix):
+    return (
+        '|'
+        f'{case["case_ref"]}|'
+        '|||'
+        f'{case["address_line_1"]}|'
+        f'{case["address_line_2"]}|'
+        f'{case["address_line_3"]}|'
+        f'{case["town_name"]}|'
+        f'{case["postcode"]}|'
+        f'{prefix}|'
+        '|'
+        f'{case["organization_name"]}|'
+        '|'
     )
 
 
