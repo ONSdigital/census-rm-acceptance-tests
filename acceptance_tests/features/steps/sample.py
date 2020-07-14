@@ -1,6 +1,6 @@
+import time
 from datetime import datetime
 
-import time
 from behave import step
 
 from acceptance_tests.utilities.action_helper import poll_until_sample_is_ingested_to_action
