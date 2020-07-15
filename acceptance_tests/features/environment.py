@@ -39,6 +39,13 @@ def before_tag(context, tag):
         # e.g where skeleton cases are used
         context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
         context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
+    # if tag == 'new_aims_topic_and_subscription':
+    #     response = requests.put()
+    #         get(f'{Config.CASE_API_CASE_URL}ccs/{case_id}/qid')
+    #     test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
+    #     response_json = response.json()
+    #     return response_json
+    #     "http://localhost:8538/v1/projects/project/topics/eq-submission-topic" "PUT" "pubsub_emulator topic"
 
 
 def after_tag(_, tag):
