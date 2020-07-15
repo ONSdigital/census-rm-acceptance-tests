@@ -153,6 +153,7 @@ Feature: Address updates
   @new_aims_topic_and_subscription
   Scenario: New address event received without sourceCaseId and without UPRN
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId or UPRN
+    Then a new address is sent to aims
     Then a case created event is emitted
     And the case can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]

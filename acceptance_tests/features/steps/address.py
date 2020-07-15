@@ -6,6 +6,7 @@ import requests
 from behave import step
 
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
+from acceptance_tests.utilities.pubsub_helper import setup_aims_new_address_subscription
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -571,3 +572,8 @@ def step_impl(context, sender):
             message=message,
             content_type='application/json',
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step("a new address is sent to aims")
+def new_address_sent_to_aims(context):
+    setup_aims_new_address_subscription(context)

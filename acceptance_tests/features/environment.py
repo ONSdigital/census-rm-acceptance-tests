@@ -5,6 +5,7 @@ from datetime import datetime
 
 import requests
 
+from acceptance_tests.utilities.pubsub_helper import setup_aims_new_address_subscription
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from config import Config
 
@@ -40,12 +41,7 @@ def before_tag(context, tag):
         context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
         context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
     # if tag == 'new_aims_topic_and_subscription':
-    #     response = requests.put()
-    #         get(f'{Config.CASE_API_CASE_URL}ccs/{case_id}/qid')
-    #     test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
-    #     response_json = response.json()
-    #     return response_json
-    #     "http://localhost:8538/v1/projects/project/topics/eq-submission-topic" "PUT" "pubsub_emulator topic"
+    #     setup_aims_new_address_subscription(context)
 
 
 def after_tag(_, tag):
