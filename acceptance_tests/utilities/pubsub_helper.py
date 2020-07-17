@@ -43,7 +43,7 @@ def sync_consume_of_pubsub(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
 
-    response = subscriber.pull(subscription_path, max_messages=2, timeout=5)
+    response = subscriber.pull(subscription_path, max_messages=2, timeout=30)
     test_helper.assertEqual(len(response.received_messages), 1)
 
     context.aims_new_address_message = json.loads(response.received_messages[0].message.data)
