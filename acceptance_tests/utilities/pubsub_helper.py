@@ -1,8 +1,15 @@
+import functools
+import json
 import logging
+from time import sleep
 
+from datetime import datetime
 from google.cloud import pubsub_v1
+from google.protobuf.timestamp_pb2 import Timestamp
+
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -21,32 +28,44 @@ def publish_to_pubsub(message, project, topic, **kwargs):
     logger.info("Sent PubSub message", topic=topic, project=project)
 
 
-def setup_aims_new_address_subscription(context):
-    """
-    Create a subscriber thread which handles new messages through a callback
-
-    :param subscription_name: The name of the pubsub subscription
-    :param subscription_project_id: GCP project where subscription should already exist
-    :param callback: The callback to use upon receipt of a new message from the subscription
-    :return: a StreamingPullFuture for managing the callback thread
-    """
-    # subscription_path = client.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT, Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-    # subscriber_future = client.subscribe(subscription_path, callback)
-    # logger.info('Listening for Pub/Sub Messages', subscription_path=subscription_path)
-    # return subscriber_future
-
+def consume_aims_new_address_messages(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-    streaming_pull_future = subscriber.subscribe(subscription_path, callback=aims_callback)
-    print("Listening for messages on {}..\n".format(subscription_path))
-
-    with subscriber:
-        try:
-        except TimeoutError:
-            streaming_pull_future.cancel()
+    subscriber.subscribe(subscription_path, callback=functools.partial(store_aims_new_address_message, context=context))
 
 
-def aims_callback(message):
-    print("Received message: {}".format(message))
+def store_aims_new_address_message(message, context):
+    context.aims_new_address_message = json.loads(message.data)
     message.ack()
-    # How do we get this to compare the msg to the expected one? without context?
+
+
+def sync_consume_of_pubsub(context):
+    subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
+                                                     Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
+
+    response = subscriber.pull(subscription_path, max_messages=2, timeout=5)
+    test_helper.assertEqual(len(response.received_messages), 1)
+
+    context.aims_new_address_message = json.loads(response.received_messages[0].message.data)
+
+    ack_ids = []
+    for received_message in response.received_messages:
+        ack_ids.append(received_message.ack_id)
+
+    subscriber.acknowledge(subscription_path, ack_ids)
+
+
+def purge_aims_new_address_topic():
+    subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
+                                                     Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
+    response = subscriber.pull(subscription_path, max_messages=100, timeout=1)
+
+    ack_ids = []
+    for received_message in response.received_messages:
+        ack_ids.append(received_message.ack_id)
+
+    if len(ack_ids) > 0:
+        subscriber.acknowledge(subscription_path, ack_ids)
+
+    if len(response.received_messages) == 100:
+        purge_aims_new_address_topic()

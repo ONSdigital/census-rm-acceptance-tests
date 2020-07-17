@@ -1,12 +1,14 @@
 import functools
 import json
 import uuid
+from time import sleep
 
 import requests
 from behave import step
 
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
-from acceptance_tests.utilities.pubsub_helper import setup_aims_new_address_subscription
+from acceptance_tests.utilities.pubsub_helper import sync_consume_of_pubsub,  \
+    purge_aims_new_address_topic
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -529,6 +531,7 @@ def new_address_without_source_id(context, sender):
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId or UPRN')
 def step_impl(context, sender):
     context.case_id = str(uuid.uuid4())
+
     context.collection_exercise_id = str(uuid.uuid4())
     message = json.dumps(
         {
@@ -574,6 +577,12 @@ def step_impl(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step("a new address is sent to aims")
+@step("a NEW_ADDRESS_ENHANCED event is sent to aims")
 def new_address_sent_to_aims(context):
-    setup_aims_new_address_subscription(context)
+    sync_consume_of_pubsub(context)
+
+    test_helper.assertEqual(context.aims_new_address_message['payload']['newAddress']['collectionCase']['id'],
+                            context.case_id)
+    test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
+    # Should it be a skellington case??
+
