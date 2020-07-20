@@ -530,14 +530,19 @@ QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
 
 NOTIFY_TEMPLATE = {
     # Household
-    "household_english": "21447bc2-e7c7-41ba-8c5e-7a5893068525",
-    "household_welsh_and_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
-    "household_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
-    "household_northern_ireland": "1ccd02a4-9b90-4234-ab7a-9215cb498f14",
+    "household_english": "ce1e545e-f50f-455b-a394-88b49a36fa0c",
+    "household_welsh_and_english": "2375c493-359d-4712-938e-bf97a641f18f",
+    "household_welsh": "67dc02ff-a667-4b21-8e4e-61dd28936b8c",
+    "household_northern_ireland": "5d985237-b446-492a-bd0a-f7368265282c",
 
-    # Individual (same as household?)
-    "individual_english": "21447bc2-e7c7-41ba-8c5e-7a5893068525",
-    "individual_welsh_and_english": "23f96daf-9674-4087-acfc-ffe98a52cf16",
-    "individual_welsh": "ef045f43-ffa8-4047-b8e2-65bfbce0f026",
-    "individual_northern_ireland": "1ccd02a4-9b90-4234-ab7a-9215cb498f14",
+    # Individual
+    "individual_english": "b7ec0cde-b55b-460a-a78a-cb80767acdca",
+    "individual_welsh_and_english": "f6de09f2-4d4c-4f62-82e3-b1a24e0cf910",
+    "individual_welsh": "b2db05f0-d7d1-4b88-b3de-658495bd8a47",
+    "individual_northern_ireland": "d490af7d-300a-4eb8-a961-cb4de54332ee",
+
+    # CE
+    "ce_english": "21f22f8d-2642-444e-9d13-a54b87647a93",
+    "ce_welsh_and_english": "b2b9e650-cb22-49d7-b5da-95169e13ea12",
+    "ce_welsh": "2c12a125-4035-4b81-9988-204e02e759a5"
 }

@@ -1,6 +1,6 @@
 Feature: Handle fulfilment request events
 
-  Scenario Outline: Household UAC SMS requests
+  Scenario Outline: Household and CE UAC SMS requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
     Then notify api was called with SMS template "<SMS template>"
@@ -12,12 +12,22 @@ Feature: Handle fulfilment request events
       | fulfilment code | questionnaire type | SMS template      |
       | UACHHT1         | 01                 | household English |
 
+    Examples: CE UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | SMS template |
+      | UACCET1         | 31                 | ce English   |
+
     @regression
     Examples: Household UAC fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type | SMS template                |
       | UACHHT2         | 02                 | household Welsh and English |
       | UACHHT2W        | 03                 | household Welsh             |
       | UACHHT4         | 04                 | household Northern Ireland  |
+
+    @regression
+    Examples: CE UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type | SMS template         |
+      | UACCET2         | 32                 | ce Welsh and English |
+      | UACCET2W        | 33                 | ce Welsh             |
 
   Scenario Outline: Individual UAC SMS requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
