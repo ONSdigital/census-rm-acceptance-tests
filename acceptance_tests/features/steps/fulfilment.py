@@ -187,7 +187,7 @@ def create_individual_print_fulfilment_message(context, fulfilment_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
-@step('an individual UAC SMS fulfilment request "{fulfilment_code}" is received by RM')
+@step('an individual UAC SMS fulfilment request "{fulfilment_code}" is received by RM for a CE/SPG case')
 def create_individual_uac_sms_fulfilment_message_without_ind_case_id(context, fulfilment_code):
     requests.get(f'{Config.NOTIFY_STUB_SERVICE}/reset')
 
