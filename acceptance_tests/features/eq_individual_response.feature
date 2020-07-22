@@ -10,15 +10,15 @@ Feature: Request individual response via EQ
     And the individual case has these events logged [RM_UAC_CREATED]
 
     Examples: Individual UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template       |
-      | UACIT1          | 21                 | individual English |
+      | fulfilment code | questionnaire type | SMS template |
+      | UACIT1          | 21                 | UACIT1       |
 
     @regression
     Examples: Individual UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template                 |
-      | UACIT2          | 22                 | individual Welsh and English |
-      | UACIT2W         | 23                 | individual Welsh             |
-      | UACIT4          | 24                 | individual Northern Ireland  |
+      | fulfilment code | questionnaire type | SMS template |
+      | UACIT2          | 22                 | UACIT2       |
+      | UACIT2W         | 23                 | UACIT2W      |
+      | UACIT4          | 24                 | UACIT4       |
 
   Scenario Outline: Individual UAC print requests via EQ
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully

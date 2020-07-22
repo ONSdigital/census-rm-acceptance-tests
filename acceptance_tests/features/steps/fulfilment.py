@@ -252,7 +252,7 @@ def check_case_events_logged(context):
 
 @step('notify api was called with SMS template "{expected_template}"')
 def check_notify_api_call(context, expected_template: str):
-    _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.lower().split())])
+    _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.split())])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
