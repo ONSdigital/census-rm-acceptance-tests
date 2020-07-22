@@ -187,6 +187,58 @@ def create_individual_print_fulfilment_message(context, fulfilment_code):
             routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
 
 
+@step('an individual UAC SMS fulfilment request "{fulfilment_code}" is received by RM')
+def create_individual_uac_sms_fulfilment_message_without_ind_case_id(context, fulfilment_code):
+    requests.get(f'{Config.NOTIFY_STUB_SERVICE}/reset')
+
+    context.first_case = get_first_case(context)
+    context.fulfilment_requested_case_id = context.uac_created_events[0]['payload']['uac']['caseId']
+    message = json.dumps(
+        {
+            "event": {
+                "type": "FULFILMENT_REQUESTED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2019-07-07T22:37:11.988+0000",
+                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+            },
+            "payload": {
+                "fulfilmentRequest": {
+                    "fulfilmentCode": fulfilment_code,
+                    "caseId": context.fulfilment_requested_case_id,
+                    "individualCaseId": None,
+                    "address": {
+                        "addressLine1": "1 main street",
+                        "addressLine2": "upper upperingham",
+                        "addressLine3": "",
+                        "townName": "upton",
+                        "postcode": "UP103UP",
+                        "region": "E",
+                        "latitude": "50.863849",
+                        "longitude": "-1.229710",
+                        "uprn": "XXXXXXXXXXXXX",
+                        "addressType": "CE",
+                        "estabType": "XXX"
+                    },
+                    "contact": {
+                        "title": "Ms",
+                        "forename": "jo",
+                        "surname": "smith",
+                        "email": "me@example.com",
+                        "telNo": "01234567"
+                    }
+                }
+            }
+        }
+    )
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_FULFILMENT_REQUESTED_ROUTING_KEY)
+
+
 @step("a fulfilment request event is logged")
 def check_case_events_logged(context):
     response = requests.get(f"{Config.CASE_API_CASE_URL}{context.fulfilment_requested_case_id}",

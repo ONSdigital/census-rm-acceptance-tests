@@ -305,3 +305,10 @@ Feature: Handle fulfilment request events
     And a UAC updated message with "21" questionnaire type is emitted
     And print file and manifest files are created for pack code "P_OR_I1" with individual contact details
     Then the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+
+  Scenario: CE and SPG UAC SMS Individual fulfilments without Individual Case ID
+    Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
+    When an individual UAC SMS fulfilment request "UACIT1" is received by RM
+    And a UAC updated message with "21" questionnaire type is emitted
+    Then notify api was called with SMS template "individual English"
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
