@@ -250,9 +250,9 @@ def check_case_events_logged(context):
     test_helper.fail('Did not find fulfilment request event')
 
 
-@step('notify api was called with SMS template "{expected_template}"')
-def check_notify_api_call(context, expected_template: str):
-    _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE['_'.join(expected_template.split())])
+@step('notify api was called with SMS template for fulfilment code "{fulfilment_code}"')
+def check_notify_api_call(context, fulfilment_code: str):
+    _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE[fulfilment_code])
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
