@@ -3,41 +3,59 @@ Feature: Handle fulfilment request events
   Scenario Outline: Household UAC SMS requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
-    Then notify api was called with SMS template "<SMS template>"
+    Then notify api was called with SMS template for fulfilment code "<fulfilment code>"
     And a UAC updated message with "<questionnaire type>" questionnaire type is emitted
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
 
     @smoke
     Examples: Household UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template      |
-      | UACHHT1         | 01                 | household English |
+      | fulfilment code | questionnaire type |
+      | UACHHT1         | 01                 |
 
     @regression
     Examples: Household UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template                |
-      | UACHHT2         | 02                 | household Welsh and English |
-      | UACHHT2W        | 03                 | household Welsh             |
-      | UACHHT4         | 04                 | household Northern Ireland  |
+      | fulfilment code | questionnaire type |
+      | UACHHT2         | 02                 |
+      | UACHHT2W        | 03                 |
+      | UACHHT4         | 04                 |
+
+  Scenario Outline: CE UAC SMS requests
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
+    When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
+    Then notify api was called with SMS template for fulfilment code "<fulfilment code>"
+    And a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]
+
+    @smoke
+    Examples: CE UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | UACCET1         | 31                 |
+
+    @regression
+    Examples: CE UAC fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | UACCET2         | 32                 |
+      | UACCET2W        | 33                 |
 
   Scenario Outline: Individual UAC SMS requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a UAC fulfilment request "<fulfilment code>" message for a created case is sent
     Then a new individual child case for the fulfilment is emitted to RH and Action Scheduler
-    And notify api was called with SMS template "<SMS template>"
+    And notify api was called with SMS template for fulfilment code "<fulfilment code>"
     And a UAC updated message with "<questionnaire type>" questionnaire type is emitted for the individual case
     And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED]
     And the individual case has these events logged [RM_UAC_CREATED]
 
     Examples: Individual UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template       |
-      | UACIT1          | 21                 | individual English |
+      | fulfilment code | questionnaire type |
+      | UACIT1          | 21                 |
 
     @regression
     Examples: Individual UAC fulfilment codes: <fulfilment code>
-      | fulfilment code | questionnaire type | SMS template                 |
-      | UACIT2          | 22                 | individual Welsh and English |
-      | UACIT2W         | 23                 | individual Welsh             |
-      | UACIT4          | 24                 | individual Northern Ireland  |
+      | fulfilment code | questionnaire type |
+      | UACIT2          | 22                 |
+      | UACIT2W         | 23                 |
+      | UACIT4          | 24                 |
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
@@ -295,3 +313,10 @@ Feature: Handle fulfilment request events
     And a UAC updated message with "21" questionnaire type is emitted
     And print file and manifest files are created for pack code "P_OR_I1" with individual contact details
     Then the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+
+  Scenario: Individual UAC SMS fulfilments for a CE/SPG case
+    Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
+    When an individual UAC SMS fulfilment request "UACIT1" is received by RM for a CE/SPG case
+    And a UAC updated message with "21" questionnaire type is emitted
+    Then notify api was called with SMS template for fulfilment code "UACIT1"
+    And the fulfilment request case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED]

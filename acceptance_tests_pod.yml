@@ -53,7 +53,7 @@ spec:
       valueFrom:
         configMapKeyRef:
           name: db-config
-          key: db-host
+          key: db-host-action
     - name: DB_PORT
       valueFrom:
         configMapKeyRef:
@@ -186,7 +186,7 @@ spec:
   volumes:
   - name: cloud-sql-certs
     secret:
-      secretName: cloud-sql-certs
+      secretName: cloud-sql-action-certs
       defaultMode: 0660
       items:
       - key: "root.crt"
