@@ -43,7 +43,7 @@ def send_requests_for_every_non_individual_census_qid_type(context):
 
 @step('unaddressed QID request messages for every individual type census type are sent '
       'and an unlinked uacs are emitted')
-def send_requests_for_every_non_individual_census_qid_type(context):
+def send_requests_for_every_individual_census_qid_type(context):
     context.messages_received = []
     for qid_type in [qid_type for qid_type, form_type in QUESTIONNAIRE_TYPE_TO_FORM_TYPE.items() if form_type == 'I']:
         send_unaddressed_message_and_uac_emitted(context, qid_type)

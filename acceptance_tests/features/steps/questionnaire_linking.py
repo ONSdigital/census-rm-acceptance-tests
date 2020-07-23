@@ -3,7 +3,7 @@ import time
 import uuid
 
 import requests
-from behave.step_registry import step
+from behave import step
 from retrying import retry
 
 from acceptance_tests.utilities.event_helper import get_uac_updated_events
