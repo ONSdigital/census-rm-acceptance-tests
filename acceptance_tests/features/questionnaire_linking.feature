@@ -29,7 +29,7 @@ Feature: QID's can be linked to cases
       | sample_1_welsh_SPG_estab.csv  |
       | sample_1_english_SPG_unit.csv |
 
-  Scenario Outline: Individual Questionnaire linked to unaddressed
+  Scenario Outline: Any individual QID can be linked to a HH case, creating a HI case
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an unaddressed QID request message of questionnaire type <questionnaire type> is sent
     And a UACUpdated message not linked to a case is emitted to RH and Action Scheduler
