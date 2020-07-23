@@ -94,15 +94,20 @@ def get_case_created_events(context, expected_number):
 
 
 def get_and_check_uac_updated_messages(context):
+    context.uac_created_events = get_uac_updated_events(context, get_expected_uac_count(context))
+    _test_uacs_updated_correct(context)
+
+
+def get_uac_updated_events(context, expected_number):
+    context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
                                                       context=context,
-                                                      expected_msg_count=get_expected_uac_count(context),
+                                                      expected_msg_count=expected_number,
                                                       collection_exercise_id=context.collection_exercise_id))
-    context.uac_created_events = context.messages_received.copy()
-    _test_uacs_updated_correct(context)
+    uac_updated_events = context.messages_received.copy()
     context.messages_received = []
-
+    return uac_updated_events
 
 def get_last_uac_updated_event(context):
     context.messages_received = []
