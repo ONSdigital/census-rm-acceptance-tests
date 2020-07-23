@@ -57,16 +57,10 @@ Feature: Address updates
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
-  Scenario: Log Address Modified Event
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-    When an Address Modified Event is sent
-    Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
-
-
   Scenario: Modified address event received
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an Address Modified Event is sent
-    Then a case_updated msg is emitted where "addressModified" is "True"
+    Then a case updated msg is emitted with the updated case details
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
