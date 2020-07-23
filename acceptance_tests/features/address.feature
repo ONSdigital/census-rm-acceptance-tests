@@ -26,6 +26,7 @@ Feature: Address updates
       | sample_for_invalid_address_CE_E.csv  | CE           |
       | sample_for_invalid_address_SPG_E.csv | SPG          |
 
+
   Scenario: Invalid address event for CCS unit level case
     Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
     When an invalid address message for the CCS case is sent from "CC"
@@ -77,6 +78,7 @@ Feature: Address updates
     And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
     And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
+
   @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Individual Telephone capture for new skeleton case
     Given a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD" and the case is created
@@ -85,11 +87,13 @@ Feature: Address updates
     And a new individual child case for telephone capture is emitted to RH and Action Scheduler
     And a UAC updated event is emitted linking the new UAC and QID to the individual case
 
+
   Scenario: New address event received with sourceCaseId and sends Create to Field
     Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     And a CREATE action instruction is sent to field
+
 
   @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Skeleton cases are excluded from action rules
