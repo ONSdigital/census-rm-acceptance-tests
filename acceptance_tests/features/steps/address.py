@@ -463,21 +463,24 @@ def send_address_modified_event(context):
                         "addressLine3": "",
                         "townName": "upton",
                         "postcode": "UP103UP",
-                        "region": "E"
+                        "region": "E",
+                        "uprn": "XXXXXXXXXXXXX",
+                        "estabType": "HOUSEHOLD",
+                        "organisationName": ""
                     },
                     "newAddress": {
                         "addressLine1": "1a main street",
                         "addressLine2": "upper upperingham",
                         "addressLine3": "",
                         "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E"
+                        "organisationName": "",
+                        "estabType": "HOUSEHOLD"
                     }
                 }
             }
         }
-
     )
+
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,

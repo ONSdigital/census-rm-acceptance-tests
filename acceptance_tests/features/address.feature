@@ -63,10 +63,18 @@ Feature: Address updates
     Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
+  Scenario: Modified address event received
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    When an Address Modified Event is sent
+    Then a case_updated msg is emitted where "addressModified" is "True"
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
+
+
   Scenario: Log AddressTypeChanged event
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an AddressTypeChanged event is sent
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
+
 
   Scenario: Fulfilment request for new skeleton case
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId and new case is emitted
