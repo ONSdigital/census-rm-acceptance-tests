@@ -5,8 +5,7 @@ import urllib
 import uuid
 
 import requests
-from behave import given
-from behave.step_registry import then
+from behave import given, then
 from requests.auth import HTTPBasicAuth
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
