@@ -28,6 +28,9 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
 
     'P_RL_1RL1_1': "treatment_code IN ('HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E', "
                    "'HH_QFNR1E') AND survey_launched = 'f'",
+    'P_RL_1RL1B': "treatment_code IN ('HH_QP3E') AND survey_launched = 'f'",
+    'P_RL_1RL2BB': "treatment_code IN ('HH_QP3W') AND survey_launched = 'f'",
+    'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN', 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
     'P_RL_2RL2B_3a': "treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
                      " 'HH_QFNR3AW')",
     'P_QU_H2': "treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
@@ -187,6 +190,9 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_RL_2RL2BA": Config.SFTP_PPO_DIRECTORY,
     "P_RL_1IRL1": Config.SFTP_PPO_DIRECTORY,
     "P_RL_1IRL2B": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1RL1B": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1RL2BB": Config.SFTP_PPO_DIRECTORY,
+    "P_RL_1RL4A": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR1": Config.SFTP_PPO_DIRECTORY,
     "D_CE1A_ICLCR2B": Config.SFTP_PPO_DIRECTORY,
     "D_ICA_ICLR1": Config.SFTP_PPO_DIRECTORY,
@@ -344,6 +350,9 @@ PACK_CODE_TO_DATASET = {
     "P_RL_2RL2BA": PPD1_2_DATASET,
     "P_RL_1IRL1": PPD1_2_DATASET,
     "P_RL_1IRL2B": PPD1_2_DATASET,
+    "P_RL_1RL1B": PPD1_2_DATASET,
+    "P_RL_1RL2BB": PPD1_2_DATASET,
+    "P_RL_1RL4A": PPD1_2_DATASET,
     "D_CE1A_ICLCR1": PPD1_7_DATASET,
     "D_CE1A_ICLCR2B": PPD1_7_DATASET,
     "D_ICA_ICLR1": PPD1_7_DATASET,
@@ -506,6 +515,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_UAC_UACIP1": 'Individual Unique Access Code for England via paper',
     "P_UAC_UACIP2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper',
     "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper',
+    "P_RL_1RL1B": '1st Reminder, Letter - for paper first England addresses when survey not launched',
+    "P_RL_1RL2BB": '1st Reminder, Letter - for paper first Wales addresses when survey not launched',
+    "P_RL_1RL4A": '1st Reminder, Letter - for paper first Ireland addresses when survey not launched',
     "P_RL_1RL1A": '1st Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_1RL2BA": '1st Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
                    ' launched but not completed',
