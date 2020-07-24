@@ -12,6 +12,7 @@ python_version = "3.7"
 
 [packages]
 census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.0.0"}
+census-rm-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "1183-am-file-new-importable"}
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
