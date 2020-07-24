@@ -59,7 +59,7 @@ Feature: Address updates
 
 
   Scenario: Modified address event received
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
     When an Address Modified Event is sent
     Then a case updated msg is emitted with the updated case details
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
