@@ -1,20 +1,14 @@
 import json
 import logging
 import subprocess
-import time
-import urllib
-import uuid
 
-import requests
-from behave import when, step, then
-from requests.auth import HTTPBasicAuth
-from retrying import retry
+from behave import when, step
 from structlog import wrap_logger
 
+from acceptance_tests.utilities.mappings import QUESTIONNAIRE_TYPE_TO_FORM_TYPE
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
-from acceptance_tests.utilities.unadressed_helper import send_questionnaire_linked_msg_to_rabbit, \
-    check_uac_message_is_received
+from acceptance_tests.utilities.unadressed_helper import check_uac_message_is_received
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -37,125 +31,29 @@ def send_unaddressed_message_and_uac_emitted(context, questionnaire_type):
     check_uac_message_is_received(context)
 
 
-@step("a Questionnaire Linked message is sent")
-def send_linked_message(context):
-    send_questionnaire_link(context)
-    context.linked_case_id = context.linked_case['id']
+@step('unaddressed QID request messages for every non-individual type census type are sent '
+      'and an unlinked uacs are emitted')
+def send_requests_for_every_non_individual_census_qid_type(context):
+    context.messages_received = []
+    for qid_type in [qid_type for qid_type, form_type in QUESTIONNAIRE_TYPE_TO_FORM_TYPE.items() if form_type != 'I']:
+        send_unaddressed_message_and_uac_emitted(context, qid_type)
+    context.unlinked_uacs = context.messages_received.copy()
+    context.messages_received = []
 
 
-@step("a Questionnaire Linked message is sent to relink to a new case")
-def send_linked_message_for_alternative_case(context):
-    send_alternative_questionnaire_link(context)
-    time.sleep(1)
-
-
-@step("a Questionnaire Linked message is sent for blank questionnaire")
-def send_linked_message_for_blank_questionnaire(context):
-    check_blank_link_message_is_received(context)
-    context.linked_case_id = context.linked_case['id']
-
-
-@step("an Individual Questionnaire Linked message is sent and ingested")
-def send_individual_linked_message_and_verify_new_case(context):
-    context.linked_case_id = send_questionnaire_link_for_individual_hh_case(context)
-    get_case_id_by_questionnaire_id(context.expected_questionnaire_id)
-
-
-@step("an Individual Questionnaire Linked message with no individual case ID is sent and ingested")
-def send_individual_linked_message_without_individual_case_id_and_verify_new_case(context):
-    send_questionnaire_link_for_individual_hh_case(context, include_individual_id=False)
-    context.linked_case_id = context.individual_case_id = get_case_id_by_questionnaire_id(
-        context.expected_questionnaire_id)
-
-
-@step("a Questionnaire Linked message is sent for the CCS case")
-def send_ccs_linked_message(context):
-    context.linked_case_id = context.case_id
-    context.linked_uac = context.expected_uac
-
-    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
-
-
-def send_questionnaire_link(context):
-    context.linked_case = context.case_created_events[1]['payload']['collectionCase']
-
-    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
-
-
-def send_questionnaire_link_for_individual_hh_case(context, include_individual_id=True):
-    context.linked_case = context.case_created_events[1]['payload']['collectionCase']
-    if include_individual_id:
-        context.individual_case_id = uuid.uuid4()
-        _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id,
-                                                               context.linked_case['id'],
-                                                               context.individual_case_id)
-        return context.individual_case_id
-    _send_individual_hh_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id,
-                                                           context.linked_case['id'])
-
-
-def send_alternative_questionnaire_link(context):
-    alternative_case = context.case_created_events[0]['payload']['collectionCase']
-
-    context.linked_case_id = alternative_case['id']
-    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, alternative_case['id'])
-
-
-def check_blank_link_message_is_received(context):
-    context.linked_case = context.case_created_events[0]['payload']['collectionCase']
-
-    send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case['id'])
+@step('unaddressed QID request messages for every individual type census type are sent '
+      'and an unlinked uacs are emitted')
+def send_requests_for_every_individual_census_qid_type(context):
+    context.messages_received = []
+    for qid_type in [qid_type for qid_type, form_type in QUESTIONNAIRE_TYPE_TO_FORM_TYPE.items() if form_type == 'I']:
+        send_unaddressed_message_and_uac_emitted(context, qid_type)
+    context.unlinked_uacs = context.messages_received.copy()
+    context.messages_received = []
 
 
 @step("a UACUpdated message not linked to a case is emitted to RH and Action Scheduler")
 def check_uac_message_is_received_step(context):
     check_uac_message_is_received(context)
-
-
-@step("a Questionnaire Linked event is logged")
-def check_questionnaire_linked_logging(context):
-    check_question_linked_event_is_logged(context.linked_case_id)
-
-
-@step("a Questionnaire Linked event on the parent case is logged")
-def check_questionnaire_linked_logging_on_parent(context):
-    check_question_linked_event_is_logged(context.linked_case['id'])
-
-
-@step("a Questionnaire Unlinked event is logged")
-def check_questionnaire_unlinked_logging(context):
-    context.linked_case_id = context.case_created_events[1]['payload']['collectionCase']['id']
-    check_question_unlinked_event_is_logged(context)
-
-
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_question_linked_event_is_logged(case_id):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}', params={'caseEvents': True})
-    response_json = response.json()
-    for case_event in response_json['caseEvents']:
-        if case_event['description'] == 'Questionnaire Linked':
-            return
-    test_helper.fail('Did not find questionnaire linked event')
-
-
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
-def check_question_unlinked_event_is_logged(context):
-    case_id = context.linked_case_id
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}', params={'caseEvents': True})
-    response_json = response.json()
-    for case_event in response_json['caseEvents']:
-        expected_desc = f'Questionnaire unlinked from case with QID {context.expected_questionnaire_id}'
-        if case_event['description'] == expected_desc:
-            return
-    test_helper.fail('Questionnaire unlinked event has not occurred')
-
-
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
-def get_case_id_by_questionnaire_id(questionnaire_id):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}/qid/{questionnaire_id}')
-    test_helper.assertEqual(response.status_code, 200, "Unexpected status code")
-    response_json = response.json()
-    return response_json['id']
 
 
 @when("the unaddressed batch is loaded, the print files are generated")
@@ -181,59 +79,3 @@ def validate_unaddressed_print_file(context):
             check=True)
     except subprocess.CalledProcessError:
         test_helper.fail('Unaddressed print file test failed')
-
-
-@then("message redelivery does not go bananas")
-def check_message_redelivery_rate(context):
-    time.sleep(2)  # Wait a couple of seconds for all hell to break loose
-
-    v_host = urllib.parse.quote(Config.RABBITMQ_VHOST, safe='')
-    response = requests.get(
-        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/Case.Responses',
-        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
-
-    response.raise_for_status()
-    queue_details = response.json()
-    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
-    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
-
-    response = requests.get(
-        f'http://{Config.RABBITMQ_HOST}:{Config.RABBITMQ_HTTP_PORT}/api/queues/{v_host}/FieldworkAdapter.caseUpdated',
-        auth=HTTPBasicAuth(Config.RABBITMQ_USER, Config.RABBITMQ_PASSWORD))
-
-    response.raise_for_status()
-    queue_details = response.json()
-    redeliver_rate = queue_details.get('message_stats', {}).get('redeliver_details', {}).get('rate')
-
-    test_helper.assertFalse(redeliver_rate, "Redeliver rate should be zero")
-
-
-@step("the HI individual case can be retrieved")
-def retrieve_hi_case(context):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.individual_case_id}')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-
-
-def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id, individual_case_id=None):
-    questionnaire_linked_message = {
-        'event': {
-            'type': 'QUESTIONNAIRE_LINKED',
-            'source': 'FIELDWORK_GATEWAY',
-            'channel': 'FIELD',
-            "dateTime": "2011-08-12T20:17:46.384Z",
-            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-        },
-        'payload': {
-            'uac': {
-                "caseId": case_id,
-                'questionnaireId': questionnaire_id,
-            }
-        }
-    }
-    if individual_case_id:
-        questionnaire_linked_message['payload']['uac']['individualCaseId'] = str(individual_case_id)
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=json.dumps(questionnaire_linked_message),
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
