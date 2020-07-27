@@ -181,7 +181,7 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
 
-    if qid_type in ['HH', 'CE1'] or (qid_type == "Ind" and case_type == "HH"):
+    if qid_type in ['HH', 'CE1']:
         context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
         return
 
@@ -211,9 +211,9 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     test_helper.assertFalse(f"Failed to get qid for {qid_type}")
 
 
-@step('for impossible things, a new qid is created for case type "{case_type}" address level "{address_level}"'
+@step('for these unlikely scenarios, a new qid is created for case type "{case_type}" address level "{address_level}"'
       ' qid type "{qid_type}" and country "{country_code}"')
-def impossible_stuff(context, case_type, address_level, qid_type, country_code):
+def unlikely_receipting_scenarios(context, case_type, address_level, qid_type, country_code):
     context.loaded_case = context.case_created_events[0]['payload']['collectionCase']
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
