@@ -58,7 +58,7 @@ def sync_consume_of_pubsub(context):
 def purge_aims_new_address_topic():
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-    response = subscriber.pull(subscription_path, max_messages=100, timeout=1)
+    response = subscriber.pull(subscription_path, max_messages=100, timeout=30)
 
     ack_ids = []
     for received_message in response.received_messages:
