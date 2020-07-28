@@ -31,6 +31,7 @@ def send_questionnaire_linked_msg_to_rabbit(questionnaire_id, case_id):
 
 
 def check_uac_message_is_received(context):
+    context.messages_received = []
     context.expected_message_received = False
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(_uac_callback, context=context))
@@ -50,5 +51,6 @@ def _uac_callback(ch, method, _properties, body, context):
     test_helper.assertEqual(context.expected_questionnaire_type, context.expected_questionnaire_id[:2])
     context.expected_uac = parsed_body['payload']['uac']['uac']
     context.expected_message_received = True
+    context.messages_received.append(parsed_body)
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
