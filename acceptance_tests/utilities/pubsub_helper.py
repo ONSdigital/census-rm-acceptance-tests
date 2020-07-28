@@ -44,9 +44,7 @@ def sync_consume_of_pubsub(context):
 
     context.aims_new_address_message = json.loads(response.received_messages[0].message.data)
 
-    ack_ids = []
-    for received_message in response.received_messages:
-        ack_ids.append(received_message.ack_id)
+    ack_ids = [message.ack_id for message in response.received_messages]
 
     subscriber.acknowledge(subscription_path, ack_ids)
 
