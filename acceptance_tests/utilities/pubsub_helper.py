@@ -5,7 +5,6 @@ from google.cloud import pubsub_v1
 
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -38,9 +37,7 @@ def store_aims_new_address_message(message, context):
 def sync_consume_of_pubsub(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-
-    response = subscriber.pull(subscription_path, max_messages=2, timeout=30)
-    test_helper.assertEqual(len(response.received_messages), 1)
+    response = subscriber.pull(subscription_path, max_messages=1, timeout=30)
 
     context.aims_new_address_message = json.loads(response.received_messages[0].message.data)
 
@@ -50,14 +47,16 @@ def sync_consume_of_pubsub(context):
 
 
 def purge_aims_new_address_topic():
+    max_messages = 100
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-    response = subscriber.pull(subscription_path, max_messages=100, timeout=5)
+    response = subscriber.pull(subscription_path, max_messages=max_messages, timeout=5)
 
     ack_ids = [message.ack_id for message in response.received_messages]
 
     if ack_ids:
         subscriber.acknowledge(subscription_path, ack_ids)
 
-    if len(response.received_messages) == 100:
+    # It's possible (though unlikely) that they could be > max_messages on the topic so keep deleting til
+    if len(response.received_messages) == max_messages:
         purge_aims_new_address_topic()

@@ -577,7 +577,14 @@ def step_impl(context, sender):
 @step("a NEW_ADDRESS_ENHANCED event is sent to aims")
 def new_address_sent_to_aims(context):
     sync_consume_of_pubsub(context)
-
-    test_helper.assertEqual(context.aims_new_address_message['payload']['newAddress']['collectionCase']['id'],
-                            context.case_id)
     test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
+
+    actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
+    test_helper.assertEqual(actual_case['id'], context.case_id)
+
+    # caseRef not sent to aims, so need to get it to construct expected dummy Uprn
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+
+    expected_dummy_uprn = f"999{response.json()['caseRef']}"
+    test_helper.assertEqual(expected_dummy_uprn, actual_case['address']['uprn'])
