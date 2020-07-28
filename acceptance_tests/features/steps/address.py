@@ -584,5 +584,3 @@ def new_address_sent_to_aims(context):
     test_helper.assertEqual(context.aims_new_address_message['payload']['newAddress']['collectionCase']['id'],
                             context.case_id)
     test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
-    # Should it be a skellington case??
-
