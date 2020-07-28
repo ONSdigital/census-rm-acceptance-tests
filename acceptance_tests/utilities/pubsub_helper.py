@@ -58,7 +58,7 @@ def purge_aims_new_address_topic():
     for received_message in response.received_messages:
         ack_ids.append(received_message.ack_id)
 
-    if len(ack_ids) > 0:
+    if ack_ids:
         subscriber.acknowledge(subscription_path, ack_ids)
 
     if len(response.received_messages) == 100:
