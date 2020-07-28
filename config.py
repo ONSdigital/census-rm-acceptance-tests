@@ -72,7 +72,7 @@ class Config:
     EQ_FULFILMENT_PROJECT_ID = os.getenv("EQ_FULFILMENT_PROJECT_ID", "eq-fulfilment-project")
     EQ_FULFILMENT_TOPIC_NAME = os.getenv("EQ_FULFILMENT_TOPIC_NAME", "eq-fulfilment-topic")
 
-    AIMS_NEW_ADDRESS_PROJECT = os.getenv("AIMS_NEW_ADDRESS_PROJECT", "census-rm-ci")
+    AIMS_NEW_ADDRESS_PROJECT = os.getenv("AIMS_NEW_ADDRESS_PROJECT", "aims-new-address-project")
     AIMS_NEW_ADDRESS_TOPIC_NAME = os.getenv("AIMS_NEW_ADDRESS_TOPIC_NAME", "aims-new-address-topic")
     AIMS_NEW_ADDRESS_SUBSCRIPTION = os.getenv("AIMS_NEW_ADDRESS_SUBSCRIPTION", "aims-new-address-subscription")
 
