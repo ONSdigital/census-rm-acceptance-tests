@@ -34,7 +34,7 @@ def store_aims_new_address_message(message, context):
     message.ack()
 
 
-def sync_consume_of_pubsub(context):
+def synchronous_consume_of_pubsub(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
     response = subscriber.pull(subscription_path, max_messages=1, timeout=30)
