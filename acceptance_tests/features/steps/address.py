@@ -473,7 +473,6 @@ def send_address_modified_event(context):
                         "addressLine1": "1a main street",
                         "addressLine2": "upper upperingham",
                         "addressLine3": "thingy",
-                        "townName": "upton",
                         "organisationName": "Bedlam",
                         "estabType": "HOSPITAL"
                     }
@@ -537,6 +536,5 @@ def address_modified_case_update(context):
     test_helper.assertEqual(emitted_case['address']['addressLine1'], "1a main street")
     test_helper.assertEqual(emitted_case['address']['addressLine2'], "upper upperingham")
     test_helper.assertEqual(emitted_case['address']['addressLine3'], "thingy")
-    test_helper.assertEqual(emitted_case['address']['townName'], "upton")
     test_helper.assertEqual(emitted_case['address']['organisationName'], "Bedlam")
     test_helper.assertEqual(emitted_case['address']['estabType'], "HOSPITAL")
