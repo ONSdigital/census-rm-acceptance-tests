@@ -34,11 +34,10 @@ def store_aims_new_address_message(message, context):
     message.ack()
 
 
-def synchronous_consume_of_pubsub(context):
+def synchronous_consume_of_aims_pubsub_topic(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
     response = subscriber.pull(subscription_path, max_messages=1, timeout=30)
-
     context.aims_new_address_message = json.loads(response.received_messages[0].message.data)
 
     ack_ids = [message.ack_id for message in response.received_messages]

@@ -5,7 +5,7 @@ import requests
 from behave import step
 
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
-from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_pubsub
+from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -576,7 +576,7 @@ def step_impl(context, sender):
 
 @step("a NEW_ADDRESS_ENHANCED event is sent to aims")
 def new_address_sent_to_aims(context):
-    synchronous_consume_of_pubsub(context)
+    synchronous_consume_of_aims_pubsub_topic(context)
     test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
 
     actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
