@@ -1,14 +1,11 @@
 import functools
 import json
 import uuid
-from time import sleep
-
 import requests
 from behave import step
 
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
-from acceptance_tests.utilities.pubsub_helper import sync_consume_of_pubsub,  \
-    purge_aims_new_address_topic
+from acceptance_tests.utilities.pubsub_helper import sync_consume_of_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper

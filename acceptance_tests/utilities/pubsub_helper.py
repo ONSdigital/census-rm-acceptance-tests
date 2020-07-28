@@ -1,11 +1,7 @@
 import functools
 import json
 import logging
-from time import sleep
-
-from datetime import datetime
 from google.cloud import pubsub_v1
-from google.protobuf.timestamp_pb2 import Timestamp
 
 from structlog import wrap_logger
 
