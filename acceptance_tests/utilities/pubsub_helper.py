@@ -54,9 +54,7 @@ def purge_aims_new_address_topic():
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
     response = subscriber.pull(subscription_path, max_messages=100, timeout=5)
 
-    ack_ids = []
-    for received_message in response.received_messages:
-        ack_ids.append(received_message.ack_id)
+    ack_ids = [message.ack_id for message in response.received_messages]
 
     if ack_ids:
         subscriber.acknowledge(subscription_path, ack_ids)
