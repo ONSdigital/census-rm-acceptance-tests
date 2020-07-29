@@ -4,6 +4,7 @@ import uuid
 import requests
 from behave import step
 
+from acceptance_tests.features.steps.receipt import _get_emitted_case
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
 from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -458,26 +459,28 @@ def send_address_modified_event(context):
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                     },
                     "originalAddress": {
-                        "addressLine1": "1 main street",
-                        "addressLine2": "upper upperingham",
-                        "addressLine3": "",
-                        "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E"
+                        "addressLine1": "nope",
+                        "addressLine2": "nope",
+                        "addressLine3": "nope",
+                        "townName": "nope",
+                        "postcode": "nope",
+                        "region": "nope",
+                        "uprn": "nope",
+                        "estabType": "nope",
+                        "organisationName": "nope"
                     },
                     "newAddress": {
                         "addressLine1": "1a main street",
                         "addressLine2": "upper upperingham",
-                        "addressLine3": "",
-                        "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E"
+                        "addressLine3": "thingy",
+                        "organisationName": "Bedlam",
+                        "estabType": "HOSPITAL"
                     }
                 }
             }
         }
-
     )
+
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
@@ -523,6 +526,18 @@ def _field_work_create_callback(ch, method, _properties, body, context):
 def new_address_without_source_id(context, sender):
     new_address_reported_event_without_source_case_id(context, sender)
     check_case_created_message_is_emitted(context)
+
+
+@step("a case updated msg is emitted with the updated case details")
+def address_modified_case_update(context):
+    emitted_case = _get_emitted_case(context)
+
+    test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
+    test_helper.assertEqual(emitted_case['address']['addressLine1'], "1a main street")
+    test_helper.assertEqual(emitted_case['address']['addressLine2'], "upper upperingham")
+    test_helper.assertEqual(emitted_case['address']['addressLine3'], "thingy")
+    test_helper.assertEqual(emitted_case['address']['organisationName'], "Bedlam")
+    test_helper.assertEqual(emitted_case['address']['estabType'], "HOSPITAL")
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId or UPRN')
