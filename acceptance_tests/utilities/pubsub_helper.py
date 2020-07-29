@@ -23,17 +23,6 @@ def publish_to_pubsub(message, project, topic, **kwargs):
     logger.info("Sent PubSub message", topic=topic, project=project)
 
 
-def consume_aims_new_address_messages(context):
-    subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
-                                                     Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
-    subscriber.subscribe(subscription_path, callback=functools.partial(store_aims_new_address_message, context=context))
-
-
-def store_aims_new_address_message(message, context):
-    context.aims_new_address_message = json.loads(message.data)
-    message.ack()
-
-
 def synchronous_consume_of_aims_pubsub_topic(context):
     subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
