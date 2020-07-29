@@ -580,11 +580,23 @@ def new_address_sent_to_aims(context):
     test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
 
     actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
-    test_helper.assertEqual(actual_case['id'], context.case_id)
+    actual_address = actual_case['address']
 
     # caseRef not sent to aims, so need to get it to construct expected dummy Uprn
     response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    case_api_case = response.json()
+    expected_dummy_uprn = f"999{case_api_case['caseRef']}"
 
-    expected_dummy_uprn = f"999{response.json()['caseRef']}"
-    test_helper.assertEqual(expected_dummy_uprn, actual_case['address']['uprn'])
+    test_helper.assertEqual(actual_case['id'], context.case_id)
+    test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
+    test_helper.assertEqual(actual_address['addressLine1'], '123')
+    test_helper.assertEqual(actual_address['addressLine2'], 'Fake caravan park')
+    test_helper.assertEqual(actual_address["addressLine3"], "The long road")
+    test_helper.assertEqual(actual_address["townName"], "Trumpton")
+    test_helper.assertEqual(actual_address["postcode"], "SO190PG")
+    test_helper.assertEqual(actual_address["region"], "E00001234")
+    test_helper.assertEqual(actual_address["addressType"], "SPG")
+    test_helper.assertEqual(actual_address["addressLevel"], "U")
+    test_helper.assertEqual(actual_address["latitude"], "50.917428")
+    test_helper.assertEqual(actual_address["longitude"], "-1.238193")
