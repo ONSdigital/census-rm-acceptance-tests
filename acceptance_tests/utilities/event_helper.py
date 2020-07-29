@@ -1,6 +1,7 @@
 import copy
 import functools
 import logging
+import sys
 
 import luhn
 import requests
@@ -149,6 +150,7 @@ def _test_cases_correct(context):
                          unmatched_sample_units=context.expected_sample_units,
                          case_created_event=event)
             test_helper.fail('Could not find correct case updated messages for all loaded sample units')
+            sys.exit(1)  # TODO: remove this exit - it's temporary to diagnose an intermittent test failure in CI
 
 
 def get_expected_uac_count(context):
