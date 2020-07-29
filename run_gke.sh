@@ -13,6 +13,7 @@ else
 fi
 
 BEHAVE_TAGS='--tags=~@local-docker'
+
 if [ "$SMOKE" = "true" ]; then
     echo "Running only the tagged smoke tests"
     BEHAVE_TAGS+=' --tags=@smoke'
