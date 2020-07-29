@@ -389,6 +389,9 @@ def create_expected_HH_UAC_supplementary_materials_csv(context, fulfilment_code)
     return [_create_expected_HH_UAC_supplementary_materials_csv_line(context.first_case, context.requested_uac,
                                                                      context.requested_qid, fulfilment_code)]
 
+def create_expected_CE_UAC_supplementary_materials_csv(context, fulfilment_code):
+    return [create_CE_uac_print_materials_csv_line(context.first_case, context.requested_uac,
+                                                                     context.requested_qid, fulfilment_code)]
 
 def _create_expected_HH_UAC_supplementary_materials_csv_line(case, uac, qid, fulfilment_code):
     return (
@@ -430,6 +433,17 @@ def create_uac_print_materials_csv_line(individual_case, uac, qid, fulfilment_co
         f'{fulfilment_code}|{qid}|||'
     )
 
+def create_CE_uac_print_materials_csv_line(case, uac, qid, fulfilment_code):
+    return (
+        f'{uac}|{case["caseRef"]}|'
+        f'Ms|jo|smith|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{fulfilment_code}|{qid}|||'
+    )
 
 def create_individual_print_material_csv_line_for_spg_ce(case, uac, qid, fulfilment_code):
     return (
