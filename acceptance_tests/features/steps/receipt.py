@@ -224,10 +224,10 @@ def qid_type_equals_hh(case_type, context, country_code):
         context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
         context.case_created_events[0]['payload']['collectionCase'] = context.receipting_case
         _get_emitted_uac(context)
-        get_second_qid(context, questionnaire_type=1, qid_needed='True')
+        _get_second_qid(context, questionnaire_type=1, qid_needed='True')
         return
     else:
-        get_second_qid(context, questionnaire_type=1, qid_needed='True')
+        _get_second_qid(context, questionnaire_type=1, qid_needed='True')
         return
 
 
@@ -242,15 +242,19 @@ def qid_type_equals_ce1(address_level, case_type, context, country_code):
         context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
         context.case_created_events[0]['payload']['collectionCase'] = context.receipting_case
         _get_emitted_uac(context)
-        get_second_qid(context, questionnaire_type=31, qid_needed='True')
+        _get_second_qid(context, questionnaire_type=31, qid_needed='True')
         return
     else:
-        get_second_qid(context, questionnaire_type=31, qid_needed='True')
+        _get_second_qid(context, questionnaire_type=31, qid_needed='True')
         return
 
 
 @step('if required for "{questionnaire_type}", a new qid is created "{qid_needed}"')
 def get_second_qid(context, questionnaire_type, qid_needed):
+    _get_second_qid(context, qid_needed, questionnaire_type)
+
+
+def _get_second_qid(context, qid_needed, questionnaire_type):
     if qid_needed == 'True':
         context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
