@@ -604,6 +604,8 @@ def new_address_sent_to_aims(context):
     actual_address = actual_case['address']
     test_helper.assertEqual(actual_case['id'], context.case_id)
     test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
+    test_helper.assertEqual(actual_case['caseType'], 'SPG')
+    test_helper.assertEqual(actual_case['survey'], 'CENSUS')
     test_helper.assertEqual(actual_address['addressLine1'], '123')
     test_helper.assertEqual(actual_address['addressLine2'], 'Fake caravan park')
     test_helper.assertEqual(actual_address["addressLine3"], "The long road")
