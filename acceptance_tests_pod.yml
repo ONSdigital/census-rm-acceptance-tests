@@ -192,7 +192,7 @@ spec:
       valueFrom:
         configMapKeyRef:
           name: pubsub-config
-          key: aim-new-address-subscription
+          key: aims-new-address-subscription
     - name: AIMS_NEW_ADDRESS_PROJECT
       valueFrom:
         configMapKeyRef:
