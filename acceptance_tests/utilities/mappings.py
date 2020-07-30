@@ -30,7 +30,8 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
                    "'HH_QFNR1E') AND survey_launched = 'f'",
     'P_RL_1RL1B': "treatment_code IN ('HH_QP3E') AND survey_launched = 'f'",
     'P_RL_1RL2BB': "treatment_code IN ('HH_QP3W') AND survey_launched = 'f'",
-    'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN', 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
+    'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
+                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
     'P_RL_2RL2B_3a': "treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
                      " 'HH_QFNR3AW')",
     'P_QU_H2': "treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
