@@ -208,6 +208,7 @@ def correct_CE_UAC_supplementary_material_print_files(context, fulfilment_code):
     check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
     check_manifest_files_created(context, fulfilment_code)
 
+
 def _get_print_file_rows_as_list(context, pack_code):
     with SftpUtility() as sftp_utility:
         context.expected_print_files = sftp_utility.get_all_files_after_time(context.test_start_local_datetime,
