@@ -1,7 +1,6 @@
 import copy
 import functools
 import logging
-import sys
 
 import luhn
 import requests
