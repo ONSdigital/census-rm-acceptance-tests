@@ -26,6 +26,7 @@ Feature: Address updates
       | sample_for_invalid_address_CE_E.csv  | CE           |
       | sample_for_invalid_address_SPG_E.csv | SPG          |
 
+
   Scenario: Invalid address event for CCS unit level case
     Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
     When an invalid address message for the CCS case is sent from "CC"
@@ -57,10 +58,11 @@ Feature: Address updates
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
-  Scenario: Log Address Modified Event
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+  Scenario: Modified address event received
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
     When an Address Modified Event is sent
-    Then events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
+    Then a case updated msg is emitted with the updated case details
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
   Scenario: Log AddressTypeChanged event
@@ -68,12 +70,14 @@ Feature: Address updates
     When an AddressTypeChanged event is sent
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
 
+
   Scenario: Fulfilment request for new skeleton case
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId and new case is emitted
     When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
     Then a UAC updated message with "01" questionnaire type is emitted
     And correctly formatted on request questionnaire print and manifest files for "P_OR_H1" are created
     And the questionnaire fulfilment case has these events logged [NEW_ADDRESS_REPORTED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
+
 
   @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Individual Telephone capture for new skeleton case
@@ -83,11 +87,13 @@ Feature: Address updates
     And a new individual child case for telephone capture is emitted to RH and Action Scheduler
     And a UAC updated event is emitted linking the new UAC and QID to the individual case
 
+
   Scenario: New address event received with sourceCaseId and sends Create to Field
     Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     And a CREATE action instruction is sent to field
+
 
   @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Skeleton cases are excluded from action rules
@@ -149,3 +155,10 @@ Feature: Address updates
       | E             | CE           | N            | 24                 |
       | E             | SPG          | N            | 24                 |
 
+  @purge_aims_topic
+  Scenario: New address event received without sourceCaseId and without UPRN
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId or UPRN
+    Then a NEW_ADDRESS_ENHANCED event is sent to aims
+    And a case created event is emitted
+    And the case can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]

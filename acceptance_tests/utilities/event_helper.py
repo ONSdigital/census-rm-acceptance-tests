@@ -1,6 +1,7 @@
 import copy
 import functools
 import logging
+import sys
 
 import luhn
 import requests
@@ -148,6 +149,7 @@ def _test_cases_correct(context):
             logger.error('To match case created event to any of the expected sample units',
                          unmatched_sample_units=context.expected_sample_units,
                          case_created_event=event)
+            sys.exit(1)  # TODO: remove this exit - it's temporary to diagnose an intermittent test failure in CI
             test_helper.fail('Could not find correct case updated messages for all loaded sample units')
 
 
