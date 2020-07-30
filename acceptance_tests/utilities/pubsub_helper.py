@@ -44,6 +44,6 @@ def purge_aims_new_address_topic():
     if ack_ids:
         subscriber.acknowledge(subscription_path, ack_ids)
 
-    # It's possible (though unlikely) that they could be > max_messages on the topic so keep deleting til
+    # It's possible (though unlikely) that they could be > max_messages on the topic so keep deleting till empty
     if len(response.received_messages) == max_messages:
         purge_aims_new_address_topic()
