@@ -183,6 +183,21 @@ spec:
         configMapKeyRef:
           name: pubsub-config
           key: eq-fulfilment-topic-name
+    - name: AIMS_NEW_ADDRESS_TOPIC_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: aims-new-address-project-id
+    - name: AIMS_NEW_ADDRESS_SUBSCRIPTION
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: aims-new-address-subscription
+    - name: AIMS_NEW_ADDRESS_PROJECT
+      valueFrom:
+        configMapKeyRef:
+          name: pubsub-config
+          key: aims-new-address-project-id
   volumes:
   - name: cloud-sql-certs
     secret:
