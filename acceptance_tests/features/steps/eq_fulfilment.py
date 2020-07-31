@@ -40,6 +40,7 @@ def send_eq_sms_fulfilment_message(context, fulfilment_code):
 
 
 @step('an individual print UAC fulfilment request "{fulfilment_code}" message is sent by EQ')
+@step('a CE print UAC fulfilment request "{fulfilment_code}" message is sent by EQ')
 def send_eq_print_fulfilment_message(context, fulfilment_code):
     requests.get(f'{Config.NOTIFY_STUB_SERVICE}/reset')
 
