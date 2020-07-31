@@ -277,6 +277,25 @@ Feature: Handle fulfilment request events
       | fulfilment code | questionnaire type |
       | P_UAC_UACIP2B   | 22                 |
       | P_UAC_UACIP4    | 24                 |
+      | P_UAC_UACIPA1   | 21                 |
+      | P_UAC_UACIPA2B  | 22                 |
+      | P_UAC_UACIPA4   | 24                 |
+
+  Scenario Outline: CE UAC print requests via EQ
+    Given sample file "sample_1_english_CE_unit.csv" is loaded successfully
+    When a CE print UAC fulfilment request "<fulfilment code>" message is sent by EQ
+    Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
+    And correctly formatted on request CE UAC supplementary material print and manifest files for "<fulfilment code>" are created
+    And the fulfilment request event is logged
+
+    Examples: CE UAC Response fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACCEP1   | 31                 |
+
+    @regression
+    Examples: CE UAC Response fulfilment codes: <fulfilment code>
+      | fulfilment code | questionnaire type |
+      | P_UAC_UACCEP2B  | 32                 |
 
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
