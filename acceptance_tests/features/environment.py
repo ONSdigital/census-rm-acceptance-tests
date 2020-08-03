@@ -7,6 +7,7 @@ import requests
 
 from acceptance_tests.utilities.pubsub_helper import purge_aims_new_address_topic
 from acceptance_tests.utilities.rabbit_helper import purge_queues
+from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
@@ -30,6 +31,14 @@ def before_scenario(context, _):
         context.action_plan_id = str(uuid.uuid4())
 
     purge_queues()
+
+
+def after_scenario(_, scenario):
+    if "clear_for_bad_messages" not in scenario.tags:
+        response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
+        response.raise_for_status()
+        if response.json():
+            test_helper.fail('Unexpected exception(s) thrown by RM')
 
 
 def before_tag(context, tag):
