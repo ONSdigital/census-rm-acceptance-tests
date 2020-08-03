@@ -49,6 +49,7 @@ def after_scenario(_, scenario):
             response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
             response.raise_for_status()
             if response.json():
+                _clear_queues_for_bad_messages_and_reset_exception_manager()
                 logger.error('Unexpected exception(s) which were not due to eventual consistency timing')
                 test_helper.fail('Unexpected exception(s) thrown by RM')
 
