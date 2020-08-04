@@ -14,12 +14,11 @@ from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProc
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 
+from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
-
-RESOURCE_FILE_PATH = Path(__file__).parents[3].joinpath('resources')
 
 
 @step('a bulk refusal file is supplied')
