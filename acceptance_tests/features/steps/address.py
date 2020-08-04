@@ -226,6 +226,8 @@ def new_address_reported_event_with_minimal_fields(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
+@step('a NEW_ADDRESS_REPORTED event with no FieldCoordinatorId with address type "{address_type} is sent from'
+      ' "{sender}"')
 @step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}" and the case is created')
 def new_address_reported_event_for_address_type(context, address_type, sender):
     context.case_id = str(uuid.uuid4())
