@@ -228,7 +228,6 @@ spec:
         configMapKeyRef:
           name: bulk-processing-config
           key: bulk-new-address-bucket-name
-
   volumes:
   - name: cloud-sql-certs
     secret:
