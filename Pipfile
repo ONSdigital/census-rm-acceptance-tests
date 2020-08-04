@@ -11,8 +11,8 @@ coverage = "*"
 python_version = "3.7"
 
 [packages]
-census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.0.0"}
-census-rm-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "5143753a74f94e4765d6623221011dd87957f46f"} # TODO pin to version tag
+census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "v2.1.0"}
+census-rm-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "f39871b3c50cc6d540bb0c78c4aaca1cdcaf26e8"} # TODO pin to version tag
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
