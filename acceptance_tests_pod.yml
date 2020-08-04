@@ -203,31 +203,31 @@ spec:
         configMapKeyRef:
           name: bulk-processing-config
           key: bulk-refusal-project-id
-        - name: BULK_REFUSAL_BUCKET_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: bulk-processing-config
-              key: bulk-refusal-bucket-name
-        - name: BULK_INVALID_ADDRESS_PROJECT_ID
-          valueFrom:
-            configMapKeyRef:
-              name: bulk-processing-config
-              key: bulk-invalid-address-project-id
-        - name: BULK_INVALID_ADDRESS_BUCKET_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: bulk-processing-config
-              key: bulk-invalid-address-bucket-name
-        - name: BULK_NEW_ADDRESS_PROJECT_ID
-          valueFrom:
-            configMapKeyRef:
-              name: bulk-processing-config
-              key: bulk-new-address-project-id
-        - name: BULK_NEW_ADDRESS_BUCKET_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: bulk-processing-config
-              key: bulk-new-address-bucket-name
+    - name: BULK_REFUSAL_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-refusal-bucket-name
+    - name: BULK_INVALID_ADDRESS_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-invalid-address-project-id
+    - name: BULK_INVALID_ADDRESS_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-invalid-address-bucket-name
+    - name: BULK_NEW_ADDRESS_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-new-address-project-id
+    - name: BULK_NEW_ADDRESS_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-new-address-bucket-name
 
   volumes:
   - name: cloud-sql-certs
