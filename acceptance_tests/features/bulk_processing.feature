@@ -1,3 +1,4 @@
+@regression
 Feature: Bulk event CSV files can be processed
 
   Scenario: A bulk refusal file is successfully ingested
