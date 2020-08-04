@@ -28,7 +28,7 @@ def poll_until_sample_is_ingested_to_action(context, after_date_time=None):
                                      success_callback)
 
 
-def setup_treatment_code_classified_action_rule(context, action_type):
+def setup_classified_action_rule(context, action_type):
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + CLASSIFIERS_FOR_ACTION_TYPE[action_type], action_type)
 
 

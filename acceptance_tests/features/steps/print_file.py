@@ -13,7 +13,7 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_reminder_questionnaire_csv_lines, create_expected_on_request_fulfilment_questionnaire_csv, \
     create_expected_csv_lines_for_ce_estab_responses, create_expected_CE_Estab_questionnaire_csv_lines, \
     create_expected_questionnaire_csv_lines, create_expected_Welsh_CE_Estab_questionnaire_csv_line_endings, \
-    create_expected_HH_UAC_supplementary_materials_csv, create_expected_csv_lines_for_reminder_survey_launched, \
+    create_expected_HH_UAC_supplementary_materials_csv, create_expected_csv_lines_with_no_uac_for_reminder_survey_launched, \
     check_print_files_have_all_the_expected_data, create_individual_print_material_csv_line_for_spg_ce, \
     create_expected_individual_reminder_letter_csv_lines
 from acceptance_tests.utilities.sftp_utility import SftpUtility
@@ -245,10 +245,10 @@ def compare_sftp_with_gcp_files(context, bucket, filename):
                              f'file contents {filename} did not match gcp file contents')
 
 
-@then('correctly formatted "{pack_code}" print files are created for packcode and where survey was launched')
+@then('correctly formatted "{pack_code}" print files with no UAC are created for packcode and where survey was launched')
 def check_reminder_files_with_survey_launched(context, pack_code):
-    expected_csv_lines = create_expected_csv_lines_for_reminder_survey_launched(context, pack_code,
-                                                                                context.survey_started_case_ids)
+    expected_csv_lines = create_expected_csv_lines_with_no_uac_for_reminder_survey_launched(context, pack_code,
+                                                                                            context.survey_started_case_ids)
     check_print_files_have_all_the_expected_data(context, expected_csv_lines, pack_code)
 
 
