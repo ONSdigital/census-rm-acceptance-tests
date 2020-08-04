@@ -4,11 +4,14 @@ import uuid
 from datetime import datetime
 
 import requests
+from structlog import wrap_logger
 
 from acceptance_tests.utilities.pubsub_helper import purge_aims_new_address_topic
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 def before_all(_):
@@ -38,7 +41,17 @@ def after_scenario(_, scenario):
         response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
         response.raise_for_status()
         if response.json():
-            test_helper.fail('Unexpected exception(s) thrown by RM')
+            logger.error('Unexpected exception(s) -- these could be due to an underpowered environment')
+
+            requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
+            time.sleep(25)  # 25 seconds should be long enough for error to happen again if it hasn't cleared itself
+
+            response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
+            response.raise_for_status()
+            if response.json():
+                _clear_queues_for_bad_messages_and_reset_exception_manager()
+                logger.error('Unexpected exception(s) which were not due to eventual consistency timing')
+                test_helper.fail('Unexpected exception(s) thrown by RM')
 
 
 def before_tag(context, tag):
