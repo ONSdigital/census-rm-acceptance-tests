@@ -74,7 +74,7 @@ spec:
         configMapKeyRef:
           name: db-config
           key: db-name
-    - name: DB_USESSL
+    - name: DB_ACTION_CERTIFICATES
       value: " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql-action/root.crt sslcert=/home/acceptancetests/.postgresql-action/postgresql.crt sslkey=/home/acceptancetests/.postgresql-action/postgresql.key"
     - name: PROJECT_NAME
       valueFrom:

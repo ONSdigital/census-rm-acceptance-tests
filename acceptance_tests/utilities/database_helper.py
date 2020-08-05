@@ -19,7 +19,7 @@ def poll_action_database_with_timeout(query, query_vars: tuple, result_success_c
         :return: None
     """
     conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST_ACTION}' "
-                            f"password={Config.DB_PASSWORD} port='{Config.DB_PORT}'{Config.DB_USESSL}")
+                            f"password={Config.DB_PASSWORD} port='{Config.DB_PORT}'{Config.DB_ACTION_CERTIFICATES}")
     timeout_deadline = time.time() + timeout
     cur = conn.cursor()
     while True:

@@ -116,7 +116,7 @@ class Config:
     DB_HOST_ACTION = os.getenv('DB_HOST_ACTION', 'localhost')
     DB_PORT = os.getenv('DB_PORT', '6432')
     DB_NAME = os.getenv('DB_NAME', 'postgres')
-    DB_USESSL = os.getenv('DB_USESSL', '')
+    DB_ACTION_CERTIFICATES = os.getenv('DB_ACTION_CERTIFICATES', '')
 
     CENSUS_ACTION_PLAN_ID = os.getenv('ACTION_PLAN_ID', 'c4415287-0e37-447b-9c3d-1a011c9fa3db')
     CENSUS_COLLECTION_EXERCISE_ID = os.getenv('COLLECTION_EXERCISE_ID', '34d7f3bb-91c9-45d0-bb2d-90afce4fc790')
