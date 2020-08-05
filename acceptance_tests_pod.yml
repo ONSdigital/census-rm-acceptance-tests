@@ -75,10 +75,7 @@ spec:
           name: db-config
           key: db-name
     - name: DB_USESSL
-      value: >-
-        " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql-action/root.crt
-        sslcert=/home/acceptancetests/.postgresql-action/postgresql.crt
-        sslkey=/home/acceptancetests/.postgresql-action/postgresql.key"
+      value: " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql-action/root.crt sslcert=/home/acceptancetests/.postgresql-action/postgresql.crt sslkey=/home/acceptancetests/.postgresql-action/postgresql.key"
     - name: PROJECT_NAME
       valueFrom:
         configMapKeyRef:
