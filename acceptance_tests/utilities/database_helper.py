@@ -5,9 +5,9 @@ import psycopg2
 from config import Config
 
 
-def poll_database_query_with_timeout(query, query_vars: tuple, result_success_callback, timeout=60):
+def poll_action_database_with_timeout(query, query_vars: tuple, result_success_callback, timeout=60):
     """
-    A helper function for checking for data changes within a timeout period
+    A helper function for checking for data changes in the action database within a timeout period
         :param query: The database query to execute
         :param query_vars: Query parameters to pass to the query executor
         :param result_success_callback: A result checking callback function, should return true for success, false for

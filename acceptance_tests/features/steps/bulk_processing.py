@@ -23,22 +23,25 @@ from config import Config
 
 @step('a bulk refusal file is supplied')
 def build_bulk_refusal_file(context):
+    # Build a bulk refusal file with a row for each the stored case created event
     context.bulk_refusals_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files', 'refusal_bulk_test.csv')
     context.bulk_refusals = {}
+
     for case_created in context.case_created_events:
         context.bulk_refusals[case_created['payload']['collectionCase']['id']] = random.choice(
             ('HARD_REFUSAL',
              'EXTRAORDINARY_REFUSAL')
         )
     test_helper.assertGreater(len(context.bulk_refusals), 0, 'Must have at least one refusal for this test to be valid')
+
     with open(context.bulk_refusals_file, 'w') as bulk_refusal_file_write:
         writer = csv.DictWriter(bulk_refusal_file_write, fieldnames=['case_id', 'refusal_type'])
         writer.writeheader()
         for case_id, refusal_type in context.bulk_refusals.items():
             writer.writerow({'case_id': case_id, 'refusal_type': refusal_type})
 
+    # Upload the file to a real bucket if one is configured
     if Config.BULK_REFUSAL_BUCKET_NAME:
-        # Upload the file to the bucket if we have one
         upload_file_to_bucket(context.bulk_refusals_file,
                               f'refusals_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_REFUSAL_BUCKET_NAME)
@@ -46,18 +49,19 @@ def build_bulk_refusal_file(context):
 
 @step('the bulk refusal file is processed')
 def process_bulk_refusal_file(context):
+    # Run against the real bucket if it is configured
     if Config.BULK_REFUSAL_BUCKET_NAME:
         BulkProcessor(RefusalProcessor()).run()
         return
 
-    # If we don't have a bucket, mock the storage client interactions to work with local files
-    with mock_bulk_processor_storage(context.bulk_refusals_file):
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_refusals_file):
         BulkProcessor(RefusalProcessor()).run()
 
 
 @step('the cases are marked with the correct refusal')
 def check_cases_are_updated_with_correct_refusal_types(context):
-    case_updated_events = get_case_updated_events(context, context.bulk_refusals.keys())
+    case_updated_events = get_case_updated_events(context, len(context.bulk_refusals))
     for event in case_updated_events:
         test_helper.assertIn(event['payload']['collectionCase']['id'], context.bulk_refusals.keys(),
                              'Case updated events should only be emitted for refused cases')
@@ -68,7 +72,6 @@ def check_cases_are_updated_with_correct_refusal_types(context):
             'Refusal type on the case updated events should match the expected type from the bulk file')
 
     context.bulk_refusals_file.unlink()
-
     if Config.BULK_REFUSAL_BUCKET_NAME:
         clear_bucket(Config.BULK_REFUSAL_BUCKET_NAME)
 
@@ -82,6 +85,7 @@ def supply_bulk_new_address_file(context, bulk_new_address_file):
         for row in reader:
             context.bulk_new_addresses.append(row)
 
+    # Upload the file to a real bucket if one is configured
     if Config.BULK_NEW_ADDRESS_BUCKET_NAME:
         upload_file_to_bucket(context.bulk_new_address_file,
                               f'new_addresses_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
@@ -92,11 +96,14 @@ def supply_bulk_new_address_file(context, bulk_new_address_file):
 def process_bulk_new_address_file(context):
     new_address_processor = NewAddressProcessor(action_plan_id=context.action_plan_id,
                                                 collection_exercise_id=context.collection_exercise_id)
+
+    # Run against the real bucket if it is configured
     if Config.BULK_NEW_ADDRESS_BUCKET_NAME:
         BulkProcessor(new_address_processor).run()
         return
 
-    with mock_bulk_processor_storage(context.bulk_new_address_file):
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_new_address_file):
         BulkProcessor(new_address_processor).run()
 
 
@@ -106,7 +113,8 @@ def check_new_cases_are_emitted(context):
                               'Must have at least one new address for this test to be valid')
 
     context.case_created_events = get_case_created_events(context, len(context.bulk_new_addresses))
-    test_helper.assertEqual(len(context.case_created_events), len(context.bulk_new_addresses))
+    test_helper.assertEqual(len(context.case_created_events), len(context.bulk_new_addresses),
+                            'Number of created cases should match number supplied in the bulk file')
 
     for address in context.bulk_new_addresses:
         test_helper.assertTrue(any([new_address_matches_case_created(address, case_created_event)
@@ -119,9 +127,10 @@ def check_new_cases_are_emitted(context):
 
 @step('the new address cases are ingested into the database')
 def check_new_cases_are_in_action_db(context):
-    query = 'SELECT case_id FROM actionv2.cases WHERE action_plan_id = %s AND created_date_time > %s'
+    case_ids_query = 'SELECT case_id FROM actionv2.cases WHERE action_plan_id = %s AND created_date_time > %s'
 
     def new_address_load_success_callback(db_result, timeout_deadline):
+        # Check we have the right number of cases and all the expected case ID's are present
         if len(db_result) == len(context.bulk_new_addresses):
             new_address_case_ids = {case_created['payload']['collectionCase']['id']
                                     for case_created in context.case_created_events}
@@ -134,12 +143,14 @@ def check_new_cases_are_in_action_db(context):
             test_helper.fail("Didn't find all new address cases in action database before the time out")
         return False
 
-    database_helper.poll_database_query_with_timeout(query, (context.action_plan_id, context.test_start_utc),
-                                                     new_address_load_success_callback)
+    database_helper.poll_action_database_with_timeout(query=case_ids_query,
+                                                      query_vars=(context.action_plan_id, context.test_start_utc),
+                                                      result_success_callback=new_address_load_success_callback)
 
 
 @step('a bulk invalid address file is supplied')
 def build_invalid_address_file(context):
+    # Build a bulk invalid address file with a row for each the stored case created event
     context.bulk_invalid_address_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
                                                                     'invalid_addresses_bulk_test.csv')
     context.bulk_invalid_addresses = {}
@@ -153,8 +164,8 @@ def build_invalid_address_file(context):
         for case_id, reason in context.bulk_invalid_addresses.items():
             writer.writerow({'case_id': case_id, 'reason': reason})
 
+    # Upload the file to a real bucket if one is configured
     if Config.BULK_INVALID_ADDRESS_BUCKET_NAME:
-        # Upload the file to the bucket if we have one
         upload_file_to_bucket(context.bulk_invalid_address_file,
                               f'invalid_addresses_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
@@ -162,19 +173,20 @@ def build_invalid_address_file(context):
 
 @step('the bulk invalid address file is processed')
 def process_bulk_invalid_address_file(context):
+    # Run against the real bucket if it is configured
     if Config.BULK_INVALID_ADDRESS_BUCKET_NAME:
         BulkProcessor(InvalidAddressProcessor()).run()
         return
 
-    # If we don't have a bucket, mock the storage client interactions to work with local files
-    with mock_bulk_processor_storage(context.bulk_invalid_address_file):
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_invalid_address_file):
         BulkProcessor(InvalidAddressProcessor()).run()
 
 
 @step('CASE_UPDATED events are emitted for all the cases in the file with addressInvalid true')
 def check_address_invalid_case_updated_events(context):
     address_invalid_case_ids = set(context.bulk_invalid_addresses.keys())
-    case_updated_events = get_case_updated_events(context, address_invalid_case_ids)
+    case_updated_events = get_case_updated_events(context, len(address_invalid_case_ids))
     test_helper.assertEqual(len(case_updated_events), len(context.bulk_invalid_addresses))
     for event in case_updated_events:
         test_helper.assertTrue(event['payload']['collectionCase']['addressInvalid'],
@@ -183,13 +195,8 @@ def check_address_invalid_case_updated_events(context):
                              'Unexpected case ID found on updated event')
 
     context.bulk_invalid_address_file.unlink()
-
     if Config.BULK_INVALID_ADDRESS_BUCKET_NAME:
         clear_bucket(Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
-
-
-def patch_download_blob_to_file(_blob_source, local_destination, replacement_local_file: Path):
-    local_destination.write(replacement_local_file.read_bytes())
 
 
 def new_address_matches_case_created(new_address, case_created_event):
@@ -215,18 +222,28 @@ def upload_file_to_bucket(file_to_upload: Path, destination_name, bucket_name):
     blob.upload_from_filename(str(file_to_upload))
 
 
+def patch_download_blob_to_file(_source_blob, local_destination, replacement_local_file: Path):
+    # Used to patch the Blob.download_blob_to_file(source_blob, destination) method
+    # replacement_local_file must be supplied in a partial so the signatures align
+    local_destination.write(replacement_local_file.read_bytes())
+
+
 @contextmanager
-def mock_bulk_processor_storage(bulk_file: Path):
-    # Patch the storage interaction so there is no attempt to use a real bucket
+def mock_bulk_processor_bucket(bulk_file: Path):
+    # Patch the storage interaction so it works on local files, never a real bucket
     with patch('toolbox.bulk_processing.bulk_processor.storage') as patch_storage:
-        # Patch the bucket interactions so it work purely on local files
         patched_storage_client = patch_storage.Client.return_value
+
+        # patch list_blobs to return at least one thing with a .name
+        # so that the bulk processor enters it's processing loop and names the files it builds correctly
         mock_blob = Mock(spec=storage.Blob)
         mock_blob.name = bulk_file.name
         patched_storage_client.list_blobs.return_value = [mock_blob]
+
+        # patch the download method so that it writes our local bulk file to the supplied destination
         patched_storage_client.download_blob_to_file.side_effect = partial(
             patch_download_blob_to_file,
             replacement_local_file=bulk_file)
 
-        # Yield here to that anything run in this context will still have the patched bulk processor storage
+        # Yield here so that within this context the patched bulk processor storage is in effect
         yield

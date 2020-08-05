@@ -246,12 +246,12 @@ def uac_message_matches_rh_message(case_created_event, rh_message):
     return case_created_event['payload']['collectionCase']['id'] == rh_message['payload']['uac']['caseId']
 
 
-def get_case_updated_events(context, case_ids):
+def get_case_updated_events(context, expected_number):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
                                     functools.partial(store_all_msgs_in_context,
                                                       context=context,
-                                                      expected_msg_count=len(case_ids),
+                                                      expected_msg_count=expected_number,
                                                       type_filter='CASE_UPDATED'))
     case_updated_events = context.messages_received.copy()
     context.messages_received = []
