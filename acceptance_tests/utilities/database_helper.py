@@ -18,7 +18,7 @@ def poll_action_database_with_timeout(query, query_vars: tuple, result_success_c
         :param timeout: Timeout period in seconds (default 60s)
         :return: None
     """
-    conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST}' "
+    conn = psycopg2.connect(f"dbname='{Config.DB_NAME}' user={Config.DB_USERNAME} host='{Config.DB_HOST_ACTION}' "
                             f"password={Config.DB_PASSWORD} port='{Config.DB_PORT}'{Config.DB_USESSL}")
     timeout_deadline = time.time() + timeout
     cur = conn.cursor()
