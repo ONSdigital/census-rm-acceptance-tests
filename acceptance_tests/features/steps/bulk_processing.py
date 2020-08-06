@@ -42,6 +42,7 @@ def build_bulk_refusal_file(context):
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_REFUSAL_BUCKET_NAME:
+        clear_bucket(Config.BULK_REFUSAL_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_refusals_file,
                               f'refusals_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_REFUSAL_BUCKET_NAME)
@@ -87,6 +88,7 @@ def supply_bulk_new_address_file(context, bulk_new_address_file):
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NEW_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_NEW_ADDRESS_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_new_address_file,
                               f'new_addresses_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NEW_ADDRESS_BUCKET_NAME)
@@ -166,6 +168,7 @@ def build_invalid_address_file(context):
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_INVALID_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_invalid_address_file,
                               f'invalid_addresses_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
