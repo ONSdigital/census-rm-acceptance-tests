@@ -6,7 +6,8 @@ from behave import step
 
 from acceptance_tests.features.steps.receipt import _get_emitted_case
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
-from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic
+from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic, \
+    purge_aims_new_address_topic
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -604,6 +605,11 @@ def new_address_sent_to_aims(context):
 
     actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
     actual_address = actual_case['address']
+
+    # Temporary extra purge for debug logging
+    if actual_case['id'] != context.case_id:
+        purge_aims_new_address_topic()
+
     test_helper.assertEqual(actual_case['id'], context.case_id)
     test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
     test_helper.assertEqual(actual_case['caseType'], 'SPG')

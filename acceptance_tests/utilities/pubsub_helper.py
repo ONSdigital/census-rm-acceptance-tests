@@ -39,6 +39,12 @@ def purge_aims_new_address_topic():
                                                      Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
     response = subscriber.pull(subscription_path, max_messages=max_messages, timeout=5)
 
+    # Temporary extra debug logging
+    if response.received_messages:
+        print('Messages purged from AIMs new address topic:')
+        for message in response.received_messages:
+            print(message.ack_id, message.message.data)
+
     ack_ids = [message.ack_id for message in response.received_messages]
 
     if ack_ids:

@@ -65,6 +65,9 @@ def before_tag(context, tag):
     if tag == 'purge_aims_topic':
         purge_aims_new_address_topic()
 
+        # Temporary extra purge call to help debugging
+        purge_aims_new_address_topic()
+
 
 def after_tag(_, tag):
     if tag == "clear_for_bad_messages":
