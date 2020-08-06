@@ -246,6 +246,18 @@ def uac_message_matches_rh_message(case_created_event, rh_message):
     return case_created_event['payload']['collectionCase']['id'] == rh_message['payload']['uac']['caseId']
 
 
+def get_case_updated_events(context, expected_number):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_CASE_QUEUE,
+                                    functools.partial(store_all_msgs_in_context,
+                                                      context=context,
+                                                      expected_msg_count=expected_number,
+                                                      type_filter='CASE_UPDATED'))
+    case_updated_events = context.messages_received.copy()
+    context.messages_received = []
+    return case_updated_events
+
+
 @retry(stop_max_attempt_number=30, wait_fixed=1000)
 def check_if_event_list_is_exact_match(event_type_list, case_id):
     actual_logged_events = get_logged_events_for_case_by_id(case_id)

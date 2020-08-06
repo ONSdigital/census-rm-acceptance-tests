@@ -18,8 +18,10 @@ spec:
             - /bin/sh
             - -c
             - |
-              cp /home/acceptancetests/postgresql/* /home/acceptancetests/.postgresql &&
+              cp /home/acceptancetests/postgresql/* /home/acceptancetests/.postgresql
+              cp /home/acceptancetests/postgresql-action/* /home/acceptancetests/.postgresql-action
               chmod 0600 /home/acceptancetests/.postgresql/postgresql.key
+              chmod 0600 /home/acceptancetests/.postgresql-action/postgresql.key
               # the above is a workaround to get round the permissions as currently we cant mount it without doing this
     image: eu.gcr.io/census-rm-ci/rm/census-rm-acceptance-tests:latest
     tty: true
@@ -33,8 +35,11 @@ spec:
         cpu: "250m"
         memory: "256Mi"
     volumeMounts:
-    - name: cloud-sql-certs
+    - name: read-replica-cloud-sql-certs
       mountPath: "/home/acceptancetests/postgresql"
+      readOnly: true
+    - name: cloud-sql-action-certs
+      mountPath: "/home/acceptancetests/postgresql-action"
       readOnly: true
     - name: sftp-keys
       mountPath: "/home/acceptancetests/.sftp-ssh"
@@ -53,6 +58,11 @@ spec:
       valueFrom:
         configMapKeyRef:
           name: db-config
+          key: db-host
+    - name: DB_HOST_ACTION
+      valueFrom:
+        configMapKeyRef:
+          name: db-config
           key: db-host-action
     - name: DB_PORT
       valueFrom:
@@ -64,6 +74,8 @@ spec:
         configMapKeyRef:
           name: db-config
           key: db-name
+    - name: DB_ACTION_CERTIFICATES
+      value: " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql-action/root.crt sslcert=/home/acceptancetests/.postgresql-action/postgresql.crt sslkey=/home/acceptancetests/.postgresql-action/postgresql.key"
     - name: PROJECT_NAME
       valueFrom:
         configMapKeyRef:
@@ -164,8 +176,8 @@ spec:
     - name: QM_UNDELIVERED_PROJECT_ID
       valueFrom:
         configMapKeyRef:
-            name: project-config
-            key: project-name
+          name: project-config
+          key: project-name
     - name: QM_UNDELIVERED_TOPIC_NAME
       value: "qm-undelivered-topic"
     - name: FULFILMENT_CONFIRMED_PROJECT_ID
@@ -198,22 +210,63 @@ spec:
         configMapKeyRef:
           name: pubsub-config
           key: aims-new-address-project-id
+    - name: BULK_REFUSAL_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-refusal-project-id
+    - name: BULK_REFUSAL_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-refusal-bucket-name
+    - name: BULK_INVALID_ADDRESS_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-invalid-address-project-id
+    - name: BULK_INVALID_ADDRESS_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-invalid-address-bucket-name
+    - name: BULK_NEW_ADDRESS_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-new-address-project-id
+    - name: BULK_NEW_ADDRESS_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-new-address-bucket-name
   volumes:
-  - name: cloud-sql-certs
+  - name: read-replica-cloud-sql-certs
+    secret:
+      secretName: cloud-sql-certs
+      defaultMode: 0400
+      items:
+        - key: "root.crt"
+          path: "root.crt"
+        - key: "postgresql.crt"
+          path: "postgresql.crt"
+        - key: "postgresql.key"
+          path: "postgresql.key"
+  - name: cloud-sql-action-certs
     secret:
       secretName: cloud-sql-action-certs
-      defaultMode: 0660
+      defaultMode: 0400
       items:
-      - key: "root.crt"
-        path: "root.crt"
-      - key: "postgresql.crt"
-        path: "postgresql.crt"
-      - key: "postgresql.key"
-        path: "postgresql.key"
+        - key: "root.crt"
+          path: "root.crt"
+        - key: "postgresql.crt"
+          path: "postgresql.crt"
+        - key: "postgresql.key"
+          path: "postgresql.key"
   - name: sftp-keys
     secret:
       secretName: sftp-ssh-credentials
       defaultMode: 0400
       items:
-      - key: private-key
-        path: "id_rsa"
+        - key: private-key
+          path: "id_rsa"

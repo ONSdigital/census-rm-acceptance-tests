@@ -3,7 +3,7 @@ import time
 
 from behave import step
 
-from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
+from acceptance_tests.utilities.database_helper import poll_action_database_with_timeout
 from acceptance_tests.utilities.event_helper import check_survey_launched_case_updated_events, \
     check_if_event_list_is_exact_match
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -63,7 +63,7 @@ def check_survey_launches_in_action_db(case_ids):
                              f"found values: {results}")
         return False
 
-    poll_database_query_with_timeout(query, query_vars, success_callback)
+    poll_action_database_with_timeout(query, query_vars, success_callback)
 
 
 @step("a survey launched for a created case is received for cases with lsoa {lsoa_list}")

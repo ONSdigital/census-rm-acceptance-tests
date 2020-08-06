@@ -4,7 +4,7 @@ from datetime import datetime
 
 import requests
 
-from acceptance_tests.utilities.database_helper import poll_database_query_with_timeout
+from acceptance_tests.utilities.database_helper import poll_action_database_with_timeout
 from acceptance_tests.utilities.mappings import CLASSIFIERS_FOR_ACTION_TYPE, DEFAULT_CLASSIFIERS
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -24,8 +24,8 @@ def poll_until_sample_is_ingested_to_action(context, after_date_time=None):
                 f"Expected: {context.sample_count}, actual: {db_result[0][0]}")
         return False
 
-    poll_database_query_with_timeout(query, (context.action_plan_id, after_date_time),
-                                     success_callback)
+    poll_action_database_with_timeout(query, (context.action_plan_id, after_date_time),
+                                      success_callback)
 
 
 def setup_treatment_code_classified_action_rule(context, action_type):
