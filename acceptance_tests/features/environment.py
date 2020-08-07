@@ -62,7 +62,7 @@ def before_tag(context, tag):
         # e.g where skeleton cases are used
         context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
         context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
-    if tag == 'purge_aims_topic':
+    if tag == 'purge_aims_subscription':
         purge_aims_new_address_subscription()
 
         # Temporary extra purge call to help debugging
