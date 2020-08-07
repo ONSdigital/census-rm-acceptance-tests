@@ -46,7 +46,7 @@ def purge_aims_new_address_subscription():
         subscriber.seek(aims_subscription_path, time=timestamp)
     except MethodNotImplemented as e:
         # Seek is not implemented by the pubsub-emulator
-        print(f'{e}, falling back on attempting to pull/ack all messages:')
+        print(f'{e}, falling back on attempting to pull/ack all messages')
         ack_all_on_aims_new_address_subscription()
 
 
