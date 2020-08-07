@@ -155,7 +155,7 @@ Feature: Address updates
       | E             | CE           | N            | 24                 |
       | E             | SPG          | N            | 24                 |
 
-  @purge_aims_topic
+  @purge_aims_subscription
   Scenario: New address event received without sourceCaseId and without UPRN
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId or UPRN
     Then a NEW_ADDRESS_ENHANCED event is sent to aims
