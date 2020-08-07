@@ -1,5 +1,23 @@
 Feature: Scheduled reminder print and manifest files can be generated and uploaded
 
+#  Scenario Outline: Generate print files and log events for scheduled reminder letters
+#    Given sample file "<sample file>" is loaded successfully
+#    When set action rule of type "<pack code>"
+#    Then UAC Updated events emitted for the 2 cases with matching treatment codes
+#    And correctly formatted "<pack code>" reminder letter print files are created
+#    And there is a correct "<pack code>" manifest file for each csv file written
+#    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
+#
+#    Examples: Reminder letter: <pack code>
+#      | pack code     | no matching cases | sample file                                    |
+#      | P_RL_1RL1_1   | 2                 | sample_input_england_census_spec.csv           |
+#      | P_RL_2RL1     | 1                 | sample_input_england_reminders_census_spec.csv |
+#
+#    @regression
+#    Examples: Reminder letter: <pack code>
+#      | pack code     | no matching cases | sample file                        |
+#      | P_RL_2RL2B_3a | 2                 | sample_input_wales_census_spec.csv |
+
   Scenario Outline: Generate print files and log events for scheduled reminder letters
     Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
     When set action rule of type "<pack code>"
