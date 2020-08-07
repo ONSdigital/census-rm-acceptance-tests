@@ -10,17 +10,17 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     Examples: Reminder letter: <pack code>
       | pack code     | no matching cases | sample file                                       |
-      | P_RL_2RL4     | 2                 | sample_input_ni_2nd_reminder_census_spec.csv      |
       | P_RL_1RL1_1   | 2                 | sample_input_england_census_spec.csv              |
-      | P_RL_2RL1     | 2                 | sample_input_england_2nd_reminder_census_spec.csv |
-      | P_RL_3RL1     | 2                 | sample_input_england_3rd_reminder_census_spec.csv |
-      | P_RL_3RL2B    | 1                 | sample_input_wales_3rd_reminder_census_spec.csv   |
-      | P_RL_1RL1B    | 1                 | sample_input_england_reminder_b_census_spec.csv   |
+      | P_RL_2RL4     | 2                 | sample_input_ni_2nd_reminder_census_spec.csv      |
 
     @regression
     Examples: Reminder letter: <pack code>
-      | pack code     | no matching cases | sample file                        |
-      | P_RL_2RL2B_3a | 2                 | sample_input_wales_census_spec.csv |
+      | pack code     | no matching cases | sample file                                       |
+      | P_RL_2RL2B_3a | 2                 | sample_input_wales_census_spec.csv                |
+      | P_RL_3RL2B    | 1                 | sample_input_wales_3rd_reminder_census_spec.csv   |
+      | P_RL_3RL1     | 2                 | sample_input_england_3rd_reminder_census_spec.csv |
+      | P_RL_2RL1     | 2                 | sample_input_england_2nd_reminder_census_spec.csv |
+      | P_RL_1RL1B    | 1                 | sample_input_england_reminder_b_census_spec.csv   |
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters
     Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
