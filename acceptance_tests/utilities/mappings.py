@@ -36,9 +36,9 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'P_RL_3RL2B': "treatment_code IN ('HH_LP2W') AND survey_launched = 'f'",
     'P_RL_1RL2BB': "treatment_code IN ('HH_QP3W') AND survey_launched = 'f'",
     'P_RL_1RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
-                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
+                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 't'",
     'P_RL_2RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
-                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLPCVN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
+                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLPCVN', 'HH_SPGLNFN', 'HH_SPGQNFN')",
     'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
                   " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 't'",
     'P_RL_2RL2B_3a': "treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
@@ -399,7 +399,7 @@ PACK_CODE_TO_DESCRIPTION = {
     'P_IC_ICL1': 'Initial contact letter households - England',
     'P_IC_ICL2B': 'Initial contact letter households - Wales',
     'P_IC_ICL4': 'Initial contact letter households - Northern Ireland',
-    'P_IC_H1': 'Initial contact `question`naire households - England',
+    'P_IC_H1': 'Initial contact question`naire households - England',
     'P_IC_H2': 'Initial contact questionnaire households - Wales',
     'P_IC_H4': 'Initial contact questionnaire households - Northern Ireland',
     'P_OR_H1': 'Household Questionnaire for England',
@@ -542,15 +542,15 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper',
     "P_RL_1RL1B": '1st Reminder, Letter - for England paper first addresses with survey not launched',
     "P_RL_1RL2BB": '1st Reminder, Letter - for Wales paper first addresses with survey not launched',
-    "P_RL_1RL4": '1st Reminder, Letter - for paper first Ireland addresses when survey not launched',
-    "P_RL_2RL4": '2nd Reminder, Letter - for Ireland addresses when survey not launched',
+    "P_RL_1RL4": '1st Reminder, Letter - for Ireland addresses',
+    "P_RL_2RL4": '2nd Reminder, Letter - for Ireland addresses',
     "P_RL_1RL4A": '1st Reminder, Letter - for paper first Ireland addresses when survey launched but not completed',
     "P_RL_1RL1A": '1st Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_2RL2B": '2nd Reminder, Letter - for Wales UAC first addresses when survey not launched',
     "P_RL_3RL2B": '3rd Reminder, Letter - for Wales UAC first addresses when survey not launched',
     "P_RL_1RL2BA": '1st Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
                    ' launched but not completed',
-    "P_RL_2RL1": '2nd Reminder, Letter - for England addresses when survey not launched',
+    "P_RL_2RL1": '2nd Reminder, Letter - for England addresses without survey launched',
     "P_RL_3RL1": '3rd Reminder, Letter - for England addresses when survey not launched',
     "P_RL_2RL1A": '2nd Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_2RL2BA": '2nd Reminder, Letter - for Wales addresses (bilingual Welsh and English) for survey'
