@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.pubsub_helper import purge_aims_new_address_topic
+from acceptance_tests.utilities.pubsub_helper import purge_aims_new_address_subscription
 from acceptance_tests.utilities.rabbit_helper import purge_queues
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -63,10 +63,10 @@ def before_tag(context, tag):
         context.action_plan_id = Config.CENSUS_ACTION_PLAN_ID
         context.collection_exercise_id = Config.CENSUS_COLLECTION_EXERCISE_ID
     if tag == 'purge_aims_topic':
-        purge_aims_new_address_topic()
+        purge_aims_new_address_subscription()
 
         # Temporary extra purge call to help debugging
-        purge_aims_new_address_topic()
+        purge_aims_new_address_subscription()
 
 
 def after_tag(_, tag):
