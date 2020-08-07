@@ -38,14 +38,12 @@ def synchronous_consume_of_aims_pubsub_topic(context):
 
 
 def purge_aims_new_address_subscription():
-    subscription_path = subscriber.subscription_path(Config.AIMS_NEW_ADDRESS_PROJECT,
-                                                     Config.AIMS_NEW_ADDRESS_SUBSCRIPTION)
     timestamp = Timestamp()
     timestamp.GetCurrentTime()
     try:
         # Try purging via the seek method
         # Seeking to now should ack any messages published before this moment
-        subscriber.seek(subscription_path, time=timestamp)
+        subscriber.seek(aims_subscription_path, time=timestamp)
     except MethodNotImplemented as e:
         # Seek is not implemented by the pubsub-emulator
         print(f'{e}, falling back on attempting to pull/ack all messages:')
