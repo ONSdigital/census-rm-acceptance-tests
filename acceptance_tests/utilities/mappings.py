@@ -399,7 +399,7 @@ PACK_CODE_TO_DESCRIPTION = {
     'P_IC_ICL1': 'Initial contact letter households - England',
     'P_IC_ICL2B': 'Initial contact letter households - Wales',
     'P_IC_ICL4': 'Initial contact letter households - Northern Ireland',
-    'P_IC_H1': 'Initial contact question`naire households - England',
+    'P_IC_H1': 'Initial contact questionnaire households - England',
     'P_IC_H2': 'Initial contact questionnaire households - Wales',
     'P_IC_H4': 'Initial contact questionnaire households - Northern Ireland',
     'P_OR_H1': 'Household Questionnaire for England',
