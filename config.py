@@ -72,6 +72,10 @@ class Config:
     EQ_FULFILMENT_PROJECT_ID = os.getenv("EQ_FULFILMENT_PROJECT_ID", "eq-fulfilment-project")
     EQ_FULFILMENT_TOPIC_NAME = os.getenv("EQ_FULFILMENT_TOPIC_NAME", "eq-fulfilment-topic")
 
+    AIMS_NEW_ADDRESS_PROJECT = os.getenv("AIMS_NEW_ADDRESS_PROJECT", "aims-new-address-project")
+    AIMS_NEW_ADDRESS_TOPIC_NAME = os.getenv("AIMS_NEW_ADDRESS_TOPIC_NAME", "aims-new-address-topic")
+    AIMS_NEW_ADDRESS_SUBSCRIPTION = os.getenv("AIMS_NEW_ADDRESS_SUBSCRIPTION", "aims-new-address-subscription")
+
     RABBITMQ_INBOUND_REFUSAL_QUEUE = 'case.refusals'
     RABBITMQ_INBOUND_FULFILMENT_REQUEST_QUEUE = 'case.fulfilments'
     RABBITMQ_INBOUND_NOTIFY_FULFILMENT_REQUEST_QUEUE = 'notify.fulfilments'
@@ -109,10 +113,14 @@ class Config:
 
     DB_USERNAME = os.getenv('DB_USERNAME', 'postgres')
     DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
+    DB_HOST_ACTION = os.getenv('DB_HOST_ACTION', 'localhost')
     DB_PORT = os.getenv('DB_PORT', '6432')
     DB_NAME = os.getenv('DB_NAME', 'postgres')
-    DB_USESSL = os.getenv('DB_USESSL', '')
+    DB_ACTION_CERTIFICATES = os.getenv('DB_ACTION_CERTIFICATES', '')
 
     CENSUS_ACTION_PLAN_ID = os.getenv('ACTION_PLAN_ID', 'c4415287-0e37-447b-9c3d-1a011c9fa3db')
     CENSUS_COLLECTION_EXERCISE_ID = os.getenv('COLLECTION_EXERCISE_ID', '34d7f3bb-91c9-45d0-bb2d-90afce4fc790')
+
+    BULK_REFUSAL_BUCKET_NAME = os.getenv('BULK_REFUSAL_BUCKET_NAME')
+    BULK_NEW_ADDRESS_BUCKET_NAME = os.getenv('BULK_NEW_ADDRESS_BUCKET_NAME')
+    BULK_INVALID_ADDRESS_BUCKET_NAME = os.getenv('BULK_INVALID_ADDRESS_BUCKET_NAME')

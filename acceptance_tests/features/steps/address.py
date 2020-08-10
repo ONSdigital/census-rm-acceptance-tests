@@ -1,11 +1,13 @@
 import functools
 import json
 import uuid
-
 import requests
 from behave import step
 
+from acceptance_tests.features.steps.receipt import _get_emitted_case
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
+from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic, \
+    purge_aims_new_address_subscription
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -225,6 +227,8 @@ def new_address_reported_event_with_minimal_fields(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
+@step('a NEW_ADDRESS_REPORTED event with no FieldCoordinatorId with address type "{address_type}" is sent from'
+      ' "{sender}"')
 @step('a NEW_ADDRESS_REPORTED event with address type "{address_type}" is sent from "{sender}" and the case is created')
 def new_address_reported_event_for_address_type(context, address_type, sender):
     context.case_id = str(uuid.uuid4())
@@ -458,26 +462,28 @@ def send_address_modified_event(context):
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                     },
                     "originalAddress": {
-                        "addressLine1": "1 main street",
-                        "addressLine2": "upper upperingham",
-                        "addressLine3": "",
-                        "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E"
+                        "addressLine1": "nope",
+                        "addressLine2": "nope",
+                        "addressLine3": "nope",
+                        "townName": "nope",
+                        "postcode": "nope",
+                        "region": "nope",
+                        "uprn": "nope",
+                        "estabType": "nope",
+                        "organisationName": "nope"
                     },
                     "newAddress": {
                         "addressLine1": "1a main street",
                         "addressLine2": "upper upperingham",
-                        "addressLine3": "",
-                        "townName": "upton",
-                        "postcode": "UP103UP",
-                        "region": "E"
+                        "addressLine3": "thingy",
+                        "organisationName": "Bedlam",
+                        "estabType": "HOSPITAL"
                     }
                 }
             }
         }
-
     )
+
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
             message=message,
@@ -523,3 +529,98 @@ def _field_work_create_callback(ch, method, _properties, body, context):
 def new_address_without_source_id(context, sender):
     new_address_reported_event_without_source_case_id(context, sender)
     check_case_created_message_is_emitted(context)
+
+
+@step("a case updated msg is emitted with the updated case details")
+def address_modified_case_update(context):
+    emitted_case = _get_emitted_case(context)
+
+    test_helper.assertEqual(emitted_case['id'], context.receipting_case['id'])
+    test_helper.assertEqual(emitted_case['address']['addressLine1'], "1a main street")
+    test_helper.assertEqual(emitted_case['address']['addressLine2'], "upper upperingham")
+    test_helper.assertEqual(emitted_case['address']['addressLine3'], "thingy")
+    test_helper.assertEqual(emitted_case['address']['organisationName'], "Bedlam")
+    test_helper.assertEqual(emitted_case['address']['estabType'], "HOSPITAL")
+
+
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId or UPRN')
+def step_impl(context, sender):
+    context.case_id = str(uuid.uuid4())
+
+    context.collection_exercise_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": None,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "SPG",
+                        "survey": "CENSUS",
+                        "fieldcoordinatorId": "SO_23",
+                        "fieldofficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "SPG",
+                            "addressLevel": "U",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193",
+                            "uprn": None
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step("a NEW_ADDRESS_ENHANCED event is sent to aims")
+def new_address_sent_to_aims(context):
+    synchronous_consume_of_aims_pubsub_topic(context)
+    test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
+
+    # caseRef not sent to aims, so need to get it to construct expected dummy Uprn
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=false')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    case_api_case = response.json()
+    expected_dummy_uprn = f"999{case_api_case['caseRef']}"
+
+    actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
+    actual_address = actual_case['address']
+
+    # Temporary extra purge for debug logging
+    if actual_case['id'] != context.case_id:
+        purge_aims_new_address_subscription()
+
+    test_helper.assertEqual(actual_case['id'], context.case_id)
+    test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
+    test_helper.assertEqual(actual_case['caseType'], 'SPG')
+    test_helper.assertEqual(actual_case['survey'], 'CENSUS')
+    test_helper.assertEqual(actual_address['addressLine1'], '123')
+    test_helper.assertEqual(actual_address['addressLine2'], 'Fake caravan park')
+    test_helper.assertEqual(actual_address["addressLine3"], "The long road")
+    test_helper.assertEqual(actual_address["townName"], "Trumpton")
+    test_helper.assertEqual(actual_address["postcode"], "SO190PG")
+    test_helper.assertEqual(actual_address["region"], "E00001234")
+    test_helper.assertEqual(actual_address["addressType"], "SPG")
+    test_helper.assertEqual(actual_address["addressLevel"], "U")
+    test_helper.assertEqual(actual_address["latitude"], "50.917428")
+    test_helper.assertEqual(actual_address["longitude"], "-1.238193")

@@ -1,8 +1,9 @@
 import json
-from pathlib import Path
 
-from config import Config
 from load_sample import load_sample_file
+
+from acceptance_tests import RESOURCE_FILE_PATH
+from config import Config
 
 
 def load_sample_file_helper(context, sample_file_name):
@@ -16,7 +17,7 @@ def load_sample_file_helper(context, sample_file_name):
 
 
 def _load_sample(context, sample_file_name):
-    sample_file_path = Path(__file__).parents[2].joinpath('resources', 'sample_files', sample_file_name)
+    sample_file_path = RESOURCE_FILE_PATH.joinpath('sample_files', sample_file_name)
     return load_sample_file(sample_file_path, context.collection_exercise_id, context.action_plan_id,
                             store_loaded_sample_units=True,
                             host=Config.RABBITMQ_HOST, port=Config.RABBITMQ_PORT,

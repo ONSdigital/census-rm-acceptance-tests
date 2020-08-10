@@ -226,9 +226,14 @@ PACK_CODE_TO_SFTP_DIRECTORY = {
     "P_UAC_UACIP1": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACIP2B": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACIP4": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIPA1": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIPA2B": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACIPA4": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP1": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP2B": Config.SFTP_PPO_DIRECTORY,
     "P_UAC_UACHHP4": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACCEP1": Config.SFTP_PPO_DIRECTORY,
+    "P_UAC_UACCEP2B": Config.SFTP_PPO_DIRECTORY,
     "P_ER_ILER1": Config.SFTP_PPO_DIRECTORY,
     "P_ER_ILER2B": Config.SFTP_PPO_DIRECTORY,
 }
@@ -392,7 +397,12 @@ PACK_CODE_TO_DATASET = {
     "D_FDCE_H2": QM3_2_DATASET,
     "P_UAC_UACIP1": PPD1_3_DATASET,
     "P_UAC_UACIP2B": PPD1_3_DATASET,
-    "P_UAC_UACIP4": PPD1_3_DATASET
+    "P_UAC_UACIP4": PPD1_3_DATASET,
+    "P_UAC_UACIPA1": PPD1_3_DATASET,
+    "P_UAC_UACIPA2B": PPD1_3_DATASET,
+    "P_UAC_UACIPA4": PPD1_3_DATASET,
+    "P_UAC_UACCEP1": PPD1_3_DATASET,
+    "P_UAC_UACCEP2B": PPD1_3_DATASET
 }
 
 PACK_CODE_TO_DESCRIPTION = {
@@ -545,6 +555,11 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_RL_1RL4": '1st Reminder, Letter - for Ireland addresses',
     "P_RL_2RL4": '2nd Reminder, Letter - for Ireland addresses',
     "P_RL_1RL4A": '1st Reminder, Letter - for paper first Ireland addresses when survey launched but not completed',
+    "P_UAC_UACIPA1": 'Individual Unique Access Code for England via paper - Request from EQ',
+    "P_UAC_UACIPA2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper - Request from EQ',
+    "P_UAC_UACIPA4": 'Individual Unique Access Code for Northern Ireland via paper - Request from EQ',
+    "P_UAC_UACCEP1": 'UAC provided to Communal Establishment manager in England via paper',
+    "P_UAC_UACCEP2B": 'UAC provided to Communal Establishment manager in Wales via paper (Bilingual)',
     "P_RL_1RL1A": '1st Reminder, Letter - for England addresses for survey launched but not completed',
     "P_RL_2RL2B": '2nd Reminder, Letter - for Wales UAC first addresses when survey not launched',
     "P_RL_3RL2B": '3rd Reminder, Letter - for Wales UAC first addresses when survey not launched',

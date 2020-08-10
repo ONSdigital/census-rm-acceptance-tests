@@ -181,9 +181,11 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     # receipting_case will be over written if a child case is created
     context.receipting_case = context.case_created_events[0]['payload']['collectionCase']
 
-    if qid_type in ['HH', 'CE1']:
-        context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
-        return
+    if qid_type == "CE1":
+        return qid_type_equals_ce1(address_level, case_type, context, country_code)
+
+    if qid_type == "HH":
+        return qid_type_equals_hh(case_type, context, country_code)
 
     if qid_type == 'Ind':
         if case_type == 'HI':
@@ -211,8 +213,48 @@ def get_new_qid_and_case_as_required(context, case_type, address_level, qid_type
     test_helper.assertFalse(f"Failed to get qid for {qid_type}")
 
 
+def qid_type_equals_hh(case_type, context, country_code):
+    if case_type in ['HH', 'SPG']:
+        context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+        return
+    elif case_type == "HI":
+        context.case_type = "HI"
+        request_hi_individual_telephone_capture(context, "HH", country_code)
+        context.qid_to_receipt = context.telephone_capture_qid_uac['questionnaireId']
+        context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
+        context.case_created_events[0]['payload']['collectionCase'] = context.receipting_case
+        _get_emitted_uac(context)
+        _get_second_qid(context, questionnaire_type=1, qid_needed='True')
+        return
+    else:
+        _get_second_qid(context, questionnaire_type=1, qid_needed='True')
+        return
+
+
+def qid_type_equals_ce1(address_level, case_type, context, country_code):
+    if case_type == "CE" and address_level == "E":
+        context.qid_to_receipt = context.uac_created_events[0]['payload']['uac']['questionnaireId']
+        return
+    elif case_type == "HI":
+        context.case_type = "HI"
+        request_hi_individual_telephone_capture(context, "HH", country_code)
+        context.qid_to_receipt = context.telephone_capture_qid_uac['questionnaireId']
+        context.receipting_case = _get_emitted_case(context, 'CASE_CREATED')
+        context.case_created_events[0]['payload']['collectionCase'] = context.receipting_case
+        _get_emitted_uac(context)
+        _get_second_qid(context, questionnaire_type=31, qid_needed='True')
+        return
+    else:
+        _get_second_qid(context, questionnaire_type=31, qid_needed='True')
+        return
+
+
 @step('if required for "{questionnaire_type}", a new qid is created "{qid_needed}"')
 def get_second_qid(context, questionnaire_type, qid_needed):
+    _get_second_qid(context, qid_needed, questionnaire_type)
+
+
+def _get_second_qid(context, qid_needed, questionnaire_type):
     if qid_needed == 'True':
         context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
@@ -298,6 +340,7 @@ def check_receipt_to_field_msg_is_none(context):
 
 @step('the correct events are logged for loaded case events "{loaded_case_events}" '
       'and individual case events "{individual_case_events}"')
+@step('the correct events are logged for the loaded case events "{loaded_case_events}"')
 @step('the correct events are logged for loaded case events "{loaded_case_events}" for blank questionnaire')
 def check_events_logged_on_loaded_and_ind_case(context, loaded_case_events, individual_case_events=None):
     check_if_event_list_is_exact_match(loaded_case_events, context.loaded_case['id'])
