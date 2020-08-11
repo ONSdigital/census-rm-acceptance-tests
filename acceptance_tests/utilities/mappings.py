@@ -518,7 +518,7 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_OR_I2W": 'Individual Questionnaire for Wales (in Welsh)',
     "P_OR_I4": 'Individual Questionnaire for Northern Ireland (in English)',
     "P_RL_1RL1_1": '1st Reminder, Letter - for England addresses',
-    "P_RL_1RL2B_1": '1st Reminder, Letter - for Wales addresses',
+    "P_RL_1RL2B_1": '1st Reminder, Letter - for Wales addresses (bilingual Welsh and English)',
     "P_RL_2RL2B_3a": '3rd Reminder, Letter - for Wales addresses',
     "P_QU_H1": '3rd Reminder, Questionnaire - for England addresses',
     "P_QU_H2": '3rd Reminder, Questionnaire - for Wales addresses',
