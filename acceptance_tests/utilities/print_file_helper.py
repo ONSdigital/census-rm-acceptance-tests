@@ -42,7 +42,7 @@ def create_expected_csv_lines(context, prefix, ignore_case_id=None):
     ]
 
 
-def create_expected_csv_lines_with_no_uac_for_reminder_survey_launched(context, prefix, expected_case_ids=None):
+def create_expected_csv_lines_with_no_uac_eq_survey_launched(context, prefix, expected_case_ids=None):
     expected_data = defaultdict(dict)
 
     for case in context.case_created_events:

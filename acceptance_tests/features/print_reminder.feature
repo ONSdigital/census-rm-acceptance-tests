@@ -56,7 +56,7 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
     Given sample file "<sample file>" is loaded successfully
     And a survey launched for a created case is received for cases with lsoa <lsoa list>
     When set action rule of type "<pack code>"
-    Then correctly formatted "<pack code>" print files with no uac are created for packcode and where survey was launched
+    Then correctly formatted "<pack code>" print files with no uac are created for packcode where survey launched
     And there is a correct "<pack code>" manifest file for each csv file written
     Examples: Reminder contact letter: <pack code>
       | pack code  | lsoa list             | sample file                                        |
