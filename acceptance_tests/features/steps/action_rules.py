@@ -1,7 +1,7 @@
 from behave import step
 from retrying import retry
 
-from acceptance_tests.utilities.action_helper import setup_treatment_code_classified_action_rule, \
+from acceptance_tests.utilities.action_helper import setup_classified_action_rule, \
     build_and_create_action_rule, setup_address_frame_delta_action_rule
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.mappings import DEFAULT_CLASSIFIERS
@@ -31,7 +31,7 @@ def create_field_action_plan(context, address_type):
 @step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
 def set_action_rule_when_case_event_logged(context, action_type, event_type):
     check_for_event(context, event_type)
-    setup_treatment_code_classified_action_rule(context, action_type)
+    setup_classified_action_rule(context, action_type)
 
 
 @retry(stop_max_attempt_number=30, wait_fixed=1000)
@@ -47,7 +47,7 @@ def check_for_event(context, event_type):
 
 @step('set action rule of type "{action_type}"')
 def set_action_rule(context, action_type):
-    setup_treatment_code_classified_action_rule(context, action_type)
+    setup_classified_action_rule(context, action_type)
 
 
 @step('the address frame delta initial contact action rule of type "{action_type}" is set')
