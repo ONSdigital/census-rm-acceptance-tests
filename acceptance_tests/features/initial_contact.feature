@@ -22,7 +22,7 @@ Feature: Scheduled initial contact print and manifest files can be generated and
       | pack code      | action type | questionnaire types | sample file                        |
       | P_IC_ICL2B     | ICL2W       | [02]                | sample_input_wales_census_spec.csv |
       | P_IC_ICL4      | ICL4N       | [04]                | sample_input_ni_census_spec.csv    |
-      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_1_welsh_CE_estab.csv        |
+      | D_CE1A_ICLCR2B | CE1_IC02    | [32]                | sample_for_IC02.csv                |
       | P_ICCE_ICL1    | SPG_IC11    | [01]                | sample_1_english_SPG_unit.csv      |
       | P_ICCE_ICL2B   | SPG_IC12    | [02]                | sample_1_welsh_SPG_unit.csv        |
 

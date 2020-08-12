@@ -45,7 +45,7 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
                      " 'HH_QFNR3AW')",
     'P_QU_H2': "treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
     'CE1_IC01': "treatment_code IN ('CE_LDCEE')",
-    'CE1_IC02': "treatment_code IN ('CE_LDCEW')",
+    'CE1_IC02': "treatment_code IN ('CE_LDCEW', 'CE_LDIEW', 'CE_QDIEW')",
     'CE_IC03': "treatment_code IN ('CE_LDIEE')",
     'CE_IC04': "treatment_code IN ('CE_LDIEW')",
     'CE_IC03_1': "treatment_code IN ('CE_LDIUE')",
