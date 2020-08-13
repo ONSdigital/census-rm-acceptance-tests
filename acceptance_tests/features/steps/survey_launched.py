@@ -1,4 +1,5 @@
 import json
+import random
 import time
 
 from behave import step
@@ -66,15 +67,12 @@ def check_survey_launches_in_action_db(case_ids):
     poll_action_database_with_timeout(query, query_vars, success_callback)
 
 
-@step("a survey launched for a created case is received for cases with lsoa {lsoa_list}")
-def send_survey_for_case_with_lsoa(context, lsoa_list):
-    lsoas_to_match = lsoa_list.replace('[', '').replace(']', '').split(',')
-
-    context.survey_started_case_ids = [
-        case['payload']['collectionCase']['id']
-        for case in context.case_created_events
-        if case['payload']['collectionCase']['lsoa'] in lsoas_to_match
-    ]
+@step("we receive a survey launch event for some of the cases")
+def send_survey_for_some_cases(context):
+    # Launch at least one case
+    number_of_cases_to_launch = random.randrange(1, len(context.case_created_events))
+    cases_to_launch = random.sample(context.case_created_events, number_of_cases_to_launch)
+    context.survey_started_case_ids = [case['payload']['collectionCase']['id'] for case in cases_to_launch]
 
     for uac_created_event in context.uac_created_events:
         if uac_created_event['payload']['uac']['caseId'] in context.survey_started_case_ids:

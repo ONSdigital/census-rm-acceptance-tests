@@ -28,8 +28,12 @@ def poll_until_sample_is_ingested_to_action(context, after_date_time=None):
                                       success_callback)
 
 
-def setup_classified_action_rule(context, action_type):
+def setup_action_rule(context, action_type):
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + CLASSIFIERS_FOR_ACTION_TYPE[action_type], action_type)
+
+
+def setup_lsoa_action_rule(context, action_type, lsoas):
+    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + f'lsoa IN {lsoas}', action_type)
 
 
 def setup_address_frame_delta_action_rule(context, action_type):

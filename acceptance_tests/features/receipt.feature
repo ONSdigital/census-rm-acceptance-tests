@@ -42,7 +42,7 @@ Feature: Case processor handles receipt message from pubsub service
   Scenario: Receipted Cases are excluded from print files
     Given sample file "sample_input_england_census_spec.csv" is loaded successfully
     When the receipt msg for the created case is put on the GCP pubsub
-    And set action rule of type "ICL1E" when case event "RESPONSE_RECEIVED" is logged
+    And we schedule an action rule of type "ICL1E" when case event "RESPONSE_RECEIVED" is logged
     Then only unreceipted cases appear in "P_IC_ICL1" print files
     And the events logged for the receipted case are [SAMPLE_LOADED,RESPONSE_RECEIVED]
 

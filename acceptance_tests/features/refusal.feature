@@ -4,7 +4,7 @@ Feature: Handle refusal message
     Given sample file "sample_for_refusals_print.csv" is loaded successfully
     When a refusal message of type "<refusal type>" is sent from "CC" for the created case
     Then a CANCEL action instruction is emitted to FWMT
-    And set action rule of type "ICL1E" when case event "REFUSAL_RECEIVED" is logged
+    And we schedule an action rule of type "ICL1E" when case event "REFUSAL_RECEIVED" is logged
     And the refused case of type "<refusal type>" only appears in the "P_IC_ICL1" print files if it is a HARD_REFUSAL
     And the case is marked as refused
     And the events logged for the refusal case are <events expected>
@@ -19,7 +19,7 @@ Feature: Handle refusal message
     Given sample file "sample_for_refusals_field.csv" is loaded successfully
     When a refusal message of type "<refusal type>" is sent from "CC" for the created case
     Then a CANCEL action instruction is emitted to FWMT
-    And set action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
+    And we schedule an action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
     And Only unrefused cases are sent to field
     And the case is marked as refused
     And the events logged for the refusal case are [SAMPLE_LOADED,REFUSAL_RECEIVED]
@@ -34,7 +34,7 @@ Feature: Handle refusal message
     Given sample file "sample_for_refusals_field.csv" is loaded successfully
     When a refusal message of type "HARD_REFUSAL" is sent from "FIELD" for the created case
     Then no ActionInstruction is sent to FWMT
-    And set action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
+    And we schedule an action rule of type "FIELD" when case event "REFUSAL_RECEIVED" is logged
     And Only unrefused cases are sent to field
     And the case is marked as refused
     And the events logged for the refusal case are [SAMPLE_LOADED,REFUSAL_RECEIVED]
