@@ -1,8 +1,8 @@
 from behave import step
 from retrying import retry
 
-from acceptance_tests.utilities.action_helper import setup_classified_action_rule, \
-    build_and_create_action_rule, setup_address_frame_delta_action_rule
+from acceptance_tests.utilities.action_helper import setup_action_rule, \
+    build_and_create_action_rule, setup_address_frame_delta_action_rule, setup_lsoa_action_rule
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.mappings import DEFAULT_CLASSIFIERS
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -28,10 +28,10 @@ def create_field_action_plan(context, address_type):
     build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + f"address_type = '{address_type}'", 'FIELD')
 
 
-@step('set action rule of type "{action_type}" when case event "{event_type}" is logged')
+@step('we schedule an action rule of type "{action_type}" when case event "{event_type}" is logged')
 def set_action_rule_when_case_event_logged(context, action_type, event_type):
     check_for_event(context, event_type)
-    setup_classified_action_rule(context, action_type)
+    setup_action_rule(context, action_type)
 
 
 @retry(stop_max_attempt_number=30, wait_fixed=1000)
@@ -45,9 +45,14 @@ def check_for_event(context, event_type):
     test_helper.fail(f"Case {context.first_case['id']} event_type {event_type} not logged")
 
 
-@step('set action rule of type "{action_type}"')
+@step('we schedule an action rule of type "{action_type}"')
 def set_action_rule(context, action_type):
-    setup_classified_action_rule(context, action_type)
+    setup_action_rule(context, action_type)
+
+
+@step('we schedule an action rule of type "{action_type}" for LSOAs {lsoas}')
+def set_up_lsoa_driven_action_rule(context, action_type, lsoas):
+    setup_lsoa_action_rule(context, action_type, lsoas)
 
 
 @step('the address frame delta initial contact action rule of type "{action_type}" is set')

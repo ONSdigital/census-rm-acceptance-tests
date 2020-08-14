@@ -254,7 +254,7 @@ def compare_sftp_with_gcp_files(context, bucket, filename):
                              f'file contents {filename} did not match gcp file contents')
 
 
-@then('correctly formatted "{pack_code}" print files with no UAC are created for packcode where survey launched')
+@then('correctly formatted "{pack_code}" print files with no UAC are created for pack code where survey launched')
 def check_reminder_files_with_survey_launched(context, pack_code):
     expected_csv_lines = create_expected_csv_lines_with_no_uac_eq_survey_launched(context,
                                                                                   pack_code,

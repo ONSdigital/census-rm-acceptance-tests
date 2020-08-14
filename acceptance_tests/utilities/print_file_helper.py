@@ -498,7 +498,7 @@ def _check_actual_file_contents_sorted_by_production_code(unsorted_actual_conten
         for csvrow in unsorted_actual_content_list
     ]
 
-    # If called with an invalid packcode the test will fail, this is expected behaviour
+    # If called with an invalid pack code the test will fail, this is expected behaviour
     sorted_list = []
 
     # This will sort a list of lists based on template ICL or QM

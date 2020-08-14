@@ -43,7 +43,10 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
                   " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 't'",
     'P_RL_2RL2B_3a': "treatment_code IN ('HH_LF2R3AW', 'HH_LF3R3AW', 'HH_LFNR3AW', 'HH_QF2R3AW', 'HH_QF3R3AW',"
                      " 'HH_QFNR3AW')",
+    'P_QU_H1': "treatment_code IN ('HH_LP1E')",
     'P_QU_H2': "treatment_code IN ('HH_LF2R3BW', 'HH_LF3R3BW', 'HH_LFNR3BW')",
+    'P_QU_H4': "treatment_code IN ('HH_1ALSFN','HH_2BLEFN','HH_2CLEFN','HH_3DQSFN','HH_3EQSFN','HH_3FQSFN',"
+               "'HH_3GQSFN','HH_4HLPCVN','HH_SPGLNFN','HH_SPGQNFN')",
     'CE1_IC01': "treatment_code IN ('CE_LDCEE')",
     'CE1_IC02': "treatment_code IN ('CE_LDCEW', 'CE_LDIEW', 'CE_QDIEW')",
     'CE_IC03': "treatment_code IN ('CE_LDIEE')",
@@ -59,16 +62,10 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'SPG_IC12': "treatment_code IN ('SPG_LPHUW')",
     'SPG_IC13': "treatment_code IN ('SPG_QDHUE')",
     'SPG_IC14': "treatment_code IN ('SPG_QDHUW')",
-    'P_RD_2RL1_1': "lsoa IN ('E01014540', 'E01014541', 'E01014542', 'W01014540')",
-    'P_RD_2RL2B_1': "lsoa IN ('E01014669', 'W01014669')",
-    'P_RD_2RL1_2': "lsoa IN ('E01014543', 'E01014544')",
-    'P_RD_2RL2B_2': "lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005')",
-    'P_RD_2RL1_3': "lsoa IN ('E01014545')",
-    'P_RD_2RL2B_3': "lsoa IN ('E01014897', 'W01014897')",
-    'P_RL_1RL1A': "lsoa IN ('E01014540', 'E01014541', 'E01014542') AND survey_launched = 't'",
-    'P_RL_1RL2BA': "lsoa IN ('E01014669', 'W01014669') AND survey_launched = 't'",
-    'P_RL_2RL1A': "lsoa IN ('E01014543', 'E01014544') AND survey_launched = 't'",
-    'P_RL_2RL2BA': "lsoa IN ('E01033361', 'E01015005', 'W01033361', 'W01015005') AND survey_launched = 't'",
+    'P_RL_1RL1A': "treatment_code IN ('HH_LP1E','HH_LP2E','HH_QP3E') AND survey_launched = 't'",
+    'P_RL_1RL2BA': "treatment_code IN ('HH_LP1W','HH_LP2W','HH_QP3W') AND survey_launched = 't'",
+    'P_RL_2RL1A': "treatment_code IN ('HH_LP1E','HH_LP2E','HH_QP3E') AND survey_launched = 't'",
+    'P_RL_2RL2BA': "treatment_code IN ('HH_LP1W','HH_LP2W','HH_QP3W') AND survey_launched = 't'",
 }
 
 PACK_CODE_TO_SFTP_DIRECTORY = {

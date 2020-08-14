@@ -33,8 +33,9 @@ def gather_ce_estab_messages_emitted_with_qids(context, questionnaire_types):
     context.messages_received = []
 
 
-@step('UAC Updated events emitted for the {number_of_matching_cases} cases with matching treatment codes')
-def gather_uac_updated_events(context, number_of_matching_cases):
+@step('UAC Updated events are emitted for the {number_of_matching_cases} cases with matching treatment codes'
+      ' with questionnaire type "{questionnaire_type}"')
+def gather_uac_updated_events(context, number_of_matching_cases, questionnaire_type):
     start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
                                     functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
                                                       context=context,
@@ -42,6 +43,10 @@ def gather_uac_updated_events(context, number_of_matching_cases):
                                                       collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEqual(len(context.messages_received), int(number_of_matching_cases))
     context.reminder_uac_updated_events = context.messages_received.copy()
+    for uac_updated_event in context.reminder_uac_updated_events:
+        test_helper.assertTrue(uac_updated_event['payload']['uac']['questionnaireId'].startswith(questionnaire_type),
+                               f"Exoected QIDs to have type {questionnaire_type}, "
+                               f"found QID {uac_updated_event['payload']['uac']['questionnaireId']}")
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
 
@@ -56,6 +61,15 @@ def gather_welsh_reminder_uac_events(context, number_of_matching_cases):
                                                       collection_exercise_id=context.collection_exercise_id))
     test_helper.assertEquals(len(context.messages_received), number_of_matching_cases * 2)
     context.reminder_uac_updated_events = context.messages_received.copy()
+    qids = [uac_updated['payload']['uac']['questionnaireId'] for uac_updated in context.reminder_uac_updated_events]
+    test_helper.assertEqual(len([qid for qid in qids if qid.startswith('02')]),
+                            number_of_matching_cases,
+                            (f'Expected to find an "02" questionnaire type QID '
+                             f'for each of the {number_of_matching_cases} cases, found {qids}'))
+    test_helper.assertEqual(len([qid for qid in qids if qid.startswith('03')]),
+                            number_of_matching_cases,
+                            (f'Expected to find an "03" questionnaire type QID '
+                             f'for each of the {number_of_matching_cases} cases, found {qids}'))
     context.reminder_case_ids = {uac['payload']['uac']['caseId'] for uac in context.reminder_uac_updated_events}
     context.messages_received = []
 
