@@ -78,8 +78,8 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
     And there is a correct "<pack code>" manifest file for each csv file written
 
     Examples: Reminder contact letter: <pack code>
-      | pack code | sample file                                  |
-      | P_RL_1RL4 | sample_input_ni_1st_reminder_census_spec.csv |
+      | pack code  | sample file                                  |
+      | P_RL_1RL4A | sample_input_ni_1st_reminder_census_spec.csv |
 
     @regression
     Examples: Reminder contact letter: <pack code>
@@ -102,8 +102,9 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     @regression
     Examples: Reminder contact letter: <pack code>
-      | pack code   | questionnaire type | sample file      |
-      | P_RL_1RL2BB | 02                 | HH_unit_QP3W.csv |
+      | pack code   | questionnaire type | sample file                                    |
+      | P_RL_1RL2BB | 02                 | HH_unit_QP3W.csv                               |
+      | P_RL_1RL4   | 04                 | sample_1_input_ni_1st_reminder_census_spec.csv |
 
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters checking for MILITARY SFA
