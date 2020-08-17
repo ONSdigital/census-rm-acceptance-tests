@@ -2,7 +2,7 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
   Scenario Outline: Generate print files and log events for initial contact letters
     Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
-    When set action rule of type "<action type>"
+    When we schedule an action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -29,7 +29,7 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
   Scenario Outline: Generate print files and log events for initial contact letters CE Estabs
     Given sample file "<sample file>" is loaded and correct qids <questionnaire type> set
-    When set action rule of type "<action type>"
+    When we schedule an action rule of type "<action type>"
     Then CE Estab messages are emitted with <individual qid type> questionnaire types
     And correctly formatted "<pack code>" print files are created for CE Estab expected responses
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -52,7 +52,7 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
   Scenario Outline: Generate print files and log events for initial contact questionnaires
     Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
-    When set action rule of type "<action type>"
+    When we schedule an action rule of type "<action type>"
     Then correctly formatted "<pack code>" print files are created for questionnaire
     And there is a correct "<pack code>" manifest file for each csv file written
     And events logged against the case are [PRINT_CASE_SELECTED,SAMPLE_LOADED]
@@ -72,7 +72,7 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
   Scenario Outline: Generate print files and log events for CE initial contact questionnaires
     Given sample file "<sample file>" is loaded and correct qids <questionnaire types> set
-    When set action rule of type "<action type>"
+    When we schedule an action rule of type "<action type>"
     Then CE Estab messages are emitted with <individual qid type> questionnaire types
     And correctly formatted "<pack code>" print files are created for CE Estab questionnaires
     And there is a correct "<pack code>" manifest file for each csv file written
@@ -90,33 +90,11 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
   Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
     Given sample file "sample_3_welsh_CE_estab_questionnaire.csv" is loaded and correct qids [32] set
-    When set action rule of type "CE_IC10"
+    When we schedule an action rule of type "CE_IC10"
     Then CE Estab messages are emitted with [22,23] questionnaire types
     And correctly formatted "D_FDCE_I2" print files are created for CE Estab Welsh questionnaires
     And there is a correct "D_FDCE_I2" manifest file for each csv file written
     And two "RM_UAC_CREATED" events [PRINT_CASE_SELECTED,SAMPLE_LOADED] are logged per case
-
-
-  Scenario Outline: Generate print files and log events for response driven reminders
-    Given sample file "<sample file>" is loaded successfully
-    When set action rule of type "<pack code>"
-    Then UAC Updated events emitted for the <number of matching cases> cases with matching treatment codes
-    Then correctly formatted "<pack code>" reminder letter print files are created
-    And there is a correct "<pack code>" manifest file for each csv file written
-    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
-
-    Examples: Reminder contact letter: <pack code>
-      | pack code   | number of matching cases | sample file                                        |
-      | P_RD_2RL1_1 | 3                        | sample_input_england_response_driven_reminders.csv |
-
-    @regression
-    Examples: Reminder contact letter: <pack code>
-      | pack code    | number of matching cases | sample file                                        |
-      | P_RD_2RL2B_1 | 1                        | sample_input_wales_census_spec.csv                 |
-      | P_RD_2RL1_2  | 2                        | sample_input_england_response_driven_reminders.csv |
-      | P_RD_2RL2B_2 | 2                        | sample_input_wales_census_spec.csv                 |
-      | P_RD_2RL1_3  | 1                        | sample_input_england_response_driven_reminders.csv |
-      | P_RD_2RL2B_3 | 1                        | sample_input_wales_census_spec.csv                 |
 
 
   Scenario Outline: Address frame delta initial contact print files

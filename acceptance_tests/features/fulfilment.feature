@@ -124,17 +124,10 @@ Feature: Handle fulfilment request events
       | fulfilment code |
       | P_TB_TBARA1     |
 
-    Examples: Large print questionnaire: <fulfilment code>
-      | fulfilment code |
-      | P_LP_HL1        |
-
-    Examples: Large print individual questionnaire: <fulfilment code>
-      | fulfilment code |
-      | P_LP_ILP1       |
-
     @regression
     Examples: Large print questionnaire: <fulfilment code>
       | fulfilment code |
+      | P_LP_HL1        |
       | P_LP_HL2        |
       | P_LP_HL2W       |
       | P_LP_HL4        |
@@ -142,6 +135,7 @@ Feature: Handle fulfilment request events
     @regression
     Examples: Large print individual questionnaire: <fulfilment code>
       | fulfilment code |
+      | P_LP_ILP1       |
       | P_LP_ILP2       |
       | P_LP_ILP2W      |
       | P_LP_IL4        |
@@ -234,13 +228,10 @@ Feature: Handle fulfilment request events
       | P_TB_TBVIE1     |
       | P_TB_TBYSH1     |
 
-    Examples: Information leaflet: <fulfilment code>
-      | fulfilment code |
-      | P_ER_ILER1      |
-
     @regression
     Examples: Information leaflet: <fulfilment code>
       | fulfilment code |
+      | P_ER_ILER1      |
       | P_ER_ILER2B     |
 
   Scenario Outline: Generate print files and log events for individual questionnaire fulfilment requests
@@ -300,7 +291,7 @@ Feature: Handle fulfilment request events
   Scenario: Generate individual cases and check that no actions rules are triggered for them
     Given sample file "sample_individual_case_spec.csv" is loaded successfully
     When a UAC fulfilment request "UACIT1" message for a created case is sent
-    And set action rule of type "FIELD" when case event "FULFILMENT_REQUESTED" is logged
+    And we schedule an action rule of type "FIELD" when case event "FULFILMENT_REQUESTED" is logged
     Then the action instruction messages for only the HH case are emitted to FWMT where the case has a "treatmentCode" of "HH_QF2R1E"
     And an individual case has been created and only has logged events of [RM_UAC_CREATED]
 

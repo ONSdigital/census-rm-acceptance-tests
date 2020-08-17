@@ -100,7 +100,7 @@ Feature: Address updates
     Given sample file "sample_1_english_SPG_unit.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
-    When set action rule of type "P_RD_2RL1_1"
+    When we schedule an action rule of type "P_RD_2RL1_1" for LSOAs ('E01014540')
     Then skeleton cases do not appear in "P_RD_2RL1_1" print files
 
 
