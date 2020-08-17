@@ -146,3 +146,13 @@ Feature: Handling Blank Questionnaire Scenario
     When the blank questionnaire msg for a case is put on the GCP pubsub
     Then no ActionInstruction is sent to FWMT
     And the events logged for the case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
+
+   @regression
+   Scenario: Case and form types that are invalid or shouldn't change the response flag or send to field
+     Given sample file "sample_1_english_SPG_unit.csv" is loaded successfully
+     And the eQ receipt msg is put on the GCP pubsub
+     And a case_updated msg is emitted where "receiptReceived" is "True"
+     And a CANCEL action instruction is sent to field work management with address type "SPG"
+     When the blank questionnaire msg for a case is put on the GCP pubsub
+     Then no ActionInstruction is sent to FWMT
+     And the events logged for the case are [SAMPLE_LOADED,RESPONSE_RECEIVED,RESPONSE_RECEIVED]
