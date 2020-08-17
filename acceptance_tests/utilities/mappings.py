@@ -36,7 +36,7 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'P_RL_3RL2B': "treatment_code IN ('HH_LP2W') AND survey_launched = 'f'",
     'P_RL_1RL2BB': "treatment_code IN ('HH_QP3W') AND survey_launched = 'f'",
     'P_RL_1RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
-                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 't'",
+                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
     'P_RL_2RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
                   " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLPCVN', 'HH_SPGLNFN', 'HH_SPGQNFN')",
     'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
@@ -549,9 +549,9 @@ PACK_CODE_TO_DESCRIPTION = {
     "P_UAC_UACIP4": 'Individual Unique Access Code for Northern Ireland via paper',
     "P_RL_1RL1B": '1st Reminder, Letter - for England paper first addresses with survey not launched',
     "P_RL_1RL2BB": '1st Reminder, Letter - for Wales paper first addresses with survey not launched',
-    "P_RL_1RL4": '1st Reminder, Letter - for Ireland addresses',
+    "P_RL_1RL4": "R1b NI - first reminder, haven't launched EQ",
     "P_RL_2RL4": '2nd Reminder, Letter - for Ireland addresses',
-    "P_RL_1RL4A": '1st Reminder, Letter - for paper first Ireland addresses when survey launched but not completed',
+    "P_RL_1RL4A": 'R1a NI - first reminder, have launched EQ',
     "P_UAC_UACIPA1": 'Individual Unique Access Code for England via paper - Request from EQ',
     "P_UAC_UACIPA2B": 'Individual Unique Access Code for Wales (English/Welsh - Bilingual) via paper - Request from EQ',
     "P_UAC_UACIPA4": 'Individual Unique Access Code for Northern Ireland via paper - Request from EQ',
