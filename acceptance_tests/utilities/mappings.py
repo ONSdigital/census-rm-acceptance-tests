@@ -49,8 +49,6 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'CE1_IC02': "treatment_code IN ('CE_LDCEW', 'CE_LDIEW', 'CE_QDIEW')",
     'CE_IC03': "treatment_code IN ('CE_LDIEE')",
     'CE_IC04': "treatment_code IN ('CE_LDIEW')",
-    'CE_IC03_1': "treatment_code IN ('CE_LDIUE')",
-    'CE_IC04_1': "treatment_code IN ('CE_LDIUW')",
     'CE_IC05': "treatment_code IN ('CE_2LNFN')",
     'CE_IC06': "treatment_code IN ('CE_3LSNFN')",
     'CE_IC08': "treatment_code IN ('CE_1QNFN')",
