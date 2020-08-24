@@ -11,19 +11,17 @@ from unittest.mock import patch, Mock
 from behave import step
 from google.cloud import storage
 from toolbox.bulk_processing.bulk_processor import BulkProcessor
+from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProcessor
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
-from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
-from acceptance_tests.features.steps.event_log import _check_if_event_is_logged
 from acceptance_tests.utilities import database_helper
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
-    get_and_check_uac_updated_messages, get_uac_updated_events, check_if_event_list_is_exact_match
+    get_uac_updated_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
