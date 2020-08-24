@@ -308,4 +308,12 @@ def uac_updated_with_active_set_to_false_for_all_original_uacs(context):
 @step("every created case has a DEACTIVATE_UAC event logged against it")
 def deactivate_uac_events_logged_against_all_cases(context):
     for case in context.case_created_events:
-        _check_if_event_is_logged('DEACTIVATE_UAC', case['payload']['collectionCase']['id'])
+        actual_logged_events = get_logged_events_for_case_by_id(case["payload"]["collectionCase"]["id"])
+        actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
+        test_helper.assertIn('DEACTIVATE_UAC', actual_logged_event_types,
+                             msg=(f'Expected event type = {"DEACTIVATE_UAC"},'
+                                  f' actual logged event types = {actual_logged_event_types}'))
+
+    context.bulk_deactivate_uac_file.unlink()
+    if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
+        clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2b2a9f2f24615cf68bc7e28570d5b8fed80e9142d33ba3be96fbd48f5376e62e"
+            "sha256": "52a298a015c75354f1750fcac9c2999f8d97f1df65228e25cb41483b985d1bf6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -51,7 +51,7 @@
         "census-rm-toolbox": {
             "editable": true,
             "git": "https://github.com/ONSdigital/census-rm-toolbox",
-            "ref": "50bc22d9bed3cd6820944b0a0c87ded864306997"
+            "ref": "726e81d605049a09cb3cde979cbb343735e53e33"
         },
         "certifi": {
             "hashes": [
