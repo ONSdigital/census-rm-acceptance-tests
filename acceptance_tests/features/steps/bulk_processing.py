@@ -1,4 +1,5 @@
 import csv
+import json
 import random
 import time
 from contextlib import contextmanager
@@ -21,6 +22,7 @@ from acceptance_tests.utilities import database_helper
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_and_check_uac_updated_messages, get_uac_updated_events, check_if_event_list_is_exact_match
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -314,6 +316,37 @@ def deactivate_uac_events_logged_against_all_cases(context):
                              msg=(f'Expected event type = {"DEACTIVATE_UAC"},'
                                   f' actual logged event types = {actual_logged_event_types}'))
 
-    context.bulk_deactivate_uac_file.unlink()
+    if hasattr(context, 'bulk_deactivate_uac_file'):
+        context.bulk_deactivate_uac_file.unlink()
+
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+
+
+@step("a deactivate uac msg is sent for each uac emitted")
+def deactivate_uac_(context):
+    context.bulk_deactivate_uac = []
+    for uac_updated in context.uac_created_events:
+        context.bulk_deactivate_uac.append(uac_updated['payload']['uac']['questionnaireId'])
+        message = json.dumps(
+            {
+                "event": {
+                    "type": "DEACTIVATE_UAC",
+                    "source": "TESTY TEST",
+                    "channel": "AR",
+                    "dateTime": "2019-07-07T22:37:11.988+0000",
+                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+                },
+                "payload": {
+                    "uac": {
+                        "questionnaireId": uac_updated['payload']['uac']['questionnaireId'],
+                    }
+                }
+            }
+        )
+
+        with RabbitContext(exchange='') as rabbit:
+            rabbit.publish_message(
+                message=message,
+                content_type='application/json',
+                routing_key=Config.RABBITMQ_DEACTIVATE_UAC_QUEUE)

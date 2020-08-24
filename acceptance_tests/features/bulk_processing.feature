@@ -19,7 +19,6 @@ Feature: Bulk event CSV files can be processed
     When the bulk invalid address file is processed
     Then CASE_UPDATED events are emitted for all the cases in the file with addressInvalid true
 
-
   Scenario: A bulk deactivate uac file is successfully ingested
     Given sample file "sample_for_print_stories.csv" is loaded successfully
     And a bulk deactivate uac file is supplied
@@ -27,4 +26,8 @@ Feature: Bulk event CSV files can be processed
     Then UAC_UPDATED msgs with active set to false for all the original uacs created
     And every created case has a DEACTIVATE_UAC event logged against it
 
-#  Scenario: A DEACTIVATE_UAC msg
+  Scenario: A DEACTIVATE_UAC msg is sent and processed
+    Given sample file "sample_for_print_stories.csv" is loaded successfully
+    When a deactivate uac msg is sent for each uac emitted
+    Then UAC_UPDATED msgs with active set to false for all the original uacs created
+    And every created case has a DEACTIVATE_UAC event logged against it
