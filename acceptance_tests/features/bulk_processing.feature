@@ -27,7 +27,7 @@ Feature: Bulk event CSV files can be processed
     And every created case has a DEACTIVATE_UAC event logged against it
 
   Scenario: A DEACTIVATE_UAC msg is sent and processed
-    Given sample file "sample_for_print_stories.csv" is loaded successfully
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a deactivate uac msg is sent for each uac emitted
     Then UAC_UPDATED msgs with active set to false for all the original uacs created
     And every created case has a DEACTIVATE_UAC event logged against it
