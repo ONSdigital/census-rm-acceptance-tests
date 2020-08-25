@@ -318,6 +318,8 @@ def retrieve_skeleton_case(context):
     test_helper.assertEqual(context.first_case['addressLevel'], "U")
     test_helper.assertEqual(context.first_case['latitude'], "50.917428")
     test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
+    test_helper.assertEqual(context.first_case['uprn'][0:3], "999", "Expected Dummy uprn to start with 999")
+    test_helper.assertEqual(context.first_case['estabUprn'][0:3], "999", "Expected Dummy estabUprn to start with 999")
     test_helper.assertEqual(context.first_case['id'], context.case_id)
 
 
@@ -340,6 +342,7 @@ def retrieve_case_from_source_case_id_and_event_details(context):
     test_helper.assertEqual(context.first_case['latitude'], "50.917428")
     test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
     test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['uprn'], source_case['address']['uprn'])
     test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
@@ -368,7 +371,7 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
     test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
     test_helper.assertEqual(context.first_case['id'], context.case_id)
-    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
+    test_helper.assertEqual(context.first_case['estabUprn'], f"999{context.first_case['caseRef']}")
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
@@ -612,6 +615,7 @@ def new_address_sent_to_aims(context):
 
     test_helper.assertEqual(actual_case['id'], context.case_id)
     test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
+    test_helper.assertEqual(actual_address["estabUprn"], expected_dummy_uprn)
     test_helper.assertEqual(actual_case['caseType'], 'SPG')
     test_helper.assertEqual(actual_case['survey'], 'CENSUS')
     test_helper.assertEqual(actual_case['handDelivery'], False)
@@ -628,6 +632,5 @@ def new_address_sent_to_aims(context):
     test_helper.assertEqual(actual_address["latitude"], "50.917428")
     test_helper.assertEqual(actual_address["longitude"], "-1.238193")
     test_helper.assertEqual(actual_address["abpCode"], None)
-    test_helper.assertEqual(actual_address["estabUprn"], None)
     test_helper.assertEqual(actual_address["estabType"], None)
     test_helper.assertEqual(actual_address["organisationName"], None)
