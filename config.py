@@ -17,6 +17,9 @@ class Config:
     CASEAPI_SERVICE = f'{PROTOCOL}://{CASEAPI_SERVICE_HOST}:{CASEAPI_SERVICE_PORT}'
     CASE_API_CASE_URL = f'{CASEAPI_SERVICE}/cases/'
 
+    ROPS_HOST = os.getenv('ROPS_HOST', 'localhost')
+    ROPS_PORT = os.getenv('ROPS_PORT', '8234')
+
     RABBITMQ_HOST = os.getenv('RABBITMQ_SERVICE_HOST', 'localhost')
     RABBITMQ_PORT = os.getenv('RABBITMQ_SERVICE_PORT', '6672')
     RABBITMQ_HTTP_PORT = os.getenv('RABBITMQ_HTTP_PORT', '16672')
