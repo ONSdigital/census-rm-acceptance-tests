@@ -149,9 +149,9 @@ spec:
       value: "case-api"
     - name: CASEAPI_SERVICE_PORT
       value: "80"
-    - name: CASEAPI_SERVICE_HOST
+    - name: ROPS_HOST
       value: "ops-ui"
-    - name: CASEAPI_SERVICE_PORT
+    - name: ROPS_PORT
       value: "80"
     - name: RECEIPT_TOPIC_ID
       valueFrom:
