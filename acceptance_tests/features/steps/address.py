@@ -318,8 +318,8 @@ def retrieve_skeleton_case(context):
     test_helper.assertEqual(context.first_case['addressLevel'], "U")
     test_helper.assertEqual(context.first_case['latitude'], "50.917428")
     test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
-    test_helper.assertEqual(context.first_case['uprn'][0:3], "999", "Expected Dummy uprn to start with 999")
-    test_helper.assertEqual(context.first_case['estabUprn'][0:3], "999", "Expected Dummy estabUprn to start with 999")
+    test_helper.assertEqual(context.first_case['uprn'], f"999{context.first_case['caseRef']}")
+    test_helper.assertEqual(context.first_case['estabUprn'], f"999{context.first_case['caseRef']}")
     test_helper.assertEqual(context.first_case['id'], context.case_id)
 
 
@@ -371,7 +371,7 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
     test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
     test_helper.assertEqual(context.first_case['id'], context.case_id)
-    test_helper.assertEqual(context.first_case['estabUprn'], f"999{context.first_case['caseRef']}")
+    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
@@ -502,7 +502,9 @@ def create_msg_sent_to_field(context):
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.case_id)
     test_helper.assertEqual(context.addressType, "SPG")
-    test_helper.assertEqual(context.field_action_cancel_message['surveyName'], "CENSUS")
+    test_helper.assertEqual(context.field_action_create_message['surveyName'], "CENSUS")
+    test_helper.assertEqual(context.field_action_create_message['uprn'], f"999{context.field_action_create_message['caseRef']}")
+    test_helper.assertEqual(context.field_action_create_message['estabUprn'], "77469066363")
 
 
 @step('the action plan and collection exercises IDs are the hardcoded census values')
@@ -523,7 +525,7 @@ def _field_work_create_callback(ch, method, _properties, body, context):
 
     context.addressType = action_create['addressType']
     context.fwmt_emitted_case_id = action_create['caseId']
-    context.field_action_cancel_message = action_create
+    context.field_action_create_message = action_create
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
@@ -615,7 +617,6 @@ def new_address_sent_to_aims(context):
 
     test_helper.assertEqual(actual_case['id'], context.case_id)
     test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
-    test_helper.assertEqual(actual_address["estabUprn"], expected_dummy_uprn)
     test_helper.assertEqual(actual_case['caseType'], 'SPG')
     test_helper.assertEqual(actual_case['survey'], 'CENSUS')
     test_helper.assertEqual(actual_case['handDelivery'], False)
