@@ -382,10 +382,10 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
 @step(
     'the "{case_type}" case with level "{address_level}" has the correct values')
 def check_new_case(context, case_type, address_level):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.new_case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
-    source_case = context.case_created_events[0]['payload']['collectionCase']
+    source_case = context.old_case
 
     test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
     test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
@@ -398,7 +398,7 @@ def check_new_case(context, case_type, address_level):
     test_helper.assertEqual(context.first_case['addressLevel'], address_level)
     test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
     test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
-    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['id'], context.new_case_id)
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
@@ -440,7 +440,8 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
 
 @step('an AddressTypeChanged event to "{type}" is sent')
 def address_type_changed_event_is_sent(context, type):
-    context.case_id = str(uuid.uuid4())
+    context.old_case = context.case_created_events[0]['payload']['collectionCase']
+    context.new_case_id = str(uuid.uuid4())
     message = json.dumps(
         {
             "event": {
@@ -452,7 +453,7 @@ def address_type_changed_event_is_sent(context, type):
             },
             "payload": {
                 "addressTypeChange": {
-                    "newCaseId": context.case_id,
+                    "newCaseId": context.new_case_id,
                     "collectionCase": {
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                         "ceExpectedCapacity": "20",

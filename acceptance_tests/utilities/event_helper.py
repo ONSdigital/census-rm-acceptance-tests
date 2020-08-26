@@ -161,7 +161,7 @@ def check_case_created_message_is_emitted(context):
                                     functools.partial(store_first_message_in_context,
                                                       context=context))
     test_helper.assertEqual(context.first_message['payload']['collectionCase']['id'],
-                            context.case_id)
+                            context.new_case_id)
     context.case_created_events = [context.first_message]
 
 
