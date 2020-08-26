@@ -46,19 +46,12 @@ def purge_aims_new_address_subscription():
         subscriber.seek(aims_subscription_path, time=timestamp)
     except MethodNotImplemented as e:
         # Seek is not implemented by the pubsub-emulator
-        print(f'{e}, falling back on attempting to pull/ack all messages')
         ack_all_on_aims_new_address_subscription()
 
 
 def ack_all_on_aims_new_address_subscription():
     max_messages_per_attempt = 100
     response = subscriber.pull(aims_subscription_path, max_messages=max_messages_per_attempt, timeout=5)
-
-    # Temporary extra debug logging
-    if response.received_messages:
-        print('Messages purged from AIMs new address topic:')
-        for message in response.received_messages:
-            print(message.ack_id, message.message.data)
 
     ack_ids = [message.ack_id for message in response.received_messages]
 
