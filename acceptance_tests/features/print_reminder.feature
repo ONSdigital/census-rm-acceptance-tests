@@ -117,7 +117,7 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     Examples: Reminder letter: <pack code>
       | pack code   | number of matching cases | questionnaire type | sample file                           |
-      | P_RL_1RL1_1 | 1                        | 01                 | sample_1_english_SPG_MILITARY_SFA.csv |
+      | P_RL_1RL1_1 | 2                        | 01                 | sample_2_english_SPG_MILITARY_SFA.csv |
 
 
   Scenario Outline: Individual response reminder for HI cases created by EQ IR SMS request
