@@ -44,7 +44,7 @@ def purge_aims_new_address_subscription():
         # Try purging via the seek method
         # Seeking to now should ack any messages published before this moment
         subscriber.seek(aims_subscription_path, time=timestamp)
-    except MethodNotImplemented as e:
+    except MethodNotImplemented:
         # Seek is not implemented by the pubsub-emulator
         ack_all_on_aims_new_address_subscription()
 
