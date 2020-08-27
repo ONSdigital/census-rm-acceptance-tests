@@ -1,6 +1,7 @@
 import functools
 import json
 import uuid
+
 import requests
 from behave import step
 
@@ -378,6 +379,39 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
 
 
+@step(
+    'the "{case_type}" case with level "{address_level}" has the correct values')
+def check_new_case(context, case_type, address_level):
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.new_case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    context.first_case = response.json()
+    source_case = context.old_case
+    emitted_case_created_event = context.case_created_events[0]['payload']['collectionCase']
+
+    address_type_changed_check_details(address_level, case_type, context, source_case)
+    address_type_changed_check_details(address_level, case_type, context, emitted_case_created_event)
+
+
+def address_type_changed_check_details(address_level, case_type, context, source_case):
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
+    test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
+    test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
+    test_helper.assertEqual(context.first_case['addressLine3'], source_case['address']['addressLine3'])
+    test_helper.assertEqual(context.first_case['townName'], source_case['address']['townName'])
+    test_helper.assertEqual(context.first_case['postcode'], source_case['address']['postcode'])
+    test_helper.assertEqual(context.first_case['region'], "E12000009")
+    test_helper.assertEqual(context.first_case['addressType'], case_type)
+    test_helper.assertEqual(context.first_case['addressLevel'], address_level)
+    test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
+    test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
+    test_helper.assertEqual(context.first_case['id'], context.new_case_id)
+    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
+    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
+    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
+    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
+    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+
+
 @step('a case created event is emitted')
 def check_case_created_event(context):
     check_case_created_message_is_emitted(context)
@@ -410,8 +444,10 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step("an AddressTypeChanged event is sent")
-def address_type_changed_event_is_sent(context):
+@step('an AddressTypeChanged event to "{type}" is sent')
+def address_type_changed_event_is_sent(context, type):
+    context.old_case = context.case_created_events[0]['payload']['collectionCase']
+    context.new_case_id = context.case_id = str(uuid.uuid4())
     message = json.dumps(
         {
             "event": {
@@ -423,14 +459,12 @@ def address_type_changed_event_is_sent(context):
             },
             "payload": {
                 "addressTypeChange": {
+                    "newCaseId": context.new_case_id,
                     "collectionCase": {
                         "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
                         "ceExpectedCapacity": "20",
                         "address": {
-                            "organisationName": "bobs",
-                            "uprn": "XXXXXXXXXXXXX",
-                            "addressType": "CE",
-                            "estabType": "XXX"
+                            "addressType": type
                         }
                     }
                 }
