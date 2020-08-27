@@ -386,7 +386,13 @@ def check_new_case(context, case_type, address_level):
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
     context.first_case = response.json()
     source_case = context.old_case
+    emitted_case_created_event = context.case_created_events[0]['payload']['collectionCase']
 
+    address_type_changed_check_details(address_level, case_type, context, source_case)
+    address_type_changed_check_details(address_level, case_type, context, emitted_case_created_event)
+
+
+def address_type_changed_check_details(address_level, case_type, context, source_case):
     test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
     test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
     test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
