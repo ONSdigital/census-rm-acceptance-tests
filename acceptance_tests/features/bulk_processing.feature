@@ -18,3 +18,9 @@ Feature: Bulk event CSV files can be processed
     And a bulk invalid address file is supplied
     When the bulk invalid address file is processed
     Then CASE_UPDATED events are emitted for all the cases in the file with addressInvalid true
+
+  Scenario: A bulk addrees update file is successfully ingested
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_CREATED events are emitted for all the updated cases with correctly updated data
