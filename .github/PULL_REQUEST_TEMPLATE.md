@@ -1,3 +1,8 @@
+# Checklist
+Reminder: If any changes have been released in the [census-rm-sample-loader](https://github.com/ONSdigital/census-rm-sample-loader) or [census-rm-toolbox](https://github.com/ONSdigital/census-rm-toolbox/) then the version pins in the [Pipfile](/Pipfile) need to be updated.
+* [ ] Updated census-rm-toolbox version pin (if applicable)
+* [ ] Updated census-rm-sample-loader version pin (if applicable)
+
 # Motivation and Context
 <!--- Why is this change required? What problem does it solve? -->
 
