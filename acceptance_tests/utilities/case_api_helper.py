@@ -5,6 +5,12 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
+def get_case_and_case_events_by_case_id(case_id):
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}?caseEvents=true')
+    test_helper.assertEqual(response.status_code, 200, f'Case ID not found: {case_id}')
+    return response.json()
+
+
 def get_logged_events_for_case_by_id(case_id):
     response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}?caseEvents=true').content.decode("utf-8")
     response_json = json.loads(response)
