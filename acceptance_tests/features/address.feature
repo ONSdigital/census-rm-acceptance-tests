@@ -35,10 +35,10 @@ Feature: Address updates
     And the case event log records invalid address
 
 
-  Scenario: New address event received without sourceCaseId
-    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId
+  Scenario: New address event received without sourceCaseId with UPRN
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId with UPRN
     Then a case created event is emitted
-    And the case can be retrieved
+    And the case with UPRN from the New Address event can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
@@ -160,5 +160,5 @@ Feature: Address updates
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId or UPRN
     Then a NEW_ADDRESS_ENHANCED event is sent to aims
     And a case created event is emitted
-    And the case can be retrieved
+    And the case with dummy UPRN from the New Address event can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
