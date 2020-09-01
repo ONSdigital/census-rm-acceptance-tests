@@ -305,8 +305,8 @@ def uac_updated_with_active_set_to_false_for_all_original_uacs(context):
                             "Expected to be empty after matching UAC_UPDATED events emitted")
 
 
-@step("every created case has a DEACTIVATE_UAC event logged against it")
-def deactivate_uac_events_logged_against_all_cases(context):
+@step("every created UAC QID pair has a DEACTIVATE_UAC event logged against it")
+def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
     for case in context.case_created_events:
         actual_logged_events = get_logged_events_for_case_by_id(case["payload"]["collectionCase"]["id"])
         actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
