@@ -65,11 +65,27 @@ Feature: Address updates
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
-  Scenario: Log AddressTypeChanged event
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-    When an AddressTypeChanged event is sent
-    And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
+  Scenario Outline: AddressTypeChanged event
+    Given sample file "<sample file>" is loaded successfully
+    When an AddressTypeChanged event to "<target address type>" is sent
+    Then a case_updated msg is emitted where "addressInvalid" is "True"
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_NOT_VALID,ADDRESS_TYPE_CHANGED]
+    And a case created event is emitted
+    And the "<target address type>" case with level "<derived address level>" has the correct values
+    And events logged against the case are [ADDRESS_TYPE_CHANGED]
 
+    Examples:
+      | sample file                  | target address type | derived address level |
+      | sample_1_english_HH_unit.csv | CE                  | E                     |
+
+    @regression
+    Examples:
+      | sample file                    | target address type | derived address level |
+      | sample_1_english_HH_unit.csv   | SPG                 | U                     |
+      | sample_1_english_CE_estab.csv  | HH                  | U                     |
+      | sample_1_english_CE_estab.csv  | SPG                 | U                     |
+      | sample_1_english_SPG_estab.csv | HH                  | U                     |
+      | sample_1_english_SPG_estab.csv | CE                  | E                     |
 
   Scenario: Fulfilment request for new skeleton case
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId and new case is emitted
