@@ -305,7 +305,7 @@ def new_address_reported_event_for_address_type_and_region(context, address_type
 
 
 @step("the case with UPRN from the New Address event can be retrieved")
-def retrieve_skeleton_case(context):
+def retrieve_skeleton_case_and_check_uprn(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
     test_helper.assertEqual(context.first_case['id'], context.case_id)
@@ -316,7 +316,7 @@ def retrieve_skeleton_case(context):
 
 
 @step("the case with dummy UPRN from the New Address event can be retrieved")
-def retrieve_skeleton_case(context):
+def retrieve_skeleton_case_and_check_dummy_uprn(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
     test_helper.assertEqual(context.first_case['id'], context.case_id)
