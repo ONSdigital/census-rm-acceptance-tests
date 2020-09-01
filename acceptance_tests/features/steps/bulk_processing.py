@@ -216,7 +216,6 @@ def build_address_updates_file(context):
             'ESTAB_UPRN': '987654321',
             'ESTAB_TYPE': 'ROYAL HOUSEHOLD',
             'ABP_CODE': '4321',
-            'ABP_CODE': '4321',
             'ORGANISATION_NAME': 'foo_incorporated',
             'ADDRESS_LINE1': 'foo flat1',
             'ADDRESS_LINE2': 'foo some road',
@@ -266,7 +265,7 @@ def process_bulk_address_updates_file(context):
         BulkProcessor(AddressUpdateProcessor()).run()
 
 
-@step('CASE_UPDATED events are emitted for all the updated cases with correctly updated data')
+@step('CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false')
 def check_address_update_case_updated_events(context):
     address_update_case_ids = set(row['CASE_ID'] for row in context.bulk_address_updates)
     case_updated_events = get_case_updated_events(context, len(address_update_case_ids))
