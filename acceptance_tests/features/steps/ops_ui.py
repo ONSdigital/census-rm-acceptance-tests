@@ -23,7 +23,7 @@ def get_cases_from_postcode(context, postcode):
 def rops_case_details_page(context):
     context.case_details = context.case_created_events[0]['payload']['collectionCase']
     case_details_page_response = requests.get(
-        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case_details?case_id={context.first_case["id"]}')
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details?case_id={context.first_case["id"]}')
     case_details_page_response.raise_for_status()
     case_details_text = case_details_page_response.text
 
