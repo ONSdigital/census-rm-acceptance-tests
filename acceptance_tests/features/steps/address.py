@@ -6,6 +6,7 @@ import requests
 from behave import step
 
 from acceptance_tests.features.steps.receipt import _get_emitted_case
+from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
 from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic, \
     purge_aims_new_address_subscription
@@ -42,10 +43,11 @@ def check_case_events(context):
     test_helper.fail('Did not find expected invalid address event')
 
 
-@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId')
-def new_address_reported_event_without_source_case_id(context, sender):
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId with UPRN')
+def new_address_reported_event_with_uprn_but_without_source_case_id(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
+    context.new_address_uprn = "12345"
     message = json.dumps(
         {
             "event": {
@@ -76,7 +78,7 @@ def new_address_reported_event_without_source_case_id(context, sender):
                             "addressLevel": "U",
                             "latitude": "50.917428",
                             "longitude": "-1.238193",
-                            "uprn": None
+                            "uprn": context.new_address_uprn
                         }
                     }
                 }
@@ -303,61 +305,52 @@ def new_address_reported_event_for_address_type_and_region(context, address_type
     check_case_created_message_is_emitted(context)
 
 
-@step('the case can be retrieved')
-def retrieve_skeleton_case(context):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    context.first_case = response.json()
-    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
-    test_helper.assertEqual(context.first_case['addressLine1'], "123")
-    test_helper.assertEqual(context.first_case['addressLine2'], "Fake caravan park")
-    test_helper.assertEqual(context.first_case['addressLine3'], "The long road")
-    test_helper.assertEqual(context.first_case['townName'], "Trumpton")
-    test_helper.assertEqual(context.first_case['postcode'], "SO190PG")
-    test_helper.assertEqual(context.first_case['region'], "E00001234")
-    test_helper.assertEqual(context.first_case['addressType'], "SPG")
-    test_helper.assertEqual(context.first_case['addressLevel'], "U")
-    test_helper.assertEqual(context.first_case['latitude'], "50.917428")
-    test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
+@step("the case with UPRN from the New Address event can be retrieved")
+def retrieve_skeleton_case_and_check_uprn(context):
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
+
     test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+
+    expected_estab_uprn = context.new_address_uprn  # estabUprn should match uprn from event
+    _check_case_address_details(context.first_case, context.new_address_uprn, expected_estab_uprn)
+
+
+@step("the case with dummy UPRN from the New Address event can be retrieved")
+def retrieve_skeleton_case_and_check_dummy_uprn(context):
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
+
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+
+    expected_dummy_uprn = f"999{context.first_case['caseRef']}"
+    expected_dummy_estab_uprn = expected_dummy_uprn
+
+    _check_case_address_details(context.first_case, expected_dummy_uprn, expected_dummy_estab_uprn)
 
 
 @step('the case can be retrieved and contains the correct properties when the event had details')
 def retrieve_case_from_source_case_id_and_event_details(context):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    context.first_case = response.json()
-    source_case = context.case_created_events[0]['payload']['collectionCase']
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
-    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
-    test_helper.assertEqual(context.first_case['addressLine1'], "123")
-    test_helper.assertEqual(context.first_case['addressLine2'], "Fake caravan park")
-    test_helper.assertEqual(context.first_case['addressLine3'], "The long road")
-    test_helper.assertEqual(context.first_case['townName'], "Trumpton")
-    test_helper.assertEqual(context.first_case['postcode'], "SO190PG")
-    test_helper.assertEqual(context.first_case['region'], "E00001234")
-    test_helper.assertEqual(context.first_case['addressType'], "SPG")
-    test_helper.assertEqual(context.first_case['addressLevel'], "U")
-    test_helper.assertEqual(context.first_case['latitude'], "50.917428")
-    test_helper.assertEqual(context.first_case['longitude'], "-1.238193")
     test_helper.assertEqual(context.first_case['id'], context.case_id)
-    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
-    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
-    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
-    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
-    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
-    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
-    test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+
+    source_case = context.case_created_events[0]['payload']['collectionCase']
+    _check_case_address_details(context.first_case, source_case['address']['uprn'], source_case['address']['estabUprn'])
 
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
 def retrieve_case_from_source_case_id_and_no_event_details(context):
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=true')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    context.first_case = response.json()
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
+
     source_case = context.case_created_events[0]['payload']['collectionCase']
 
     test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+
+    expected_dummy_uprn = f"999{context.first_case['caseRef']}"
+
     test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
     test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
     test_helper.assertEqual(context.first_case['addressLine3'], source_case['address']['addressLine3'])
@@ -369,13 +362,13 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
     test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
     test_helper.assertEqual(context.first_case['id'], context.case_id)
-    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
+    test_helper.assertEqual(context.first_case['estabUprn'], '92128659213')
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
     test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
     test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
-    test_helper.assertEqual(context.first_case['uprn'], f"999{context.first_case['caseRef']}")
+    test_helper.assertEqual(context.first_case['uprn'], expected_dummy_uprn)
     test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
 
 
@@ -533,7 +526,11 @@ def create_msg_sent_to_field(context):
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.case_id)
     test_helper.assertEqual(context.addressType, "SPG")
-    test_helper.assertEqual(context.field_action_cancel_message['surveyName'], "CENSUS")
+    test_helper.assertEqual(context.field_action_create_message['surveyName'], "CENSUS")
+    test_helper.assertEqual(context.field_action_create_message['uprn'],
+                            f"999{context.field_action_create_message['caseRef']}")
+    test_helper.assertEqual(context.field_action_create_message['estabUprn'],
+                            "77469066363")  # original estabUprn should be retained
 
 
 @step('the action plan and collection exercises IDs are the hardcoded census values')
@@ -554,14 +551,14 @@ def _field_work_create_callback(ch, method, _properties, body, context):
 
     context.addressType = action_create['addressType']
     context.fwmt_emitted_case_id = action_create['caseId']
-    context.field_action_cancel_message = action_create
+    context.field_action_create_message = action_create
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId and new case is emitted')
 def new_address_without_source_id(context, sender):
-    new_address_reported_event_without_source_case_id(context, sender)
+    new_address_reported_event_with_uprn_but_without_source_case_id(context, sender)
     check_case_created_message_is_emitted(context)
 
 
@@ -632,11 +629,6 @@ def new_address_sent_to_aims(context):
     test_helper.assertEqual(context.aims_new_address_message['event']['type'], 'NEW_ADDRESS_ENHANCED')
 
     # caseRef not sent to aims, so need to get it to construct expected dummy Uprn
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}?caseEvents=false')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    case_api_case = response.json()
-    expected_dummy_uprn = f"999{case_api_case['caseRef']}"
-
     actual_case = context.aims_new_address_message['payload']['newAddress']['collectionCase']
     actual_address = actual_case['address']
 
@@ -645,23 +637,34 @@ def new_address_sent_to_aims(context):
         purge_aims_new_address_subscription()
 
     test_helper.assertEqual(actual_case['id'], context.case_id)
-    test_helper.assertEqual(actual_address['uprn'], expected_dummy_uprn)
     test_helper.assertEqual(actual_case['caseType'], 'SPG')
     test_helper.assertEqual(actual_case['survey'], 'CENSUS')
-    test_helper.assertEqual(actual_case['handDelivery'], False)
-    test_helper.assertEqual(actual_case['skeleton'], False)
-    test_helper.assertEqual(actual_case['surveyLaunched'], False)
-    test_helper.assertEqual(actual_address['addressLine1'], '123')
-    test_helper.assertEqual(actual_address['addressLine2'], 'Fake caravan park')
-    test_helper.assertEqual(actual_address["addressLine3"], "The long road")
-    test_helper.assertEqual(actual_address["townName"], "Trumpton")
-    test_helper.assertEqual(actual_address["postcode"], "SO190PG")
-    test_helper.assertEqual(actual_address["region"], "E00001234")
-    test_helper.assertEqual(actual_address["addressType"], "SPG")
-    test_helper.assertEqual(actual_address["addressLevel"], "U")
-    test_helper.assertEqual(actual_address["latitude"], "50.917428")
-    test_helper.assertEqual(actual_address["longitude"], "-1.238193")
-    test_helper.assertEqual(actual_address["abpCode"], None)
-    test_helper.assertEqual(actual_address["estabUprn"], None)
-    test_helper.assertEqual(actual_address["estabType"], None)
-    test_helper.assertEqual(actual_address["organisationName"], None)
+
+    case_api_case = get_case_and_case_events_by_case_id(context.case_id)
+    expected_dummy_uprn = f"999{case_api_case['caseRef']}"
+    _check_case_address_details(actual_address, expected_dummy_uprn)
+
+
+def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
+    test_helper.assertEqual(case['addressLine1'], "123")
+    test_helper.assertEqual(case['addressLine2'], "Fake caravan park")
+    test_helper.assertEqual(case['addressLine3'], "The long road")
+    test_helper.assertEqual(case['townName'], "Trumpton")
+    test_helper.assertEqual(case['postcode'], "SO190PG")
+    test_helper.assertEqual(case['region'], "E00001234")
+    test_helper.assertEqual(case['addressType'], "SPG")
+    test_helper.assertEqual(case['addressLevel'], "U")
+    test_helper.assertEqual(case['latitude'], "50.917428")
+    test_helper.assertEqual(case['longitude'], "-1.238193")
+    test_helper.assertEqual(case['uprn'], expected_uprn)
+
+    if expected_estab_uprn:
+        test_helper.assertEqual(case['estabUprn'], expected_estab_uprn)
+
+    if extra_address_details:
+        test_helper.assertEqual(case['lad'], extra_address_details['lad'])
+        test_helper.assertEqual(case['oa'], extra_address_details['oa'])
+        test_helper.assertEqual(case['msoa'], extra_address_details['msoa'])
+        test_helper.assertEqual(case['lsoa'], extra_address_details['lsoa'])
+        test_helper.assertEqual(case['organisationName'], extra_address_details['address']['organisationName'])
+        test_helper.assertEqual(case['secureEstablishment'], extra_address_details['metadata']['secureEstablishment'])
