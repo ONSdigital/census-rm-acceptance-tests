@@ -362,7 +362,7 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
     test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
     test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
     test_helper.assertEqual(context.first_case['id'], context.case_id)
-    test_helper.assertEqual(context.first_case['estabUprn'], expected_dummy_uprn)
+    test_helper.assertEqual(context.first_case['estabUprn'], '92128659213')
     test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
     test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
     test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
