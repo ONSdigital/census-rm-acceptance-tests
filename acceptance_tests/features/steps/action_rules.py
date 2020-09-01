@@ -10,7 +10,8 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 
 @step('set SPG MILITARY SFA action rule of type "{action_type}" when the case loading queues are drained')
 def setup_print_action_rule_once_case_action_is_drained_spg_military_sfa(context, action_type):
-    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + "estab_type = 'MILITARY SFA'", action_type)
+    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + "estab_type in ('MILITARY SFA', 'MILITARY US SFA')",
+                                 action_type)
 
 
 @step('the individual response reminder action rule of type "{action_type}" is set')

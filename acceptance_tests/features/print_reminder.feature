@@ -17,7 +17,6 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | pack code     | no matching cases | questionnaire type | sample file                                       |
       | P_RL_1RL2B_1  | 2                 | 02                 | sample_input_wales_uac_census_spec.csv            |
       | P_RL_2RL4     | 2                 | 04                 | sample_input_ni_2nd_reminder_census_spec.csv      |
-      | P_RL_2RL2B_3a | 2                 | 02                 | sample_input_wales_census_spec.csv                |
       | P_RL_3RL2B    | 1                 | 02                 | sample_input_wales_3rd_reminder_census_spec.csv   |
       | P_RL_3RL1     | 2                 | 01                 | sample_input_england_3rd_reminder_census_spec.csv |
       | P_RL_2RL1     | 2                 | 01                 | sample_input_england_2nd_reminder_census_spec.csv |
@@ -49,26 +48,27 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       # Note that in practice these actions will be run with the reminder batch scheduler
       | P_QU_H1   | 1                        | 01                 | HH_unit_LP1E.csv   |
 
-  Scenario Outline: Generate print files and log events for response driven reminders
-    Given sample file "<sample file>" is loaded successfully
-    When we schedule an action rule of type "<pack code>" for LSOAs <LSOAs>
-    Then UAC Updated events are emitted for the <number of matching cases> cases with matching treatment codes with questionnaire type "<questionnaire type>"
-    Then correctly formatted "<pack code>" reminder letter print files are created
-    And there is a correct "<pack code>" manifest file for each csv file written
-    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
-
-    Examples: Reminder contact letter: <pack code>
-      | pack code   | LSOAs                      | number of matching cases | questionnaire type | sample file                           |
-      | P_RD_2RL1_1 | ('E01014540', 'E01014541') | 2                        | 01                 | response_driven_reminders_england.csv |
-
-    @regression
-    Examples: Reminder contact letter: <pack code>
-      | pack code    | LSOAs                      | number of matching cases | questionnaire type | sample file                           |
-      | P_RD_2RL2B_1 | ('W01014669')              | 1                        | 02                 | sample_input_wales_census_spec.csv    |
-      | P_RD_2RL1_2  | ('E01014543', 'E01014544') | 2                        | 01                 | response_driven_reminders_england.csv |
-      | P_RD_2RL2B_2 | ('W01033361', 'W01015005') | 2                        | 02                 | sample_input_wales_census_spec.csv    |
-      | P_RD_2RL1_3  | ('E01014545')              | 1                        | 01                 | response_driven_reminders_england.csv |
-      | P_RD_2RL2B_3 | ('W01014897')              | 1                        | 02                 | sample_input_wales_census_spec.csv    |
+# TODO: Re-instate this scenario when we've implemented response driven reminders for Census 2021
+#  Scenario Outline: Generate print files and log events for response driven reminders
+#    Given sample file "<sample file>" is loaded successfully
+#    When we schedule an action rule of type "<pack code>" for LSOAs <LSOAs>
+#    Then UAC Updated events are emitted for the <number of matching cases> cases with matching treatment codes with questionnaire type "<questionnaire type>"
+#    Then correctly formatted "<pack code>" reminder letter print files are created
+#    And there is a correct "<pack code>" manifest file for each csv file written
+#    And "PRINT_CASE_SELECTED" events are logged against the cases included in the reminder
+#
+#    Examples: Reminder contact letter: <pack code>
+#      | pack code   | LSOAs                      | number of matching cases | questionnaire type | sample file                           |
+#      | P_RD_2RL1_1 | ('E01014540', 'E01014541') | 2                        | 01                 | response_driven_reminders_england.csv |
+#
+#    @regression
+#    Examples: Reminder contact letter: <pack code>
+#      | pack code    | LSOAs                      | number of matching cases | questionnaire type | sample file                           |
+#      | P_RD_2RL2B_1 | ('W01014669')              | 1                        | 02                 | sample_input_wales_census_spec.csv    |
+#      | P_RD_2RL1_2  | ('E01014543', 'E01014544') | 2                        | 01                 | response_driven_reminders_england.csv |
+#      | P_RD_2RL2B_2 | ('W01033361', 'W01015005') | 2                        | 02                 | sample_input_wales_census_spec.csv    |
+#      | P_RD_2RL1_3  | ('E01014545')              | 1                        | 01                 | response_driven_reminders_england.csv |
+#      | P_RD_2RL2B_3 | ('W01014897')              | 1                        | 02                 | sample_input_wales_census_spec.csv    |
 
   Scenario Outline: Generate print files and log events for scheduled reminders with no uac and survey launched
     Given sample file "<sample file>" is loaded successfully
@@ -117,7 +117,7 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     Examples: Reminder letter: <pack code>
       | pack code   | number of matching cases | questionnaire type | sample file                           |
-      | P_RL_1RL1_1 | 1                        | 01                 | sample_1_english_SPG_MILITARY_SFA.csv |
+      | P_RL_1RL1_1 | 2                        | 01                 | sample_2_english_SPG_MILITARY_SFA.csv |
 
 
   Scenario Outline: Individual response reminder for HI cases created by EQ IR SMS request
