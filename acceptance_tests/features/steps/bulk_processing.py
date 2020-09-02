@@ -1,5 +1,4 @@
 import csv
-import json
 import random
 import time
 from contextlib import contextmanager
@@ -19,10 +18,10 @@ from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
-from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, get_case_and_case_events_by_case_id
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, \
+    get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -338,7 +337,7 @@ def check_the_cases_via_case_api(context):
         test_helper.assertEqual(actual_case['addressLine2'], row['ADDRESS_LINE2'])
         test_helper.assertEqual(actual_case['addressLine3'], row['ADDRESS_LINE3'])
         test_helper.assertEqual(actual_case['abpCode'], row['ABP_CODE'])
-        test_helper.assertEqual(actual_case['organisationName'],  row['ORGANISATION_NAME'])
+        test_helper.assertEqual(actual_case['organisationName'], row['ORGANISATION_NAME'])
         test_helper.assertEqual(actual_case['postcode'], row['POSTCODE'])
         test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
 
