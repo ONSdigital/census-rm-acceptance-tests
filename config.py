@@ -45,6 +45,9 @@ class Config:
                                                           'event.ccs.propertylisting')
     RABBITMQ_FIELD_CASE_UPDATED_ROUTING_KEY = os.getenv('RABBITMQ_FIELD_CASE_UPDATED_ROUTING_KEY',
                                                         'event.fieldcase.update')
+
+    RABBITMQ_DEACTIVATE_UAC_QUEUE = os.getenv('RABBITMQ_DEACTIVATE_UAC_QUEUE', 'case.deactivate-uac')
+
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
@@ -127,6 +130,7 @@ class Config:
     BULK_REFUSAL_BUCKET_NAME = os.getenv('BULK_REFUSAL_BUCKET_NAME')
     BULK_NEW_ADDRESS_BUCKET_NAME = os.getenv('BULK_NEW_ADDRESS_BUCKET_NAME')
     BULK_INVALID_ADDRESS_BUCKET_NAME = os.getenv('BULK_INVALID_ADDRESS_BUCKET_NAME')
+    BULK_DEACTIVATE_UAC_BUCKET_NAME = os.getenv('BULK_DEACTIVATE_UAC_BUCKET_NAME')
 
     BULK_ADDRESS_UPDATE_FILE_PREFIX = os.getenv('BULK_ADDRESS_UPDATE_FILE_PREFIX', 'address_updates_')
     BULK_ADDRESS_UPDATE_BUCKET_NAME = os.getenv('BULK_ADDRESS_UPDATE_BUCKET_NAME')

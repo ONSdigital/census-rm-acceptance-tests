@@ -1,4 +1,5 @@
 import csv
+import json
 import random
 import time
 from contextlib import contextmanager
@@ -11,14 +12,17 @@ from behave import step
 from google.cloud import storage
 from toolbox.bulk_processing.address_update_processor import AddressUpdateProcessor
 from toolbox.bulk_processing.bulk_processor import BulkProcessor
+from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProcessor
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
-from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
-from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, get_case_and_case_events_by_case_id
+from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
+    get_uac_updated_events
+from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -339,6 +343,42 @@ def check_the_cases_via_case_api(context):
         test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
 
 
+@step('a bulk deactivate uac file is supplied')
+def bulk_deactivate_uac_file(context):
+    # Build a bulk deactivate uac file
+    context.bulk_deactivate_uac_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                   'deactivate_uac_bulk_test.csv')
+    context.bulk_deactivate_uac = []
+
+    for uac_updated in context.uac_created_events:
+        context.bulk_deactivate_uac.append(uac_updated['payload']['uac']['questionnaireId'])
+
+    with open(context.bulk_deactivate_uac_file, 'w') as bulk_deactivate_uac_write:
+        writer = csv.DictWriter(bulk_deactivate_uac_write, fieldnames=['qid'])
+        writer.writeheader()
+        for qid in context.bulk_deactivate_uac:
+            writer.writerow({'qid': qid})
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
+        clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+        upload_file_to_bucket(context.bulk_invalid_address_file,
+                              f'deactivate_uacs_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+
+
+@step('the bulk deactivate file is processed')
+def process_bulk_deactivate_uac_file(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_REFUSAL_BUCKET_NAME:
+        BulkProcessor(DeactivateUacProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_deactivate_uac_file):
+        BulkProcessor(DeactivateUacProcessor()).run()
+
+
 def new_address_matches_case_created(new_address, case_created_event):
     return all([
         new_address['UPRN'] == case_created_event['payload']['collectionCase']['address']['uprn'],
@@ -387,3 +427,60 @@ def mock_bulk_processor_bucket(bulk_file: Path):
 
         # Yield here so that within this context the patched bulk processor storage is in effect
         yield
+
+
+@step("UAC_UPDATED msgs with active set to false for all the original uacs created")
+def uac_updated_with_active_set_to_false_for_all_original_uacs(context):
+    uac_updated_events = get_uac_updated_events(context, len(context.bulk_deactivate_uac))
+
+    for uac_updated in uac_updated_events:
+        test_helper.assertFalse(uac_updated['payload']['uac']['active'])
+        context.bulk_deactivate_uac.remove(uac_updated['payload']['uac']['questionnaireId'])
+
+    test_helper.assertEqual(len(context.bulk_deactivate_uac), 0,
+                            "Expected to be empty after matching UAC_UPDATED events emitted")
+
+
+@step("every created UAC QID pair has a DEACTIVATE_UAC event logged against it")
+def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
+    for case in context.case_created_events:
+        actual_logged_events = get_logged_events_for_case_by_id(case["payload"]["collectionCase"]["id"])
+        actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
+        test_helper.assertIn('DEACTIVATE_UAC', actual_logged_event_types,
+                             msg=(f'Expected event type = {"DEACTIVATE_UAC"},'
+                                  f' actual logged event types = {actual_logged_event_types}'))
+
+    if hasattr(context, 'bulk_deactivate_uac_file'):
+        context.bulk_deactivate_uac_file.unlink()
+
+    if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
+        clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+
+
+@step("a deactivate uac msg is sent for each uac emitted")
+def deactivate_uac_(context):
+    context.bulk_deactivate_uac = []
+    for uac_updated in context.uac_created_events:
+        context.bulk_deactivate_uac.append(uac_updated['payload']['uac']['questionnaireId'])
+        message = json.dumps(
+            {
+                "event": {
+                    "type": "DEACTIVATE_UAC",
+                    "source": "TESTY TEST",
+                    "channel": "AR",
+                    "dateTime": "2019-07-07T22:37:11.988+0000",
+                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+                },
+                "payload": {
+                    "uac": {
+                        "questionnaireId": uac_updated['payload']['uac']['questionnaireId'],
+                    }
+                }
+            }
+        )
+
+        with RabbitContext(exchange='') as rabbit:
+            rabbit.publish_message(
+                message=message,
+                content_type='application/json',
+                routing_key=Config.RABBITMQ_DEACTIVATE_UAC_QUEUE)
