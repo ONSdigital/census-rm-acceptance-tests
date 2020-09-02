@@ -65,3 +65,32 @@ def check_case_updated_event(context):
     test_helper.assertEqual(collection_case['address']['latitude'], context.rm_case_updated['latitude'])
     test_helper.assertEqual(collection_case['address']['longitude'], context.rm_case_updated['longitude'])
     test_helper.assertFalse(collection_case['skeleton'], 'Skeleton flag should be removed from updated case')
+
+
+@step("a deactivate uac msg is sent for each uac emitted")
+def deactivate_uac_(context):
+    context.bulk_deactivate_uac = []
+    for uac_updated in context.uac_created_events:
+        context.bulk_deactivate_uac.append(uac_updated['payload']['uac']['questionnaireId'])
+        message = json.dumps(
+            {
+                "event": {
+                    "type": "DEACTIVATE_UAC",
+                    "source": "TESTY TEST",
+                    "channel": "AR",
+                    "dateTime": "2019-07-07T22:37:11.988+0000",
+                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+                },
+                "payload": {
+                    "uac": {
+                        "questionnaireId": uac_updated['payload']['uac']['questionnaireId'],
+                    }
+                }
+            }
+        )
+
+        with RabbitContext(exchange='') as rabbit:
+            rabbit.publish_message(
+                message=message,
+                content_type='application/json',
+                routing_key=Config.RABBITMQ_DEACTIVATE_UAC_QUEUE)
