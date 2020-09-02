@@ -17,6 +17,7 @@ from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
+from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -311,6 +312,31 @@ def check_address_update_case_updated_events(context):
     context.bulk_address_updates_file.unlink()
     if Config.BULK_ADDRESS_UPDATE_BUCKET_NAME:
         clear_bucket(Config.BULK_ADDRESS_UPDATE_BUCKET_NAME)
+
+
+@step('the cases are updated in the database')
+def check_the_cases_via_case_api(context):
+    for row in context.bulk_address_updates:
+        actual_case = get_case_and_case_events_by_case_id(row['CASE_ID'])
+
+        # Check all the fields available in the case API are updated
+        test_helper.assertEqual(actual_case['estabType'], row['ESTAB_TYPE'])
+        test_helper.assertEqual(actual_case['oa'], row['OA'])
+        test_helper.assertEqual(actual_case['lsoa'], row['LSOA'])
+        test_helper.assertEqual(actual_case['msoa'], row['MSOA'])
+        test_helper.assertEqual(actual_case['lad'], row['LAD'])
+        test_helper.assertEqual(actual_case['latitude'], row['LATITUDE'])
+        test_helper.assertEqual(actual_case['longitude'], row['LONGITUDE'])
+        test_helper.assertTrue(actual_case['secureEstablishment'], 'Secure flag should be changed to true')
+        test_helper.assertEqual(actual_case['uprn'], row['UPRN'])
+        test_helper.assertEqual(actual_case['estabUprn'], row['ESTAB_UPRN'])
+        test_helper.assertEqual(actual_case['addressLine1'], row['ADDRESS_LINE1'])
+        test_helper.assertEqual(actual_case['addressLine2'], row['ADDRESS_LINE2'])
+        test_helper.assertEqual(actual_case['addressLine3'], row['ADDRESS_LINE3'])
+        test_helper.assertEqual(actual_case['abpCode'], row['ABP_CODE'])
+        test_helper.assertEqual(actual_case['organisationName'],  row['ORGANISATION_NAME'])
+        test_helper.assertEqual(actual_case['postcode'], row['POSTCODE'])
+        test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
 
 
 def new_address_matches_case_created(new_address, case_created_event):
