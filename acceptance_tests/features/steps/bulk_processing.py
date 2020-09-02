@@ -1,5 +1,4 @@
 import csv
-import json
 import random
 import time
 from contextlib import contextmanager
@@ -10,6 +9,7 @@ from unittest.mock import patch, Mock
 
 from behave import step
 from google.cloud import storage
+from toolbox.bulk_processing.address_update_processor import AddressUpdateProcessor
 from toolbox.bulk_processing.bulk_processor import BulkProcessor
 from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProcessor
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
@@ -18,10 +18,10 @@ from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
-from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
+from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, \
+    get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -207,6 +207,141 @@ def check_address_invalid_case_updated_events(context):
         clear_bucket(Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
 
 
+@step('a bulk address update file is supplied')
+def build_address_updates_file(context):
+    # Build a bulk invalid address file with a row for each the stored case created event
+    context.bulk_address_updates_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                    'address_updates_bulk_test.csv')
+    context.bulk_address_updates = []
+    for case_created in context.case_created_events:
+        context.bulk_address_updates.append({
+            'CASE_ID': case_created['payload']['collectionCase']['id'],
+            'UPRN': '123456789',
+            'ESTAB_UPRN': '987654321',
+            'ESTAB_TYPE': 'ROYAL HOUSEHOLD',
+            'ABP_CODE': '4321',
+            'ORGANISATION_NAME': 'foo_incorporated',
+            'ADDRESS_LINE1': 'foo flat1',
+            'ADDRESS_LINE2': 'foo some road',
+            'ADDRESS_LINE3': 'foo somewhere',
+            'TOWN_NAME': 'foo some town',
+            'POSTCODE': 'F00 BAR',
+            'LATITUDE': '0.0',
+            'LONGITUDE': '127.0',
+            'OA': 'foo_1',
+            'LSOA': 'foo_2',
+            'MSOA': 'foo_3',
+            'LAD': 'foo_4',
+            'HTC_WILLINGNESS': '5',
+            'HTC_DIGITAL': '3',
+            'TREATMENT_CODE': 'HH_LP1E',
+            'FIELDCOORDINATOR_ID': 'ABC123',
+            'FIELDOFFICER_ID': 'XYZ999',
+            'CE_EXPECTED_CAPACITY': '10',
+            'CE_SECURE': '1',
+            'PRINT_BATCH': '99',
+        })
+    test_helper.assertGreater(len(context.bulk_address_updates), 0,
+                              'Must have at least one update for this test to be valid')
+    with open(context.bulk_address_updates_file, 'w') as bulk_updates_file_write:
+        writer = csv.DictWriter(bulk_updates_file_write, fieldnames=list(context.bulk_address_updates[0].keys()))
+        writer.writeheader()
+        for row in context.bulk_address_updates:
+            writer.writerow(row)
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_ADDRESS_UPDATE_BUCKET_NAME:
+        clear_bucket(Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
+        upload_file_to_bucket(context.bulk_invalid_address_file,
+                              f'address_updates_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_ADDRESS_UPDATE_BUCKET_NAME)
+
+
+@step('the bulk address update file is processed')
+def process_bulk_address_updates_file(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_ADDRESS_UPDATE_BUCKET_NAME:
+        BulkProcessor(AddressUpdateProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_address_updates_file):
+        BulkProcessor(AddressUpdateProcessor()).run()
+
+
+@step('CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false')
+def check_address_update_case_updated_events(context):
+    address_update_case_ids = set(row['CASE_ID'] for row in context.bulk_address_updates)
+    case_updated_events = get_case_updated_events(context, len(address_update_case_ids))
+    test_helper.assertEqual(len(case_updated_events), len(context.bulk_address_updates))
+    for event in case_updated_events:
+        collection_case = event['payload']['collectionCase']
+        test_helper.assertIn(collection_case['id'], address_update_case_ids,
+                             'Unexpected case ID found on updated event')
+        test_helper.assertEqual(collection_case['treatmentCode'], context.bulk_address_updates[0]['TREATMENT_CODE'])
+        test_helper.assertEqual(collection_case['address']['estabType'], context.bulk_address_updates[0]['ESTAB_TYPE'])
+        test_helper.assertEqual(collection_case['oa'], context.bulk_address_updates[0]['OA'])
+        test_helper.assertEqual(collection_case['lsoa'], context.bulk_address_updates[0]['LSOA'])
+        test_helper.assertEqual(collection_case['msoa'], context.bulk_address_updates[0]['MSOA'])
+        test_helper.assertEqual(collection_case['lad'], context.bulk_address_updates[0]['LAD'])
+        test_helper.assertEqual(collection_case['fieldCoordinatorId'],
+                                context.bulk_address_updates[0]['FIELDCOORDINATOR_ID'])
+        test_helper.assertEqual(collection_case['fieldOfficerId'], context.bulk_address_updates[0]['FIELDOFFICER_ID'])
+        test_helper.assertEqual(collection_case['address']['latitude'], context.bulk_address_updates[0]['LATITUDE'])
+        test_helper.assertEqual(collection_case['address']['longitude'], context.bulk_address_updates[0]['LONGITUDE'])
+        test_helper.assertTrue(collection_case['metadata']['secureEstablishment'],
+                               'Secure flag should be changed to true')
+        test_helper.assertEqual(collection_case['printBatch'], context.bulk_address_updates[0]['PRINT_BATCH'])
+        test_helper.assertEqual(collection_case['ceExpectedCapacity'],
+                                int(context.bulk_address_updates[0]['CE_EXPECTED_CAPACITY']))
+        test_helper.assertEqual(collection_case['htcWillingness'], context.bulk_address_updates[0]['HTC_WILLINGNESS'])
+        test_helper.assertEqual(collection_case['htcDigital'], context.bulk_address_updates[0]['HTC_DIGITAL'])
+        test_helper.assertEqual(collection_case['address']['uprn'], context.bulk_address_updates[0]['UPRN'])
+        test_helper.assertEqual(collection_case['address']['estabUprn'], context.bulk_address_updates[0]['ESTAB_UPRN'])
+        test_helper.assertEqual(collection_case['address']['addressLine1'],
+                                context.bulk_address_updates[0]['ADDRESS_LINE1'])
+        test_helper.assertEqual(collection_case['address']['addressLine2'],
+                                context.bulk_address_updates[0]['ADDRESS_LINE2'])
+        test_helper.assertEqual(collection_case['address']['addressLine3'],
+                                context.bulk_address_updates[0]['ADDRESS_LINE3'])
+        test_helper.assertEqual(collection_case['address']['abpCode'], context.bulk_address_updates[0]['ABP_CODE'])
+        test_helper.assertEqual(collection_case['address']['organisationName'],
+                                context.bulk_address_updates[0]['ORGANISATION_NAME'])
+        test_helper.assertEqual(collection_case['address']['postcode'], context.bulk_address_updates[0]['POSTCODE'])
+        test_helper.assertEqual(collection_case['address']['townName'], context.bulk_address_updates[0]['TOWN_NAME'])
+
+        test_helper.assertFalse(collection_case['skeleton'], 'Skeleton flag should be removed from updated case')
+
+    context.bulk_address_updates_file.unlink()
+    if Config.BULK_ADDRESS_UPDATE_BUCKET_NAME:
+        clear_bucket(Config.BULK_ADDRESS_UPDATE_BUCKET_NAME)
+
+
+@step('the cases are updated in the database')
+def check_the_cases_via_case_api(context):
+    for row in context.bulk_address_updates:
+        actual_case = get_case_and_case_events_by_case_id(row['CASE_ID'])
+
+        # Check all the fields available in the case API are updated
+        test_helper.assertEqual(actual_case['estabType'], row['ESTAB_TYPE'])
+        test_helper.assertEqual(actual_case['oa'], row['OA'])
+        test_helper.assertEqual(actual_case['lsoa'], row['LSOA'])
+        test_helper.assertEqual(actual_case['msoa'], row['MSOA'])
+        test_helper.assertEqual(actual_case['lad'], row['LAD'])
+        test_helper.assertEqual(actual_case['latitude'], row['LATITUDE'])
+        test_helper.assertEqual(actual_case['longitude'], row['LONGITUDE'])
+        test_helper.assertTrue(actual_case['secureEstablishment'], 'Secure flag should be changed to true')
+        test_helper.assertEqual(actual_case['uprn'], row['UPRN'])
+        test_helper.assertEqual(actual_case['estabUprn'], row['ESTAB_UPRN'])
+        test_helper.assertEqual(actual_case['addressLine1'], row['ADDRESS_LINE1'])
+        test_helper.assertEqual(actual_case['addressLine2'], row['ADDRESS_LINE2'])
+        test_helper.assertEqual(actual_case['addressLine3'], row['ADDRESS_LINE3'])
+        test_helper.assertEqual(actual_case['abpCode'], row['ABP_CODE'])
+        test_helper.assertEqual(actual_case['organisationName'], row['ORGANISATION_NAME'])
+        test_helper.assertEqual(actual_case['postcode'], row['POSTCODE'])
+        test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
+
+
 @step('a bulk deactivate uac file is supplied')
 def bulk_deactivate_uac_file(context):
     # Build a bulk deactivate uac file
@@ -319,32 +454,3 @@ def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
 
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
-
-
-@step("a deactivate uac msg is sent for each uac emitted")
-def deactivate_uac_(context):
-    context.bulk_deactivate_uac = []
-    for uac_updated in context.uac_created_events:
-        context.bulk_deactivate_uac.append(uac_updated['payload']['uac']['questionnaireId'])
-        message = json.dumps(
-            {
-                "event": {
-                    "type": "DEACTIVATE_UAC",
-                    "source": "TESTY TEST",
-                    "channel": "AR",
-                    "dateTime": "2019-07-07T22:37:11.988+0000",
-                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
-                },
-                "payload": {
-                    "uac": {
-                        "questionnaireId": uac_updated['payload']['uac']['questionnaireId'],
-                    }
-                }
-            }
-        )
-
-        with RabbitContext(exchange='') as rabbit:
-            rabbit.publish_message(
-                message=message,
-                content_type='application/json',
-                routing_key=Config.RABBITMQ_DEACTIVATE_UAC_QUEUE)

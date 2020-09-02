@@ -254,6 +254,16 @@ spec:
         configMapKeyRef:
           name: bulk-processing-config
           key: bulk-deactivate-uac-bucket-name
+    - name: BULK_ADDRESS_UPDATE_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-address-updates-project-id
+    - name: BULK_ADDRESS_UPDATE_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-address-updates-bucket-name
   volumes:
   - name: read-replica-cloud-sql-certs
     secret:

@@ -25,3 +25,17 @@ Feature: Bulk event CSV files can be processed
     When the bulk deactivate file is processed
     Then UAC_UPDATED msgs with active set to false for all the original uacs created
     And every created UAC QID pair has a DEACTIVATE_UAC event logged against it
+
+  Scenario: A bulk address update file is successfully ingested
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+
+  Scenario: A bulk address update file for a skeleton case is successfully ingested
+    Given a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD" and the case is created
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
