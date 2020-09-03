@@ -49,8 +49,8 @@ def an_rm_address_update_message_is_sent(context):
 
 @step('CASE_UPDATED event is emitted with updated case data')
 def check_case_updated_event(context):
-    case_updated_events = get_case_updated_events(context, 1)
-    collection_case = case_updated_events[0]['payload']['collectionCase']
+    context.case_updated_events = get_case_updated_events(context, 1)
+    collection_case = context.case_updated_events[0]['payload']['collectionCase']
 
     test_helper.assertIn(collection_case['id'], context.rm_case_updated['caseId'])
     test_helper.assertEqual(collection_case['treatmentCode'], context.rm_case_updated['treatmentCode'])

@@ -41,7 +41,8 @@ def after_scenario(_, scenario):
         response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
         response.raise_for_status()
         if response.json():
-            logger.error('Unexpected exception(s) -- these could be due to an underpowered environment')
+            logger.error('Unexpected exception(s) -- these could be due to an underpowered environment',
+                         exception_manager_response=response.json())
 
             requests.get(f'{Config.EXCEPTION_MANAGER_URL}/reset')
             time.sleep(25)  # 25 seconds should be long enough for error to happen again if it hasn't cleared itself
@@ -50,7 +51,8 @@ def after_scenario(_, scenario):
             response.raise_for_status()
             if response.json():
                 _clear_queues_for_bad_messages_and_reset_exception_manager()
-                logger.error('Unexpected exception(s) which were not due to eventual consistency timing')
+                logger.error('Unexpected exception(s) which were not due to eventual consistency timing',
+                             exception_manager_response=response.json())
                 test_helper.fail('Unexpected exception(s) thrown by RM')
 
 

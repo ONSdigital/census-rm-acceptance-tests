@@ -272,9 +272,9 @@ def process_bulk_address_updates_file(context):
 @step('CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false')
 def check_address_update_case_updated_events(context):
     address_update_case_ids = set(row['CASE_ID'] for row in context.bulk_address_updates)
-    case_updated_events = get_case_updated_events(context, len(address_update_case_ids))
-    test_helper.assertEqual(len(case_updated_events), len(context.bulk_address_updates))
-    for event in case_updated_events:
+    context.case_updated_events = get_case_updated_events(context, len(address_update_case_ids))
+    test_helper.assertEqual(len(context.case_updated_events), len(context.bulk_address_updates))
+    for event in context.case_updated_events:
         collection_case = event['payload']['collectionCase']
         test_helper.assertIn(collection_case['id'], address_update_case_ids,
                              'Unexpected case ID found on updated event')

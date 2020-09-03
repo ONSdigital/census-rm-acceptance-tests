@@ -518,7 +518,7 @@ def send_address_modified_event(context):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step("a CREATE action instruction is sent to field")
+@step("a CREATE action instruction is sent to field for the SPG case")
 def create_msg_sent_to_field(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(

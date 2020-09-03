@@ -108,7 +108,7 @@ Feature: Address updates
     Given sample file "sample_1_english_SPG_estab.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
-    And a CREATE action instruction is sent to field
+    And a CREATE action instruction is sent to field for the SPG case
 
 # TODO: Re-instate this scenario when we've implemented response-driven reminders for Census 2021
 #  @hardcoded_census_values_for_collection_and_action_plan_ids
