@@ -2,7 +2,7 @@ import functools
 
 from behave import step
 
-from acceptance_tests.utilities.fieldwork_helper import fieldwork_message_callback
+from acceptance_tests.utilities.fieldwork_helper import fieldwork_create_message_callback
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -31,7 +31,25 @@ def _check_emitted_action_instructions(context, filter_column, treatment_code, e
     context.expected_ce1_complete = expected_ce1_complete
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(fieldwork_message_callback, context=context))
+                                    functools.partial(fieldwork_create_message_callback, context=context))
+
+    test_helper.assertFalse(context.expected_cases_for_action,
+                            msg="Didn't find all expected fieldwork action instruction messages")
+
+
+@step('a CREATE message is sent to field for each updated case '
+      'excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"')
+def fwmt_create_message_sent_for_first_case(context):
+    context.expected_cases_for_action = [
+        event['payload']['collectionCase'] for event in context.case_updated_events
+        if event['payload']['collectionCase']['address']['estabType'] not in {"TRANSIENT PERSONS", "MIGRANT WORKERS"}
+           and (event['payload']['collectionCase']['address']['addressType'] != 'CE' or
+                event['payload']['collectionCase']['address']['region'][0] != 'N')
+    ]
+    context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
+
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(fieldwork_create_message_callback, context=context))
 
     test_helper.assertFalse(context.expected_cases_for_action,
                             msg="Didn't find all expected fieldwork action instruction messages")
