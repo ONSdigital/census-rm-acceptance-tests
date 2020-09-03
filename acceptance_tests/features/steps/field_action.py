@@ -42,9 +42,9 @@ def _check_emitted_action_instructions(context, filter_column, treatment_code, e
 def fwmt_create_message_sent_for_first_case(context):
     context.expected_cases_for_action = [
         event['payload']['collectionCase'] for event in context.case_updated_events
-        if event['payload']['collectionCase']['address']['estabType'] not in {"TRANSIENT PERSONS", "MIGRANT WORKERS"}
-           and (event['payload']['collectionCase']['address']['addressType'] != 'CE' or
-                event['payload']['collectionCase']['address']['region'][0] != 'N')
+        if (event['payload']['collectionCase']['address']['estabType'] not in {"TRANSIENT PERSONS", "MIGRANT WORKERS"}
+            and (event['payload']['collectionCase']['address']['addressType'] != 'CE'
+                 or event['payload']['collectionCase']['address']['region'][0] != 'N'))
     ]
     context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
 
