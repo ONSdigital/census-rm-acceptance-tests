@@ -595,6 +595,11 @@ NOTIFY_TEMPLATE = {
     "UACIT2W": "b2db05f0-d7d1-4b88-b3de-658495bd8a47",
     "UACIT4": "d490af7d-300a-4eb8-a961-cb4de54332ee",
 
+    # Individual, via EQ
+    "UACITA1": "c6548c71-abd0-4990-aeb5-a7d5854f8da0",
+    "UACITA2B": "203b931c-4a79-48f4-8475-6dd8acf04d9b",
+    "UACITA4": "ef3c0cfe-582e-4952-9316-d8f602a8323a",
+
     # CE
     "UACCET1": "21f22f8d-2642-444e-9d13-a54b87647a93",
     "UACCET2": "b2b9e650-cb22-49d7-b5da-95169e13ea12",
