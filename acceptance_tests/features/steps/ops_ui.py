@@ -1,5 +1,6 @@
 import requests
 from behave import step
+from bs4 import BeautifulSoup
 
 from config import Config
 
@@ -50,3 +51,53 @@ def rops_search_postcode(context):
 def rops_results(context):
     postcode_result_text = context.postcode_result.text
     assert f'{context.number_of_cases} results for postcode: "{context.postcode}"' in postcode_result_text
+
+
+@step('the cases are returned to the user in a sensible order')
+def ce_cases_rops_results(context):
+    postcode_result_text = context.postcode_result.text
+
+    context.postcode_result = requests.get(
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/postcode?postcode={context.postcode}')
+
+    soup = BeautifulSoup(context.postcode_result.content, 'html.parser')
+
+
+
+    uprn_details = soup.find_all(id="uprn")
+
+    case_details = []
+    case_ref_details = soup.find_all(id="caseRef")
+
+    case_details.append(case_ref_details)
+
+    case_details = [case_ref.text for case_ref in case_ref_details]
+
+
+
+
+    #
+    # results_1 = soup.find(id="1").context.case_created_events[0]['payload']['collectionCase']["caseRef"]
+    #
+    # 123456789127
+
+    # results_1 = soup.find(id="1")
+    # assert results_1.postcode_result_text["caseRef"] == '6702808939'
+    #
+    # results_2 = soup.find(id="2")
+    # assert results_2.postcode_result_text["caseRef"] == '7597709695'
+    #
+    # results_3 = soup.find(id="3")
+    # assert results_3.postcode_result_text["caseRef"] == '9339489297'
+    #
+    # results_4 = soup.find(id="4")
+    # assert results_4.postcode_result_text["caseRef"] == '7114862076'
+    #
+    # results_5 = soup.find(id="5")
+    # assert results_5.postcode_result_text["caseRef"] == '1043356383'
+    #
+    # results_6 = soup.find(id="6")
+    # assert results_6.postcode_result_text["caseRef"] == '7998274828'
+    #
+    # results_7 = soup.find(id="7")
+    # assert results_7.postcode_result_text["caseRef"] == '1167754595'
