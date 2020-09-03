@@ -10,3 +10,5 @@ Feature: Internal messages used by RM which might be used by future systems
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an RM address update message is sent
     Then CASE_UPDATED event is emitted with updated case data
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
