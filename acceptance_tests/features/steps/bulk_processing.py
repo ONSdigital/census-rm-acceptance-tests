@@ -252,7 +252,7 @@ def build_address_updates_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_ADDRESS_UPDATE_BUCKET_NAME:
         clear_bucket(Config.BULK_INVALID_ADDRESS_BUCKET_NAME)
-        upload_file_to_bucket(context.bulk_invalid_address_file,
+        upload_file_to_bucket(context.bulk_address_updates_file,
                               f'address_updates_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_ADDRESS_UPDATE_BUCKET_NAME)
 
@@ -361,7 +361,7 @@ def bulk_deactivate_uac_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
-        upload_file_to_bucket(context.bulk_invalid_address_file,
+        upload_file_to_bucket(context.bulk_deactivate_uac_file,
                               f'deactivate_uacs_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
 
