@@ -362,7 +362,7 @@ def bulk_deactivate_uac_file(context):
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_deactivate_uac_file,
-                              f'deactivate_uacs_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              f'deactivate_uac_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
 
 
