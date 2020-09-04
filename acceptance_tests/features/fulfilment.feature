@@ -50,7 +50,7 @@ Feature: Handle fulfilment request events
       | fulfilment code | questionnaire type |
       | UACIT1          | 21                 |
 
-#    @regression
+    @regression
     Examples: Individual UAC fulfilment codes: <fulfilment code>
       | fulfilment code | questionnaire type |
       | UACIT2          | 22                 |
