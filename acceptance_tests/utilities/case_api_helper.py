@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -22,3 +23,9 @@ def get_ccs_qid_for_case_id(case_id):
     test_helper.assertEqual(response.status_code, 200, 'CCS QID API call failed')
     response_json = response.json()
     return response_json
+
+
+def get_cases_from_postcode(postcode):
+    response = requests.get(f"{Config.CASE_API_CASE_URL}/postcode/{postcode}")
+    response.raise_for_status()
+    return response.json()
