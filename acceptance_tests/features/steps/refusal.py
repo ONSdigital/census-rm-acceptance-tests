@@ -6,7 +6,7 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match
-from acceptance_tests.utilities.fieldwork_helper import fieldwork_message_callback, field_work_cancel_callback
+from acceptance_tests.utilities.fieldwork_helper import fieldwork_create_message_callback, field_work_cancel_callback
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -105,7 +105,7 @@ def only_unrefused_cases_are_sent_to_field(context):
     context.fieldwork_case_ids = [case['id'] for case in context.expected_cases_for_action]
 
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                    functools.partial(fieldwork_message_callback, context=context))
+                                    functools.partial(fieldwork_create_message_callback, context=context))
 
     test_helper.assertFalse(context.expected_cases_for_action,
                             msg="Didn't find all expected fieldwork action instruction messages")

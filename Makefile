@@ -7,6 +7,10 @@ package_vulnerability:
 flake:
 	pipenv run flake8 .
 
+lint: flake
+
+check: package_vulnerability flake
+
 test: package_vulnerability flake at_tests
 
 smoke_test: package_vulnerability flake run_smoke_tests
