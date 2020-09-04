@@ -50,17 +50,26 @@ def rops_search_postcode(context):
 
 @step('the cases are presented to the user in order')
 def rops_results(context):
-    # Check the order directly from case API not the UI page for now until UI is more testable
     sorted_cases = sorted(context.cases_by_postcode,
                           key=operator.itemgetter('organisationName', 'addressLine1', 'caseType', 'addressLevel'))
-    unittest_helper.assertEqual(sorted_cases, context.cases_by_postcode, 'The API should return the cases in the correct order')
 
+    # Check the order returned by case API
+    unittest_helper.assertEqual(context.cases_by_postcode, sorted_cases,
+                                'The API should return the cases in the correct order')
+
+    # Check the expected data is on the page
     postcode_result_text = context.postcode_result.text
     unittest_helper.assertIn(f'{context.number_of_cases} results for postcode: "{context.postcode}"',
                              postcode_result_text)
-
+    case_page_locations = []
     for case in context.cases_by_postcode:
         unittest_helper.assertIn(case['caseRef'], postcode_result_text)
         unittest_helper.assertIn(case['addressLine1'], postcode_result_text)
         unittest_helper.assertIn(case['uprn'], postcode_result_text)
         unittest_helper.assertIn(case['estabType'], postcode_result_text)
+        case_page_locations.append({'id': case['id'], 'location': postcode_result_text.find(case['caseRef'])})
+
+    # Check the cases appear in the expected order on the page
+    case_order_on_page = [case['id'] for case in sorted(case_page_locations, key=operator.itemgetter('location'))]
+    unittest_helper.assertEqual(case_order_on_page, [case['id'] for case in sorted_cases],
+                                'The order of cases should be in order on the page')
