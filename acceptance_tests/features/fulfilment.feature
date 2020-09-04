@@ -56,6 +56,9 @@ Feature: Handle fulfilment request events
       | UACIT2          | 22                 |
       | UACIT2W         | 23                 |
       | UACIT4          | 24                 |
+      | UACITA1         | 21                 |
+      | UACITA2B        | 22                 |
+      | UACITA4         | 24                 |
 
   Scenario Outline: Generate print files and log events for questionnaire fulfilment requests
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
