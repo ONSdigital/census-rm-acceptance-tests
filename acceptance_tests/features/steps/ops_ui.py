@@ -102,9 +102,11 @@ def entering_in_qid_to_see_if_it_exists(context):
 @step("the user submits a fake qid to be linked to the case")
 def submit_qid_link_on_r_ops(context):
     unittest_helper.assertIn('Submit QID Link', context.case_details_text)
+    payload = {'case_id': context.case_details['id'],
+               'qid': '123456789'}
     context.qid_link_response = requests.get(
         f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details'
-        f'/questionnaire-id/?qid=123456789&case_id={context.case_details["id"]}')
+        f'/questionnaire-id/', params=payload)
 
     unittest_helper.assertEqual(context.qid_link_response.status_code, 200)
 
