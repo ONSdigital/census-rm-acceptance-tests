@@ -100,7 +100,7 @@ def entering_in_qid_to_see_if_it_exists(context):
 
 
 @step("the user submits a fake qid to be linked to the case")
-def submit_qid_link_on_r_ops(context):
+def search_for_fake_qid(context):
     unittest_helper.assertIn('Submit QID Link', context.case_details_text)
     payload = {'case_id': context.case_details['id'],
                'qid': '123456789'}
@@ -109,7 +109,6 @@ def submit_qid_link_on_r_ops(context):
         f'/questionnaire-id/', params=payload)
 
     unittest_helper.assertEqual(context.qid_link_response.status_code, 200)
-
 
 
 @then("a qid linked message appears on the screen")
