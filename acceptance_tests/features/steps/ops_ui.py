@@ -1,7 +1,7 @@
 import operator
 
 import requests
-from behave import step
+from behave import step, then
 from toolbox.tests import unittest_helper
 
 from acceptance_tests.utilities.case_api_helper import get_cases_from_postcode
@@ -73,3 +73,61 @@ def rops_results(context):
     case_order_on_page = [case['id'] for case in sorted(case_page_locations, key=operator.itemgetter('location'))]
     unittest_helper.assertEqual(case_order_on_page, [case['id'] for case in sorted_cases],
                                 'The order of cases should be in order on the page')
+
+
+@step("the user submits a qid to be linked to the case")
+def submit_qid_link_on_r_ops(context):
+    unittest_helper.assertIn('Submit QID Link', context.case_details_text)
+    payload = {'case_id': context.case_details['id'],
+               'qid': context.requested_qid}
+    context.qid_link_response = requests.post(
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details/questionnaire-id'
+        f'/link/', data=payload)
+
+    unittest_helper.assertEqual(context.qid_link_response.status_code, 200)
+
+
+@step("the user enters a qid they would like to link to the case")
+def entering_in_qid_to_see_if_it_exists(context):
+    payload = {'case_id': context.case_details['id'],
+               'qid': context.requested_qid}
+
+    context.qid_link_response = requests.get(
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details'
+        f'/questionnaire-id/', params=payload)
+
+    unittest_helper.assertEqual(context.qid_link_response.status_code, 200)
+
+
+@step("the user submits a fake qid to be linked to the case")
+def submit_qid_link_on_r_ops(context):
+    unittest_helper.assertIn('Submit QID Link', context.case_details_text)
+    context.qid_link_response = requests.get(
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details'
+        f'/questionnaire-id/?qid=123456789&case_id={context.case_details["id"]}')
+
+    unittest_helper.assertEqual(context.qid_link_response.status_code, 200)
+
+
+
+@then("a qid linked message appears on the screen")
+def qid_linked_message_appears(context):
+    response_text = context.qid_link_response.text
+
+    unittest_helper.assertIn('QID link has been submitted', response_text)
+    unittest_helper.assertIn('QUESTIONNAIRE_LINKED', response_text)
+    unittest_helper.assertIn(f'{context.requested_qid}', response_text)
+
+
+@then("a failed to find qid message appears on r ops ui")
+def qid_failed_message(context):
+    response_text = context.qid_link_response.text
+
+    unittest_helper.assertIn('QID does not exist in RM', response_text)
+
+
+@then("the qid details page appears")
+def qid_details_page(context):
+    response_text = context.qid_link_response.text
+
+    unittest_helper.assertIn(f'<b>questionnaireId:</b> {context.requested_qid}', response_text)
