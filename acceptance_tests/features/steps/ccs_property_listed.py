@@ -21,38 +21,6 @@ def send_ccs_property_listed_event(context, interview_required):
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
-# @step("a CCS Property Listed event is sent with a qid")
-# def send_ccs_property_listed_event_with_qid(context):
-#     message = _create_ccs_property_listed_event(context)
-#     message['payload']['CCSProperty']['uac'] = [{
-#         "questionnaireId": context.expected_questionnaire_id
-#     }]
-#
-#     _send_ccs_case_list_msg_to_rabbit(message)
-
-
-# @step('a CCS Property Listed event is sent with refusal')
-# def send_ccs_property_listed_event_with_refusal(context):
-#     message = _create_ccs_property_listed_event(context)
-#     message['payload']['CCSProperty']['refusal'] = {
-#         "type": "HARD_REFUSAL",
-#         "report": "respondent too busy",
-#         "agentId": "110001"
-#     }
-#
-#     _send_ccs_case_list_msg_to_rabbit(message)
-
-
-# @step('a CCS Property Listed event is sent with an address invalid event and address type "{address_type}"')
-# def send_ccs_property_listed_event_with_invalid_address(context, address_type):
-#     message = _create_ccs_property_listed_event(context, address_type)
-#     message['payload']['CCSProperty']['invalidAddress'] = {
-#         "reason": "NON_RESIDENTIAL"
-#     }
-#
-#     _send_ccs_case_list_msg_to_rabbit(message)
-
-
 @step('the CCS Property Listed case is created with address type "{address_type}"')
 @retry(stop_max_attempt_number=10, wait_fixed=1000)
 def check_case_created(context, address_type):
