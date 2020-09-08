@@ -5,6 +5,7 @@ import uuid
 import requests
 from behave import step
 from retrying import retry
+from str2bool import str2bool
 
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
@@ -14,9 +15,9 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step("a CCS Property Listed event is sent")
-def send_ccs_property_listed_event(context):
-    message = _create_ccs_property_listed_event(context)
+@step("a CCS Property Listed event is sent with interview required set to {interview_required}")
+def send_ccs_property_listed_event(context, interview_required):
+    message = _create_ccs_property_listed_event(context, interview_required=str2bool(interview_required))
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
@@ -123,7 +124,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH"):
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -136,6 +137,7 @@ def _create_ccs_property_listed_event(context, address_type="HH"):
         },
         "payload": {
             "CCSProperty": {
+                "interviewRequired": interview_required,
                 "collectionCase": {
                     "id": context.case_id
                 },
