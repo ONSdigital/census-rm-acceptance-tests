@@ -48,4 +48,7 @@ Feature: Bulk event CSV files can be processed
     And a bulk un-invalidate addresses file is supplied
     When the bulk un-invalidate address file is processed
     Then CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false
+    And the addresses for the cases are un-invalidated in the database
+#    And an UPDATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS"
+
 

@@ -1,5 +1,4 @@
 import csv
-import json
 import random
 import time
 from contextlib import contextmanager
@@ -20,11 +19,11 @@ from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateA
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
+from acceptance_tests.utilities.address_helper import send_invalid_address_message_to_rabbit
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, \
     get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
-from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -345,6 +344,13 @@ def check_the_cases_via_case_api(context):
         test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
 
 
+@step('the addresses for the cases are un-invalidated in the database')
+def check_the_uninvalidated_cases_via_case_api(context):
+    for row in context.bulk_uninvalidated_addresses:
+        actual_case = get_case_and_case_events_by_case_id(row['case_id'])
+        test_helper.assertFalse(actual_case['addressInvalid'])
+
+
 @step('a bulk deactivate uac file is supplied')
 def bulk_deactivate_uac_file(context):
     # Build a bulk deactivate uac file
@@ -461,31 +467,15 @@ def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
 
 @step('all the cases are marked as invalid')
 def mark_cases_as_invalid(context):
-    for case in context.case_created_events:
-        message = json.dumps(
-            {
-                "event": {
-                    "type": "ADDRESS_NOT_VALID",
-                    "source": "FIELDWORK_GATEWAY",
-                    "channel": "CC",
-                    "dateTime": "2019-07-07T22:37:11.988+0000",
-                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
-                },
-                "payload": {
-                    "invalidAddress": {
-                        "reason": "DEMOLISHED",
-                        "collectionCase": {
-                            "id": case['payload']['collectionCase']['id']
-                        }
-                    }
-                }
-            }
-        )
-        with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-            rabbit.publish_message(
-                message=message,
-                content_type='application/json',
-                routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+    invalid_address_case_ids = [case['payload']['collectionCase']['id'] for case in context.case_created_events]
+
+    for case_id in invalid_address_case_ids:
+        send_invalid_address_message_to_rabbit(case_id, "CC")
+
+    case_updated_events = get_case_updated_events(context, len(context.case_created_events))
+    for event in case_updated_events:
+        test_helper.assertIn(event['payload']['collectionCase']['id'], invalid_address_case_ids,
+                             'Unexpected case ID found on updated event')
 
 
 @step('a bulk un-invalidate addresses file is supplied')

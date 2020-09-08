@@ -6,6 +6,7 @@ import requests
 from behave import step
 
 from acceptance_tests.features.steps.receipt import _get_emitted_case
+from acceptance_tests.utilities.address_helper import send_invalid_address_message_to_rabbit
 from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import check_case_created_message_is_emitted
 from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic, \
@@ -20,7 +21,7 @@ from config import Config
 def invalid_address_message(context, sender):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
 
-    _send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
+    send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
 
 
 @step('an invalid address message for the CCS case is sent from "{sender}"')
@@ -30,7 +31,7 @@ def invalid_ccs_address_message(context, sender):
     # TODO: Other tests match on this key structure. Remove when we've settled on case API fields
     context.first_case['survey'] = context.ccs_case['surveyType']
 
-    _send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
+    send_invalid_address_message_to_rabbit(context.first_case['id'], sender)
 
 
 @step("the case event log records invalid address")
@@ -408,33 +409,6 @@ def address_type_changed_check_details(address_level, case_type, context, source
 @step('a case created event is emitted')
 def check_case_created_event(context):
     check_case_created_message_is_emitted(context)
-
-
-def _send_invalid_address_message_to_rabbit(case_id, sender):
-    message = json.dumps(
-        {
-            "event": {
-                "type": "ADDRESS_NOT_VALID",
-                "source": "FIELDWORK_GATEWAY",
-                "channel": sender,
-                "dateTime": "2019-07-07T22:37:11.988+0000",
-                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
-            },
-            "payload": {
-                "invalidAddress": {
-                    "reason": "DEMOLISHED",
-                    "collectionCase": {
-                        "id": case_id
-                    }
-                }
-            }
-        }
-    )
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
 @step('an AddressTypeChanged event to "{type}" is sent')
