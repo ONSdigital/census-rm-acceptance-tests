@@ -507,7 +507,8 @@ def build_uninvalidated_address_bulk_file(context):
     if Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME:
         clear_bucket(Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_uninvalidated_addresses_file,
-                              f'uninvalidated_addresses_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              f'uninvalidated_addresses_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME)
 
 
