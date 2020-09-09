@@ -350,7 +350,7 @@ def check_the_cases_via_case_api(context):
 @step('the addresses for the cases are un-invalidated in the database')
 def check_the_uninvalidated_cases_via_case_api(context):
     for row in context.bulk_uninvalidated_addresses:
-        actual_case = get_case_and_case_events_by_case_id(row['case_id'])
+        actual_case = get_case_and_case_events_by_case_id(row['CASE_ID'])
         test_helper.assertFalse(actual_case['addressInvalid'])
 
 
@@ -492,7 +492,7 @@ def build_uninvalidated_address_bulk_file(context):
     context.bulk_uninvalidated_addresses = []
     for case_created in context.case_created_events:
         context.bulk_uninvalidated_addresses.append({
-            'case_id': case_created['payload']['collectionCase']['id'],
+            'CASE_ID': case_created['payload']['collectionCase']['id'],
         })
     test_helper.assertGreater(len(context.bulk_uninvalidated_addresses), 0,
                               'Must have at least one update for this test to be valid')
@@ -525,7 +525,7 @@ def process_uninvalidate_addresses_updates_file(context):
 
 @step('CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false')
 def check_address_valid_case_updated_events(context):
-    address_valid_case_ids = [case_id['case_id'] for case_id in context.bulk_uninvalidated_addresses]
+    address_valid_case_ids = [case_id['CASE_ID'] for case_id in context.bulk_uninvalidated_addresses]
     context.case_updated_events = get_case_updated_events(context, len(address_valid_case_ids))
     test_helper.assertEqual(len(context.case_updated_events), len(context.bulk_uninvalidated_addresses))
     for event in context.case_updated_events:
