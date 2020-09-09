@@ -1,4 +1,5 @@
 import csv
+import functools
 import random
 import time
 from contextlib import contextmanager
@@ -24,6 +25,8 @@ from acceptance_tests.utilities.case_api_helper import get_logged_events_for_cas
     get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
+from acceptance_tests.utilities.fieldwork_helper import field_work_cancel_callback
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -476,6 +479,9 @@ def mark_cases_as_invalid(context):
     for event in case_updated_events:
         test_helper.assertIn(event['payload']['collectionCase']['id'], invalid_address_case_ids,
                              'Unexpected case ID found on updated event')
+    for i in range(0, len(case_updated_events)):
+        start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                        functools.partial(field_work_cancel_callback, context=context))
 
 
 @step('a bulk un-invalidate addresses file is supplied')
@@ -518,13 +524,13 @@ def process_uninvalidate_addresses_updates_file(context):
 
 
 @step('CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false')
-def check_address_invalid_case_updated_events(context):
+def check_address_valid_case_updated_events(context):
     address_valid_case_ids = [case_id['case_id'] for case_id in context.bulk_uninvalidated_addresses]
-    case_updated_events = get_case_updated_events(context, len(address_valid_case_ids))
-    test_helper.assertEqual(len(case_updated_events), len(context.bulk_uninvalidated_addresses))
-    for event in case_updated_events:
+    context.case_updated_events = get_case_updated_events(context, len(address_valid_case_ids))
+    test_helper.assertEqual(len(context.case_updated_events), len(context.bulk_uninvalidated_addresses))
+    for event in context.case_updated_events:
         test_helper.assertFalse(event['payload']['collectionCase']['addressInvalid'],
-                               'Address invalid flag must be "False" on all updated events')
+                                'Address invalid flag must be "False" on all updated events')
         test_helper.assertIn(event['payload']['collectionCase']['id'], address_valid_case_ids,
                              'Unexpected case ID found on updated event')
 
