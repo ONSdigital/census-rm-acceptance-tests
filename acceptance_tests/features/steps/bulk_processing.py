@@ -479,7 +479,7 @@ def mark_cases_as_invalid(context):
     for event in case_updated_events:
         test_helper.assertIn(event['payload']['collectionCase']['id'], invalid_address_case_ids,
                              'Unexpected case ID found on updated event')
-    for i in range(0, len(case_updated_events)):
+    for event in case_updated_events:
         start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                         functools.partial(field_work_cancel_callback, context=context))
 
