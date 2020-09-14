@@ -6,6 +6,7 @@ import requests
 from behave import step
 from retrying import retry
 
+from acceptance_tests.utilities.event_helper import get_case_created_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
@@ -123,7 +124,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH"):
+def _create_ccs_property_listed_event(context, address_type="HH", address_level="U"):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -159,3 +160,27 @@ def _create_ccs_property_listed_event(context, address_type="HH"):
     }
 
     return message
+
+
+@step('a CCS Property List event is sent with Address Type "{address_type}" address level "{address_level}" '
+      'and it is created successfully')
+def send_css_telephone_capture_event(context, address_type, address_level):
+    message = _create_ccs_property_listed_event(context, address_type, address_level)
+
+    _send_ccs_case_list_msg_to_rabbit(message)
+
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        _field_callback, context=context))
+
+    action_instruction = context.emitted_action_instruction
+    case_id = message['payload']['CCSProperty']['collectionCase']['id']
+    test_helper.assertEqual(case_id, action_instruction['caseId'])
+
+    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}')
+    test_helper.assertEqual(response.status_code, 200, 'Case not found')
+    context.case_details = response.json()
+    context.collection_exercise_id = context.case_details['collectionExerciseId']
+
+    context.case_created_events = get_case_created_events(context, 1)
