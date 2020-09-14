@@ -76,12 +76,7 @@ def field_work_update_callback(ch, method, _properties, body, context):
     for index, case in enumerate(context.expected_cases_for_action):
         del context.expected_cases_for_action[index]
         ch.basic_ack(delivery_tag=method.delivery_tag)
-
         break
-    else:
-        test_helper.fail(
-            f'Found message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue which did not '
-            f'match any expected sample units')
 
     if not context.expected_cases_for_action:
         ch.stop_consuming()
