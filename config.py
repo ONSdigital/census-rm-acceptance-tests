@@ -48,6 +48,9 @@ class Config:
 
     RABBITMQ_DEACTIVATE_UAC_QUEUE = os.getenv('RABBITMQ_DEACTIVATE_UAC_QUEUE', 'case.deactivate-uac')
 
+    RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE = os.getenv('RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE',
+                                                    'case.rm.unInvalidateAddress')
+
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')

@@ -25,8 +25,8 @@ from acceptance_tests.utilities.case_api_helper import get_logged_events_for_cas
     get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
-from acceptance_tests.utilities.fieldwork_helper import field_work_cancel_callback
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    ignore_field_cancel_msgs
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -479,9 +479,10 @@ def mark_cases_as_invalid(context):
     for event in case_updated_events:
         test_helper.assertIn(event['payload']['collectionCase']['id'], invalid_address_case_ids,
                              'Unexpected case ID found on updated event')
-    for event in case_updated_events:
-        start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
-                                        functools.partial(field_work_cancel_callback, context=context))
+    context.cancels_to_ignore = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(ignore_field_cancel_msgs, context=context,
+                                                      expected_msg_count=len(case_updated_events)))
 
 
 @step('a bulk un-invalidate addresses file is supplied')

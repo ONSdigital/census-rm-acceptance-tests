@@ -55,7 +55,7 @@ def fwmt_create_message_sent_for_first_case(context):
                             msg="Didn't find all expected fieldwork action instruction messages")
 
 
-@step('an UPDATE message is sent to field for each updated case excluding NI CE, estab type "TRANSIENT PERSONS"')
+@step('an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused')
 def fwmt_update_message_sent_for_first_case(context):
     context.expected_cases_for_action = [
         event['payload']['collectionCase'] for event in context.case_updated_events

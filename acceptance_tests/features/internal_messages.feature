@@ -12,3 +12,10 @@ Feature: Internal messages used by RM which might be used by future systems
     Then CASE_UPDATED event is emitted with updated case data
     And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
 
+  Scenario: Un-invalidate an address message is sent
+    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
+    And all the cases are marked as invalid
+    When an UNINVALIDATE_ADDRESS message is sent
+    Then CASE_UPDATED events are emitted for all the cases
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
+
