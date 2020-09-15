@@ -264,16 +264,16 @@ spec:
         configMapKeyRef:
           name: bulk-processing-config
           key: bulk-address-updates-bucket-name
-    - name: BULK_UNINVALIDATE_ADDRESS_PROJECT_ID
+    - name: BULK_UNINVALIDATED_ADDRESS_PROJECT_ID
       valueFrom:
         configMapKeyRef:
           name: bulk-processing-config
-          key: bulk-uninvalidate-address-project-id
-    - name: BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME
+          key: bulk-uninvalidated-address-project-id
+    - name: BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME
       valueFrom:
         configMapKeyRef:
           name: bulk-processing-config
-          key: bulk-uninvalidate-address-bucket-name
+          key: bulk-uninvalidated-address-bucket-name
   volumes:
   - name: read-replica-cloud-sql-certs
     secret:

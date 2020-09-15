@@ -505,18 +505,18 @@ def build_uninvalidated_address_bulk_file(context):
             writer.writerow(row)
 
     # Upload the file to a real bucket if one is configured
-    if Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME:
-        clear_bucket(Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME)
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
         upload_file_to_bucket(context.bulk_uninvalidated_addresses_file,
                               f'uninvalidated_addresses_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
-                              Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME)
+                              Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
 
 
 @step('the bulk un-invalidate address file is processed')
 def process_uninvalidate_addresses_updates_file(context):
     # Run against the real bucket if it is configured
-    if Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME:
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
         BulkProcessor(UnInvalidateAddressProcessor()).run()
         return
 
@@ -537,5 +537,5 @@ def check_address_valid_case_updated_events(context):
                              'Unexpected case ID found on updated event')
 
     context.bulk_uninvalidated_addresses_file.unlink()
-    if Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME:
-        clear_bucket(Config.BULK_UNINVALIDATE_ADDRESS_BUCKET_NAME)
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
