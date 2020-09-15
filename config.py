@@ -141,11 +141,11 @@ class Config:
     BULK_ADDRESS_UPDATE_ROUTING_KEY = os.getenv('BULK_ADDRESS_UPDATE_ROUTING_KEY', 'case.rm.updated')
 
     BULK_UNINVALIDATED_ADDRESS_FILE_PREFIX = os.getenv('BULK_UNINVALIDATED_ADDRESS_UPDATE_FILE_PREFIX',
-                                                      'uninvalidated_addresses_')
+                                                       'uninvalidated_addresses_')
     BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME = os.getenv('BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME')
     BULK_UNINVALIDATED_ADDRESS_PROJECT_ID = os.getenv('BULK_UNINVALIDATED_ADDRESS_PROJECT_ID')
     UNINVALIDATED_ADDRESS_EVENT_ROUTING_KEY = os.getenv('BULK_UNINVALIDATED_ADDRESS_ROUTING_KEY',
-                                                       'case.rm.unInvalidateAddress')
+                                                        'case.rm.unInvalidateAddress')
 
     TREATMENT_CODES = {
         'HH_LP1E', 'HH_LP1W', 'HH_LP2E', 'HH_LP2W', 'HH_QP3E', 'HH_QP3W', 'HH_1ALSFN', 'HH_2BLEFN',
