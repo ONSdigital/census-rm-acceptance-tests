@@ -6,7 +6,7 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-def fieldwork_create_message_callback(ch, method, _properties, body, context, store_msg=None):
+def fieldwork_create_message_callback(ch, method, _properties, body, context):
     action_instruction = json.loads(body)
 
     if not action_instruction['actionInstruction'] == 'CREATE':
@@ -19,9 +19,6 @@ def fieldwork_create_message_callback(ch, method, _properties, body, context, st
             _message_valid(case, action_instruction)
             del context.expected_cases_for_action[index]
             ch.basic_ack(delivery_tag=method.delivery_tag)
-
-            if store_msg:
-                store_msg.append(action_instruction)
 
             break
     else:
