@@ -377,32 +377,65 @@ def retrieve_case_from_source_case_id_and_no_event_details(context):
 def check_new_case(context, case_type, address_level):
     response = requests.get(f'{Config.CASE_API_CASE_URL}{context.new_case_id}?caseEvents=true')
     test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    context.first_case = response.json()
-    source_case = context.old_case
+    new_case = response.json()
     emitted_case_created_event = context.case_created_events[0]['payload']['collectionCase']
 
-    address_type_changed_check_details(address_level, case_type, context, source_case)
-    address_type_changed_check_details(address_level, case_type, context, emitted_case_created_event)
+    address_type_changed_check_created_event(emitted_case_created_event, context.old_case,
+                                             context.event, address_level)
+
+    address_type_changed_check_case(new_case, context.old_case, context.event, address_level)
 
 
-def address_type_changed_check_details(address_level, case_type, context, source_case):
-    test_helper.assertEqual(context.first_case['collectionExerciseId'], source_case['collectionExerciseId'])
-    test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
-    test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
-    test_helper.assertEqual(context.first_case['addressLine3'], source_case['address']['addressLine3'])
-    test_helper.assertEqual(context.first_case['townName'], source_case['address']['townName'])
-    test_helper.assertEqual(context.first_case['postcode'], source_case['address']['postcode'])
-    test_helper.assertEqual(context.first_case['region'], "E12000009")
-    test_helper.assertEqual(context.first_case['addressType'], case_type)
-    test_helper.assertEqual(context.first_case['addressLevel'], address_level)
-    test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
-    test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
-    test_helper.assertEqual(context.first_case['id'], context.new_case_id)
-    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
-    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
-    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
-    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
-    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+def address_type_changed_check_created_event(case_created_event, old_case, address_type_changed_event, address_level):
+    payload = address_type_changed_event["payload"]["addressTypeChange"]
+    collection_case = payload["collectionCase"]
+
+    test_helper.assertEqual(case_created_event['id'], payload["newCaseId"])
+    test_helper.assertEqual(case_created_event["address"]['addressType'], collection_case["address"]["addressType"])
+    test_helper.assertEqual(case_created_event["address"]['addressLevel'], address_level)
+    test_helper.assertEqual(case_created_event["address"]['addressLine1'], collection_case['address']['addressLine1'])
+    test_helper.assertEqual(case_created_event["address"]['addressLine2'], collection_case['address']['addressLine2'])
+    test_helper.assertEqual(case_created_event["address"]['addressLine3'], collection_case['address']['addressLine3'])
+    test_helper.assertEqual(case_created_event["address"]['organisationName'],
+                            collection_case['address']['organisationName'])
+    test_helper.assertEqual(case_created_event["address"]['estabType'], collection_case['address']['estabType'])
+    test_helper.assertEqual(case_created_event['ceExpectedCapacity'], int(collection_case['ceExpectedCapacity']))
+
+    test_helper.assertEqual(case_created_event['collectionExerciseId'], old_case['collectionExerciseId'])
+    test_helper.assertEqual(case_created_event["address"]['townName'], old_case['address']['townName'])
+    test_helper.assertEqual(case_created_event["address"]['postcode'], old_case['address']['postcode'])
+    test_helper.assertEqual(case_created_event["address"]['region'], old_case["address"]["region"][0])
+    test_helper.assertEqual(case_created_event["address"]['latitude'], old_case['address']['latitude'])
+    test_helper.assertEqual(case_created_event["address"]['longitude'], old_case['address']['longitude'])
+    test_helper.assertEqual(case_created_event['lad'], old_case['lad'])
+    test_helper.assertEqual(case_created_event['oa'], old_case['oa'])
+    test_helper.assertEqual(case_created_event['msoa'], old_case['msoa'])
+    test_helper.assertEqual(case_created_event['lsoa'], old_case['lsoa'])
+
+
+def address_type_changed_check_case(new_case, old_case, address_type_changed_event, address_level):
+    payload = address_type_changed_event["payload"]["addressTypeChange"]
+    collection_case = payload["collectionCase"]
+
+    test_helper.assertEqual(new_case['id'], payload["newCaseId"])
+    test_helper.assertEqual(new_case['addressType'], collection_case["address"]["addressType"])
+    test_helper.assertEqual(new_case['addressLevel'], address_level)
+    test_helper.assertEqual(new_case['addressLine1'], collection_case['address']['addressLine1'])
+    test_helper.assertEqual(new_case['addressLine2'], collection_case['address']['addressLine2'])
+    test_helper.assertEqual(new_case['addressLine3'], collection_case['address']['addressLine3'])
+    test_helper.assertEqual(new_case['organisationName'], collection_case['address']['organisationName'])
+    test_helper.assertEqual(new_case['estabType'], collection_case['address']['estabType'])
+
+    test_helper.assertEqual(new_case['collectionExerciseId'], old_case['collectionExerciseId'])
+    test_helper.assertEqual(new_case['townName'], old_case['address']['townName'])
+    test_helper.assertEqual(new_case['postcode'], old_case['address']['postcode'])
+    test_helper.assertEqual(new_case['region'][0], old_case["address"]["region"])
+    test_helper.assertEqual(new_case['latitude'], old_case['address']['latitude'])
+    test_helper.assertEqual(new_case['longitude'], old_case['address']['longitude'])
+    test_helper.assertEqual(new_case['lad'], old_case['lad'])
+    test_helper.assertEqual(new_case['oa'], old_case['oa'])
+    test_helper.assertEqual(new_case['msoa'], old_case['msoa'])
+    test_helper.assertEqual(new_case['lsoa'], old_case['lsoa'])
 
 
 @step('a case created event is emitted')
@@ -438,72 +471,37 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
 
 
 @step('an AddressTypeChanged event to "{type}" is sent')
-def address_type_changed_event_is_sent(context, type):
+def event_is_sent(context, type):
     context.old_case = context.case_created_events[0]['payload']['collectionCase']
     context.new_case_id = context.case_id = str(uuid.uuid4())
-    message = json.dumps(
-        {
-            "event": {
-                "type": "ADDRESS_TYPE_CHANGED",
-                "source": "FIELDWORK_GATEWAY",
-                "channel": "FIELD",
-                "dateTime": "2011-08-12T20:17:46.384Z",
-                "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-            },
-            "payload": {
-                "addressTypeChange": {
-                    "newCaseId": context.new_case_id,
-                    "collectionCase": {
-                        "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
-                        "ceExpectedCapacity": "20",
-                        "address": {
-                            "addressType": type
-                        }
+    context.event = {
+        "event": {
+            "type": "ADDRESS_TYPE_CHANGED",
+            "source": "FIELDWORK_GATEWAY",
+            "channel": "FIELD",
+            "dateTime": "2011-08-12T20:17:46.384Z",
+            "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        "payload": {
+            "addressTypeChange": {
+                "newCaseId": context.new_case_id,
+                "collectionCase": {
+                    "id": str(context.old_case["id"]),
+                    "ceExpectedCapacity": "20",
+                    "address": {
+                        "addressType": type,
+                        "organisationName": "The Grand Budapest Hotel",
+                        "estabType": "HOTEL",
+                        "addressLine1": "The Grand Budapest Hotel",
+                        "addressLine2": "Main Street",
+                        "addressLine3": ""
                     }
                 }
             }
         }
-    )
+    }
 
-    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
-        rabbit.publish_message(
-            message=message,
-            content_type='application/json',
-            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
-
-
-@step('an AddressTypeChanged event is sent')
-def address_type_changed_event_is_sent(context):
-    context.old_case = context.case_created_events[0]['payload']['collectionCase']
-    context.new_case_id = context.case_id = str(uuid.uuid4())
-    message = json.dumps(
-        {
-            "event": {
-                "type": "ADDRESS_TYPE_CHANGED",
-                "source": "CONTACT_CENTRE_API",
-                "channel": "CC",
-                "dateTime": "2011-08-12T20:17:46.384Z",
-                "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-            },
-            "payload": {
-                "addressTypeChange": {
-                    "newCaseId": context.new_case_id,
-                    "collectionCase": {
-                        "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
-                        "ceExpectedCapacity": "20",
-                        "address": {
-                            "organisationName": "The Grand Budapest Hotel",
-                            "addressType": "CE",
-                            "estabType": "HOTEL",
-                            "addressLine1": "The Grand Budapest Hotel",
-                            "addressLine2": "Main Street",
-                            "addressLine3": ""
-                        }
-                    }
-                }
-            }
-        }
-    )
+    message = json.dumps(context.event)
 
     with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
         rabbit.publish_message(
