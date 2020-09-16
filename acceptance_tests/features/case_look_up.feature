@@ -19,6 +19,6 @@ Feature: Case look up for the contact centre
     And it contains the correct fields for a CENSUS case
 
   Scenario: Check case-api returns correct fields for a CCS case
-    When a CCS Property Listed event is sent
+    When a CCS Property Listed event is sent with interview required set to False
     Then the CCS Property Listed case is created with address type "HH"
     And it contains the correct fields for a CCS case
