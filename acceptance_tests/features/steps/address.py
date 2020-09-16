@@ -471,7 +471,7 @@ def _send_invalid_address_message_to_rabbit(case_id, sender):
 
 
 @step('an AddressTypeChanged event to "{type}" is sent')
-def event_is_sent(context, type):
+def address_type_changed_event_is_sent(context, type):
     context.old_case = context.case_created_events[0]['payload']['collectionCase']
     context.new_case_id = context.case_id = str(uuid.uuid4())
     context.event = {
