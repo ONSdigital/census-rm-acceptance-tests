@@ -65,6 +65,16 @@ Feature: Address updates
     And events logged against the case are [SAMPLE_LOADED,ADDRESS_MODIFIED]
 
 
+  Scenario: Address Modifications on AddressTypeChanged event
+    Given sample file "sample_1_english_CE_estab.csv" is loaded successfully
+    When an AddressTypeChanged event is sent
+    Then a case_updated msg is emitted where "addressInvalid" is "True"
+    And events logged against the case are [SAMPLE_LOADED,ADDRESS_TYPE_CHANGED]
+    And a case created event is emitted
+#    And the "<target address type>" case with level "<derived address level>" has the correct values
+    And events logged against the case are [ADDRESS_TYPE_CHANGED]
+
+
   Scenario Outline: AddressTypeChanged event
     Given sample file "<sample file>" is loaded successfully
     When an AddressTypeChanged event to "<target address type>" is sent

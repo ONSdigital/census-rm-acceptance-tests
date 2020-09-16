@@ -472,6 +472,46 @@ def address_type_changed_event_is_sent(context, type):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
+@step('an AddressTypeChanged event is sent')
+def address_type_changed_event_is_sent(context):
+    context.old_case = context.case_created_events[0]['payload']['collectionCase']
+    context.new_case_id = context.case_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "ADDRESS_TYPE_CHANGED",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+            },
+            "payload": {
+                "addressTypeChange": {
+                    "newCaseId": context.new_case_id,
+                    "collectionCase": {
+                        "id": str(context.case_created_events[0]['payload']['collectionCase']['id']),
+                        "ceExpectedCapacity": "20",
+                        "address": {
+                            "organisationName": "The Grand Budapest Hotel",
+                            "addressType": "CE",
+                            "estabType": "HOTEL",
+                            "addressLine1": "The Grand Budapest Hotel",
+                            "addressLine2": "Main Street",
+                            "addressLine3": ""
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
 @step("an Address Modified Event is sent")
 def send_address_modified_event(context):
     message = json.dumps(
