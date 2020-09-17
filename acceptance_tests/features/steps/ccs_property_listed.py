@@ -5,6 +5,7 @@ import uuid
 import requests
 from behave import step
 from retrying import retry
+from str2bool import str2bool
 
 from acceptance_tests.utilities.event_helper import get_case_created_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -15,41 +16,9 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step("a CCS Property Listed event is sent")
-def send_ccs_property_listed_event(context):
-    message = _create_ccs_property_listed_event(context)
-    _send_ccs_case_list_msg_to_rabbit(message)
-
-
-@step("a CCS Property Listed event is sent with a qid")
-def send_ccs_property_listed_event_with_qid(context):
-    message = _create_ccs_property_listed_event(context)
-    message['payload']['CCSProperty']['uac'] = [{
-        "questionnaireId": context.expected_questionnaire_id
-    }]
-
-    _send_ccs_case_list_msg_to_rabbit(message)
-
-
-@step('a CCS Property Listed event is sent with refusal')
-def send_ccs_property_listed_event_with_refusal(context):
-    message = _create_ccs_property_listed_event(context)
-    message['payload']['CCSProperty']['refusal'] = {
-        "type": "HARD_REFUSAL",
-        "report": "respondent too busy",
-        "agentId": "110001"
-    }
-
-    _send_ccs_case_list_msg_to_rabbit(message)
-
-
-@step('a CCS Property Listed event is sent with an address invalid event and address type "{address_type}"')
-def send_ccs_property_listed_event_with_invalid_address(context, address_type):
-    message = _create_ccs_property_listed_event(context, address_type)
-    message['payload']['CCSProperty']['invalidAddress'] = {
-        "reason": "NON_RESIDENTIAL"
-    }
-
+@step("a CCS Property Listed event is sent with interview required set to {interview_required}")
+def send_ccs_property_listed_event(context, interview_required):
+    message = _create_ccs_property_listed_event(context, interview_required=str2bool(interview_required))
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
@@ -124,7 +93,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH", address_level="U"):
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -137,6 +106,7 @@ def _create_ccs_property_listed_event(context, address_type="HH", address_level=
         },
         "payload": {
             "CCSProperty": {
+                "interviewRequired": interview_required,
                 "collectionCase": {
                     "id": context.case_id
                 },
