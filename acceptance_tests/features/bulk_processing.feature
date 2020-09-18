@@ -12,6 +12,7 @@ Feature: Bulk event CSV files can be processed
     When the bulk new address file is processed
     Then CASE_CREATED events are emitted for all the new addressed supplied
     And the new address cases are ingested into the database
+    And the new address cases are sent to field as CREATE with UAA true
 
   Scenario: A bulk invalid address file is successfully ingested
     Given sample file "sample_input_wales_census_spec.csv" is loaded successfully
