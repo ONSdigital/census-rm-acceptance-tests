@@ -134,7 +134,6 @@ def ignore_field_cancel_msgs(ch, method, _properties, body, context, expected_ms
         context.cancels_to_ignore.append(parsed_body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
     else:
-        # take it, ignore it?
         ch.basic_nack(delivery_tag=method.delivery_tag)
 
     if len(context.cancels_to_ignore) == expected_msg_count:
