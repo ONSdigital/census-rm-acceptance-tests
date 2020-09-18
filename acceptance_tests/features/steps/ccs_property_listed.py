@@ -64,7 +64,7 @@ def ccs_case_event_logged(context):
 
 @step('a CCS Property List event is sent and associated "{address_type}" case is created and sent to FWMT')
 def css_property_list_and_events_emitted(context, address_type):
-    message = _create_ccs_property_listed_event(context)
+    message = _create_ccs_property_listed_event(context, address_type=address_type, address_level="U")
     _send_ccs_case_list_msg_to_rabbit(message)
 
     check_case_created(context, address_type)
@@ -93,7 +93,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True):
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="E"):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -113,7 +113,7 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
                 "sampleUnit": {
                     "addressType": address_type,
                     "estabType": "Household",
-                    "addressLevel": "U",
+                    "addressLevel": address_level,
                     "organisationName": "Testy McTest",
                     "addressLine1": "123 Fake street",
                     "addressLine2": "Upper upperingham",
@@ -135,7 +135,7 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
 @step('a CCS Property List event is sent with Address Type "{address_type}" address level "{address_level}" '
       'and it is created successfully')
 def send_css_telephone_capture_event(context, address_type, address_level):
-    message = _create_ccs_property_listed_event(context, address_type, address_level)
+    message = _create_ccs_property_listed_event(context, address_type, address_level=address_level)
 
     _send_ccs_case_list_msg_to_rabbit(message)
 
