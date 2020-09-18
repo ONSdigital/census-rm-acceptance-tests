@@ -1,4 +1,5 @@
 import csv
+import functools
 import random
 import time
 from contextlib import contextmanager
@@ -22,6 +23,7 @@ from acceptance_tests.utilities.case_api_helper import get_logged_events_for_cas
     get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -454,3 +456,27 @@ def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
 
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+
+
+@step("the new address cases are sent to field as CREATE with UAA true")
+def new_addresses_sent_to_field(context):
+    expected_case_ids = [
+        event['payload']['collectionCase']['id'] for event in context.case_created_events
+    ]
+
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=len(context.case_created_events)))
+
+    for field_msg in context.messages_received:
+        test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
+        test_helper.assertTrue(field_msg['undeliveredAsAddress'])
+
+        for expected_case_id in expected_case_ids:
+            if field_msg['caseId'] == expected_case_id:
+                expected_case_ids.remove(expected_case_id)
+                break
+
+    test_helper.assertEqual(len(expected_case_ids), 0, 'Not all new addresses accounted for')
