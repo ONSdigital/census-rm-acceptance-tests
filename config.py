@@ -48,6 +48,9 @@ class Config:
 
     RABBITMQ_DEACTIVATE_UAC_QUEUE = os.getenv('RABBITMQ_DEACTIVATE_UAC_QUEUE', 'case.deactivate-uac')
 
+    RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE = os.getenv('RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE',
+                                                    'case.rm.unInvalidateAddress')
+
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
     RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
@@ -136,6 +139,13 @@ class Config:
     BULK_ADDRESS_UPDATE_BUCKET_NAME = os.getenv('BULK_ADDRESS_UPDATE_BUCKET_NAME')
     BULK_ADDRESS_UPDATE_PROJECT_ID = os.getenv('BULK_ADDRESS_UPDATE_PROJECT_ID')
     BULK_ADDRESS_UPDATE_ROUTING_KEY = os.getenv('BULK_ADDRESS_UPDATE_ROUTING_KEY', 'case.rm.updated')
+
+    BULK_UNINVALIDATED_ADDRESS_FILE_PREFIX = os.getenv('BULK_UNINVALIDATED_ADDRESS_UPDATE_FILE_PREFIX',
+                                                       'uninvalidated_addresses_')
+    BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME = os.getenv('BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME')
+    BULK_UNINVALIDATED_ADDRESS_PROJECT_ID = os.getenv('BULK_UNINVALIDATED_ADDRESS_PROJECT_ID')
+    UNINVALIDATED_ADDRESS_EVENT_ROUTING_KEY = os.getenv('BULK_UNINVALIDATED_ADDRESS_ROUTING_KEY',
+                                                        'case.rm.unInvalidateAddress')
 
     TREATMENT_CODES = {
         'HH_LP1E', 'HH_LP1W', 'HH_LP2E', 'HH_LP2W', 'HH_QP3E', 'HH_QP3W', 'HH_1ALSFN', 'HH_2BLEFN',

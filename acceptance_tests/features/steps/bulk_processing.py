@@ -16,14 +16,17 @@ from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProces
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
+from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateAddressProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
+from acceptance_tests.utilities.address_helper import send_invalid_address_message_to_rabbit
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id, \
     get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_updated_events, get_case_created_events, \
     get_uac_updated_events
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    ignore_field_cancel_msgs, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -344,6 +347,13 @@ def check_the_cases_via_case_api(context):
         test_helper.assertEqual(actual_case['townName'], row['TOWN_NAME'])
 
 
+@step('the addresses for the cases are un-invalidated in the database')
+def check_the_uninvalidated_cases_via_case_api(context):
+    for row in context.bulk_uninvalidated_addresses:
+        actual_case = get_case_and_case_events_by_case_id(row['CASE_ID'])
+        test_helper.assertFalse(actual_case['addressInvalid'])
+
+
 @step('a bulk deactivate uac file is supplied')
 def bulk_deactivate_uac_file(context):
     # Build a bulk deactivate uac file
@@ -456,6 +466,79 @@ def deactivate_uac_events_logged_against_all_uac_qid_pairs(context):
 
     if Config.BULK_DEACTIVATE_UAC_BUCKET_NAME:
         clear_bucket(Config.BULK_DEACTIVATE_UAC_BUCKET_NAME)
+
+
+@step('all the cases are marked as invalid')
+def mark_cases_as_invalid(context):
+    invalid_address_case_ids = [case['payload']['collectionCase']['id'] for case in context.case_created_events]
+
+    for case_id in invalid_address_case_ids:
+        send_invalid_address_message_to_rabbit(case_id, "CC")
+
+    case_updated_events = get_case_updated_events(context, len(context.case_created_events))
+    for event in case_updated_events:
+        test_helper.assertIn(event['payload']['collectionCase']['id'], invalid_address_case_ids,
+                             'Unexpected case ID found on updated event')
+    context.cancels_to_ignore = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(ignore_field_cancel_msgs, context=context,
+                                                      expected_msg_count=len(case_updated_events)))
+
+
+@step('a bulk un-invalidate addresses file is supplied')
+def build_uninvalidated_address_bulk_file(context):
+    # Build a bulk un-invalid address file with a row for each the stored case created event
+    context.bulk_uninvalidated_addresses_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                            'uninvalidated_addresses_bulk_test.csv')
+    context.bulk_uninvalidated_addresses = []
+    for case_created in context.case_created_events:
+        context.bulk_uninvalidated_addresses.append({
+            'CASE_ID': case_created['payload']['collectionCase']['id'],
+        })
+    test_helper.assertGreater(len(context.bulk_uninvalidated_addresses), 0,
+                              'Must have at least one update for this test to be valid')
+    with open(context.bulk_uninvalidated_addresses_file, 'w') as bulk_invalidated_addresses_file_write:
+        writer = csv.DictWriter(bulk_invalidated_addresses_file_write, fieldnames=list(
+            context.bulk_uninvalidated_addresses[0].keys()))
+        writer.writeheader()
+        for row in context.bulk_uninvalidated_addresses:
+            writer.writerow(row)
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
+        upload_file_to_bucket(context.bulk_uninvalidated_addresses_file,
+                              f'uninvalidated_addresses_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
+
+
+@step('the bulk un-invalidate address file is processed')
+def process_uninvalidate_addresses_updates_file(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
+        BulkProcessor(UnInvalidateAddressProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.bulk_uninvalidated_addresses_file):
+        BulkProcessor(UnInvalidateAddressProcessor()).run()
+
+
+@step('CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false')
+def check_address_valid_case_updated_events(context):
+    address_valid_case_ids = [case_id['CASE_ID'] for case_id in context.bulk_uninvalidated_addresses]
+    context.case_updated_events = get_case_updated_events(context, len(address_valid_case_ids))
+    test_helper.assertEqual(len(context.case_updated_events), len(context.bulk_uninvalidated_addresses))
+    for event in context.case_updated_events:
+        test_helper.assertFalse(event['payload']['collectionCase']['addressInvalid'],
+                                'Address invalid flag must be "False" on all updated events')
+        test_helper.assertIn(event['payload']['collectionCase']['id'], address_valid_case_ids,
+                             'Unexpected case ID found on updated event')
+
+    context.bulk_uninvalidated_addresses_file.unlink()
+    if Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME:
+        clear_bucket(Config.BULK_UNINVALIDATED_ADDRESS_BUCKET_NAME)
 
 
 @step("the new address cases are sent to field as CREATE with UAA true")
