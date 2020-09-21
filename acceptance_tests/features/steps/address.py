@@ -492,7 +492,7 @@ def address_type_changed_event_is_sent(context, type):
                         "addressType": type,
                         "organisationName": "The Grand Budapest Hotel",
                         "estabType": "HOTEL",
-                        "addressLine1": "The Grand Budapest Hotel",
+                        "addressLine1": "Testy test",
                         "addressLine2": "Main Street",
                         "addressLine3": ""
                     }
