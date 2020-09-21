@@ -63,3 +63,26 @@ def field_work_cancel_callback(ch, method, _properties, body, context):
     context.field_action_cancel_message = action_cancel
     ch.basic_ack(delivery_tag=method.delivery_tag)
     ch.stop_consuming()
+
+
+def field_work_update_callback(ch, method, _properties, body, context):
+    action_instruction = json.loads(body)
+
+    if not action_instruction['actionInstruction'] == 'UPDATE':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{action_instruction["actionInstruction"]}", wanted "UPDATE"')
+
+    for index, case in enumerate(context.expected_cases_for_action):
+        if _message_matches(case, action_instruction):
+            del context.expected_cases_for_action[index]
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+            break
+    else:
+        test_helper.fail(
+            f'Found message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue which did not '
+            f'match any expected sample units')
+
+    if not context.expected_cases_for_action:
+        ch.stop_consuming()
