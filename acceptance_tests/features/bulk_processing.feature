@@ -42,3 +42,12 @@ Feature: Bulk event CSV files can be processed
     Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
     And the cases are updated in the database
     And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+  Scenario: A bulk address un-invalidate file is successfully ingested
+    Given sample file "sample_input_wales_census_spec.csv" is loaded successfully
+    And all the cases are marked as invalid
+    And a bulk un-invalidate addresses file is supplied
+    When the bulk un-invalidate address file is processed
+    Then CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false
+    And the addresses for the cases are un-invalidated in the database
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused

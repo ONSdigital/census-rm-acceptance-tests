@@ -94,3 +94,45 @@ def deactivate_uac_(context):
                 message=message,
                 content_type='application/json',
                 routing_key=Config.RABBITMQ_DEACTIVATE_UAC_QUEUE)
+
+
+@step("an UNINVALIDATE_ADDRESS message is sent")
+def uninvalidate_address(context):
+    context.bulk_uninvalidated_addresses = []
+    for invalid_address in context.case_created_events:
+        invalid = {'CASE_ID': invalid_address['payload']['collectionCase']['id']}
+        context.bulk_uninvalidated_addresses.append(invalid)
+        message = json.dumps(
+            {
+                "event": {
+                    "type": "RM_UNINVALIDATE_ADDRESS",
+                    "source": "TESTY TEST",
+                    "channel": "AR",
+                    "dateTime": "2019-07-07T22:37:11.988+0000",
+                    "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+                },
+                "payload": {
+                    "rmUnInvalidateAddress": {
+                        "caseId": invalid_address['payload']['collectionCase']['id']
+                    }
+                }
+            }
+        )
+
+        with RabbitContext(exchange='') as rabbit:
+            rabbit.publish_message(
+                message=message,
+                content_type='application/json',
+                routing_key=Config.RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE)
+
+
+@step('CASE_UPDATED events are emitted for all the cases')
+def check_address_valid_case_updated_events(context):
+    address_valid_case_ids = [case_id['CASE_ID'] for case_id in context.bulk_uninvalidated_addresses]
+    context.case_updated_events = get_case_updated_events(context, len(address_valid_case_ids))
+    test_helper.assertEqual(len(context.case_updated_events), len(context.bulk_uninvalidated_addresses))
+    for event in context.case_updated_events:
+        test_helper.assertFalse(event['payload']['collectionCase']['addressInvalid'],
+                                'Address invalid flag must be "False" on all updated events')
+        test_helper.assertIn(event['payload']['collectionCase']['id'], address_valid_case_ids,
+                             'Unexpected case ID found on updated event')
