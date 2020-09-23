@@ -762,26 +762,15 @@ def new_address_sent_to_aims(context):
 
 @step("the new address reported cases are sent to field as CREATE with secureEstablishment as true")
 def new_addresses_sent_to_field(context):
-    expected_case_ids = [
-        event['payload']['collectionCase']['id'] for event in context.case_created_events
-    ]
-
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
                                         store_all_msgs_in_context, context=context,
-                                        expected_msg_count=len(context.case_created_events)))
+                                        expected_msg_count=1))
 
-    for field_msg in context.messages_received:
-        test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
-        test_helper.assertTrue(field_msg['secureEstablishment'])
-
-        for expected_case_id in expected_case_ids:
-            if field_msg['caseId'] == expected_case_id:
-                expected_case_ids.remove(expected_case_id)
-                break
-
-    test_helper.assertEqual(len(expected_case_ids), 0, 'Not all new addresses accounted for')
+    field_msg = context.messages_received[0]
+    test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
+    test_helper.assertTrue(field_msg['secureEstablishment'])
 
 
 def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
