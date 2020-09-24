@@ -7,6 +7,8 @@ from behave import step
 from retrying import retry
 from str2bool import str2bool
 
+from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
+from acceptance_tests.utilities.event_helper import get_case_created_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
     check_no_msgs_sent_to_queue
@@ -63,7 +65,7 @@ def ccs_case_event_logged(context):
 
 @step('a CCS Property List event is sent and associated "{address_type}" case is created and sent to FWMT')
 def css_property_list_and_events_emitted(context, address_type):
-    message = _create_ccs_property_listed_event(context)
+    message = _create_ccs_property_listed_event(context, address_type=address_type, address_level="U")
     _send_ccs_case_list_msg_to_rabbit(message)
 
     check_case_created(context, address_type)
@@ -92,7 +94,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True):
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="E"):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -112,7 +114,7 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
                 "sampleUnit": {
                     "addressType": address_type,
                     "estabType": "Household",
-                    "addressLevel": "U",
+                    "addressLevel": address_level,
                     "organisationName": "Testy McTest",
                     "addressLine1": "123 Fake street",
                     "addressLine2": "Upper upperingham",
@@ -129,3 +131,25 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
     }
 
     return message
+
+
+@step('a CCS Property List event is sent with Address Type "{address_type}" address level "{address_level}" '
+      'and it is created successfully')
+def send_css_telephone_capture_event(context, address_type, address_level):
+    message = _create_ccs_property_listed_event(context, address_type, address_level=address_level)
+
+    _send_ccs_case_list_msg_to_rabbit(message)
+
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        _field_callback, context=context))
+
+    action_instruction = context.emitted_action_instruction
+    case_id = message['payload']['CCSProperty']['collectionCase']['id']
+    test_helper.assertEqual(case_id, action_instruction['caseId'])
+
+    context.case_details = get_case_and_case_events_by_case_id(case_id)
+    context.collection_exercise_id = context.case_details['collectionExerciseId']
+
+    context.case_created_events = get_case_created_events(context, 1)
