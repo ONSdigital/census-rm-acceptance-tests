@@ -7,6 +7,7 @@ from behave import step
 from retrying import retry
 from str2bool import str2bool
 
+from acceptance_tests.utilities.case_api_helper import get_case_and_case_events_by_case_id
 from acceptance_tests.utilities.event_helper import get_case_created_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context, \
@@ -148,9 +149,7 @@ def send_css_telephone_capture_event(context, address_type, address_level):
     case_id = message['payload']['CCSProperty']['collectionCase']['id']
     test_helper.assertEqual(case_id, action_instruction['caseId'])
 
-    response = requests.get(f'{Config.CASE_API_CASE_URL}{case_id}')
-    test_helper.assertEqual(response.status_code, 200, 'Case not found')
-    context.case_details = response.json()
+    context.case_details = get_case_and_case_events_by_case_id(case_id)
     context.collection_exercise_id = context.case_details['collectionExerciseId']
 
     context.case_created_events = get_case_created_events(context, 1)
