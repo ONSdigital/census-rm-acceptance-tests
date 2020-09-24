@@ -580,6 +580,7 @@ QUESTIONNAIRE_TYPE_TO_FORM_TYPE = {
     "31": 'C',
     "32": 'C',
     "34": 'C',
+    "71": 'H',
 }
 
 NOTIFY_TEMPLATE = {
