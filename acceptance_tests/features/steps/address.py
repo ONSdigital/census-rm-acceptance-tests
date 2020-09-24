@@ -93,7 +93,7 @@ def new_address_reported_event_with_uprn_but_without_source_case_id(context, sen
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" without a sourceCaseId')
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" without a sourceCaseId')
 def ce_new_address_reported_event_without_source_case_id(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
@@ -422,7 +422,7 @@ def retrieve_skeleton_case_and_check_uprn(context):
 
 
 @step("the CE case with secureEstablishment marked True from the New Address event can be retrieved")
-def retrieve_ce_case(context):
+def retrieve_ce_true_case(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
     test_helper.assertEqual(context.first_case['id'], context.case_id)
@@ -456,7 +456,7 @@ def retrieve_case_from_source_case_id_and_event_details(context):
 
 
 @step('the CE case can be retrieved and contains the correct properties when the event had details')
-def retrieve_ce_case_from_source_case_id_and_event_details(context):
+def retrieve_ce_true_case_from_source_case_id_and_event_details(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
     test_helper.assertEqual(context.first_case['id'], context.case_id)
@@ -811,6 +811,7 @@ def _check_ce_secure_estab_case_address_details(case, extra_address_details=None
     test_helper.assertEqual(case['addressLevel'], "E")
     test_helper.assertEqual(case['latitude'], "50.917428")
     test_helper.assertEqual(case['longitude'], "-1.238193")
+    test_helper.assertEqual(case['uprn'], "1214242")
 
     if extra_address_details:
         test_helper.assertEqual(case['lad'], extra_address_details['lad'])

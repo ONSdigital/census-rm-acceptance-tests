@@ -43,7 +43,7 @@ Feature: Address updates
 
 
   Scenario: New address event received for CE case without sourceCaseId and Secure Establishment True
-    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" without a sourceCaseId
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" without a sourceCaseId
     Then a case created event is emitted
     And the CE case with secureEstablishment marked True from the New Address event can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
