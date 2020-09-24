@@ -47,7 +47,6 @@ Feature: Address updates
     Then a case created event is emitted
     And the CE case with secureEstablishment marked True from the New Address event can be retrieved
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
-    And the new address reported cases are sent to field as CREATE with secureEstablishment as true
 
 
   Scenario: New address event received for CE case with sourceCaseId and Secure Establishment True

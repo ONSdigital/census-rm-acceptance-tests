@@ -129,7 +129,8 @@ def ce_new_address_reported_event_without_source_case_id(context, sender):
                             "latitude": "50.917428",
                             "longitude": "-1.238193",
                             "estabType": "HOSPITAL",
-                            "secureType": True
+                            "secureType": True,
+                            "uprn": "1214242"
                         }
                     }
                 }
@@ -282,7 +283,8 @@ def ce_new_address_reported_event_with_source_case_id(context, sender):
                             "latitude": "50.917428",
                             "longitude": "-1.238193",
                             "estabType": "HOSPITAL",
-                            "secureType": True
+                            "secureType": True,
+                            "uprn": "1214242"
                         }
                     }
                 }
