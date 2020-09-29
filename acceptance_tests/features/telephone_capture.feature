@@ -71,3 +71,11 @@ Feature: Telephone capture
       | sample_1_english_CE_unit.csv   | CE           | E            | 21                 |
       | sample_1_welsh_CE_unit.csv     | CE           | W            | 22                 |
       | sample_1_ni_CE_unit.csv        | CE           | N            | 24                 |
+
+
+  Scenario: Generate and link correct QID type for non individual CCS telephone capture requests
+    Given a CCS Property List event is sent with Address Type "HH" address level "U" and it is created successfully
+    When there is a request for telephone capture against the new case
+    Then a UAC and QID with questionnaire type "71" type are generated and returned
+    And a UAC updated event is emitted linking the new UAC and QID to the requested case
+    And a fulfilment request event is logged
