@@ -1,4 +1,4 @@
-Feature: Internal messages used by RM which might be used by future systems
+Feature: Internal messages used by RM from bulk processing actions
 
   Scenario: A DEACTIVATE_UAC msg is sent and processed
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
@@ -10,7 +10,7 @@ Feature: Internal messages used by RM which might be used by future systems
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When an RM address update message is sent
     Then CASE_UPDATED event is emitted with updated case data
-    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
 
   Scenario: Un-invalidate an address message is sent
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
