@@ -42,6 +42,22 @@ Feature: Address updates
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
+  Scenario: New address event received for CE case without sourceCaseId and Secure Establishment True
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" without a sourceCaseId
+    Then a case created event is emitted
+    And the CE case with secureEstablishment marked True from the New Address event can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+
+
+  Scenario: New address event received for CE case with sourceCaseId and Secure Establishment True
+    Given sample file "sample_1_english_CE_secure_estab.csv" is loaded successfully
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId
+    Then a case created event is emitted
+    And the CE case can be retrieved and contains the correct properties when the event had details
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+    And the new address reported cases are sent to field as CREATE with secureEstablishment as true
+
+
   Scenario: New address event received with sourceCaseId
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
@@ -87,6 +103,7 @@ Feature: Address updates
       | sample_1_english_SPG_estab.csv | HH                  | U                     |
       | sample_1_english_SPG_estab.csv | CE                  | E                     |
 
+
   Scenario: Fulfilment request for new skeleton case
     Given a NEW_ADDRESS_REPORTED event is sent from "FIELD" without sourceCaseId and new case is emitted
     When a PQ fulfilment request event with fulfilment code "P_OR_H1" is received by RM
@@ -109,6 +126,7 @@ Feature: Address updates
     When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     And a CREATE action instruction is sent to field for the SPG case
+
 
 # TODO: Re-instate this scenario when we've implemented response-driven reminders for Census 2021
 #  @hardcoded_census_values_for_collection_and_action_plan_ids
