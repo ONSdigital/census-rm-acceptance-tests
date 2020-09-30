@@ -77,13 +77,13 @@ Feature: Scheduled initial contact print and manifest files can be generated and
     And the expected number of "RM_UAC_CREATED" and [PRINT_CASE_SELECTED,SAMPLE_LOADED] events are logged against the case
 
     Examples: CE Estab Initial contact questionnaire: <pack code>
-      | pack code | action type | questionnaire types | sample file                            | individual qid type |
-      | D_FDCE_I4 | CE_IC08     | [34]                | sample_3_ni_CE_estab_questionnaire.csv | 24                  |
+      | pack code | action type | questionnaire types | sample file                          | individual qid type |
+      | D_FDCE_I4 | CE_IC08     | [34]                | sample_5_ni_CE_estab_for_sorting.csv | 24                  |
 
     @regression
     Examples: CE Estab Initial contact questionnaire: <pack code>
       | pack code | action type | questionnaire types | sample file                                 | individual qid type |
-      | D_FDCE_I1 | CE_IC09     | [31]                | sample_3_english_CE_estab_questionnaire.csv | 21                  |
+      | D_FDCE_I1 | CE_IC09     | [31]                | sample_5_english_CE_estab_for_sorting.csv | 21                  |
 
 
   Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
