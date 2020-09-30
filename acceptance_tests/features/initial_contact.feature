@@ -78,12 +78,12 @@ Feature: Scheduled initial contact print and manifest files can be generated and
 
     Examples: CE Estab Initial contact questionnaire: <pack code>
       | pack code | action type | questionnaire types | sample file                          | individual qid type |
-      | D_FDCE_I4 | CE_IC08     | [34]                | sample_5_ni_CE_estab_for_sorting.csv | 24                  |
+      | D_FDCE_I4 | CE_IC08     | [34]                | sample_10_ni_CE_estab_for_sorting.csv | 24                  |
 
     @regression
     Examples: CE Estab Initial contact questionnaire: <pack code>
       | pack code | action type | questionnaire types | sample file                                 | individual qid type |
-      | D_FDCE_I1 | CE_IC09     | [31]                | sample_5_english_CE_estab_for_sorting.csv | 21                  |
+      | D_FDCE_I1 | CE_IC09     | [31]                | sample_10_english_CE_estab_for_sorting.csv | 21                  |
 
 
   Scenario: Generate print files and log events for Welsh CE initial contact questionnaires
