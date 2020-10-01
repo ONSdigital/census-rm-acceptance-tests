@@ -53,7 +53,7 @@ class Config:
 
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'rmquser')
-    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'rmqp455w0rd')
+    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'qpassword')
 
     SFTP_HOST = os.getenv('SFTP_HOST', 'localhost')
     SFTP_PORT = os.getenv('SFTP_PORT', '122')
