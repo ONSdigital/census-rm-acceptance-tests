@@ -12,7 +12,7 @@ from acceptance_tests.utilities.event_helper import check_case_created_message_i
 from acceptance_tests.utilities.pubsub_helper import synchronous_consume_of_aims_pubsub_topic, \
     purge_aims_new_address_subscription
 from acceptance_tests.utilities.rabbit_context import RabbitContext
-from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, store_all_msgs_in_context
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -80,6 +80,57 @@ def new_address_reported_event_with_uprn_but_without_source_case_id(context, sen
                             "latitude": "50.917428",
                             "longitude": "-1.238193",
                             "uprn": context.new_address_uprn
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" without a sourceCaseId')
+def ce_new_address_reported_event_without_source_case_id(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": None,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "CE",
+                        "survey": "CENSUS",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "ceExpectedCapacity": 5,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "CE",
+                            "addressLevel": "E",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193",
+                            "estabType": "HOSPITAL",
+                            "secureType": True,
+                            "uprn": "1214242"
                         }
                     }
                 }
@@ -181,6 +232,59 @@ def new_address_reported_event_with_source_case_id(context, sender):
                             "addressLevel": "U",
                             "latitude": "50.917428",
                             "longitude": "-1.238193"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId')
+def ce_new_address_reported_event_with_source_case_id(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.sourceCaseId = str(context.first_case['id'])
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": context.sourceCaseId,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "CE",
+                        "survey": "CENSUS",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "ceExpectedCapacity": 5,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "CE",
+                            "addressLevel": "E",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193",
+                            "estabType": "HOSPITAL",
+                            "secureType": True,
+                            "uprn": "1214242"
                         }
                     }
                 }
@@ -317,6 +421,16 @@ def retrieve_skeleton_case_and_check_uprn(context):
     _check_case_address_details(context.first_case, context.new_address_uprn, expected_estab_uprn)
 
 
+@step("the CE case with secureEstablishment marked True from the New Address event can be retrieved")
+def retrieve_ce_true_case(context):
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
+
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
+
+    _check_ce_secure_estab_case_address_details(context.first_case)
+
+
 @step("the case with dummy UPRN from the New Address event can be retrieved")
 def retrieve_skeleton_case_and_check_dummy_uprn(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
@@ -339,6 +453,35 @@ def retrieve_case_from_source_case_id_and_event_details(context):
 
     source_case = context.case_created_events[0]['payload']['collectionCase']
     _check_case_address_details(context.first_case, source_case['address']['uprn'], source_case['address']['estabUprn'])
+
+
+@step('the CE case can be retrieved and contains the correct properties when the event had details')
+def retrieve_ce_true_case_from_source_case_id_and_event_details(context):
+    context.first_case = get_case_and_case_events_by_case_id(context.case_id)
+
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+
+    source_case = context.case_created_events[0]['payload']['collectionCase']
+
+    test_helper.assertEqual(context.first_case['addressLine1'], source_case['address']['addressLine1'])
+    test_helper.assertEqual(context.first_case['addressLine2'], source_case['address']['addressLine2'])
+    test_helper.assertEqual(context.first_case['addressLine3'], source_case['address']['addressLine3'])
+    test_helper.assertEqual(context.first_case['townName'], source_case['address']['townName'])
+    test_helper.assertEqual(context.first_case['postcode'], source_case['address']['postcode'])
+    test_helper.assertEqual(context.first_case['region'], "E00001234")
+    test_helper.assertEqual(context.first_case['addressType'], "CE")
+    test_helper.assertEqual(context.first_case['addressLevel'], "E")
+    test_helper.assertEqual(context.first_case['latitude'], source_case['address']['latitude'])
+    test_helper.assertEqual(context.first_case['longitude'], source_case['address']['longitude'])
+    test_helper.assertEqual(context.first_case['id'], context.case_id)
+    test_helper.assertEqual(context.first_case['estabUprn'], source_case['address']['estabUprn'])
+    test_helper.assertEqual(context.first_case['lad'], source_case['lad'])
+    test_helper.assertEqual(context.first_case['oa'], source_case['oa'])
+    test_helper.assertEqual(context.first_case['msoa'], source_case['msoa'])
+    test_helper.assertEqual(context.first_case['lsoa'], source_case['lsoa'])
+    test_helper.assertEqual(context.first_case['organisationName'], source_case['address']['organisationName'])
+    test_helper.assertEqual(context.first_case['uprn'], source_case['address']['uprn'])
+    test_helper.assertEqual(context.first_case['secureEstablishment'], source_case['metadata']['secureEstablishment'])
 
 
 @step('the case can be retrieved and contains the correct properties when the event had minimal details')
@@ -657,6 +800,19 @@ def new_address_sent_to_aims(context):
     _check_case_address_details(actual_address, expected_dummy_uprn)
 
 
+@step("the new address reported cases are sent to field as CREATE with secureEstablishment as true")
+def new_addresses_sent_to_field(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1))
+
+    field_msg = context.messages_received[0]
+    test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
+    test_helper.assertTrue(field_msg['secureEstablishment'])
+
+
 def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
     test_helper.assertEqual(case['addressLine1'], "123")
     test_helper.assertEqual(case['addressLine2'], "Fake caravan park")
@@ -680,3 +836,26 @@ def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, e
         test_helper.assertEqual(case['lsoa'], extra_address_details['lsoa'])
         test_helper.assertEqual(case['organisationName'], extra_address_details['address']['organisationName'])
         test_helper.assertEqual(case['secureEstablishment'], extra_address_details['metadata']['secureEstablishment'])
+
+
+def _check_ce_secure_estab_case_address_details(case, extra_address_details=None):
+    test_helper.assertEqual(case['addressLine1'], "123")
+    test_helper.assertEqual(case['addressLine2'], "Fake caravan park")
+    test_helper.assertEqual(case['addressLine3'], "The long road")
+    test_helper.assertEqual(case['townName'], "Trumpton")
+    test_helper.assertEqual(case['postcode'], "SO190PG")
+    test_helper.assertEqual(case['region'], "E00001234")
+    test_helper.assertEqual(case['addressType'], "CE")
+    test_helper.assertEqual(case['addressLevel'], "E")
+    test_helper.assertEqual(case['latitude'], "50.917428")
+    test_helper.assertEqual(case['longitude'], "-1.238193")
+    test_helper.assertEqual(case['uprn'], "1214242")
+
+    if extra_address_details:
+        test_helper.assertEqual(case['lad'], extra_address_details['lad'])
+        test_helper.assertEqual(case['oa'], extra_address_details['oa'])
+        test_helper.assertEqual(case['msoa'], extra_address_details['msoa'])
+        test_helper.assertEqual(case['lsoa'], extra_address_details['lsoa'])
+        test_helper.assertEqual(case['organisationName'], extra_address_details['address']['organisationName'])
+        test_helper.assertEqual(case['secureEstablishment'], extra_address_details['metadata']['secureEstablishment'])
+        test_helper.assertEqual(case['estabType'], extra_address_details['address']['estabType'])
