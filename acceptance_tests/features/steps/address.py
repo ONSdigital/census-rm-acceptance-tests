@@ -145,7 +145,7 @@ def ce_new_address_reported_event_without_source_case_id(context, sender):
 
 
 @step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" without a sourceCaseId and no secureType')
-def ce_new_address_reported_event_without_source_case_id(context, sender):
+def ce_new_address_reported_event_without_source_case_id_and_no_secureType(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     message = json.dumps(
