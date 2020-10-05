@@ -33,7 +33,7 @@ Feature: Bulk event CSV files can be processed
     When the bulk address update file is processed
     Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
     And the cases are updated in the database
-    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
 
   Scenario: A bulk address update file for a skeleton case is successfully ingested
     Given a NEW_ADDRESS_REPORTED event with address type "HH" is sent from "FIELD" and the case is created
