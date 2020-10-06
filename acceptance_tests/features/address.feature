@@ -49,6 +49,13 @@ Feature: Address updates
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
 
 
+  Scenario: New address event received for CE case without sourceCaseId and no secureType recorded
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" without a sourceCaseId and no secureType
+    Then a case created event is emitted
+    And the CE case with secureEstablishment marked False from the New Address event can be retrieved
+    And the events logged for the case are [NEW_ADDRESS_REPORTED]
+
+
   Scenario: New address event received for CE case with sourceCaseId and Secure Establishment True
     Given sample file "sample_1_english_CE_secure_estab.csv" is loaded successfully
     When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId

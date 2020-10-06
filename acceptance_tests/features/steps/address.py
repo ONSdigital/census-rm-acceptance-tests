@@ -144,6 +144,56 @@ def ce_new_address_reported_event_without_source_case_id(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" without a sourceCaseId and no secureType')
+def ce_new_address_reported_event_without_source_case_id_and_no_secureType(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": None,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "CE",
+                        "survey": "CENSUS",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "ceExpectedCapacity": 5,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "CE",
+                            "addressLevel": "E",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193",
+                            "estabType": "HOSPITAL",
+                            "uprn": "1214242"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
 @step(
     'a NEW_ADDRESS_REPORTED event is sent from "{sender}" without sourceCaseId with region "{region}", '
     'address type "{address_type}" and address level "{address_level}" and case emitted')
@@ -422,7 +472,8 @@ def retrieve_skeleton_case_and_check_uprn(context):
 
 
 @step("the CE case with secureEstablishment marked True from the New Address event can be retrieved")
-def retrieve_ce_true_case(context):
+@step("the CE case with secureEstablishment marked False from the New Address event can be retrieved")
+def retrieve_ce_secureType_true_or_false_case(context):
     context.first_case = get_case_and_case_events_by_case_id(context.case_id)
 
     test_helper.assertEqual(context.first_case['id'], context.case_id)
