@@ -295,8 +295,8 @@ def new_address_reported_event_with_source_case_id(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId')
-def ce_new_address_reported_event_with_source_case_id(context, sender):
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId and secureType true')
+def ce_new_address_reported_event_with_source_case_id_and_secureType_true(context, sender):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
@@ -334,6 +334,59 @@ def ce_new_address_reported_event_with_source_case_id(context, sender):
                             "longitude": "-1.238193",
                             "estabType": "HOSPITAL",
                             "secureType": True,
+                            "uprn": "1214242"
+                        }
+                    }
+                }
+            }
+        }
+    )
+    with RabbitContext(exchange=Config.RABBITMQ_EVENT_EXCHANGE) as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
+
+
+@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId and secureType false')
+def ce_new_address_reported_event_with_source_case_id_and_secureType_false(context, sender):
+    context.case_id = str(uuid.uuid4())
+    context.collection_exercise_id = str(uuid.uuid4())
+    context.first_case = context.case_created_events[0]['payload']['collectionCase']
+    context.sourceCaseId = str(context.first_case['id'])
+    message = json.dumps(
+        {
+            "event": {
+                "type": "NEW_ADDRESS_REPORTED",
+                "source": "FIELDWORK_GATEWAY",
+                "channel": sender,
+                "dateTime": "2011-08-12T20:17:46.384Z",
+                "transactionId": "d9126d67-2830-4aac-8e52-47fb8f84d3b9"
+            },
+            "payload": {
+                "newAddress": {
+                    "sourceCaseId": context.sourceCaseId,
+                    "collectionCase": {
+                        "id": context.case_id,
+                        "caseType": "CE",
+                        "survey": "CENSUS",
+                        "fieldCoordinatorId": "SO_23",
+                        "fieldOfficerId": "SO_23_123",
+                        "collectionExerciseId": context.collection_exercise_id,
+                        "ceExpectedCapacity": 5,
+                        "address": {
+                            "addressLine1": "123",
+                            "addressLine2": "Fake caravan park",
+                            "addressLine3": "The long road",
+                            "townName": "Trumpton",
+                            "postcode": "SO190PG",
+                            "region": "E00001234",
+                            "addressType": "CE",
+                            "addressLevel": "E",
+                            "latitude": "50.917428",
+                            "longitude": "-1.238193",
+                            "estabType": "HOSPITAL",
+                            "secureType": False,
                             "uprn": "1214242"
                         }
                     }
@@ -852,7 +905,7 @@ def new_address_sent_to_aims(context):
 
 
 @step("the new address reported cases are sent to field as CREATE with secureEstablishment as true")
-def new_addresses_sent_to_field(context):
+def new_addresses_sent_to_field_secureType_true(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
@@ -862,6 +915,19 @@ def new_addresses_sent_to_field(context):
     field_msg = context.messages_received[0]
     test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
     test_helper.assertTrue(field_msg['secureEstablishment'])
+
+
+@step("the new address reported cases are sent to field as CREATE with secureEstablishment as false")
+def new_addresses_sent_to_field_secureType_false(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1))
+
+    field_msg = context.messages_received[0]
+    test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
+    test_helper.assertFalse(field_msg['secureEstablishment'])
 
 
 def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
