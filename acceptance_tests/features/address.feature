@@ -58,7 +58,7 @@ Feature: Address updates
 
   Scenario: New address event received for CE case with sourceCaseId and Secure Establishment True
     Given sample file "sample_1_english_CE_secure_estab.csv" is loaded successfully
-    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId and secureType true
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId and secureType "True"
     Then a case created event is emitted
     And the CE case can be retrieved and contains the correct properties when the event had details
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
@@ -67,7 +67,7 @@ Feature: Address updates
 
   Scenario: New address event received for CE case with sourceCaseId and Secure Establishment False
     Given sample file "sample_1_english_CE_secure_estab.csv" is loaded successfully
-    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId and secureType false
+    When a NEW_ADDRESS_REPORTED event for a CE case is sent from "FIELD" with sourceCaseId and secureType "False"
     Then a case created event is emitted
     And the CE case can be retrieved and contains the correct properties when the event had details
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
