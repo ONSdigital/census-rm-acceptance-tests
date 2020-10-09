@@ -296,7 +296,8 @@ def new_address_reported_event_with_source_case_id(context, sender):
 
 
 @step(
-    'a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId and secureType "{secure_type}"')
+    'a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId '
+    'and secureType "{secure_type}"')
 def ce_new_address_reported_event_with_source_case_id_and_secureType_true(context, sender, secure_type):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
