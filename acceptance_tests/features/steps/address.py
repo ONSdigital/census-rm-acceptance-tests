@@ -295,8 +295,10 @@ def new_address_reported_event_with_source_case_id(context, sender):
             routing_key=Config.RABBITMQ_ADDRESS_ROUTING_KEY)
 
 
-@step('a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId')
-def ce_new_address_reported_event_with_source_case_id(context, sender):
+@step(
+    'a NEW_ADDRESS_REPORTED event for a CE case is sent from "{sender}" with sourceCaseId '
+    'and secureType "{secure_type}"')
+def ce_new_address_reported_event_with_source_case_id_and_secureType_true(context, sender, secure_type):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
@@ -333,7 +335,7 @@ def ce_new_address_reported_event_with_source_case_id(context, sender):
                             "latitude": "50.917428",
                             "longitude": "-1.238193",
                             "estabType": "HOSPITAL",
-                            "secureType": True,
+                            "secureType": secure_type,
                             "uprn": "1214242"
                         }
                     }
@@ -852,7 +854,7 @@ def new_address_sent_to_aims(context):
 
 
 @step("the new address reported cases are sent to field as CREATE with secureEstablishment as true")
-def new_addresses_sent_to_field(context):
+def new_addresses_sent_to_field_secureType_true(context):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(
@@ -862,6 +864,19 @@ def new_addresses_sent_to_field(context):
     field_msg = context.messages_received[0]
     test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
     test_helper.assertTrue(field_msg['secureEstablishment'])
+
+
+@step("the new address reported cases are sent to field as CREATE with secureEstablishment as false")
+def new_addresses_sent_to_field_secureType_false(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1))
+
+    field_msg = context.messages_received[0]
+    test_helper.assertEqual(field_msg['actionInstruction'], 'CREATE')
+    test_helper.assertFalse(field_msg['secureEstablishment'])
 
 
 def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
