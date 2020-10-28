@@ -51,3 +51,83 @@ Feature: Bulk event CSV files can be processed
     Then CASE_UPDATED events are emitted for all the cases in the file with addressInvalid false
     And the addresses for the cases are un-invalidated in the database
     And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 1: address update on new address from CC/RH with existing uprn (no sourceid, so no oa) (no coordid) -> CREATE
+    Given a NEW_ADDRESS_REPORTED event is sent from "CC" without sourceCaseId and new case is emitted
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 2: address update on new address from CC/RH with no uprn (no sourceid, so no oa)(no coordid) -> CREATE
+    Given a NEW_ADDRESS_REPORTED event with no FieldCoordinatorId with address type "HH" is sent from "CC"
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 3: address update on new address from CE/SPG field no sourceid (no oa) -> CREATE
+    Given a NEW_ADDRESS_REPORTED event with no FieldCoordinatorId with address type "SPG" is sent from "CC"
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 4: address update on new address from HH Field no sourceid -> CREATE
+    Given a NEW_ADDRESS_REPORTED event with no FieldCoordinatorId with address type "HH" is sent from "FIELD"
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 5: address update on new address from CE/SPG Field with sourceid. (has oa) (inc coord id)   [goes straight to field already] -> UPDATE
+    Given sample file "sample_1_english_SPG_unit_with_gubbins.csv" is loaded successfully
+    And a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and minimal event fields
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 6: address update on new address from HH Field with sourceid (For split address only) -> UPDATE
+    Given sample file "sample_1_english_HH_unit_this_definitely_isnt_a_split_address_but_the_requirements_are_lunacy.csv" is loaded successfully
+    And a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and minimal event fields
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 7: address update on new case created by address type change from CC (has oa) (no coordid) -> CREATE
+    Given sample file "sample_1_english_HH_unit_this_definitely_isnt_a_split_address_but_the_requirements_are_lunacy.csv" is loaded successfully
+    And an AddressTypeChanged event to "SPG" is sent
+    And a case_updated msg is emitted where "addressInvalid" is "True"
+    And a case created event is emitted
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
+
+#    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
+  Scenario: HACK 8: address update on new case created by address type changed from CE/SPG (no coord id) -> CREATE
+    Given sample file "sample_1_english_SPG_unit_with_gubbins.csv" is loaded successfully
+    And an AddressTypeChanged event to "HH" is sent
+    And a case_updated msg is emitted where "addressInvalid" is "True"
+    And a case created event is emitted
+    And a bulk address update file is supplied
+    When the bulk address update file is processed
+    Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
+    And the cases are updated in the database
+    And a CREATE message is sent to field for each updated case excluding NI CE cases and estab types "TRANSIENT PERSONS" and "MIGRANT WORKERS"
