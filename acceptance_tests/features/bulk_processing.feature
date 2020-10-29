@@ -90,7 +90,7 @@ Feature: Bulk event CSV files can be processed
 
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 5: address update on new address from CE/SPG Field with sourceid. (has oa) (inc coord id)   [goes straight to field already] -> UPDATE
-    Given sample file "sample_1_english_SPG_unit_with_gubbins.csv" is loaded successfully
+    Given sample file "sample_1_english_SPG_unit_with_fieldcoordinator.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and minimal event fields
     And a bulk address update file is supplied
     When the bulk address update file is processed
@@ -100,7 +100,7 @@ Feature: Bulk event CSV files can be processed
 
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 6: address update on new address from HH Field with sourceid (For split address only) -> UPDATE
-    Given sample file "sample_1_english_HH_unit_this_definitely_isnt_a_split_address_but_the_requirements_are_lunacy.csv" is loaded successfully
+    Given sample file "sample_1_english_HH_unit_with_fieldcoordinator.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and minimal event fields
     And a bulk address update file is supplied
     When the bulk address update file is processed
@@ -110,7 +110,7 @@ Feature: Bulk event CSV files can be processed
 
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 7: address update on new case created by address type change from CC (has oa) (no coordid) -> CREATE
-    Given sample file "sample_1_english_HH_unit_this_definitely_isnt_a_split_address_but_the_requirements_are_lunacy.csv" is loaded successfully
+    Given sample file "sample_1_english_HH_unit_with_fieldcoordinator.csv" is loaded successfully
     And an AddressTypeChanged event to "SPG" is sent
     And a case_updated msg is emitted where "addressInvalid" is "True"
     And a case created event is emitted
@@ -122,7 +122,7 @@ Feature: Bulk event CSV files can be processed
 
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 8: address update on new case created by address type changed from CE/SPG (no coord id) -> CREATE
-    Given sample file "sample_1_english_SPG_unit_with_gubbins.csv" is loaded successfully
+    Given sample file "sample_1_english_SPG_unit_with_fieldcoordinator.csv" is loaded successfully
     And an AddressTypeChanged event to "HH" is sent
     And a case_updated msg is emitted where "addressInvalid" is "True"
     And a case created event is emitted
