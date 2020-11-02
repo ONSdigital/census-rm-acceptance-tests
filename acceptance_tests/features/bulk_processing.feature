@@ -28,7 +28,7 @@ Feature: Bulk event CSV files can be processed
     And every created UAC QID pair has a DEACTIVATE_UAC event logged against it
 
   Scenario: A bulk address update file is successfully ingested
-    Given sample file "HH_unit_and_NI_CE_unit.csv" is loaded successfully
+    Given sample file "HH_unit_and_NI_CE_unit_with_fieldcoordinator.csv" is loaded successfully
     And a bulk address update file is supplied
     When the bulk address update file is processed
     Then CASE_UPDATED events are emitted for all the updated cases with correctly updated data and skeleton marker false
