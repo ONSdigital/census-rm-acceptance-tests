@@ -247,7 +247,8 @@ def new_address_reported_event_without_source_case_id_with_address_type(context,
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
-def new_address_reported_event_with_source_case_id(context, sender):
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and casetype "{case_type}"')
+def new_address_reported_event_with_source_case_id(context, sender, case_type='SPG'):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
@@ -266,7 +267,7 @@ def new_address_reported_event_with_source_case_id(context, sender):
                     "sourceCaseId": context.sourceCaseId,
                     "collectionCase": {
                         "id": context.case_id,
-                        "caseType": "SPG",
+                        "caseType": case_type,
                         "survey": "CENSUS",
                         "fieldCoordinatorId": "SO_23",
                         "fieldOfficerId": "SO_23_123",
@@ -278,7 +279,7 @@ def new_address_reported_event_with_source_case_id(context, sender):
                             "townName": "Trumpton",
                             "postcode": "SO190PG",
                             "region": "E00001234",
-                            "addressType": "SPG",
+                            "addressType": case_type,
                             "addressLevel": "U",
                             "latitude": "50.917428",
                             "longitude": "-1.238193"
