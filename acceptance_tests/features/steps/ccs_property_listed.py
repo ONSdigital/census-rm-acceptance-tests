@@ -24,7 +24,7 @@ def send_ccs_property_listed_event(context, interview_required):
 
 
 @step('the CCS Property Listed case is created with address type "{address_type}"')
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
+@retry(stop_max_attempt_number=30, wait_fixed=1000)
 def check_case_created(context, address_type):
     response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}', params={'caseEvents': True})
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')

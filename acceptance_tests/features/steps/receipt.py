@@ -5,7 +5,8 @@ from behave import step
 
 from acceptance_tests.utilities.case_api_helper import get_ccs_qid_for_case_id
 from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match
-from acceptance_tests.utilities.fieldwork_helper import field_work_cancel_callback
+from acceptance_tests.utilities.fieldwork_helper import field_work_cancel_callback, \
+    field_work_update_callback_without_faff
 from acceptance_tests.utilities.fulfilment_helper import send_print_fulfilment_request
 from acceptance_tests.utilities.pubsub_helper import publish_to_pubsub
 from acceptance_tests.utilities.rabbit_context import RabbitContext
@@ -96,6 +97,17 @@ def action_cancel_sent_to_fwm(context, address_type):
     context.messages_received = []
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
         field_work_cancel_callback, context=context))
+
+    test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
+    test_helper.assertEqual(context.addressType, address_type)
+    test_helper.assertEqual(context.field_action_cancel_message['surveyName'], context.first_case['survey'])
+
+
+@step('an UPDATE action instruction is sent to field work management with address type "{address_type}"')
+def action_update_sent_to_fwm(context, address_type):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE, functools.partial(
+        field_work_update_callback_without_faff, context=context))
 
     test_helper.assertEqual(context.fwmt_emitted_case_id, context.first_case["id"])
     test_helper.assertEqual(context.addressType, address_type)
