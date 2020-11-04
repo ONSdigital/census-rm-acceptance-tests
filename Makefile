@@ -11,8 +11,7 @@ lint: flake
 
 check: package_vulnerability flake
 
-# Put back this: package_vulnerability
-test:  flake at_tests
+test:  package_vulnerability flake at_tests
 
 smoke_test: package_vulnerability flake run_smoke_tests
 
