@@ -255,7 +255,7 @@ def check_notify_api_call(context, fulfilment_code: str):
     _check_notify_api_called_with_correct_template_id(NOTIFY_TEMPLATE[fulfilment_code])
 
 
-@retry(stop_max_attempt_number=10, wait_fixed=1000)
+@retry(stop_max_attempt_number=30, wait_fixed=1000)
 def _check_notify_api_called_with_correct_template_id(expected_template_id):
     response = requests.get(f'{Config.NOTIFY_STUB_SERVICE}/log')
     test_helper.assertEqual(response.status_code, 200, "Unexpected status code")

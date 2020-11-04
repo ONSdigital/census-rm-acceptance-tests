@@ -247,11 +247,13 @@ def new_address_reported_event_without_source_case_id_with_address_type(context,
 
 
 @step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId')
-def new_address_reported_event_with_source_case_id(context, sender):
+@step('a NEW_ADDRESS_REPORTED event is sent from "{sender}" with sourceCaseId and casetype "{case_type}"')
+def new_address_reported_event_with_source_case_id(context, sender, case_type='SPG'):
     context.case_id = str(uuid.uuid4())
     context.collection_exercise_id = str(uuid.uuid4())
     context.first_case = context.case_created_events[0]['payload']['collectionCase']
     context.sourceCaseId = str(context.first_case['id'])
+    context.case_type = case_type
     message = json.dumps(
         {
             "event": {
@@ -266,7 +268,7 @@ def new_address_reported_event_with_source_case_id(context, sender):
                     "sourceCaseId": context.sourceCaseId,
                     "collectionCase": {
                         "id": context.case_id,
-                        "caseType": "SPG",
+                        "caseType": context.case_type,
                         "survey": "CENSUS",
                         "fieldCoordinatorId": "SO_23",
                         "fieldOfficerId": "SO_23_123",
@@ -278,7 +280,7 @@ def new_address_reported_event_with_source_case_id(context, sender):
                             "townName": "Trumpton",
                             "postcode": "SO190PG",
                             "region": "E00001234",
-                            "addressType": "SPG",
+                            "addressType": context.case_type,
                             "addressLevel": "U",
                             "latitude": "50.917428",
                             "longitude": "-1.238193"
@@ -505,7 +507,8 @@ def retrieve_case_from_source_case_id_and_event_details(context):
     test_helper.assertEqual(context.first_case['collectionExerciseId'], context.collection_exercise_id)
 
     source_case = context.case_created_events[0]['payload']['collectionCase']
-    _check_case_address_details(context.first_case, source_case['address']['uprn'], source_case['address']['estabUprn'])
+    _check_case_address_details(context.first_case, source_case['address']['uprn'],
+                                source_case['address']['estabUprn'], expected_address_type=context.case_type)
 
 
 @step('the CE case can be retrieved and contains the correct properties when the event had details')
@@ -879,14 +882,15 @@ def new_addresses_sent_to_field_secureType_false(context):
     test_helper.assertFalse(field_msg['secureEstablishment'])
 
 
-def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None, extra_address_details=None):
+def _check_case_address_details(case, expected_uprn, expected_estab_uprn=None,
+                                extra_address_details=None, expected_address_type='SPG'):
     test_helper.assertEqual(case['addressLine1'], "123")
     test_helper.assertEqual(case['addressLine2'], "Fake caravan park")
     test_helper.assertEqual(case['addressLine3'], "The long road")
     test_helper.assertEqual(case['townName'], "Trumpton")
     test_helper.assertEqual(case['postcode'], "SO190PG")
     test_helper.assertEqual(case['region'], "E00001234")
-    test_helper.assertEqual(case['addressType'], "SPG")
+    test_helper.assertEqual(case['addressType'], expected_address_type)
     test_helper.assertEqual(case['addressLevel'], "U")
     test_helper.assertEqual(case['latitude'], "50.917428")
     test_helper.assertEqual(case['longitude'], "-1.238193")
