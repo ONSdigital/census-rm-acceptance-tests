@@ -75,11 +75,12 @@ Feature: Address updates
 
 
   Scenario: New address event received with sourceCaseId
-    Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
+    Given sample file "sample_1_english_HH_unit_with_fieldcoordinator.csv" is loaded successfully
+    When a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId and caseType "HH"
     Then a case created event is emitted
     And the case can be retrieved and contains the correct properties when the event had details
     And the events logged for the case are [NEW_ADDRESS_REPORTED]
+    And the new address reported cases are sent to field as CREATE with secureEstablishment as true
 
 
   Scenario: New address event received with sourceCaseId and minimal event fields

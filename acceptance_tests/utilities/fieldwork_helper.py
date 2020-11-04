@@ -65,6 +65,21 @@ def field_work_cancel_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
+def field_work_update_callback_without_faff(ch, method, _properties, body, context):
+    action_cancel = json.loads(body)
+
+    if not action_cancel['actionInstruction'] == 'UPDATE':
+        ch.basic_nack(delivery_tag=method.delivery_tag)
+        test_helper.fail(f'Unexpected message on {Config.RABBITMQ_OUTBOUND_FIELD_QUEUE} case queue. '
+                         f'Got "{action_cancel["actionInstruction"]}", wanted "UPDATE"')
+
+    context.addressType = action_cancel['addressType']
+    context.fwmt_emitted_case_id = action_cancel['caseId']
+    context.field_action_cancel_message = action_cancel
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    ch.stop_consuming()
+
+
 def field_work_update_callback(ch, method, _properties, body, context):
     action_instruction = json.loads(body)
 
