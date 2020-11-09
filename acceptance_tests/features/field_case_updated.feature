@@ -12,7 +12,6 @@ Feature: Field Case Updated Events
     When a Field Case Updated message has been sent with expected capacity as "3"
     Then a case_updated msg is emitted where "ceExpectedCapacity" is "3"
     And the events logged for the case are [SAMPLE_LOADED,FIELD_CASE_UPDATED]
-    And an UPDATE action instruction is sent to field work management with address type "CE"
 
   @regression
   Scenario: A request to change the CE expected capacity for a CE estab case isn't sent to field
