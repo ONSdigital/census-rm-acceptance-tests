@@ -147,7 +147,7 @@ Feature: Address updates
 
   @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Skeleton cases are excluded from action rules
-    Given sample file "sample_1_english_SPG_unit.csv" is loaded successfully
+    Given sample file "response_driven_reminders_england.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
     And a case created event is emitted
     When we schedule an action rule of type "P_RD_RNP41" for LSOAs ('E01014540')
