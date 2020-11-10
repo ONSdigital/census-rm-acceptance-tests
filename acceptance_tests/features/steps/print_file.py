@@ -16,7 +16,8 @@ from acceptance_tests.utilities.print_file_helper import \
     create_expected_HH_UAC_supplementary_materials_csv, \
     create_expected_csv_lines_with_no_uac_eq_survey_launched, \
     check_print_files_have_all_the_expected_data, create_individual_print_material_csv_line_for_spg_ce, \
-    create_expected_individual_reminder_letter_csv_lines, create_expected_CE_UAC_supplementary_materials_csv
+    create_expected_individual_reminder_letter_csv_lines, create_expected_CE_UAC_supplementary_materials_csv, \
+    create_skeleton_expected_on_request_questionnaire_csv_for_fulfilment
 from acceptance_tests.utilities.sftp_utility import SftpUtility
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
@@ -168,8 +169,14 @@ def check_manifest_files(context, pack_code):
     check_manifest_files_created(context, pack_code)
 
 
-@step('correctly formatted on request contn questionnaire print and manifest files for "{fulfilment_code}" are created')
 @step('correctly formatted on request questionnaire print and manifest files for "{fulfilment_code}" are created')
+def correct_skeleton_case_questionnaire_print_files(context, fulfilment_code):
+    expected_csv_lines = create_skeleton_expected_on_request_questionnaire_csv_for_fulfilment(context, fulfilment_code)
+    check_print_files_have_all_the_expected_data(context, expected_csv_lines, fulfilment_code)
+    check_manifest_files_created(context, fulfilment_code)
+
+
+@step('correctly formatted on request contn questionnaire print and manifest files for "{fulfilment_code}" are created')
 @step('correctly formatted on request UAC questionnaire print and manifest files for "{fulfilment_code}" are created')
 def correct_on_request_questionnaire_print_files(context, fulfilment_code):
     expected_csv_lines = create_expected_on_request_questionnaire_csv(context, fulfilment_code)

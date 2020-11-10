@@ -324,13 +324,13 @@ def _create_expected_questionnaire_csv_line_ending_for_welsh_ce_individual_estab
     )
 
 
-def create_expected_on_request_questionnaire_csv(context, pack_code):
-    return [_create_expected_on_request_questionnaire_csv_line(context.first_case, pack_code,
-                                                               context.requested_uac,
-                                                               context.requested_qid)]
+def create_skeleton_expected_on_request_questionnaire_csv_for_fulfilment(context, pack_code):
+    return [_create_skeleton_expected_on_request_questionnaire_csv_line(context.first_case, pack_code,
+                                                                        context.requested_uac,
+                                                                        context.requested_qid)]
 
 
-def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid):
+def _create_skeleton_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid):
     return (
         f'{uac}|'
         f'{qid}'
@@ -342,6 +342,27 @@ def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
         f'{pack_code}||'
+    )
+
+
+def create_expected_on_request_questionnaire_csv(context, pack_code):
+    return [_create_expected_on_request_questionnaire_csv_line(context.first_case, pack_code,
+                                                               context.requested_uac,
+                                                               context.requested_qid)]
+
+
+def _create_expected_on_request_questionnaire_csv_line(case, pack_code, uac, qid):
+    return (
+        f'{uac}|'
+        f'{qid}'
+        f'|||M|'
+        f'Mrs|Test|McTest|'
+        f'{case["address"]["addressLine1"]}|'
+        f'{case["address"]["addressLine2"]}|'
+        f'{case["address"]["addressLine3"]}|'
+        f'{case["address"]["townName"]}|'
+        f'{case["address"]["postcode"]}|'
+        f'{pack_code}||007'
     )
 
 
@@ -381,7 +402,7 @@ def _create_expected_supplementary_materials_csv_line(case, fulfilment_code):
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{fulfilment_code}||||'
+        f'{fulfilment_code}|||M|007'
     )
 
 
@@ -404,7 +425,7 @@ def _create_expected_HH_UAC_supplementary_materials_csv_line(case, uac, qid, ful
         f'{case["address"]["addressLine3"]}|'
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
-        f'{fulfilment_code}|{qid}|||'
+        f'{fulfilment_code}|{qid}||M|007'
     )
 
 

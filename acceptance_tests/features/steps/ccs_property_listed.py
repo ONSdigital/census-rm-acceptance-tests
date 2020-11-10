@@ -124,7 +124,9 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
                     "latitude": "50.863849",
                     "longitude": "-1.229714",
                     "fieldCoordinatorId": "XXXXXXXXXX",
-                    "fieldOfficerId": "XXXXXXXXXXXXX"
+                    "fieldOfficerId": "XXXXXXXXXXXXX",
+                    "region": "E19166",
+                    "oa": "oa oa, oa oa"
                 },
             }
         }
