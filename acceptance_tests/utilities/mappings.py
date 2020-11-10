@@ -25,7 +25,6 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'ICHHQW': "treatment_code IN ('HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', "
               "'HH_QF3R3AW')",
     'ICHHQN': "treatment_code IN ('HH_3QSFN')",
-
     'P_RL_1RL1_1': "treatment_code IN ('HH_LF2R1E', 'HH_LF3R1E', 'HH_LFNR1E', 'HH_QF2R1E', 'HH_QF3R1E', "
                    "'HH_QFNR1E') AND survey_launched = 'f'",
     'P_RL_1RL1B': "treatment_code IN ('HH_QP3E') AND survey_launched = 'f'",
@@ -36,9 +35,9 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'P_RL_3RL2B': "treatment_code IN ('HH_LP2W') AND survey_launched = 'f'",
     'P_RL_1RL2BB': "treatment_code IN ('HH_QP3W') AND survey_launched = 'f'",
     'P_RL_1RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
-                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
+                 " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 'f'",
     'P_RL_2RL4': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
-                  " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLPCVN', 'HH_SPGLNFN', 'HH_SPGQNFN')",
+                 " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLPCVN', 'HH_SPGLNFN', 'HH_SPGQNFN')",
     'P_RL_1RL4A': "treatment_code IN ('HH_1ALSFN', 'HH_2BLEFN', 'HH_2CLEFN', 'HH_3DQSFN', 'HH_3EQSFN',"
                   " 'HH_3FQSFN', 'HH_3GQSFN', 'HH_4HLEFN', 'HH_SPGLNFN', 'HH_SPGQNFN') AND survey_launched = 't'",
     'P_QU_H1': "treatment_code IN ('HH_LP1E')",
@@ -62,6 +61,25 @@ CLASSIFIERS_FOR_ACTION_TYPE = {
     'P_RL_1RL2BA': "treatment_code IN ('HH_LP1W','HH_LP2W','HH_QP3W') AND survey_launched = 't'",
     'P_RL_2RL1A': "treatment_code IN ('HH_LP1E','HH_LP2E','HH_QP3E') AND survey_launched = 't'",
     'P_RL_2RL2BA': "treatment_code IN ('HH_LP1W','HH_LP2W','HH_QP3W') AND survey_launched = 't'",
+
+    'ICL1E_RERUN': "treatment_code IN ('HH_LFNR1E', 'HH_LFNR2E', 'HH_LFNR3AE', 'HH_LF2R1E', 'HH_LF2R2E', "
+                   "'HH_LF2R3AE', 'HH_LF2R3BE', 'HH_LF3R1E', 'HH_LF3R2E', 'HH_LF3R3AE', 'HH_LF3R3BE')",
+    'ICL2W_RERUN': "treatment_code IN ('HH_LFNR1W', 'HH_LFNR2W', 'HH_LFNR3AW', 'HH_LF2R1W', 'HH_LF2R2W', "
+                   "'HH_LF2R3AW', 'HH_LF2R3BW', 'HH_LF3R1W', 'HH_LF3R2W', 'HH_LF3R3AW', 'HH_LF3R3BW')",
+    'ICL4N_RERUN': "treatment_code IN ('HH_1LSFN', 'HH_2LEFN')",
+    'ICHHQE_RERUN': "treatment_code IN ('HH_QF2R1E', 'HH_QF2R2E', 'HH_QF2R3AE', 'HH_QF3R1E', 'HH_QF3R2E', "
+                    "'HH_QF3R3AE')",
+    'ICHHQW_RERUN': "treatment_code IN ('HH_QF2R1W', 'HH_QF2R2W', 'HH_QF2R3AW', 'HH_QF3R1W', 'HH_QF3R2W', "
+                    "'HH_QF3R3AW')",
+    'ICHHQN_RERUN': "treatment_code IN ('HH_3QSFN')",
+    'SPG_IC11_RERUN': "treatment_code IN ('SPG_LPHUE')",
+    'SPG_IC12_RERUN': "treatment_code IN ('SPG_LPHUW')",
+    'SPG_IC13_RERUN': "treatment_code IN ('SPG_QDHUE')",
+    'SPG_IC14_RERUN': "treatment_code IN ('SPG_QDHUW')",
+
+    'CE1_IC01_RERUN': "treatment_code IN ('CE_LDCEE')",
+    'CE1_IC02_RERUN': "treatment_code IN ('CE_LDCEW', 'CE_LDIEW', 'CE_QDIEW')",
+
 }
 
 PACK_CODE_TO_SFTP_DIRECTORY = {
