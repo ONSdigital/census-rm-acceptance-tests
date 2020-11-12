@@ -145,7 +145,6 @@ Feature: Address updates
     And a CREATE action instruction is sent to field for the SPG case
 
 
-  @hardcoded_census_values_for_collection_and_action_plan_ids
   Scenario: Skeleton cases are excluded from action rules
     Given sample file "response_driven_reminders_england.csv" is loaded successfully
     And a NEW_ADDRESS_REPORTED event is sent from "FIELD" with sourceCaseId
