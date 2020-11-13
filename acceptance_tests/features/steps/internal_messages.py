@@ -99,6 +99,7 @@ def deactivate_uac_(context):
 @step("an UNINVALIDATE_ADDRESS message is sent")
 def uninvalidate_address(context):
     context.bulk_uninvalidated_addresses = []
+
     for invalid_address in context.case_created_events:
         invalid = {'CASE_ID': invalid_address['payload']['collectionCase']['id']}
         context.bulk_uninvalidated_addresses.append(invalid)
@@ -136,3 +137,40 @@ def check_address_valid_case_updated_events(context):
                                 'Address invalid flag must be "False" on all updated events')
         test_helper.assertIn(event['payload']['collectionCase']['id'], address_valid_case_ids,
                              'Unexpected case ID found on updated event')
+
+
+@step("a NONCOMPLIANCE message is sent")
+def non_compliance_msg_sent(context):
+    context.non_compliance_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
+
+    message = json.dumps(
+        {
+            "event": {
+                "type": "SELECTED_FOR_NON_COMPLIANCE",
+                "source": "NON_COMPLIANCE",
+                "channel": "NC",
+                "dateTime": "2019-07-07T22:37:11.988+0000",
+                "transactionId": "d2541acb-230a-4ade-8123-eee2310c9143"
+            },
+            "payload": {
+                "collectionCase": {
+                    "id": context.non_compliance_case_id,
+                    "nonComplianceStatus": 'NCF',
+                }
+            }
+        }
+    )
+
+    with RabbitContext(exchange='') as rabbit:
+        rabbit.publish_message(
+            message=message,
+            content_type='application/json',
+            routing_key=Config.RABBITMQ_NONCOMPLIANCE_QUEUE)
+
+
+@step('CASE_UPDATED events are emitted Case with nonCompliance set')
+def check_address_valid_case_updated_events(context):
+    collection_case = get_case_updated_events(context, 1)[0]['payload']['collectionCase']
+
+    test_helper.assertEqual(collection_case['id'], context.non_compliance_case_id)
+    test_helper.assertEqual(collection_case['metadata']['nonCompliance'], 'NCF')
