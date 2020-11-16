@@ -52,6 +52,13 @@ Feature: Bulk event CSV files can be processed
     And the addresses for the cases are un-invalidated in the database
     And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
 
+  Scenario: A bulk address noncompliance file is successfully ingested
+    Given sample file "sample_input_wales_census_spec.csv" is loaded successfully
+    And a bulk noncompliance file is supplied
+    When the bulk noncompliance file is processed
+    Then CASE_UPDATED events are emitted for all the cases in the file with noncompliance set
+
+
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 1: address update on new address from CC/RH with existing uprn (no sourceid, so no oa) (no coordid) -> CREATE
     Given a NEW_ADDRESS_REPORTED event is sent from "CC" without sourceCaseId and new case is emitted

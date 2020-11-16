@@ -563,3 +563,53 @@ def new_addresses_sent_to_field(context):
                 break
 
     test_helper.assertEqual(len(expected_case_ids), 0, 'Not all new addresses accounted for')
+
+
+@step("a bulk noncompliance file is supplied")
+def bulk_non_compliance_file(context):
+    # Build a bulk deactivate uac file
+    context.non_compliance_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                   'non_compliance_bulk_test.csv')
+
+    context.non_compliance_case_ids = [case['payload']['collectionCase']['id'] for case in context.case_created_events]
+
+    with open(context.non_compliance_bulk_file, 'w') as non_compliance_bulk_write:
+        writer = csv.DictWriter(non_compliance_bulk_write,
+                                fieldnames=['case_id', 'nc_status', 'fieldcoordinator_id', 'fieldofficer_id'])
+        writer.writeheader()
+
+        for case_id in context.bulk_deactivate_uac:
+            writer.writerow(
+                {'case_id': case_id, 'nc_status': 'NCL', 'fieldcoordinator_id': '10000', 'fieldofficer_id': '100010'})
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
+        clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
+        upload_file_to_bucket(context.non_compliance_bulk_write,
+                              f'non_compliance_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
+
+
+@step("the bulk noncompliance file is processed")
+def bulk_non_compliance_processed(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
+        BulkProcessor(NonComplianceProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.non_compliance_bulk_file):
+        BulkProcessor(NonComplianceProcessor()).run()
+
+
+@step("CASE_UPDATED events are emitted for all the cases in the file with noncompliance set")
+def check_non_compliance_bulk_updates(context):
+    updated_cases = get_case_updated_events(context, len(context.non_compliance_case_ids))
+
+    for updated_case in updated_cases:
+        for case_id in context.non_compliance_case_ids:
+            if updated_case['payload']['collectionCase']['id'] == case_id:
+                context.non_compliance_case_ids.remove(case_id)
+                test_helper.assertEqual(updated_case['payload']['collectionCase']['metadata']['nonCompliance'], 'NCL')
+
+    test_helper.assertEqual(len(context.non_compliance_case_ids), 0)
