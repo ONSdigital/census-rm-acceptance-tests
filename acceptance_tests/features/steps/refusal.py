@@ -29,7 +29,7 @@ def _send_refusal_msg_to_rabbit(case_id, refusal_type, channel):
                     "report": "Test refusal",
                     "agentId": "110001",
                     "callId": "8f04b136-d13c-4d88-9068-331560a26bec",
-                    "isHouseholder": True,
+                    "householder": True,
                     "collectionCase": {
                         "id": case_id
                     },
