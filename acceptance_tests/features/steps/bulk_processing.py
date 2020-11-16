@@ -605,12 +605,16 @@ def bulk_non_compliance_processed(context):
 
 @step("CASE_UPDATED events are emitted for all the cases in the file with noncompliance set")
 def check_non_compliance_bulk_updates(context):
-    updated_cases = get_case_updated_events(context, len(context.non_compliance_case_ids))
+    updated_case_events = get_case_updated_events(context, len(context.non_compliance_case_ids))
+
+    updated_cases = [case['payload']['collectionCase'] for case in updated_case_events]
 
     for updated_case in updated_cases:
         for case_id in context.non_compliance_case_ids:
-            if updated_case['payload']['collectionCase']['id'] == case_id:
+            if updated_case['id'] == case_id:
                 context.non_compliance_case_ids.remove(case_id)
-                test_helper.assertEqual(updated_case['payload']['collectionCase']['metadata']['nonCompliance'], 'NCL')
+                test_helper.assertEqual(updated_case['metadata']['nonCompliance'], 'NCL')
+                test_helper.assertEqual(updated_case['fieldCoordinatorId'], '10000')
+                test_helper.assertEqual(updated_case['fieldOfficerId'], '100010')
 
     test_helper.assertEqual(len(context.non_compliance_case_ids), 0)
