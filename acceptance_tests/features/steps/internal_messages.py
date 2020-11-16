@@ -169,7 +169,7 @@ def non_compliance_msg_sent(context):
 
 
 @step('CASE_UPDATED events are emitted Case with nonCompliance set')
-def check_address_valid_case_updated_events(context):
+def check_address_valid_case_updated_events_non_compliance(context):
     collection_case = get_case_updated_events(context, 1)[0]['payload']['collectionCase']
 
     test_helper.assertEqual(collection_case['id'], context.non_compliance_case_id)
