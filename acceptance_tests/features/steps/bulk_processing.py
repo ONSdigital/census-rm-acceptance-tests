@@ -17,6 +17,8 @@ from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProc
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateAddressProcessor
+from toolbox.bulk_processing.non_compliance_processor import NonComplianceProcessor
+
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
@@ -567,7 +569,6 @@ def new_addresses_sent_to_field(context):
 
 @step("a bulk noncompliance file is supplied")
 def bulk_non_compliance_file(context):
-    # Build a bulk deactivate uac file
     context.non_compliance_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
                                                                    'non_compliance_bulk_test.csv')
 
@@ -575,12 +576,12 @@ def bulk_non_compliance_file(context):
 
     with open(context.non_compliance_bulk_file, 'w') as non_compliance_bulk_write:
         writer = csv.DictWriter(non_compliance_bulk_write,
-                                fieldnames=['case_id', 'nc_status', 'fieldcoordinator_id', 'fieldofficer_id'])
+                                fieldnames=['CASE_ID', 'NC_STATUS', 'FIELDCOORDINATOR_ID', 'FIELDOFFICER_ID'])
         writer.writeheader()
 
-        for case_id in context.bulk_deactivate_uac:
+        for case_id in context.non_compliance_case_ids:
             writer.writerow(
-                {'case_id': case_id, 'nc_status': 'NCL', 'fieldcoordinator_id': '10000', 'fieldofficer_id': '100010'})
+                {'CASE_ID': case_id, 'NC_STATUS': 'NCL', 'FIELDCOORDINATOR_ID': '10000', 'FIELDOFFICER_ID': '100010'})
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
