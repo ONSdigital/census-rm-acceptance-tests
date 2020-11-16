@@ -34,9 +34,9 @@ def _send_refusal_msg_to_rabbit(case_id, refusal_type, channel):
                         "id": case_id
                     },
                     "contact": {
-                        "title": "Mr",
-                        "forename": "Test",
-                        "surname": "Testing"
+                        "title": "LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCmhRSU1BN0dwbm5rWFFIVytBUS8rTDZyLzZr",
+                        "forename": "WFFIVytBUS8rTDZyLzZrWHRMVnNwN3d1elE1enRrd3h5c",
+                        "surname": "DhqVmo3b1dyL0pWNldsS1FqZWYKdGZrWU04MUIzSy9zdFBzaU9JSVYrVVFKSG1"
                     },
                     "address": {
                         "addressLine1": "123",
