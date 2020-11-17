@@ -168,7 +168,7 @@ def non_compliance_msg_sent(context):
             routing_key=Config.RABBITMQ_NONCOMPLIANCE_QUEUE)
 
 
-@step("a case updated event is emitted nonCompliance set")
+@step("a case updated event is emitted with nonCompliance set")
 def check_address_valid_case_updated_event_non_compliance(context):
     collection_case = get_case_updated_events(context, 1)[0]['payload']['collectionCase']
 

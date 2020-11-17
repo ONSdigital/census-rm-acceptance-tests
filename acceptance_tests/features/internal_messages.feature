@@ -28,4 +28,4 @@ Feature: Internal messages used by RM from bulk processing actions
   Scenario: NonCompliance message is sent
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a non compliance message is sent
-    Then a case updated event is emitted nonCompliance set
+    Then a case updated event is emitted with nonCompliance set
