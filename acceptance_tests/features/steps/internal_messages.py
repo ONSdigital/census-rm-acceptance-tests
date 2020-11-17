@@ -139,7 +139,7 @@ def check_address_valid_case_updated_events(context):
                              'Unexpected case ID found on updated event')
 
 
-@step("a NONCOMPLIANCE message is sent")
+@step("a non compliance message is sent")
 def non_compliance_msg_sent(context):
     context.non_compliance_case_id = context.case_created_events[0]['payload']['collectionCase']['id']
 
@@ -168,8 +168,8 @@ def non_compliance_msg_sent(context):
             routing_key=Config.RABBITMQ_NONCOMPLIANCE_QUEUE)
 
 
-@step('CASE_UPDATED events are emitted Case with nonCompliance set')
-def check_address_valid_case_updated_events_non_compliance(context):
+@step("a case updated event is emitted nonCompliance set")
+def check_address_valid_case_updated_event_non_compliance(context):
     collection_case = get_case_updated_events(context, 1)[0]['payload']['collectionCase']
 
     test_helper.assertEqual(collection_case['id'], context.non_compliance_case_id)

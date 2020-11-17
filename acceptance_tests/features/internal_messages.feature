@@ -25,7 +25,7 @@ Feature: Internal messages used by RM from bulk processing actions
     Then CASE_UPDATED events are emitted for all the cases
     And an UPDATE message is sent to field for each updated case excluding NI CE, "TRANSIENT PERSONS" and refused
 
-  Scenario: NonCompliance an address message is sent
+  Scenario: NonCompliance message is sent
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
-    When a NONCOMPLIANCE message is sent
-    Then CASE_UPDATED events are emitted Case with nonCompliance set
+    When a non compliance message is sent
+    Then a case updated event is emitted nonCompliance set

@@ -50,7 +50,7 @@ class Config:
 
     RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE = os.getenv('RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE',
                                                     'case.rm.unInvalidateAddress')
-    RABBITMQ_NONCOMPLIANCE_QUEUE = os.getenv('RABBITMQ_UNINVALIDATE_ADDRESS_QUEUE', 'case.rm.nonCompliance')
+    RABBITMQ_NONCOMPLIANCE_QUEUE = os.getenv('RABBITMQ_NONCOMPLIANCE_QUEUE', 'case.rm.nonCompliance')
 
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
     RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
