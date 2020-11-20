@@ -14,13 +14,13 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     @regression
     Examples: Reminder letter: <pack code>
-      | pack code     | no matching cases | questionnaire type | sample file                                       |
-      | P_RL_1RL2B_1  | 2                 | 02                 | sample_input_wales_uac_census_spec.csv            |
-      | P_RL_2RL4     | 2                 | 04                 | sample_input_ni_2nd_reminder_census_spec.csv      |
-      | P_RL_3RL2B    | 1                 | 02                 | sample_input_wales_3rd_reminder_census_spec.csv   |
-      | P_RL_3RL1     | 2                 | 01                 | sample_input_england_3rd_reminder_census_spec.csv |
-      | P_RL_2RL1     | 2                 | 01                 | sample_input_england_2nd_reminder_census_spec.csv |
-      | P_RL_1RL1B    | 1                 | 01                 | sample_input_england_reminder_b_census_spec.csv   |
+      | pack code    | no matching cases | questionnaire type | sample file                                       |
+      | P_RL_1RL2B_1 | 2                 | 02                 | sample_input_wales_uac_census_spec.csv            |
+      | P_RL_2RL4    | 2                 | 04                 | sample_input_ni_2nd_reminder_census_spec.csv      |
+      | P_RL_3RL2B   | 1                 | 02                 | sample_input_wales_3rd_reminder_census_spec.csv   |
+      | P_RL_3RL1    | 2                 | 01                 | sample_input_england_3rd_reminder_census_spec.csv |
+      | P_RL_2RL1    | 2                 | 01                 | sample_input_england_2nd_reminder_census_spec.csv |
+      | P_RL_1RL1B   | 1                 | 01                 | sample_input_england_reminder_b_census_spec.csv   |
 
 
   # Note that in practice these actions will be run with the reminder batch scheduler
@@ -152,3 +152,17 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | reminder pack code | fulfilment code | sample file                  |
       | P_RL_1IRL1         | P_UAC_UACIP1    | sample_1_english_HH_unit.csv |
       | P_RL_1IRL2B        | P_UAC_UACIP2B   | sample_1_welsh_HH_unit.csv   |
+
+
+  Scenario Outline: Generate print files and log events for scheduled reminder letters checking for non compliance
+    Given sample file "<sample file>" is loaded successfully
+    And a bulk noncompliance file is supplied
+    And the bulk noncompliance file is processed
+    When we schedule an action rule of type "<pack code>" with NCL and "<region>" classifiers
+    Then correctly formatted "<pack code>" reminder letter print files are created for cases marked non compliance
+    And there is a correct "<pack code>" manifest file for each csv file written
+
+    Examples: Reminder letter: <pack code>
+      | pack code    | region | sample file                  |
+      | P_NC_NCLTA1  | E      | HH_units_england.csv |
+      | P_NC_NCLTA2B | W      | HH_units_wales.csv   |
