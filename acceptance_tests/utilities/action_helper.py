@@ -33,7 +33,9 @@ def setup_action_rule(context, action_type):
 
 
 def setup_lsoa_action_rule(context, action_type, lsoas):
-    build_and_create_action_rule(context, DEFAULT_CLASSIFIERS + f'lsoa IN {lsoas}', action_type)
+    classifier = f"case_type = 'HH' " \
+                 f"AND lsoa IN {lsoas}"
+    build_and_create_action_rule(context, classifier, action_type)
 
 
 def setup_address_frame_delta_action_rule(context, action_type):

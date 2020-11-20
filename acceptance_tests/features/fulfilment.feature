@@ -64,7 +64,7 @@ Feature: Handle fulfilment request events
     Given sample file "sample_1_english_HH_unit.csv" is loaded successfully
     When a PQ fulfilment request event with fulfilment code "<fulfilment code>" is received by RM
     Then a UAC updated message with "<questionnaire type>" questionnaire type is emitted
-    And correctly formatted on request questionnaire print and manifest files for "<fulfilment code>" are created
+    And correctly formatted on request UAC questionnaire print and manifest files for "<fulfilment code>" are created
     And the questionnaire fulfilment case has these events logged [SAMPLE_LOADED,FULFILMENT_REQUESTED,RM_UAC_CREATED,PRINT_CASE_SELECTED]
 
     @smoke
