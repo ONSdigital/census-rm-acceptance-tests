@@ -64,6 +64,6 @@ def set_address_delta_action_rule(context, action_type):
 @step('we schedule an action rule of type "{action_type}" with NCL and "{region}" classifiers')
 def setup_print_action_rule_once_case_action_is_drained_for_non_compliance(context, action_type, region):
     build_and_create_action_rule(context,
-                                 DEFAULT_CLASSIFIERS + f"metadata->>'nonCompliance' = 'NCL' AND SUBSTRING(region, 1, 1) \
+                                 f"case_type='HH' AND metadata->>'nonCompliance' = 'NCL' AND SUBSTRING(region, 1, 1) \
                                   = '{region}'",
                                  action_type)
