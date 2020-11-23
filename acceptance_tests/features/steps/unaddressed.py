@@ -66,7 +66,7 @@ def validate_unaddressed_print_file(context):
              '--env', 'OUR_PUBLIC_KEY_PATH=dummy_keys/our_dummy_public.asc',
              '--env', 'QM_PUBLIC_KEY_PATH=dummy_keys/supplier_QM_dummy_public_key.asc',
              '--env', 'PPO_PUBLIC_KEY_PATH=dummy_keys/supplier_PPO_dummy_public_key.asc',
-             '--env', 'RABBITMQ_SERVICE_HOST=rm-rabbitmq',
+             '--env', 'RABBITMQ_SERVICE_HOST=rabbitmq',
              '--env', 'RABBITMQ_SERVICE_PORT=5672',
              '--env', f'SFTP_QM_DIRECTORY={Config.SFTP_QM_DIRECTORY}',
              '--env', f'SFTP_PPO_DIRECTORY={Config.SFTP_PPO_DIRECTORY}',
