@@ -26,17 +26,16 @@ def _send_refusal_msg_to_rabbit(case_id, refusal_type, channel):
             "payload": {
                 "refusal": {
                     "type": refusal_type,
-                    "report": "Test refusal",
-                    "agentId": None,
+                    "agentId": "110001",
                     "callId": "8f04b136-d13c-4d88-9068-331560a26bec",
+                    "isHouseholder": True,
                     "collectionCase": {
                         "id": case_id
                     },
                     "contact": {
-                        "title": "Mr",
-                        "forename": "Test",
-                        "surname": "Testing",
-                        "telNo": "01234123123"
+                        "title": "LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCmhRSU1BN0dwbm5rWFFIVytBUS8rTDZyLzZr",
+                        "forename": "WFFIVytBUS8rTDZyLzZrWHRMVnNwN3d1elE1enRrd3h5c",
+                        "surname": "DhqVmo3b1dyL0pWNldsS1FqZWYKdGZrWU04MUIzSy9zdFBzaU9JSVYrVVFKSG1"
                     },
                     "address": {
                         "addressLine1": "123",
