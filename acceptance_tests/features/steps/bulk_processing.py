@@ -19,7 +19,6 @@ from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateAddressProcessor
 from toolbox.bulk_processing.non_compliance_processor import NonComplianceProcessor
 
-
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
 from acceptance_tests.utilities.address_helper import send_invalid_address_message_to_rabbit
@@ -609,12 +608,22 @@ def check_non_compliance_bulk_updates(context):
 
     updated_cases = [case['payload']['collectionCase'] for case in updated_case_events]
 
+    non_compliance_ids = context.non_compliance_case_ids.copy()
+
     for updated_case in updated_cases:
-        for case_id in context.non_compliance_case_ids:
+        for case_id in non_compliance_ids:
             if updated_case['id'] == case_id:
-                context.non_compliance_case_ids.remove(case_id)
+                non_compliance_ids.remove(case_id)
                 test_helper.assertEqual(updated_case['metadata']['nonCompliance'], 'NCL')
                 test_helper.assertEqual(updated_case['fieldCoordinatorId'], '10000')
                 test_helper.assertEqual(updated_case['fieldOfficerId'], '100010')
 
-    test_helper.assertEqual(len(context.non_compliance_case_ids), 0)
+    test_helper.assertEqual(len(non_compliance_ids), 0)
+
+
+@step("each case has a NON_COMPLIANCE event logged against it")
+def check_non_compliance_case_events(context):
+    for case_id in context.non_compliance_case_ids:
+        case_events = get_logged_events_for_case_by_id(case_id)
+        logged_events = [case_event['eventType'] for case_event in case_events]
+        test_helper.assertEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
