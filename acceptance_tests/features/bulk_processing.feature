@@ -57,6 +57,7 @@ Feature: Bulk event CSV files can be processed
     And a bulk noncompliance file is supplied
     When the bulk noncompliance file is processed
     Then CASE_UPDATED events are emitted for all the cases in the file with noncompliance set
+    And each case has a NON_COMPLIANCE event logged against it
 
 
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
