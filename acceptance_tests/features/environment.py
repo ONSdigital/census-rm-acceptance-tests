@@ -50,10 +50,18 @@ def after_scenario(_, scenario):
             response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessages')
             response.raise_for_status()
             if response.json():
+                bad_message_details = []
+
+                list_of_bad_message_hashes = response.json()
+                for bad_message_hash in list_of_bad_message_hashes:
+                    response = requests.get(f'{Config.EXCEPTION_MANAGER_URL}/badmessage/{bad_message_hash}')
+                    bad_message_details.append(response.json())
+
                 _clear_queues_for_bad_messages_and_reset_exception_manager()
                 logger.error('Unexpected exception(s) which were not due to eventual consistency timing',
-                             exception_manager_response=response.json())
-                test_helper.fail('Unexpected exception(s) thrown by RM')
+                             exception_manager_response=bad_message_details)
+
+                test_helper.fail(f'Unexpected exception(s) thrown by RM. Details: {bad_message_details}')
 
 
 def before_tag(context, tag):
