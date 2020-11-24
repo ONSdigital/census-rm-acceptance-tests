@@ -62,7 +62,7 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
     @regression
     Examples: Reminder contact letter: <pack code>
-      | pack code   | LSOAs         | number of matching cases | questionnaire type | sample file                           |
+      | pack code   | LSOAs                      | number of matching cases | questionnaire type | sample file                           |
       | P_RD_RNP42B | ('W01014669', 'W01014897') | 2                        | 02                 | sample_input_wales_census_spec.csv    |
       | P_RD_RNP51  | ('E01014545', 'E01014547') | 2                        | 01                 | response_driven_reminders_england.csv |
       | P_RD_RNP52B | ('W01033361', 'W01014540') | 2                        | 02                 | sample_input_wales_census_spec.csv    |
@@ -150,3 +150,18 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
       | reminder pack code | fulfilment code | sample file                  |
       | P_RL_1IRL1         | P_UAC_UACIP1    | sample_1_english_HH_unit.csv |
       | P_RL_1IRL2B        | P_UAC_UACIP2B   | sample_1_welsh_HH_unit.csv   |
+
+
+  Scenario Outline: Generate print files and log events for scheduled reminder letters checking for non compliance
+    Given sample file "<sample file>" is loaded successfully
+    And a bulk noncompliance file is supplied
+    And the bulk noncompliance file is processed
+    When we schedule an action rule of type "<pack code>" with NCL and "<region>" classifiers
+    Then correctly formatted "<pack code>" reminder letter print files are created for cases marked non compliance
+    And there is a correct "<pack code>" manifest file for each csv file written
+    And events logged against the case are [SAMPLE_LOADED,SELECTED_FOR_NON_COMPLIANCE,PRINT_CASE_SELECTED]
+
+    Examples: Reminder letter: <pack code>
+      | pack code    | region | sample file          |
+      | P_NC_NCLTA1  | E      | HH_units_england.csv |
+      | P_NC_NCLTA2B | W      | HH_units_wales.csv   |
