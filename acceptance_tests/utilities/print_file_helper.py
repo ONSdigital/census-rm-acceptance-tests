@@ -154,6 +154,22 @@ def create_expected_reminder_letter_csv_lines(context, pack_code):
     ]
 
 
+def create_expected_reminder_letter_csv_lines_for_non_compliance(context, pack_code):
+    expected_data = defaultdict(dict)
+
+    expected_reminder_case_created_events = (case for case in context.case_created_events
+                                             if
+                                             case['payload']['collectionCase']['id'] in context.non_compliance_case_ids)
+
+    for case in expected_reminder_case_created_events:
+        expected_data = _add_expected_case_data(case, expected_data)
+
+    return [
+        _create_expected_non_compliance_csv_line(case, pack_code)
+        for case in expected_data.values()
+    ]
+
+
 def create_expected_individual_reminder_letter_csv_lines(context, pack_code):
     expected_data = defaultdict(dict)
 
@@ -482,6 +498,22 @@ def create_individual_print_material_csv_line_for_spg_ce(case, uac, qid, fulfilm
         f'{case["address"]["townName"]}|'
         f'{case["address"]["postcode"]}|'
         f'{fulfilment_code}||'
+    )
+
+
+def _create_expected_non_compliance_csv_line(case, prefix):
+    return (
+        '|'
+        f'{case["case_ref"]}|'
+        '|||'
+        f'{case["address_line_1"]}|'
+        f'{case["address_line_2"]}|'
+        f'{case["address_line_3"]}|'
+        f'{case["town_name"]}|'
+        f'{case["postcode"]}|'
+        f'{prefix}|||'
+        '10000|'
+        '100010'
     )
 
 
