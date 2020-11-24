@@ -12,7 +12,7 @@ python_version = "3.7"
 
 [packages]
 census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "b4701466838cdc740a12dacbbcf3f45decac9273"}
-census-rm-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "304f3c380c0a52b7370e524c54781eca8c9f6780"}
+census-rm-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "a6e98fd7e118ba83a86efe559a918ef86d5c40ca"}
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
