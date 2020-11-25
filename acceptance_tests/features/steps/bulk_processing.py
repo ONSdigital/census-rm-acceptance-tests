@@ -626,4 +626,4 @@ def check_non_compliance_case_events(context):
     for case_id in context.non_compliance_case_ids:
         case_events = get_logged_events_for_case_by_id(case_id)
         logged_events = [case_event['eventType'] for case_event in case_events]
-        test_helper.assertEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
+        test_helper.assertCountEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
