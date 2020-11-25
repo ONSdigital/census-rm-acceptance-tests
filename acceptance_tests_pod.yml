@@ -138,7 +138,7 @@ spec:
           name: rabbitmq
           key: rabbitmq-password
     - name: RABBITMQ_SERVICE_HOST
-      value: "rabbitmq"
+      value: "rm-rabbitmq"
     - name: RABBITMQ_SERVICE_PORT
       value: "5672"
     - name: ACTION_SERVICE_HOST

@@ -119,3 +119,6 @@ setenvs.sh
 
 # VSCode
 .vscode/
+
+# Bulk Test CSV Files
+*bulk_test.csv
