@@ -7,6 +7,12 @@ Feature: Bulk event CSV files can be processed
     When the bulk refusal file is processed
     Then the cases are marked with the correct refusal
 
+  Scenario: A bulk refusal file with dodgy case IDs does not cause all hell to break loose
+    Given sample file "sample_input_wales_census_spec.csv" is loaded successfully
+    And a bulk refusal file is supplied with invalid case IDs
+    When the bulk refusal file is processed
+    Then all hell does not break loose
+
   Scenario: A bulk new address file is successfully ingested
     Given a bulk new address file "new_addresses_30.csv" is supplied
     When the bulk new address file is processed
