@@ -2,6 +2,7 @@ import csv
 import functools
 import random
 import time
+import uuid
 from contextlib import contextmanager
 from datetime import datetime
 from functools import partial
@@ -34,12 +35,33 @@ from config import Config
 
 @step('a bulk refusal file is supplied')
 def build_bulk_refusal_file(context):
+    _build_bulk_refusal_file_with_gubbins(context)
+
+
+@step('a bulk refusal file is supplied with invalid case IDs')
+def build_bulk_refusal_file_with_invalid_case_ids(context):
+    _build_bulk_refusal_file_with_gubbins(context, dodgy_ids=True)
+
+
+@step('all hell does not break loose')
+def all_hell_does_not_break_loose(context):
+    # This step doesn't really do much... but the final step of the scenario will check that exception manager hasn't
+    # had any problems... which we would do if the bulk processor allowed dodgy IDs through!
+    pass
+
+
+def _build_bulk_refusal_file_with_gubbins(context, dodgy_ids=False):
     # Build a bulk refusal file with a row for each the stored case created event
     context.bulk_refusals_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files', 'refusal_bulk_test.csv')
     context.bulk_refusals = {}
 
     for case_created in context.case_created_events:
-        context.bulk_refusals[case_created['payload']['collectionCase']['id']] = random.choice(
+        case_id = case_created['payload']['collectionCase']['id']
+
+        if dodgy_ids:
+            case_id = str(uuid.uuid4())
+
+        context.bulk_refusals[case_id] = random.choice(
             ('HARD_REFUSAL',
              'EXTRAORDINARY_REFUSAL')
         )
