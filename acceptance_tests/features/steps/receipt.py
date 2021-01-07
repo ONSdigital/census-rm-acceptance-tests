@@ -296,10 +296,16 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
         if incremented == 'True':
             expected_actual_responses = expected_actual_responses + 1
 
+        if receipted == 'AR > E':
+            expected_actual_responses = expected_actual_responses + 1
+
         test_helper.assertEqual(emitted_case['ceActualResponses'], expected_actual_responses)
 
-    if receipted == 'AR >= E':
-        receipted = emitted_case['ceActualResponses'] >= emitted_case['ceExpectedCapacity']
+    if receipted == 'AR = E':
+        receipted = emitted_case['ceActualResponses'] == emitted_case['ceExpectedCapacity']
+
+    if receipted == 'AR > E':
+        receipted = emitted_case['ceActualResponses'] > emitted_case['ceExpectedCapacity']
 
     test_helper.assertEqual(str(emitted_case['receiptReceived']), str(receipted),
                             "Receipted status on case updated event does not match expected")
