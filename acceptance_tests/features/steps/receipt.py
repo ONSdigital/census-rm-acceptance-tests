@@ -299,6 +299,9 @@ def check_ce_actual_responses_and_receipted(context, incremented, receipted, cas
         if receipted == 'AR > E':
             expected_actual_responses = expected_actual_responses + 1
 
+        if receipted == 'AR < E':
+            receipted = 'False'
+
         test_helper.assertEqual(emitted_case['ceActualResponses'], expected_actual_responses)
 
     if receipted == 'AR = E':
