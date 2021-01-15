@@ -53,8 +53,8 @@ class Config:
     RABBITMQ_NONCOMPLIANCE_QUEUE = os.getenv('RABBITMQ_NONCOMPLIANCE_QUEUE', 'case.rm.nonCompliance')
 
     RABBITMQ_EXCHANGE = os.getenv('RABBITMQ_EXCHANGE', '')
-    RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'guest')
-    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'guest')
+    RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'rmquser')
+    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'qpassword')
 
     SFTP_HOST = os.getenv('SFTP_HOST', 'localhost')
     SFTP_PORT = os.getenv('SFTP_PORT', '122')
