@@ -2,7 +2,8 @@ from behave import step
 from retrying import retry
 
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
-from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match
+from acceptance_tests.utilities.event_helper import check_if_event_list_is_exact_match, \
+    check_if_qid_event_list_is_exact_match
 from acceptance_tests.utilities.test_case_helper import test_helper
 
 
@@ -62,3 +63,8 @@ def _check_if_event_is_logged(expected_event_type, case_id):
     test_helper.assertEqual(actual_logged_event_types.count(expected_event_type), 1,
                             msg=(f'Expected event type = {expected_event_type},'
                                  f' actual logged event types = {actual_logged_event_types}'))
+
+
+@step('the events logged for the unaddressed QID are {expected_event_list}')
+def check_logged_events_for_unaddressed_qid(context, expected_event_list):
+    check_if_qid_event_list_is_exact_match(expected_event_list, context.requested_qid)

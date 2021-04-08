@@ -18,6 +18,12 @@ def undelivered_qm_published_to_gcp_pubsub(context):
     test_helper.assertTrue(context.sent_to_gcp)
 
 
+@when("an undelivered mail QM message for the unlinked QID is put on GCP pubsub")
+def undelivered_unlinked_qm_published_to_gcp_pubsub(context):
+    _publish_qm_undelivered_mail(context, questionnaire_id=context.requested_qid)
+    test_helper.assertTrue(context.sent_to_gcp)
+
+
 @when("an undelivered mail PPO message is put on GCP pubsub")
 def undelivered_ppo_published_to_gcp_pubsub(context):
     context.first_case = context.case_created_events[0]['payload']['collectionCase']

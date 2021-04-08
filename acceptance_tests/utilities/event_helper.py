@@ -1,6 +1,8 @@
 import copy
 import functools
 import logging
+import time
+from collections import Counter
 
 import luhn
 import requests
@@ -9,6 +11,7 @@ from rfc3339 import parse_datetime
 from structlog import wrap_logger
 
 from acceptance_tests.utilities.case_api_helper import get_logged_events_for_case_by_id
+from acceptance_tests.utilities.database_helper import poll_case_database_with_timeout
 from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
     store_all_case_created_msgs_by_collection_exercise_id, store_all_uac_updated_msgs_by_collection_exercise_id, \
     store_first_message_in_context, store_all_msgs_in_context
@@ -265,4 +268,36 @@ def check_if_event_list_is_exact_match(event_type_list, case_id):
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
 
     test_helper.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
+
                                  msg="Actual logged event types did not match expected")
+
+
+def _check_logged_events_for_qid(qid, expected_event_types):
+    query = ('SELECT e.event_type FROM casev2.event e, casev2.uac_qid_link u '
+             'WHERE e.uac_qid_link_id = u.id AND u.qid = %s')
+    query_vars = (qid,)
+
+    def success_callback(db_result, timeout_deadline):
+        actual_event_types = [row[0] for row in db_result]
+
+        if len(actual_event_types) > len(expected_event_types):
+            # Fail fast if we find too many events
+            test_helper.fail(f'Actual events logged against QID do not match expected, '
+                             f'actual events: {actual_event_types}, expected: {expected_event_types}')
+
+        if Counter(list(actual_event_types)) == Counter(list(expected_event_types)):
+            # Counter returns a dict of list elements and their frequency in the given list so
+            # comparing counters of lists will return true if they contain the same elements, ignoring order
+            return True
+
+        elif time.time() > timeout_deadline:
+            test_helper.fail(f'Did not find expected QID events within the time limit, '
+                             f'actual events: {actual_event_types}, expected: {expected_event_types}')
+        return False
+
+    poll_case_database_with_timeout(query, query_vars, success_callback, timeout=30)
+
+
+def check_if_qid_event_list_is_exact_match(event_type_list, qid):
+    expected_logged_event_types = event_type_list.replace('[', '').replace(']', '').split(',')
+    _check_logged_events_for_qid(qid, expected_logged_event_types)
