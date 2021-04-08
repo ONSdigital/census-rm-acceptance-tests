@@ -268,7 +268,6 @@ def check_if_event_list_is_exact_match(event_type_list, case_id):
     actual_logged_event_types = [event['eventType'] for event in actual_logged_events]
 
     test_helper.assertCountEqual(expected_logged_event_types, actual_logged_event_types,
-
                                  msg="Actual logged event types did not match expected")
 
 
