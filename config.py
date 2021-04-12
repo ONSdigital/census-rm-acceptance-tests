@@ -124,9 +124,11 @@ class Config:
     DB_USERNAME = os.getenv('DB_USERNAME', 'postgres')
     DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
     DB_HOST_ACTION = os.getenv('DB_HOST_ACTION', 'localhost')
+    DB_HOST_CASE = os.getenv('DB_HOST', 'localhost')
     DB_PORT = os.getenv('DB_PORT', '6432')
     DB_NAME = os.getenv('DB_NAME', 'postgres')
     DB_ACTION_CERTIFICATES = os.getenv('DB_ACTION_CERTIFICATES', '')
+    DB_CASE_CERTIFICATES = os.getenv('DB_CASE_CERTIFICATES', '')
 
     CENSUS_ACTION_PLAN_ID = os.getenv('ACTION_PLAN_ID', 'c4415287-0e37-447b-9c3d-1a011c9fa3db')
     CENSUS_COLLECTION_EXERCISE_ID = os.getenv('COLLECTION_EXERCISE_ID', '34d7f3bb-91c9-45d0-bb2d-90afce4fc790')

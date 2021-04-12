@@ -35,7 +35,7 @@ spec:
         cpu: "250m"
         memory: "256Mi"
     volumeMounts:
-    - name: read-replica-cloud-sql-certs
+    - name: case-cloud-sql-certs
       mountPath: "/home/acceptancetests/postgresql"
       readOnly: true
     - name: cloud-sql-action-certs
@@ -76,6 +76,8 @@ spec:
           key: db-name
     - name: DB_ACTION_CERTIFICATES
       value: " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql-action/root.crt sslcert=/home/acceptancetests/.postgresql-action/postgresql.crt sslkey=/home/acceptancetests/.postgresql-action/postgresql.key"
+    - name: DB_CASE_CERTIFICATES
+      value: " sslmode=verify-ca sslrootcert=/home/acceptancetests/.postgresql/root.crt sslcert=/home/acceptancetests/.postgresql/postgresql.crt sslkey=/home/acceptancetests/.postgresql/postgresql.key"
     - name: PROJECT_NAME
       valueFrom:
         configMapKeyRef:
@@ -275,7 +277,7 @@ spec:
           name: bulk-processing-config
           key: bulk-uninvalidated-address-bucket-name
   volumes:
-  - name: read-replica-cloud-sql-certs
+  - name: case-cloud-sql-certs
     secret:
       secretName: cloud-sql-certs
       defaultMode: 0400
