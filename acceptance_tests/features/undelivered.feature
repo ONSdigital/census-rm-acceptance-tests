@@ -21,7 +21,7 @@ Feature: We want to deliver mail to the wrong addresses
     And the events logged for the receipted case are [NEW_ADDRESS_REPORTED,UNDELIVERED_MAIL_REPORTED]
     And no ActionInstruction is sent to FWMT
 
-  Scenario: Unaddressed material is returned as UAA with being linked to a case
+  Scenario: Unaddressed material is returned as UAA without being linked to a case
     Given an unaddressed QID request message of questionnaire type 01 is sent
     And a UAC updated message with "01" questionnaire type is emitted
     When an undelivered mail QM message for the unlinked QID is put on GCP pubsub
