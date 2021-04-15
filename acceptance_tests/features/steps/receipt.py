@@ -88,7 +88,7 @@ def receipt_ccs_offline_msg_published_to_gcp_pubsub(context):
 def uac_updated_msg_emitted(context):
     emitted_uac = _get_emitted_uac(context)
     test_helper.assertEqual(emitted_uac['caseId'], context.first_case['id'])
-    test_helper.assertFalse(emitted_uac['active'])
+    test_helper.assertFalse(emitted_uac['active'], 'The UAC_UPDATED message should active flag "false"')
 
 
 @step('a CANCEL action instruction is sent to field work management with address type "{address_type}"')
@@ -115,6 +115,8 @@ def send_receipt_for_unaddressed(context):
     '"{expected_field_value}" and qid is "{another_qid_needed}"')
 def case_updated_msg_sent_with_values(context, case_field, expected_field_value, address_level=None, case_type=None,
                                       another_qid_needed=None):
+    if not hasattr(context, 'receipting_case'):
+        context.receipting_case = context.first_case
     if another_qid_needed == 'True' or address_level == 'E':
         return
     emitted_case = _get_emitted_case(context)
@@ -335,6 +337,21 @@ def check_receipt_to_field_msg(context, action_instruction_type):
     test_helper.assertEquals(msg_to_field['caseId'], context.receipting_case['id'])
     test_helper.assertEquals(msg_to_field['actionInstruction'], action_instruction_type)
     test_helper.assertEqual(msg_to_field['surveyName'], context.receipting_case['survey'])
+
+
+@step('an "{action_instruction_type}" field instruction is emitted for the CCS case')
+@step('a "{action_instruction_type}" field instruction is emitted for the CCS case')
+def check_message_to_field_for_ccs_case(context, action_instruction_type):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
+                                    functools.partial(
+                                        store_all_msgs_in_context, context=context,
+                                        expected_msg_count=1))
+
+    msg_to_field = context.messages_received[0]
+    test_helper.assertEquals(msg_to_field['caseId'], context.ccs_case['id'])
+    test_helper.assertEquals(msg_to_field['actionInstruction'], action_instruction_type)
+    test_helper.assertEqual(msg_to_field['surveyName'], context.ccs_case['surveyType'])
 
 
 @step('a case_updated msg has not been emitted')

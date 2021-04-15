@@ -29,3 +29,9 @@ def get_cases_from_postcode(postcode):
     response = requests.get(f"{Config.CASE_API_CASE_URL}/postcode/{postcode}")
     response.raise_for_status()
     return response.json()
+
+
+def get_case_details_by_case_id(case_id):
+    response = requests.get(f'{Config.CASE_API_CASE_URL}case-details/{case_id}')
+    response.raise_for_status()
+    return response.json()
