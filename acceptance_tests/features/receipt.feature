@@ -178,25 +178,15 @@ Feature: Case processor handles receipt message from pubsub service
       | questionnaire type | address type | address level |
       | 61                 | HH           | U             |
 
+# TODO Uncomment these rows to include 62 once the bug is patched
     @regression
     Examples:
       | questionnaire type | address type | address level |
+#      | 62                 | HH           | U             |
       | 63                 | HH           | U             |
       | 61                 | CE           | U             |
+#      | 62                 | CE           | U             |
       | 63                 | CE           | U             |
       | 61                 | CE           | E             |
-      | 63                 | CE           | E             |
-
-
-# TODO Replace the above examples to include 62 once bug is patched
-#    @regression
-#    Examples:
-#      | questionnaire type | address type | address level |
-#      | 62                 | HH           | U             |
-#      | 63                 | HH           | U             |
-#      | 61                 | CE           | U             |
-#      | 62                 | CE           | U             |
-#      | 63                 | CE           | U             |
-#      | 61                 | CE           | E             |
 #      | 62                 | CE           | E             |
-#      | 63                 | CE           | E             |
+      | 63                 | CE           | E             |
