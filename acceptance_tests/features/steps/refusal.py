@@ -81,7 +81,7 @@ def check_case_events(context):
     test_helper.fail('Did not find "Refusal Received" event')
 
 
-@step('a CANCEL action instruction is emitted to FWMT')
+@step('a CANCEL action instruction is emitted to FWMT for the refused case')
 def refusal_received(context):
     start_listening_to_rabbit_queue(Config.RABBITMQ_OUTBOUND_FIELD_QUEUE,
                                     functools.partial(field_work_cancel_callback, context=context))

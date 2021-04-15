@@ -17,9 +17,12 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@step("a CCS Property Listed event is sent with interview required set to {interview_required}")
-def send_ccs_property_listed_event(context, interview_required):
-    message = _create_ccs_property_listed_event(context, interview_required=str2bool(interview_required))
+@step('a CCS Property Listed event with address type "{address_type}" '
+      'and estab type "{estab_type}" is sent with interview required set to {interview_required}')
+@step('a CCS Property Listed event is sent with interview required set to {interview_required}')
+def send_ccs_property_listed_event(context, address_type='HH', estab_type='HOUSEHOLD', interview_required="True"):
+    message = _create_ccs_property_listed_event(context, interview_required=str2bool(interview_required),
+                                                address_type=address_type, estab_type=estab_type)
     _send_ccs_case_list_msg_to_rabbit(message)
 
 
@@ -29,7 +32,7 @@ def check_case_created(context, address_type):
     response = requests.get(f'{Config.CASE_API_CASE_URL}{context.case_id}', params={'caseEvents': True})
     test_helper.assertEqual(response.status_code, 200, 'CCS Property Listed case not found')
 
-    context.ccs_case = response.json()
+    context.first_case = context.ccs_case = response.json()
     test_helper.assertEqual(context.ccs_case['addressType'], address_type)
 
 
@@ -63,9 +66,11 @@ def ccs_case_event_logged(context):
     test_helper.assertEqual(context.ccs_case['caseEvents'][0]['eventType'], 'CCS_ADDRESS_LISTED')
 
 
+@step('a CCS Property List event is sent and associated "{address_type}" case '
+      'with address level "{address_level}" is created and sent to FWMT')
 @step('a CCS Property List event is sent and associated "{address_type}" case is created and sent to FWMT')
-def css_property_list_and_events_emitted(context, address_type):
-    message = _create_ccs_property_listed_event(context, address_type=address_type, address_level="U")
+def css_property_list_and_events_emitted(context, address_type, address_level='U'):
+    message = _create_ccs_property_listed_event(context, address_type=address_type, address_level=address_level)
     _send_ccs_case_list_msg_to_rabbit(message)
 
     check_case_created(context, address_type)
@@ -94,7 +99,8 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="E"):
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="E",
+                                      estab_type='HOUSEHOLD'):
     context.case_id = str(uuid.uuid4())
 
     message = {
@@ -113,7 +119,7 @@ def _create_ccs_property_listed_event(context, address_type="HH", interview_requ
                 },
                 "sampleUnit": {
                     "addressType": address_type,
-                    "estabType": "Household",
+                    "estabType": estab_type,
                     "addressLevel": address_level,
                     "organisationName": "Testy McTest",
                     "addressLine1": "123 Fake street",

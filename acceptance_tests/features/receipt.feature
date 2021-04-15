@@ -76,14 +76,6 @@ Feature: Case processor handles receipt message from pubsub service
     When the offline receipt msg for a continuation form from the case is received
     Then no ActionInstruction is sent to FWMT
 
-  Scenario: eq receipt for CCS case results in UAC updated event sent to RH
-    Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
-    When the receipt msg for the created CCS case is put on the GCP pubsub
-    Then a uac_updated msg is emitted with active set to false
-    And a case_updated msg is emitted where "receiptReceived" is "True"
-    And a CANCEL action instruction is sent to field work management with address type "HH"
-    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
-
   @smoke
   Scenario: PQRS receipt results in UAC updated event sent to RH
     Given sample file "sample_for_receipting.csv" is loaded successfully
@@ -112,3 +104,98 @@ Feature: Case processor handles receipt message from pubsub service
     When the receipt msg is put on the GCP pubsub
     Then an "UPDATE" field instruction is emitted
     And if the actual response count is incremented "True" or the case is marked receipted "True" then there should be a case updated message of case type "CE"
+
+
+    # CCS
+  Scenario: EQ receipt for HH CCS case default UAC results in UAC updated event sent to RH
+    Given a CCS Property List event is sent and associated "HH" case is created and sent to FWMT
+    When the receipt msg for the created CCS case is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And a CANCEL action instruction is sent to field work management with address type "HH"
+    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
+
+  Scenario Outline: Paper questionnaire receipts for HH U level CCS case receipts the case
+    Given an unaddressed QID request message of questionnaire type <questionnaire type> is sent and an unlinked uac is emitted
+    And a CCS Property List event is sent and associated "HH" case with address level "U" is created and sent to FWMT
+    And a Questionnaire Linked message is sent for the CCS case
+    And a UAC updated event is emitted linking the UAC and QID to the CCS case
+    When the offline receipt msg for the unlinked is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And a "CANCEL" field instruction is emitted for the CCS case
+    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,QUESTIONNAIRE_LINKED,UAC_UPDATED,RESPONSE_RECEIVED]
+
+    Examples:
+      | questionnaire type |
+      | 71                 |
+
+    @regression
+    Examples:
+      | questionnaire type |
+      | 72                 |
+      | 73                 |
+      | 74                 |
+
+  Scenario Outline: CE Manager Paper receipt for CE E level CCS case receipts the case
+    Given an unaddressed QID request message of questionnaire type <questionnaire type> is sent and an unlinked uac is emitted
+    And a CCS Property List event is sent and associated "CE" case with address level "E" is created and sent to FWMT
+    And a Questionnaire Linked message is sent for the CCS case
+    And a UAC updated event is emitted linking the UAC and QID to the CCS case
+    When the offline receipt msg for the unlinked is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And a case_updated msg is emitted where "receiptReceived" is "True"
+    And an "UPDATE" field instruction is emitted for the CCS case
+    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,QUESTIONNAIRE_LINKED,UAC_UPDATED,RESPONSE_RECEIVED]
+
+    Examples:
+      | questionnaire type |
+      | 81                 |
+
+    @regression
+    Examples:
+      | questionnaire type |
+      | 82                 |
+      | 83                 |
+      | 84                 |
+
+  Scenario Outline: CCS Continuation questionnaire receipts are logged but do not receipt the case
+    Given an unaddressed QID request message of questionnaire type <questionnaire type> is sent and an unlinked uac is emitted
+    And a CCS Property List event is sent and associated "<address type>" case with address level "<address level>" is created and sent to FWMT
+    And a Questionnaire Linked message is sent for the CCS case
+    And a UAC updated event is emitted linking the UAC and QID to the CCS case
+    When the offline receipt msg for the unlinked is put on the GCP pubsub
+    Then a uac_updated msg is emitted with active set to false
+    And the CCS case is not marked as receipted
+    And no ActionInstruction is sent to FWMT
+    And the events logged for the receipted case are [CCS_ADDRESS_LISTED,QUESTIONNAIRE_LINKED,UAC_UPDATED,RESPONSE_RECEIVED]
+
+    Examples:
+      | questionnaire type | address type | address level |
+      | 61                 | HH           | U             |
+
+    @regression
+    Examples:
+      | questionnaire type | address type | address level |
+      | 63                 | HH           | U             |
+      | 61                 | CE           | U             |
+      | 63                 | CE           | U             |
+      | 61                 | CE           | E             |
+      | 63                 | CE           | E             |
+
+
+# TODO Replace the above examples to include 62/64 once bug is patched
+#    @regression
+#    Examples:
+#      | questionnaire type | address type | address level |
+#      | 62                 | HH           | U             |
+#      | 63                 | HH           | U             |
+#      | 64                 | HH           | U             |
+#      | 61                 | CE           | U             |
+#      | 62                 | CE           | U             |
+#      | 63                 | CE           | U             |
+#      | 64                 | CE           | U             |
+#      | 61                 | CE           | E             |
+#      | 62                 | CE           | E             |
+#      | 63                 | CE           | E             |
+#      | 64                 | CE           | E             |

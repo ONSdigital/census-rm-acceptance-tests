@@ -6,7 +6,7 @@ import requests
 from behave import then, step
 from structlog import wrap_logger
 
-from acceptance_tests.utilities.case_api_helper import get_ccs_qid_for_case_id
+from acceptance_tests.utilities.case_api_helper import get_ccs_qid_for_case_id, get_case_details_by_case_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
@@ -42,7 +42,7 @@ def find_case_by_case_ref(context):
     test_helper.assertEqual(response.status_code, 200, 'Case ref not found')
 
 
-@step('the case API returns the CCS QID for the new case')
+@step('the case API returns the CCS QID for the new case with form type "H"')
 def validate_ccs_qid_for_case_id(context):
     response_json = get_ccs_qid_for_case_id(context.ccs_case['id'])
     test_helper.assertEqual(response_json['questionnaireId'][0:3],
@@ -52,8 +52,8 @@ def validate_ccs_qid_for_case_id(context):
                             f'Expected FormType is "H" but got "{response_json["formType"]}"')
 
 
-@step('the case API returns the new CCS case by postcode search')
-def get_ccs_case_by_postcode(context):
+@step('the case API returns the new CCS case with case type "{case_type}" by postcode search')
+def get_ccs_case_by_postcode(context, case_type):
     response = requests.get(f'{Config.CASE_API_CASE_URL}ccs/postcode/{context.ccs_case["postcode"]}')
     response.raise_for_status()
     found_cases = response.json()
@@ -67,6 +67,13 @@ def get_ccs_case_by_postcode(context):
 
     test_helper.assertEqual(context.ccs_case['postcode'], matched_case['postcode'])
     test_helper.assertEqual(context.ccs_case['caseRef'], matched_case['caseRef'])
+    test_helper.assertEqual(context.ccs_case['caseType'], case_type)
+
+
+@step('the CCS case is not marked as receipted')
+def check_ccs_case_not_receipted(context):
+    ccs_case = get_case_details_by_case_id(context.ccs_case['id'])
+    test_helper.assertFalse(ccs_case['receiptReceived'], 'Receipt received flag on the CCS case should be false')
 
 
 @step('it contains the correct fields for a CENSUS case')

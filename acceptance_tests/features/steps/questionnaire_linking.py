@@ -1,3 +1,4 @@
+import functools
 import json
 import time
 import uuid
@@ -8,6 +9,8 @@ from retrying import retry
 
 from acceptance_tests.utilities.event_helper import get_uac_updated_events
 from acceptance_tests.utilities.rabbit_context import RabbitContext
+from acceptance_tests.utilities.rabbit_helper import start_listening_to_rabbit_queue, \
+    store_all_uac_updated_msgs_by_collection_exercise_id
 from acceptance_tests.utilities.test_case_helper import test_helper
 from acceptance_tests.utilities.unadressed_helper import send_questionnaire_linked_msg_to_rabbit
 from config import Config
@@ -68,6 +71,22 @@ def send_ccs_linked_message(context):
     context.linked_uac = context.expected_uac
 
     send_questionnaire_linked_msg_to_rabbit(context.expected_questionnaire_id, context.linked_case_id)
+
+
+@step('a UAC updated event is emitted linking the UAC and QID to the CCS case')
+def check_correct_individual_uac_updated_message_is_emitted(context):
+    context.messages_received = []
+    start_listening_to_rabbit_queue(Config.RABBITMQ_RH_OUTBOUND_UAC_QUEUE,
+                                    functools.partial(store_all_uac_updated_msgs_by_collection_exercise_id,
+                                                      context=context,
+                                                      expected_msg_count=1,
+                                                      collection_exercise_id=Config.CCS_COLLEX_ID))
+
+    uac_updated_payload = context.messages_received[0]['payload']['uac']
+    test_helper.assertEqual(uac_updated_payload['caseId'], context.ccs_case['id'],
+                            'UAC updated event case ID does not match the case it was requested for')
+    test_helper.assertEqual(uac_updated_payload['questionnaireId'], context.expected_questionnaire_id,
+                            'The QID on the emitted UAC_UPDATED message does not match expected')
 
 
 def send_questionnaire_link(context):
