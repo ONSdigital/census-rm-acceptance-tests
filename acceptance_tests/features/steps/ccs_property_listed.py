@@ -99,7 +99,7 @@ def _field_callback(ch, method, _properties, body, context):
     ch.stop_consuming()
 
 
-def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="E",
+def _create_ccs_property_listed_event(context, address_type="HH", interview_required=True, address_level="U",
                                       estab_type='HOUSEHOLD'):
     context.case_id = str(uuid.uuid4())
 
