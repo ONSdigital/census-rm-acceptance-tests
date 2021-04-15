@@ -115,7 +115,7 @@ Feature: Case processor handles receipt message from pubsub service
     And a CANCEL action instruction is sent to field work management with address type "HH"
     And the events logged for the receipted case are [CCS_ADDRESS_LISTED,RESPONSE_RECEIVED]
 
-  Scenario Outline: Paper questionnaire receipts for HH U level CCS case receipts the case
+  Scenario Outline: Paper/postback questionnaire receipts for HH U level CCS case receipts the case
     Given an unaddressed QID request message of questionnaire type <questionnaire type> is sent and an unlinked uac is emitted
     And a CCS Property List event is sent and associated "HH" case with address level "U" is created and sent to FWMT
     And a Questionnaire Linked message is sent for the CCS case
@@ -129,6 +129,7 @@ Feature: Case processor handles receipt message from pubsub service
     Examples:
       | questionnaire type |
       | 71                 |
+      | 51                 |
 
     @regression
     Examples:
@@ -136,6 +137,9 @@ Feature: Case processor handles receipt message from pubsub service
       | 72                 |
       | 73                 |
       | 74                 |
+      | 52                 |
+      | 53                 |
+      | 54                 |
 
   Scenario Outline: CE Manager Paper receipt for CE E level CCS case receipts the case
     Given an unaddressed QID request message of questionnaire type <questionnaire type> is sent and an unlinked uac is emitted
@@ -184,18 +188,15 @@ Feature: Case processor handles receipt message from pubsub service
       | 63                 | CE           | E             |
 
 
-# TODO Replace the above examples to include 62/64 once bug is patched
+# TODO Replace the above examples to include 62 once bug is patched
 #    @regression
 #    Examples:
 #      | questionnaire type | address type | address level |
 #      | 62                 | HH           | U             |
 #      | 63                 | HH           | U             |
-#      | 64                 | HH           | U             |
 #      | 61                 | CE           | U             |
 #      | 62                 | CE           | U             |
 #      | 63                 | CE           | U             |
-#      | 64                 | CE           | U             |
 #      | 61                 | CE           | E             |
 #      | 62                 | CE           | E             |
 #      | 63                 | CE           | E             |
-#      | 64                 | CE           | E             |
