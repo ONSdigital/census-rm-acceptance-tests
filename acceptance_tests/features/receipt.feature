@@ -182,11 +182,11 @@ Feature: Case processor handles receipt message from pubsub service
     @regression
     Examples:
       | questionnaire type | address type | address level |
-#      | 62                 | HH           | U             |
+      | 62                 | HH           | U             |
       | 63                 | HH           | U             |
       | 61                 | CE           | U             |
-#      | 62                 | CE           | U             |
+      | 62                 | CE           | U             |
       | 63                 | CE           | U             |
       | 61                 | CE           | E             |
-#      | 62                 | CE           | E             |
+      | 62                 | CE           | E             |
       | 63                 | CE           | E             |
