@@ -16,9 +16,9 @@ from toolbox.bulk_processing.bulk_processor import BulkProcessor
 from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProcessor
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
+from toolbox.bulk_processing.non_compliance_processor import NonComplianceProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateAddressProcessor
-from toolbox.bulk_processing.non_compliance_processor import NonComplianceProcessor
 
 from acceptance_tests import RESOURCE_FILE_PATH
 from acceptance_tests.utilities import database_helper
@@ -588,64 +588,131 @@ def new_addresses_sent_to_field(context):
     test_helper.assertEqual(len(expected_case_ids), 0, 'Not all new addresses accounted for')
 
 
-@step("a bulk noncompliance file is supplied")
-def bulk_non_compliance_file(context):
-    context.non_compliance_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
-                                                                   'non_compliance_bulk_test.csv')
+@step("a bulk noncompliance first letter file is supplied")
+def bulk_non_compliance_first_letter_file(context):
+    context.non_compliance_first_letter_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                                'non_compliance_first_letter_bulk_test.csv')
 
-    context.non_compliance_case_ids = [case['payload']['collectionCase']['id'] for case in context.case_created_events]
+    context.non_compliance_first_letter_case_ids = [case['payload']['collectionCase']['id'] for case in
+                                                    context.case_created_events]
 
-    with open(context.non_compliance_bulk_file, 'w') as non_compliance_bulk_write:
-        writer = csv.DictWriter(non_compliance_bulk_write,
+    with open(context.non_compliance_first_letter_bulk_file, 'w') as non_compliance_first_letter_bulk_write:
+        writer = csv.DictWriter(non_compliance_first_letter_bulk_write,
                                 fieldnames=['CASE_ID', 'NC_STATUS', 'FIELDCOORDINATOR_ID', 'FIELDOFFICER_ID'])
         writer.writeheader()
 
-        for case_id in context.non_compliance_case_ids:
+        for case_id in context.non_compliance_first_letter_case_ids:
             writer.writerow(
                 {'CASE_ID': case_id, 'NC_STATUS': 'NCL', 'FIELDCOORDINATOR_ID': '10000', 'FIELDOFFICER_ID': '100010'})
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
-        upload_file_to_bucket(context.non_compliance_bulk_write,
-                              f'non_compliance_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+        upload_file_to_bucket(context.non_compliance_first_letter_bulk_write,
+                              f'non_compliance_first_letter_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
 
 
-@step("the bulk noncompliance file is processed")
-def bulk_non_compliance_processed(context):
+@step("a bulk noncompliance final warning letter file is supplied")
+def bulk_non_compliance_final_warning_letter_file(context):
+    context.non_compliance_final_warning_letter_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                                                        'non_compliance_final_warning_letter_bulk_test.csv')
+
+    context.non_compliance_final_warning_letter_case_ids = [case['payload']['collectionCase']['id'] for
+                                                            case in context.case_created_events]
+
+    with open(context.non_compliance_final_warning_letter_bulk_file,
+              'w') as non_compliance_final_warning_letter_bulk_write:
+        writer = csv.DictWriter(non_compliance_final_warning_letter_bulk_write,
+                                fieldnames=['CASE_ID', 'NC_STATUS', 'FIELDCOORDINATOR_ID', 'FIELDOFFICER_ID'])
+        writer.writeheader()
+
+        for case_id in context.non_compliance_final_warning_letter_case_ids:
+            writer.writerow(
+                {'CASE_ID': case_id, 'NC_STATUS': 'NCFW', 'FIELDCOORDINATOR_ID': '10000', 'FIELDOFFICER_ID': '100010'})
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
+        clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
+        upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_write,
+                              f'non_compliance_final_warning_letter_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
+
+
+@step("the bulk noncompliance first letter file is processed")
+def bulk_non_compliance_first_letter_processed(context):
     # Run against the real bucket if it is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         BulkProcessor(NonComplianceProcessor()).run()
         return
 
     # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
-    with mock_bulk_processor_bucket(context.non_compliance_bulk_file):
+    with mock_bulk_processor_bucket(context.non_compliance_first_letter_bulk_file):
         BulkProcessor(NonComplianceProcessor()).run()
 
 
-@step("CASE_UPDATED events are emitted for all the cases in the file with noncompliance set")
-def check_non_compliance_bulk_updates(context):
-    updated_case_events = get_case_updated_events(context, len(context.non_compliance_case_ids))
+@step("the bulk noncompliance final warning letter file is processed")
+def bulk_non_compliance_final_warning_letter_processed(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
+        BulkProcessor(NonComplianceProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.non_compliance_final_warning_letter_bulk_file):
+        BulkProcessor(NonComplianceProcessor()).run()
+
+
+@step("CASE_UPDATED events are emitted for all the cases in the first letter file with noncompliance set")
+def check_non_compliance_first_letter_bulk_updates(context):
+    updated_case_events = get_case_updated_events(context, len(context.non_compliance_first_letter_case_ids))
 
     updated_cases = [case['payload']['collectionCase'] for case in updated_case_events]
 
-    non_compliance_ids = context.non_compliance_case_ids.copy()
+    non_compliance_first_letter_ids = context.non_compliance_first_letter_case_ids.copy()
 
     for updated_case in updated_cases:
-        for case_id in non_compliance_ids:
+        for case_id in non_compliance_first_letter_ids:
             if updated_case['id'] == case_id:
-                non_compliance_ids.remove(case_id)
+                non_compliance_first_letter_ids.remove(case_id)
                 test_helper.assertEqual(updated_case['metadata']['nonCompliance'], 'NCL')
                 test_helper.assertEqual(updated_case['fieldCoordinatorId'], '10000')
                 test_helper.assertEqual(updated_case['fieldOfficerId'], '100010')
 
-    test_helper.assertEqual(len(non_compliance_ids), 0)
+    test_helper.assertEqual(len(non_compliance_first_letter_ids), 0)
 
 
-@step("each case has a NON_COMPLIANCE event logged against it")
-def check_non_compliance_case_events(context):
-    for case_id in context.non_compliance_case_ids:
+@step("CASE_UPDATED events are emitted for all the cases in the final warning letter file with noncompliance set")
+def check_non_compliance_final_warning_letter_bulk_updates(context):
+    updated_case_events = get_case_updated_events(context, len(
+        context.non_compliance_final_warning_letter_case_ids))
+
+    updated_cases = [case['payload']['collectionCase'] for case in updated_case_events]
+
+    non_compliance_final_warning_letter_ids = context.non_compliance_final_warning_letter_case_ids.copy()
+
+    for updated_case in updated_cases:
+        for case_id in non_compliance_final_warning_letter_ids:
+            if updated_case['id'] == case_id:
+                non_compliance_final_warning_letter_ids.remove(case_id)
+                test_helper.assertEqual(updated_case['metadata']['nonCompliance'], 'NCFW')
+                test_helper.assertEqual(updated_case['fieldCoordinatorId'], '10000')
+                test_helper.assertEqual(updated_case['fieldOfficerId'], '100010')
+
+    test_helper.assertEqual(len(non_compliance_final_warning_letter_ids), 0)
+
+
+@step("each first letter case has a NON_COMPLIANCE event logged against it")
+def check_non_compliance_first_letter_case_events(context):
+    for case_id in context.non_compliance_first_letter_case_ids:
+        case_events = get_logged_events_for_case_by_id(case_id)
+        logged_events = [case_event['eventType'] for case_event in case_events]
+        test_helper.assertCountEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
+
+
+@step("each final warning letter case has a NON_COMPLIANCE event logged against it")
+def check_non_compliance_final_warning_letter_case_events(context):
+    for case_id in context.non_compliance_final_warning_letter_case_ids:
         case_events = get_logged_events_for_case_by_id(case_id)
         logged_events = [case_event['eventType'] for case_event in case_events]
         test_helper.assertCountEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])

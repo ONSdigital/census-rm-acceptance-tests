@@ -159,7 +159,7 @@ def create_expected_reminder_letter_csv_lines_for_non_compliance(context, pack_c
 
     expected_reminder_case_created_events = (case for case in context.case_created_events
                                              if
-                                             case['payload']['collectionCase']['id'] in context.non_compliance_case_ids)
+                                             case['payload']['collectionCase']['id'] in context.non_compliance_first_letter_case_ids)
 
     for case in expected_reminder_case_created_events:
         expected_data = _add_expected_case_data(case, expected_data)
