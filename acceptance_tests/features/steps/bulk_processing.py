@@ -590,8 +590,8 @@ def new_addresses_sent_to_field(context):
 
 @step("a bulk noncompliance first letter file is supplied")
 def bulk_non_compliance_first_letter_file(context):
-    context.non_compliance_first_letter_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
-                                                                                'non_compliance_first_letter_bulk_test.csv')
+    context.non_compliance_first_letter_bulk_file \
+        = RESOURCE_FILE_PATH.joinpath('bulk_processing_files', 'non_compliance_first_letter_bulk_test.csv')
 
     context.non_compliance_first_letter_case_ids = [case['payload']['collectionCase']['id'] for case in
                                                     context.case_created_events]
@@ -609,14 +609,15 @@ def bulk_non_compliance_first_letter_file(context):
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
         upload_file_to_bucket(context.non_compliance_first_letter_bulk_write,
-                              f'non_compliance_first_letter_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              f'non_compliance_first_letter_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
 
 
 @step("a bulk noncompliance final warning letter file is supplied")
 def bulk_non_compliance_final_warning_letter_file(context):
-    context.non_compliance_final_warning_letter_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
-                                                                                        'non_compliance_final_warning_letter_bulk_test.csv')
+    context.non_compliance_final_warning_letter_bulk_file \
+        = RESOURCE_FILE_PATH.joinpath('bulk_processing_files', 'non_compliance_final_warning_letter_bulk_test.csv')
 
     context.non_compliance_final_warning_letter_case_ids = [case['payload']['collectionCase']['id'] for
                                                             case in context.case_created_events]
@@ -635,7 +636,8 @@ def bulk_non_compliance_final_warning_letter_file(context):
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
         upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_write,
-                              f'non_compliance_final_warning_letter_acceptance_tests_{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              f'non_compliance_final_warning_letter_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
 
 
