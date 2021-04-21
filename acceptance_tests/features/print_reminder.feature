@@ -154,8 +154,8 @@ Feature: Scheduled reminder print and manifest files can be generated and upload
 
   Scenario Outline: Generate print files and log events for scheduled reminder letters checking for non compliance
     Given sample file "<sample file>" is loaded successfully
-    And a bulk noncompliance file is supplied
-    And the bulk noncompliance file is processed
+    And a bulk noncompliance first letter file is supplied
+    And the bulk noncompliance first letter file is processed
     When we schedule an action rule of type "<pack code>" with NCL and "<region>" classifiers
     Then correctly formatted "<pack code>" reminder letter print files are created for cases marked non compliance
     And there is a correct "<pack code>" manifest file for each csv file written
