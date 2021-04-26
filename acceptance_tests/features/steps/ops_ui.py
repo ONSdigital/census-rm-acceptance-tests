@@ -27,7 +27,7 @@ def rops_get_case_details_page(context):
 
 
 @step('a user navigates to the case details page for the chosen CCS case')
-def rops_get_case_details_page(context):
+def rops_get_CCS_case_details_page(context):
     context.case_details = context.first_case
     context.case_details_text = get_case_details_page(context.first_case['id']).text
     test_helper.assertIn('Link QID', context.case_details_text)
