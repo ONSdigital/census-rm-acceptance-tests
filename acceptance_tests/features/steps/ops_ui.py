@@ -22,11 +22,14 @@ def rops_home_page(context):
 @step('a user navigates to the case details page for the chosen case')
 def rops_get_case_details_page(context):
     context.case_details = context.case_created_events[0]['payload']['collectionCase']
-    case_details_page_response = requests.get(
-        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details?case_id={context.first_case["id"]}')
-    case_details_page_response.raise_for_status()
-    context.case_details_text = case_details_page_response.text
+    context.case_details_text = get_case_details_page(context.first_case['id']).text
+    test_helper.assertIn('Link QID', context.case_details_text)
 
+
+@step('a user navigates to the case details page for the chosen CCS case')
+def rops_get_case_details_page(context):
+    context.case_details = context.first_case
+    context.case_details_text = get_case_details_page(context.first_case['id']).text
     test_helper.assertIn('Link QID', context.case_details_text)
 
 
@@ -89,6 +92,8 @@ def submit_qid_link_on_r_ops(context):
 
 @step('the user submits a QID to be linked to the case')
 @step("the user enters a QID they would like to link to the case")
+@step('the user submits the CCS QID to be linked to the case')
+@step('the user submits the non CCS QID to be linked to the case')
 def get_case_details_link_qid(context):
     context.qid_link_response = get_rops_qid_link_page(case_id=context.case_details['id'], qid=context.requested_qid)
     test_helper.assertEqual(context.qid_link_response.status_code, 200)
@@ -123,6 +128,20 @@ def qid_failed_message(context):
     response_text = context.qid_link_response.text
 
     test_helper.assertIn('QID does not exist in RM', response_text)
+
+
+@then('an error message telling them linking a CCS QID to a non CCS case is forbidden is flashed')
+def linking_ccs_qid_to_census_case_forbidden_message(context):
+    response_text = context.qid_link_response.text
+
+    test_helper.assertIn('Linking a CCS QID to a non CCS case is forbidden', response_text)
+
+
+@then('an error message telling them linking a non CCS QID to a CCS case is forbidden is flashed')
+def linking_non_ccs_qid_to_ccs_case_forbidden_message(context):
+    response_text = context.qid_link_response.text
+
+    test_helper.assertIn('Linking a non CCS QID to a CCS case is forbidden', response_text)
 
 
 @then("the QID details page is flashed")
@@ -166,3 +185,10 @@ def check_correct_uac_updated_message_is_emitted_for_rops_link(context):
                             'UAC updated event case ID does not match the case it was requested for')
     test_helper.assertEqual(uac_updated_payload['questionnaireId'], context.requested_qid,
                             'UAC updated event QID does not match what was submitted to R-ops')
+
+
+def get_case_details_page(case_id):
+    case_details_page_response = requests.get(
+        f'{Config.PROTOCOL}://{Config.ROPS_HOST}:{Config.ROPS_PORT}/case-details?case_id={case_id}')
+    case_details_page_response.raise_for_status()
+    return case_details_page_response
