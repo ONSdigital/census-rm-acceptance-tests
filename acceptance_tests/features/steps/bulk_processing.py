@@ -718,3 +718,59 @@ def check_non_compliance_final_warning_letter_case_events(context):
         case_events = get_logged_events_for_case_by_id(case_id)
         logged_events = [case_event['eventType'] for case_event in case_events]
         test_helper.assertCountEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
+
+
+@step("a bulk questionnaire link file is supplied linking these cases and QIDs")
+def bulk_questionnaire_link_file(context):
+    context.questionnaire_link_bulk_file \
+        = RESOURCE_FILE_PATH.joinpath('bulk_processing_files', 'questionnaire_link_bulk_test.csv')
+
+    context.questionnaire_link_case_ids = [case['payload']['collectionCase']['id'] for
+                                           case in context.case_created_events]
+
+    with open(context.questionnaire_link_bulk_file,
+              'w') as questionnaire_link_bulk_write:
+        writer = csv.DictWriter(questionnaire_link_bulk_write,
+                                fieldnames=['CASE_ID', 'QUESTIONNAIRE_ID'])
+        writer.writeheader()
+
+        for i, case_id in enumerate(context.questionnaire_link_case_ids):
+            writer.writerow(
+                {'CASE_ID': case_id, 'QUESTIONNAIRE_ID': context.unlinked_uacs[i]})
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_QUESTIONNAIRE_LINK_BUCKET_NAME:
+        clear_bucket(Config.BULK_QUESTIONNAIRE_LINK_BUCKET_NAME)
+        upload_file_to_bucket(context.questionnaire_link_bulk_write,
+                              f'questionnaire_link_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_QUESTIONNAIRE_LINK_BUCKET_NAME)
+
+
+@step("the bulk questionnaire link file is processed")
+def bulk_questionnaire_link_processed(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_QUESTIONNAIRE_LINK_BUCKET_NAME:
+        BulkProcessor(QuestionnaireLinkProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.questionnaire_link_bulk_file):
+        BulkProcessor(QuestionnaireLinkProcessor()).run()
+
+
+@step("UAC_UPDATED messages are emitted for all the supplied QIDs linking them to the cases")
+def check_non_compliance_final_warning_letter_bulk_updates(context):
+    uac_updated_events = get_uac_updated_events(context, len(context.unlinked_uacs))
+
+    updated_uacs = [event['payload']['uac'] for event in uac_updated_events]
+
+    linked_case_ids = context.questionnaire_link_case_ids.copy()
+
+    for updated_uac in updated_uacs:
+        for case_id in linked_case_ids:
+            if updated_uac['case_id'] == case_id:
+                # Remove each matching case ID we find
+                linked_case_ids.remove(case_id)
+
+    test_helper.assertEqual(len(linked_case_ids), 0, 'Should have received an UAC_UPDATED event for all expected case IDs')
