@@ -609,7 +609,7 @@ def bulk_non_compliance_first_letter_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
-        upload_file_to_bucket(context.non_compliance_first_letter_bulk_write,
+        upload_file_to_bucket(context.non_compliance_first_letter_bulk_file,
                               f'non_compliance_first_letter_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
@@ -636,7 +636,7 @@ def bulk_non_compliance_final_warning_letter_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
-        upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_write,
+        upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_file,
                               f'non_compliance_final_warning_letter_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
@@ -726,22 +726,21 @@ def bulk_questionnaire_link_file(context):
     context.qid_link_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
                                                              'questionnaire_link_bulk_test.csv')
 
-    context.questionnaire_link_case_ids = [case['payload']['collectionCase']['id'] for
-                                           case in context.case_created_events]
+    context.qid_link_case_ids = [case['payload']['collectionCase']['id'] for
+                                 case in context.case_created_events]
 
-    with open(context.qid_link_bulk_file, 'w') as questionnaire_link_bulk_write:
-        writer = csv.DictWriter(questionnaire_link_bulk_write,
-                                fieldnames=['case_id', 'qid'])
+    with open(context.qid_link_bulk_file, 'w') as qid_link_bulk_write:
+        writer = csv.DictWriter(qid_link_bulk_write, fieldnames=['case_id', 'qid'])
         writer.writeheader()
 
-        for i, case_id in enumerate(context.questionnaire_link_case_ids):
+        for i, case_id in enumerate(context.qid_link_case_ids):
             writer.writerow(
                 {'case_id': case_id, 'qid': context.unlinked_uacs[i]['payload']['uac']['questionnaireId']})
 
     # Upload the file to a real bucket if one is configured
     if Config.BULK_QID_LINK_BUCKET_NAME:
         clear_bucket(Config.BULK_QID_LINK_BUCKET_NAME)
-        upload_file_to_bucket(context.questionnaire_link_bulk_write,
+        upload_file_to_bucket(context.qid_link_bulk_file,
                               f'questionnaire_link_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_QID_LINK_BUCKET_NAME)

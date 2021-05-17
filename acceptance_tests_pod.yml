@@ -276,6 +276,26 @@ spec:
         configMapKeyRef:
           name: bulk-processing-config
           key: bulk-uninvalidated-address-bucket-name
+    - name: BULK_NON_COMPLIANCE_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-non-compliance-project-id
+    - name: BULK_NON_COMPLIANCE_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-non-compliance-bucket-name
+    - name: BULK_QID_LINK_PROJECT_ID
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-qid-link-project-id
+    - name: BULK_QID_LINK_BUCKET_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: bulk-processing-config
+          key: bulk-qid-link-bucket-name
   volumes:
   - name: case-cloud-sql-certs
     secret:

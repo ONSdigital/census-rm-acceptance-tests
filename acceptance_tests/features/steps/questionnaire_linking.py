@@ -203,7 +203,7 @@ def check_for_uac_updates_linking_cases(context):
 
     updated_uacs = [event['payload']['uac'] for event in uac_updated_events]
 
-    linked_case_ids = context.questionnaire_link_case_ids.copy()
+    linked_case_ids = context.qid_link_case_ids.copy()
 
     for updated_uac in updated_uacs:
         for case_id in linked_case_ids:
