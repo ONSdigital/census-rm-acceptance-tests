@@ -12,7 +12,7 @@ python_version = "3.7"
 
 [packages]
 census-rm-sample-loader = {editable = true,git = "https://github.com/ONSdigital/census-rm-sample-loader",ref = "b4701466838cdc740a12dacbbcf3f45decac9273"}
-toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "02f40e2aa67b1c773744728ab7d7fe37b5fd256f"} # TODO ref must be master commit before merge
+toolbox = {editable = true,git = "https://github.com/ONSdigital/census-rm-toolbox",ref = "17eeae06f859091805e3fd3d5f8e620500af6741"}
 pgpy = "*"
 google-cloud-storage = "*"
 psycopg2-binary = "*"
