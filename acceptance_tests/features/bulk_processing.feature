@@ -72,6 +72,13 @@ Feature: Bulk event CSV files can be processed
     Then CASE_UPDATED events are emitted for all the cases in the final warning letter file with noncompliance set
     And each final warning letter case has a NON_COMPLIANCE event logged against it
 
+  Scenario: A bulk questionnaire linking file is successfully ingested
+    Given sample file "sample_input_wales_census_spec.csv" is loaded successfully
+    And an unaddressed QID request message of type "02" is received for every loaded case and resulting unlinked UAC_UPDATED message are sent
+    And a bulk questionnaire link file is supplied linking these cases and QIDs
+    When the bulk questionnaire link file is processed
+    Then UAC_UPDATED messages are emitted for all the supplied QIDs linking them to the cases
+
 #    HERE BE DRAGONS! This is a hack which was forced onto us. Read more here: https://trello.com/c/i6xdQWau/1628-field-address-update-create-update-decision-hack-13
   Scenario: HACK 1: address update on new address from CC/RH with existing uprn (no sourceid, so no oa) (no coordid) -> CREATE
     Given a NEW_ADDRESS_REPORTED event is sent from "CC" without sourceCaseId and new case is emitted

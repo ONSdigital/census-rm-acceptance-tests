@@ -56,6 +56,15 @@ def check_uac_message_is_received_step(context):
     check_uac_message_is_received(context)
 
 
+@step('an unaddressed QID request message of type "{qid_type}" is received for every loaded case '
+      'and resulting unlinked UAC_UPDATED message are sent')
+def send_unaddressed_qid_request_for_every_case(context, qid_type):
+    context.unlinked_uacs = []
+    for _ in context.case_created_events:
+        send_unaddressed_message_and_uac_emitted(context, qid_type)
+        context.unlinked_uacs.append(context.uac_message_received)
+
+
 @when("the unaddressed batch is loaded, the print files are generated")
 def validate_unaddressed_print_file(context):
     try:

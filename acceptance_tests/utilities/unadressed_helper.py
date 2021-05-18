@@ -37,6 +37,7 @@ def check_uac_message_is_received(context):
                                     functools.partial(_uac_callback, context=context))
 
     test_helper.assertTrue(context.expected_message_received)
+    context.uac_message_received = context.messages_received[0]
 
 
 def _uac_callback(ch, method, _properties, body, context):

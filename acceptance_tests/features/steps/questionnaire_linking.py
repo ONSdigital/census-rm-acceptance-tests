@@ -195,3 +195,22 @@ def _send_individual_hh_questionnaire_linked_msg_to_rabbit(questionnaire_id, cas
             message=json.dumps(questionnaire_linked_message),
             content_type='application/json',
             routing_key=Config.RABBITMQ_QUESTIONNAIRE_LINKED_ROUTING_KEY)
+
+
+@step("UAC_UPDATED messages are emitted for all the supplied QIDs linking them to the cases")
+def check_for_uac_updates_linking_cases(context):
+    uac_updated_events = get_uac_updated_events(context, len(context.unlinked_uacs))
+
+    updated_uacs = [event['payload']['uac'] for event in uac_updated_events]
+
+    linked_case_ids = context.qid_link_case_ids.copy()
+
+    for updated_uac in updated_uacs:
+        for case_id in linked_case_ids:
+            if updated_uac['caseId'] == case_id:
+                # Remove each matching case ID we find
+                linked_case_ids.remove(case_id)
+
+    test_helper.assertEqual(len(linked_case_ids), 0,
+                            f'Should have received an UAC_UPDATED event linking all expected case IDs, '
+                            f'did not see links for these case IDs: {linked_case_ids}')

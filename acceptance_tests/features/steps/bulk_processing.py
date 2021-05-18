@@ -17,6 +17,7 @@ from toolbox.bulk_processing.deactivate_uac_processor import DeactivateUacProces
 from toolbox.bulk_processing.invalid_address_processor import InvalidAddressProcessor
 from toolbox.bulk_processing.new_address_processor import NewAddressProcessor
 from toolbox.bulk_processing.non_compliance_processor import NonComplianceProcessor
+from toolbox.bulk_processing.qid_link_processor import QidLinkProcessor
 from toolbox.bulk_processing.refusal_processor import RefusalProcessor
 from toolbox.bulk_processing.uninvalidate_address_processor import UnInvalidateAddressProcessor
 
@@ -608,7 +609,7 @@ def bulk_non_compliance_first_letter_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
-        upload_file_to_bucket(context.non_compliance_first_letter_bulk_write,
+        upload_file_to_bucket(context.non_compliance_first_letter_bulk_file,
                               f'non_compliance_first_letter_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
@@ -635,7 +636,7 @@ def bulk_non_compliance_final_warning_letter_file(context):
     # Upload the file to a real bucket if one is configured
     if Config.BULK_NON_COMPLIANCE_BUCKET_NAME:
         clear_bucket(Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
-        upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_write,
+        upload_file_to_bucket(context.non_compliance_final_warning_letter_bulk_file,
                               f'non_compliance_final_warning_letter_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_NON_COMPLIANCE_BUCKET_NAME)
@@ -718,3 +719,40 @@ def check_non_compliance_final_warning_letter_case_events(context):
         case_events = get_logged_events_for_case_by_id(case_id)
         logged_events = [case_event['eventType'] for case_event in case_events]
         test_helper.assertCountEqual(logged_events, ['SELECTED_FOR_NON_COMPLIANCE', 'SAMPLE_LOADED'])
+
+
+@step("a bulk questionnaire link file is supplied linking these cases and QIDs")
+def bulk_questionnaire_link_file(context):
+    context.qid_link_bulk_file = RESOURCE_FILE_PATH.joinpath('bulk_processing_files',
+                                                             'questionnaire_link_bulk_test.csv')
+
+    context.qid_link_case_ids = [case['payload']['collectionCase']['id'] for
+                                 case in context.case_created_events]
+
+    with open(context.qid_link_bulk_file, 'w') as qid_link_bulk_write:
+        writer = csv.DictWriter(qid_link_bulk_write, fieldnames=['case_id', 'qid'])
+        writer.writeheader()
+
+        for i, case_id in enumerate(context.qid_link_case_ids):
+            writer.writerow(
+                {'case_id': case_id, 'qid': context.unlinked_uacs[i]['payload']['uac']['questionnaireId']})
+
+    # Upload the file to a real bucket if one is configured
+    if Config.BULK_QID_LINK_BUCKET_NAME:
+        clear_bucket(Config.BULK_QID_LINK_BUCKET_NAME)
+        upload_file_to_bucket(context.qid_link_bulk_file,
+                              f'questionnaire_link_acceptance_tests_'
+                              f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
+                              Config.BULK_QID_LINK_BUCKET_NAME)
+
+
+@step("the bulk questionnaire link file is processed")
+def bulk_questionnaire_link_processed(context):
+    # Run against the real bucket if it is configured
+    if Config.BULK_QID_LINK_BUCKET_NAME:
+        BulkProcessor(QidLinkProcessor()).run()
+        return
+
+    # If we don't have a bucket, mock the storage bucket client interactions to work with only local files
+    with mock_bulk_processor_bucket(context.qid_link_bulk_file):
+        BulkProcessor(QidLinkProcessor()).run()
