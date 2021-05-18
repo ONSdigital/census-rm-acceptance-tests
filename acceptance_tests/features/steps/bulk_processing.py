@@ -741,7 +741,7 @@ def bulk_questionnaire_link_file(context):
     if Config.BULK_QID_LINK_BUCKET_NAME:
         clear_bucket(Config.BULK_QID_LINK_BUCKET_NAME)
         upload_file_to_bucket(context.qid_link_bulk_file,
-                              f'questionnaire_link_acceptance_tests_'
+                              f'qid_link_acceptance_tests_'
                               f'{datetime.utcnow().strftime("%Y%m%d-%H%M%S")}.csv',
                               Config.BULK_QID_LINK_BUCKET_NAME)
 
