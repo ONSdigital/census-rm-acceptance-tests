@@ -226,15 +226,14 @@ def check_uac_update_msgs_emitted_with_qid_active_for_individual(context, active
             test_helper.assertEqual(emitted_uac['qid'][:2], context.expected_questionnaire_type)
 
 
-@step("a CASE_UPDATE message is emitted for the individual with case type {caseType}")
-def check_case_updated_emitted_for_new_case_individual(context, caseType):
+@step("a CASE_UPDATE message is emitted for the individual with case type HI")
+def check_case_updated_emitted_for_new_case_individual(context):
     emitted_case = get_emitted_case_update_by_correlation_id(context.correlation_id, context.originating_user,
                                                              context.test_start_utc_datetime)
     context.case_id = emitted_case['caseId']
     context.emitted_cases = [emitted_case]
-    context.emitted_caseType = '"' + emitted_case['caseType'] + '"'
-    test_helper.assertEqual(context.emitted_caseType, caseType, f'The emitted case type, {emitted_case['caseType']}'
-                                                                f'does not match the case type  {caseType}')
+    test_helper.assertEqual(emitted_case['caseType'], 'HI', f'The emitted case type, {emitted_case['caseType']}'
+                            f'does not match the case type HI')
 
 
 @step("a CASE_UPDATE message is emitted for the individual with given individual caseId")
