@@ -5,3 +5,7 @@ setup_deactivate_uac_action_rule  # unused function (acceptance_tests/utilities/
 get_emitted_survey_update_by_id  # unused function (acceptance_tests/utilities/event_helper.py:109)
 read_sample  # unused function (acceptance_tests/utilities/sample_helper.py:6)
 build_expected_fulfilment_personalisation  # unused function (acceptance_tests/utilities/fulfilment_helper.py:6)
+get_exact_number_of_pubsub_messages  # unused function (acceptance_tests/utilities/pubsub_helper.py:131)
+get_matching_pubsub_message_acking_others  # unused function (acceptance_tests/utilities/pubsub_helper.py:141)
+get_messages_on_subscription  # unused function (acceptance_tests/utilities/pubsub_helper.py:231)
+
