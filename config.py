@@ -25,6 +25,8 @@ class Config:
     PUBSUB_NEW_CASE_TOPIC = os.getenv('PUBSUB_NEW_CASE_TOPIC', 'event_new-case')  # noqa: F841
     PUBSUB_CLOUD_TASK_QUEUE_AT_SUBSCRIPTION = os.getenv('PUBSUB_CLOUD_TASK_QUEUE_AT_SUBSCRIPTION',
                                                         'cloud_task_queue_at')
+    PUBSUB_FIELDWORK_ACTION_SUBSCRIPTION = os.getenv('PUBSUB_FIELDWORK_ACTION_SUBSCRIPTION',
+                                                     'event_fieldwork-action-instruction_at')
     PUBSUB_DEFAULT_PULL_TIMEOUT = int(os.getenv('PUBSUB_DEFAULT_PULL_TIMEOUT', 120))
     PUBSUB_FULFILMENT_REQUEST_TOPIC = os.getenv('PUBSUB_FULFILMENT_REQUEST_TOPIC', 'event_fulfilment-request')
 

@@ -18,7 +18,8 @@ subscriptions = [Config.PUBSUB_OUTBOUND_SURVEY_SUBSCRIPTION,
                  Config.PUBSUB_OUTBOUND_COLLECTION_EXERCISE_SUBSCRIPTION,
                  Config.PUBSUB_OUTBOUND_UAC_SUBSCRIPTION,
                  Config.PUBSUB_OUTBOUND_CASE_SUBSCRIPTION,
-                 Config.PUBSUB_CLOUD_TASK_QUEUE_AT_SUBSCRIPTION, ]
+                 Config.PUBSUB_CLOUD_TASK_QUEUE_AT_SUBSCRIPTION,
+                 Config.PUBSUB_FIELDWORK_ACTION_SUBSCRIPTION, ]
 
 
 def publish_to_pubsub(message, project, topic, **kwargs):
@@ -225,3 +226,43 @@ def get_matching_pubsub_messages_acking_others(subscription,
         )
 
     return matching_messages
+
+
+def get_messages_on_subscription(subscription, start_time, timeout=Config.PUBSUB_DEFAULT_PULL_TIMEOUT):
+    """
+    Pull all available messages from a subscription within the timeout period.
+
+    Args:
+        subscription: PubSub subscription name
+        start_time: Start time for filtering messages (optional, used for logging context)
+        timeout: Time to attempt pulling messages
+
+    Returns:
+        List of parsed message dictionaries
+    """
+    subscriber = pubsub_v1.SubscriberClient()
+    subscription_path = subscriber.subscription_path(Config.PUBSUB_PROJECT, subscription)
+    deadline = time.time() + timeout
+    all_messages = []
+
+    while time.time() < deadline:
+        try:
+            response = subscriber.pull(subscription=subscription_path, max_messages=100, timeout=1)
+        except DeadlineExceeded:
+            continue
+
+        if not response.received_messages:
+            continue
+
+        ack_ids = []
+        for message in response.received_messages:
+            ack_ids.append(message.ack_id)
+            try:
+                parsed_message = json.loads(message.message.data.decode('utf-8'))
+                all_messages.append(parsed_message)
+            except Exception as e:
+                logger.error(f'Failed to parse message: {e}')
+
+        subscriber.acknowledge(subscription=subscription_path, ack_ids=ack_ids)
+
+    return all_messages
