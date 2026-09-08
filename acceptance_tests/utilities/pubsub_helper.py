@@ -228,13 +228,12 @@ def get_matching_pubsub_messages_acking_others(subscription,
     return matching_messages
 
 
-def get_messages_on_subscription(subscription, start_time, timeout=Config.PUBSUB_DEFAULT_PULL_TIMEOUT):
+def get_messages_on_subscription(subscription, timeout=Config.PUBSUB_DEFAULT_PULL_TIMEOUT):
     """
     Pull all available messages from a subscription within the timeout period.
 
     Args:
         subscription: PubSub subscription name
-        start_time: Start time for filtering messages (optional, used for logging context)
         timeout: Time to attempt pulling messages
 
     Returns:

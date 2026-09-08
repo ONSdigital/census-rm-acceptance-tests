@@ -32,9 +32,6 @@ def emit_case_update_for_exclusion_case(context, case_status, instruction):
     context.case_update_event = context.target_case.copy()
     context.case_update_event['fieldActionInstruction'] = instruction
 
-    # Store the time before publishing for message lookup
-    context.case_update_published_time = context.test_start_utc_datetime
-
 
 @step('no fieldwork {instruction_type} action message is sent for the case')
 def verify_no_fieldwork_message_sent(context, instruction_type):
@@ -45,7 +42,6 @@ def verify_no_fieldwork_message_sent(context, instruction_type):
     try:
         messages = get_messages_on_subscription(
             subscription_name,
-            start_time=context.case_update_published_time,
             timeout=10
         )
 
