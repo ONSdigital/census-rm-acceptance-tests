@@ -250,3 +250,14 @@ def get_logged_events_for_case_by_id(case_id: str) -> list[dict]:
         columns = [col[0] for col in cur.description]
         results = [dict(zip(columns, row)) for row in cur.fetchall()]
         return results
+
+
+def check_uac_update_msgs_emitted_with_qid_active_match(emitted_cases: List[Mapping],
+                                                        correlation_id: str,
+                                                        active: bool,
+                                                        test_start_time: datetime):
+    emitted_uacs = get_uac_update_events(len(emitted_cases), correlation_id, None, test_start_time=test_start_time)
+    _check_uacs_updated_match_cases(emitted_uacs, emitted_cases)
+    _check_new_uacs_are_as_expected(emitted_uacs, active)
+
+    return emitted_uacs
