@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 from behave import step
 
 from acceptance_tests.utilities.collex_helper import add_collex
-from acceptance_tests.utilities.event_helper import get_emitted_cases, get_number_of_uac_update_events
+from acceptance_tests.utilities.event_helper import get_emitted_cases
 from acceptance_tests.utilities.file_to_process_upload_helper import upload_and_process_file_by_api
 from acceptance_tests.utilities.survey_helper import add_survey
 from acceptance_tests.utilities.test_case_helper import test_helper
@@ -49,6 +49,3 @@ def load_sample(context, sample_file_name):
     upload_and_process_file_by_api(context.collex_id, sample_file_path, 'SAMPLE')
 
     context.emitted_cases = get_emitted_cases_and_check_against_sample(sample_rows, context.test_start_utc_datetime)
-    
-    # Consume UAC_UPDATE events generated during sample loading to avoid leaving messages on the subscription
-    get_number_of_uac_update_events(len(sample_rows), context.test_start_utc_datetime)
