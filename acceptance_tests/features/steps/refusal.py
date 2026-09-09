@@ -40,7 +40,7 @@ def _send_refusal_message(correlation_id, originating_user, case_id):
                 "messageId": str(uuid.uuid4()),
                 "correlationId": correlation_id,
                 "originatingUser": originating_user,
-                "messageType": "REFUSAL"
+                "messageType": "REFUSAL_RECEIVED"
             },
             "payload": {
                 "refusal": {
