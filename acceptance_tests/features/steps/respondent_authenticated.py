@@ -11,7 +11,6 @@ from config import Config
 @step('a RESPONDENT_AUTHENTICATED event is received')
 def send_respondent_authenticated(context):
     context.correlation_id = str(uuid.uuid4())
-    context.originating_user = "test@test.com"
     message = _send_respondent_authenticated_msg(context.correlation_id,
                                                  context.emitted_uacs[0]['questionnaireId'])
     context.sent_messages.append(message)
