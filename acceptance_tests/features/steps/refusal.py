@@ -23,23 +23,22 @@ def send_bad_refusal_message(context):
 def send_refusal(context):
     context.correlation_id = str(uuid.uuid4())
     context.originating_user = add_random_suffix_to_email(context.scenario_name)
-    message = _send_refusal_message(context.correlation_id, context.originating_user,
+    message = _send_refusal_message(context.correlation_id,
                                     context.emitted_cases[0]['caseId'])
     context.sent_messages.append(message)
 
 
-def _send_refusal_message(correlation_id, originating_user, case_id):
+def _send_refusal_message(correlation_id, case_id):
     message = json.dumps(
         {
             "header": {
                 "version": Config.EVENT_SCHEMA_VERSION,
                 "topic": Config.PUBSUB_REFUSAL_TOPIC,
-                "source": "RH",
-                "channel": "RH",
+                "source": "CONTACT_CENTRE_API",
+                "channel": "CC",
                 "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
                 "messageId": str(uuid.uuid4()),
                 "correlationId": correlation_id,
-                "originatingUser": originating_user,
                 "messageType": "REFUSAL_RECEIVED"
             },
             "payload": {

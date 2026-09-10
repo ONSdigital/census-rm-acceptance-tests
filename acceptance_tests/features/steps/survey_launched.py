@@ -13,7 +13,7 @@ from config import Config
 @step('an SURVEY_LAUNCHED event is received')
 def send_survey_launched(context):
     _set_survey_launched_message_context(context)
-    message = _send_survey_launched_msg(context.correlation_id, context.originating_user,
+    message = _send_survey_launched_msg(context.correlation_id,
                                         context.emitted_uacs[0]['qid'])
     context.sent_messages.append(message)
 
@@ -51,7 +51,6 @@ def _send_survey_launched_msg(correlation_id, originating_user, qid):
                 "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
                 "messageId": str(uuid.uuid4()),
                 "correlationId": correlation_id,
-                "originatingUser": originating_user,
                 "messageType": "SURVEY_LAUNCHED",
             },
             "payload": {

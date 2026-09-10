@@ -27,7 +27,7 @@ def bad_receipt_received_put_on_topic(context):
     context.sent_messages.append(message)
 
 
-def _send_receipt_received_msg(correlation_id, originating_user, qid):
+def _send_receipt_received_msg(correlation_id, qid):
     message = json.dumps(
         {
             "header": {
@@ -38,7 +38,6 @@ def _send_receipt_received_msg(correlation_id, originating_user, qid):
                 "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
                 "messageId": str(uuid.uuid4()),
                 "correlationId": correlation_id,
-                "originatingUser": originating_user,
                 "messageType": "RECEIPT",
             },
             "payload": {

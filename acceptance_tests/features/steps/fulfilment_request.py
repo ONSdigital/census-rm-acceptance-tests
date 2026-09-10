@@ -25,7 +25,6 @@ def request_print_fulfilment_step(context):
             "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
             "messageId": str(uuid.uuid4()),
             "correlationId": context.correlation_id,
-            "originatingUser": context.originating_user,
             "messageType": "FULFILMENT_REQUEST",
         },
         "payload": {
@@ -120,7 +119,6 @@ def request_uac_by_sms_fulfilment(context, phone_number):
             "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
             "messageId": str(uuid.uuid4()),
             "correlationId": context.correlation_id,
-            "originatingUser": context.originating_user,
             "messageType": "FULFILMENT_REQUEST",
         },
         "payload": {
@@ -171,7 +169,6 @@ def request_print_fulfilment_step_with_individual_case_id(context):
             "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
             "messageId": str(uuid.uuid4()),
             "correlationId": context.correlation_id,
-            "originatingUser": context.originating_user,
             "messageType": "FULFILMENT_REQUEST",
         },
         "payload": {
@@ -209,7 +206,6 @@ def request_uac_by_sms_fulfilment_with_individual_case_id(context, phone_number)
             "dateTime": f'{datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}Z',
             "messageId": str(uuid.uuid4()),
             "correlationId": context.correlation_id,
-            "originatingUser": context.originating_user,
             "messageType": "FULFILMENT_REQUEST",
         },
         "payload": {
