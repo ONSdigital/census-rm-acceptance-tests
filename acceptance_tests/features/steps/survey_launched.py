@@ -14,7 +14,7 @@ from config import Config
 def send_survey_launched(context):
     _set_survey_launched_message_context(context)
     message = _send_survey_launched_msg(context.correlation_id,
-                                        context.emitted_uacs[0]['qid'])
+                                        context.emitted_uacs[0]['questionnaireId'])
     context.sent_messages.append(message)
 
 
@@ -23,7 +23,7 @@ def send_survey_launched_for_all_emitted_uacs(context):
     _set_survey_launched_message_context(context)
 
     for emitted_uac in context.emitted_uacs:
-        message = _send_survey_launched_msg(context.correlation_id, context.originating_user, emitted_uac['qid'])
+        message = _send_survey_launched_msg(context.correlation_id, emitted_uac['questionnaireId'])
         context.sent_messages.append(message)
 
 
