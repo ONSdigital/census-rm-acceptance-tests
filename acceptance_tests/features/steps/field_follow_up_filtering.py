@@ -11,21 +11,21 @@ def step_case_events_sent_to_adapter(context):
     """
     Validate that case events are ready to be sent to the fieldwork adapter.
 
-    This step verifies that the system is ready to process case events through 
+    This step verifies that the system is ready to process case events through
     the fieldwork adapter by checking that cases have been loaded with proper attributes.
-    
+
     The actual event processing happens in the adapter, and we verify the results
     in the THEN steps via pub/sub subscription checks.
     """
     # Get the cases from context (set by previous Given/And steps)
     cases = getattr(context, 'emitted_cases', None)
-    
+
     # Verify that cases were loaded in previous steps
     if cases is None:
         # Cases might not be set if this runs before sample loading completes
         # This is OK - the THEN steps will verify the final state
         return
-    
+
     # Basic validations if cases exist
     if len(cases) > 0:
         # Verify at least some cases have the expected structure
