@@ -1,4 +1,4 @@
-from behave import when, then
+from behave import step
 
 from acceptance_tests.utilities.event_helper import ignored_case_ids
 from acceptance_tests.utilities.pubsub_helper import get_exact_number_of_pubsub_messages
@@ -6,7 +6,7 @@ from acceptance_tests.utilities.test_case_helper import test_helper
 from config import Config
 
 
-@when('case events are sent to the fieldwork adapter')
+@step('case events are sent to the fieldwork adapter')
 def step_case_events_sent_to_adapter(context):
     """
     Validate that case events are ready to be sent to the fieldwork adapter.
@@ -37,7 +37,7 @@ def step_case_events_sent_to_adapter(context):
                 msg='Cases should have region in address')
 
 
-@then('a create message will not be generated for field')
+@step('a create message will not be generated for field')
 def step_create_message_not_generated(context):
     """
     Verify no CREATE fieldwork action instruction messages are sent for excluded cases.
@@ -60,7 +60,7 @@ def step_create_message_not_generated(context):
             test_start_time=context.test_start_utc_datetime)
 
 
-@then('an update message will not be generated for field')
+@step('an update message will not be generated for field')
 def step_update_message_not_generated(context):
     """
     Verify no UPDATE fieldwork action instruction messages are sent for excluded cases.
